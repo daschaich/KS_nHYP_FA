@@ -282,16 +282,14 @@ void make_fields() {
   FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
   FIELD_ALLOC_MAT(SigmaH2, su3_matrix, 4, 4);
 
-  FIELD_ALLOC(tempmat1, su3_matrix);
+  FIELD_ALLOC(tempmat, su3_matrix);
+  FIELD_ALLOC(tempmat2, su3_matrix);
   FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
   FIELD_ALLOC_VEC(LambdaU, su3_matrix, 4);
   FIELD_ALLOC_VEC(Lambda1, su3_matrix, 4);
   FIELD_ALLOC_VEC(Lambda2, su3_matrix, 4);
   FIELD_ALLOC_VEC(SigmaH, su3_matrix, 4);
-
   FIELD_ALLOC_VEC(Sigma, su3_matrix, 4);
-
-  FIELD_ALLOC(tempmat2, su3_matrix);
 
   node0_printf("Mallocing %.1f MBytes per node for fields\n",
                (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);

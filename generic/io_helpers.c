@@ -14,8 +14,8 @@ gauge_file *save_lattice(int flag, char *filename, char *stringLFN) {
   gauge_file *gf = NULL;
 
 #ifndef NOLINKS
-  d_plaquette(&g_ssplaq,&g_stplaq);
-  d_linktrsum(&linktrsum);
+  plaquette(&g_ssplaq, &g_stplaq);
+  linktrsum(&linktr);
   nersc_checksum = nersc_cksum();
 #endif
 
@@ -112,16 +112,16 @@ gauge_file *save_lattice(int flag, char *filename, char *stringLFN) {
   }
   dtime += dclock();
   if (flag != FORGET)
-    node0_printf("Time to save = %e\n", dtime);
+    node0_printf("Time to save = %.4g seconds\n", dtime);
 #if PRECISION == 1
   node0_printf("CHECK PLAQ: %e %e\n", g_ssplaq, g_stplaq);
   node0_printf("CHECK NERSC LINKTR: %e CKSUM: %x\n",
-               linktrsum.real / 3.0, nersc_checksum);
+               linktr.real / 3.0, nersc_checksum);
 #else
   // Double precision
   node0_printf("CHECK PLAQ: %.16e %.16e\n", g_ssplaq, g_stplaq);
   node0_printf("CHECK NERSC LINKTR: %.16e CKSUM: %x\n",
-               linktrsum.real / 3.0, nersc_checksum);
+               linktr.real / 3.0, nersc_checksum);
 #endif
   return gf;
 }
@@ -216,42 +216,42 @@ gauge_file *reload_lattice(int flag, char *filename) {
   }
   dtime += dclock();
   if (flag != FRESH && flag != CONTINUE)
-    node0_printf("Time to reload gauge configuration = %e\n", dtime);
+    node0_printf("Time to reload gauge configuration = %.4g seconds\n", dtime);
 #ifdef SCHROED_FUN
   set_boundary_fields();
 #endif
 #ifndef NOLINKS
-  d_plaquette(&g_ssplaq, &g_stplaq);
-  d_linktrsum(&linktrsum);
+  plaquette(&g_ssplaq, &g_stplaq);
+  linktrsum(&linktr);
   nersc_checksum = nersc_cksum();
 #endif
 #if PRECISION == 1
     node0_printf("CHECK PLAQ: %e %e\n",g_ssplaq, g_stplaq);
     node0_printf("CHECK NERSC LINKTR: %e CKSUM: %x\n",
-                 linktrsum.real/3.,nersc_checksum);
+                 linktr.real / 3.0, nersc_checksum);
 #else               // Double precision
     node0_printf("CHECK PLAQ: %.16e %.16e\n",g_ssplaq, g_stplaq);
     node0_printf("CHECK NERSC LINKTR: %.16e CKSUM: %x\n",
-                 linktrsum.real / 3.0, nersc_checksum);
+                 linktr.real / 3.0, nersc_checksum);
 #endif
   fflush(stdout);
+
   dtime = -dclock();
 #ifndef NO_UNIT_CHECK   // Don't check unitarity for blocked links
   max_deviation = check_unitarity();
   g_floatmax(&max_deviation);
-#if (PRECISION==1)
-  if (this_node==0)printf("Unitarity checked.  Max deviation %.2e\n",
-      max_deviation); fflush(stdout);
+#if PRECISION == 1
+  node0_printf("Unitarity checked.  Max deviation %.2g\n", max_deviation);
 #else
   reunitarize();
   max_deviation2 = check_unitarity();
   g_floatmax(&max_deviation2);
-  if (this_node==0)
-    printf("Reunitarized for double precision. Max deviation %.2e changed to %.2e\n",
-        max_deviation,max_deviation2); fflush(stdout);
+  node0_printf("Reunitarized for double precision. Max deviation %.2g changed to %.2g\n",
+               max_deviation, max_deviation2);
 #endif
+  fflush(stdout);
   dtime += dclock();
-  if (this_node==0)printf("Time to check unitarity = %e\n",dtime);
+  node0_printf("Time to check unitarity = %.4g seconds\n", dtime);
 #endif
   return gf;
 }
@@ -264,8 +264,8 @@ char *get_next_tag(FILE *fp, char *tag, char *myname){
 
   while(1){
     s = fscanf(fp, "%s",line);
-    if (s == EOF){
-      printf("%s(%d): EOF on input.\n",myname,this_node);
+    if (s == EOF) {
+      printf("%s(%d): EOF on input\n", myname, this_node);
       return NULL;
     }
     if (s == 0){

@@ -58,7 +58,7 @@ int reverse() {
 
   // Save action and do microcanonical updating
   // No need to save links, since will automatically accept
-  startaction = d_action();
+  startaction = action();
   if (num_masses == 2)
     iters += update_step_three(old_cg_time, cg_time, next_cg_time, fnorm, &gnorm);
   else
@@ -77,7 +77,7 @@ int reverse() {
   }
 
   // Find new action, always accept
-  endaction = d_action();
+  endaction = action();
   change = endaction - startaction;
 
   // Warn about overflow
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]){
     node0_printf("WITH beta_a/beta_f COEFFICIENT %2.3f\n", beta_a);
 
     // Gauge observables at start of trajectory
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     plp = ploop(TUP);
     xplp = ploop(XUP);
     // Flip signs to account for KS phases
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]){
                  plp.real, plp.imag, xplp.real, xplp.imag);
 
     // Action at start of trajectory
-    d_plaquette_a(&ssplaq, &stplaq);
+    plaquette_a(&ssplaq, &stplaq);
     startAct = (ssplaq + stplaq) / 2;
     node0_printf("ACT %.8g\n", startAct);
 
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]){
     s_iters = update();
 
     // Gauge observables at end of trajectory
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     plp = ploop(TUP);
     xplp = ploop(XUP);
     // Flip signs to account for KS phases
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]){
                  plp.real, plp.imag, xplp.real, xplp.imag);
 
     // Action at end of trajectory
-    d_plaquette_a(&ssplaq, &stplaq);
+    plaquette_a(&ssplaq, &stplaq);
     endAct = (ssplaq + stplaq) / 2;
     node0_printf("ACT %.8g\n", endAct);
 
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]){
     s_iters += reverse();
 
     // Gauge observables hopefully back at the start of the trajectory
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     plp = ploop(TUP);
     xplp = ploop(XUP);
     // Flip signs to account for KS phases
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]){
                  plp.real, plp.imag, xplp.real, xplp.imag);
 
     // Action hopefully back at the start of the trajectory
-    d_plaquette_a(&ssplaq, &stplaq);
+    plaquette_a(&ssplaq, &stplaq);
     endAct = (ssplaq + stplaq) / 2;
     node0_printf("ACT %.8g\n", endAct);
 

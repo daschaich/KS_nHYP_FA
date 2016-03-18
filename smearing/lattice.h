@@ -38,7 +38,7 @@ EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
 
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
 EXTERN char startfile[MAXFILENAME], savefile[MAXFILENAME];

@@ -49,7 +49,7 @@ G_OBJECTS =         \
   make_lattice.o    \
   nersc_cksum.o     \
   ranstuff.o        \
-  reunitarize2.o    \
+  reunitarize.o     \
   remap_stdio_from_args.o
 
 ifeq ($(strip ${HAVEQIO}),true)

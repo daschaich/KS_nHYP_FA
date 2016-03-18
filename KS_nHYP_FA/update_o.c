@@ -114,7 +114,7 @@ int update() {
   cg_time[1] = 0;
 
 #ifdef HMC_ALGORITHM    // Find action
-  startaction = d_action();
+  startaction = action();
   // node0_printf("startaction= %g\n", startaction);
 
   // Copy link field to old_link
@@ -135,7 +135,7 @@ int update() {
   if (num_masses == 2)
     doCG(1, MH, &iters);
 
-  endaction = d_action();
+  endaction = action();
   // printf("endaction= %g\n", endaction);
 
   change = endaction - startaction;

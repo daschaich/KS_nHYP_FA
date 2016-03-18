@@ -44,7 +44,7 @@ EXTERN int off_axis_flag;   // Whether to calculate off-axis loops
 EXTERN int tot_smear;       // Label output with number of smearing steps
 
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH

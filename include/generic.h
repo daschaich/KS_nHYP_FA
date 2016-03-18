@@ -23,20 +23,20 @@
 void ax_gauge();
 
 /* bsd_sum.c */
-int32type bsd_sum (char *data,int32type total_bytes);
+int32type bsd_sum (char *data, int32type total_bytes);
 
 // check_unitarity.c
 Real check_unitarity();
 
-// reunitarize2.c
+// reunitarize.c
 void reunitarize();
 int reunit_su3(su3_matrix *c);
 
-/* d_linktrsum */
-void d_linktrsum(double_complex *linktrsum);
+// linktrsum.c
+void linktrsum(double_complex *linktr);
 
-/* d_plaq?.c */
-void d_plaquette(double *ss_plaq, double *st_plaq);
+// plaq.c
+void plaquette(double *ss_plaq, double *st_plaq);
 
 // field_strength.c
 // link_src is offset for su3_matrix link[4] in site struct
@@ -132,9 +132,6 @@ void path_product_fields(su3_matrix *src[4], const int *dir,
                          const int length, su3_matrix *tempmat1);
 void path_prod_subl(const int *dir, const int length, const int subl,
                     su3_matrix *tempmat1);
-
-/* plaquette4.c */
-void plaquette(Real *ss_plaq, Real *st_plaq);
 
 /* ploop.c */
 complex ploop(int dir);

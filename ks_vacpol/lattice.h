@@ -78,7 +78,7 @@ EXTERN int ndim;
 EXTERN int latsize[4];
 
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME], outpat[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH

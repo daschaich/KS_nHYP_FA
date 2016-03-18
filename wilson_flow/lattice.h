@@ -48,7 +48,7 @@ EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
 
 EXTERN double g_ssplaq, g_stplaq;   // Global plaqs for I/O
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
 EXTERN char startfile[MAXFILENAME], savefile[MAXFILENAME];
@@ -101,5 +101,5 @@ EXTERN Real alpha_smear[3];
 EXTERN int num_block;
 EXTERN Real tblock[100];
 
-#endif // _LATTICE_H
+#endif
 // -----------------------------------------------------------------

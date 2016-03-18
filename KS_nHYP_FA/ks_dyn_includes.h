@@ -50,8 +50,8 @@ void scalar_mult_add_latvec(field_offset src1, field_offset src2,
 // Evolution stuff
 void grsource_imp(field_offset dest, Real mass, int parity);
 void grsource_Hasen(field_offset dest, int *iters, int parity);
-double d_action();
-void d_plaquette_a(double *ss_plaq, double *st_plaq);
+double action();
+void plaquette_a(double *ss_plaq, double *st_plaq);
 void meas_plaq();
 int meas_link(field_offset chi, field_offset psi, Real mass);
 int update();

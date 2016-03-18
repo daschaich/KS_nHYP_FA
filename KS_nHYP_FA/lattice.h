@@ -90,7 +90,7 @@ EXTERN Real max_gf, max_ff[2];
 EXTERN Real rsqmin, beta, beta_a, mass;
 EXTERN Real epsilon;
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
 EXTERN char startfile[MAXFILENAME], savefile[MAXFILENAME];
@@ -146,8 +146,7 @@ EXTERN su3_matrix *LambdaU[4];
 EXTERN su3_matrix *Lambda1[4];
 EXTERN su3_matrix *Lambda2[4];
 
-EXTERN su3_matrix *tempmat1;
-EXTERN su3_matrix *tempmat2;    // Used in Polyakov loop calculation
+EXTERN su3_matrix *tempmat, *tempmat2;    // Used in Polyakov loop calculation
 
 // Up to 20 concurrent timers for timing
 #ifdef TIMING
@@ -158,5 +157,5 @@ EXTERN double time_block_nhyp;    // From block_nhyp.  Use tmptime[3]
 EXTERN double time_compute_fhb;   // Not currently using tmptime[4]
 #endif
 
-#endif // _LATTICE_H
+#endif
 // -----------------------------------------------------------------

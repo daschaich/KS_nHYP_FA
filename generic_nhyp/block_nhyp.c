@@ -1,5 +1,6 @@
 // -----------------------------------------------------------------
 // Construct nHYP-smeared links
+// Use tempmat for temporary storage
 // Reference:
 //   Anna Hasenfratz, Roland Hoffmann and Stefan Schaefer
 //   ``Hypercubic smeared links for dynamical fermions''
@@ -225,22 +226,22 @@ void staple_nhyp(int dir1, int dir2, su3_matrix *lnk1,
                             EVENANDODD, gen_pt[1]);
 
   // Start working on the lower staple while we wait for the gathers
-  // The lower staple is prepared at x-dir2 and stored in tempmat1,
+  // The lower staple is prepared at x-dir2 and stored in tempmat,
   // then gathered to x
   FORALLSITES(i, s)
-    mult_su3_an(lnk2 + i, lnk1 + i, tempmat1 + i);
+    mult_su3_an(lnk2 + i, lnk1 + i, tempmat + i);
 
   wait_gather(tag0);
   wait_gather(tag1);
 
   // Finish lower staple
   FORALLSITES(i, s) {
-    mult_su3_nn(tempmat1 + i, (su3_matrix *)gen_pt[0][i], &tmat1);
-    su3mat_copy(&tmat1, tempmat1 + i);
+    mult_su3_nn(tempmat + i, (su3_matrix *)gen_pt[0][i], &tmat1);
+    su3mat_copy(&tmat1, tempmat + i);
   }
 
   // Gather staple from direction -dir2 to "home" site
-  tag2 = start_gather_field(tempmat1, sizeof(su3_matrix),
+  tag2 = start_gather_field(tempmat, sizeof(su3_matrix),
                             OPP_DIR(dir2), EVENANDODD, gen_pt[2]);
 
   // Calculate upper staple, add it

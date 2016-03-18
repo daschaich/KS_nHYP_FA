@@ -62,7 +62,7 @@ EXTERN int total_iters;
 EXTERN int phases_in;   // Flag if KS and BC phases absorbed into matrices
 
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH

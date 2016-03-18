@@ -7,7 +7,7 @@ nHYP links, reading alpha_smear parameters from infile
 NHYP_DEBUG turned on
 Hybrid Monte Carlo algorithm
 Phi algorithm
-start: Fri Mar 18 16:33:23 2016
+start: Fri Mar 18 17:39:11 2016
 
 type 0 for no prompts or 1 for prompts
 nflavors 12
@@ -48,11 +48,11 @@ forget
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 1.649857e-04
+Time to reload gauge configuration = 0.0001721 seconds
 CHECK PLAQ: 1.9094453251406434e+00 1.8984215492349603e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
-Reunitarized for double precision. Max deviation 1.42e-06 changed to 4.44e-16
-Time to check unitarity = 1.831055e-04
+Reunitarized for double precision. Max deviation 1.4e-06 changed to 4.4e-16
+Time to check unitarity = 0.000174 seconds
 
 FUNDAMENTAL--ADJOINT GAUGE ACTION WITH beta_a/beta_f COEFFICIENT -0.250
 f_eps0 0.2 f_eps1 0.1 g_eps 0.005
@@ -142,8 +142,8 @@ pbpz: mass 0.01, 45.307843 40.529408 0.49610059 3.2481579 ( ave over 5 )
 RUNNING COMPLETED
 Average CG iters for steps: 1454
 Average CG iters for measurements: 145
-Time = 5.006 seconds
+Time = 5.007 seconds
 total_iters = 7218
 
-exit: Fri Mar 18 16:33:28 2016
+exit: Fri Mar 18 17:39:16 2016
 

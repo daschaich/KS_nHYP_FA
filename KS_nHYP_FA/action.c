@@ -6,22 +6,22 @@
 
 #include "ks_dyn_includes.h"
 Real ahmat_mag_sq(anti_hermitmat *pt);
-double d_hmom_action();
-double d_fermion_action();
+double hmom_action();
+double fermion_action();
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
-double d_action() {
+double action() {
   double ssplaq, stplaq, g_action, h_action, f_action;
 
   rephase(OFF);
-  d_plaquette_a(&ssplaq, &stplaq);
+  plaquette_a(&ssplaq, &stplaq);
   rephase(ON);
   g_action = -beta * volume * (ssplaq + stplaq);
-  h_action = d_hmom_action();
-  f_action = d_fermion_action();
+  h_action = hmom_action();
+  f_action = fermion_action();
   node0_printf("D_ACTION: g, h, f, tot = %.8g %.8g %.8g %.8g\n",
                g_action, h_action, f_action,
                g_action + h_action + f_action);
@@ -36,7 +36,7 @@ double d_action() {
 // Checked that order of arguments to dot product doesn't matter
 // Checked that su3_rdot works just as well as su3_dot.real
 // Level 0 is the slow outer invert and 1 is the fast inner invert
-double d_fermion_action() {
+double fermion_action() {
   register int i;
   register site *s;
   int j;
@@ -81,7 +81,7 @@ double d_fermion_action() {
 
 // -----------------------------------------------------------------
 // Gauge momentum contribution to the action
-double d_hmom_action() {
+double hmom_action() {
   register int i, dir;
   register site *s;
   double sum = 0;
@@ -139,57 +139,50 @@ register site *s;
 
 // -----------------------------------------------------------------
 // Adds adjoint plaquette term
-void d_plaquette_a(double *ss_plaq, double *st_plaq) {
-  register int i, dir1, dir2;
+// Use tempmat for temporary storage
+void plaquette_a(double *ss_plaq, double *st_plaq) {
+  register int i, dir, dir2;
   register site *s;
   register su3_matrix *m1, *m4;
-  su3_matrix mtmp, *su3mat = malloc(sites_on_node * sizeof(*su3mat));
-  double ss_sum = 0.0, st_sum = 0.0;
-  complex ctt;
-  msg_tag *mtag0, *mtag1;
+  double ss_sum = 0.0, st_sum = 0.0, td;
+  complex tc;
+  msg_tag *mtag, *mtag2;
+  su3_matrix tmat;
 
-  if (su3mat == NULL) {
-    printf("d_plaquette_a: can't malloc su3mat\n");
-    fflush(stdout);
-    terminate(1);
-  }
-
-  for(dir1 = YUP; dir1 <= TUP; dir1++) {
-    for(dir2 = XUP; dir2 < dir1; dir2++) {
-      mtag0 = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
-                                dir1, EVENANDODD, gen_pt[0]);
-      mtag1 = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+  for (dir = YUP; dir <= TUP; dir++) {
+    for (dir2 = XUP; dir2 < dir; dir2++) {
+      mtag = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+                               dir, EVENANDODD, gen_pt[0]);
+      mtag2 = start_gather_site(F_OFFSET(link[dir]), sizeof(su3_matrix),
                                 dir2, EVENANDODD, gen_pt[1]);
 
       FORALLSITES(i, s) {
-        m1 = &(s->link[dir1]);
+        m1 = &(s->link[dir]);
         m4 = &(s->link[dir2]);
-        mult_su3_an(m4, m1, &su3mat[i]);
+        mult_su3_an(m4, m1, &tempmat[i]);
       }
-      wait_gather(mtag0);
-      wait_gather(mtag1);
-      FORALLSITES(i, s) {
-        mult_su3_nn(&su3mat[i], (su3_matrix *)(gen_pt[0][i]), &mtmp);
 
-        if (dir1 == TUP) {
-          ctt = complextrace_su3((su3_matrix *)(gen_pt[1][i]), &mtmp);
-          st_sum += (ctt.real / 3)
-                  + beta_a * (ctt.real * ctt.real + ctt.imag * ctt.imag) / 9;
-        }
-        else {
-          ctt = complextrace_su3((su3_matrix *)(gen_pt[1][i]), &mtmp);
-          ss_sum += (ctt.real / 3)
-                  + beta_a * (ctt.real * ctt.real + ctt.imag * ctt.imag) / 9;
-        }
+      wait_gather(mtag);
+      wait_gather(mtag2);
+      FORALLSITES(i, s) {
+        m1 = (su3_matrix *)(gen_pt[0][i]);
+        m4 = (su3_matrix *)(gen_pt[1][i]);
+        mult_su3_nn(&tempmat[i], m1, &tmat);
+        tc = complextrace_su3(m4, &tmat);
+        td = (tc.real / 3.0);
+        td += beta_a * (tc.real * tc.real + tc.imag * tc.imag) / 9.0;
+        if (dir == TUP)
+          st_sum += td;
+        else
+          ss_sum += td;
       }
-      cleanup_gather(mtag0);
-      cleanup_gather(mtag1);
+      cleanup_gather(mtag);
+      cleanup_gather(mtag2);
     }
   }
   g_doublesum(&ss_sum);
   g_doublesum(&st_sum);
   *ss_plaq = ss_sum / ((double)volume);
   *st_plaq = st_sum / ((double)volume);
-  free(su3mat);
 }
 // -----------------------------------------------------------------

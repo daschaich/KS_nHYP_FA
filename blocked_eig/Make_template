@@ -71,7 +71,7 @@ G_OBJECTS =         \
   make_lattice.o    \
   nersc_cksum.o     \
   ranstuff.o        \
-  reunitarize2.o    \
+  reunitarize.o     \
   field_strength.o  \
   remap_stdio_from_args.o
 

@@ -43,7 +43,7 @@ EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
 
 EXTERN double g_ssplaq, g_stplaq;
-EXTERN double_complex linktrsum;
+EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH

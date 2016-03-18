@@ -42,35 +42,36 @@ HEADERS = ${GLOBAL_HEADERS} ${MY_HEADERS}
 
 # All required object files
 # Basic set from current directory
-MY_OBJECTS =        \
-  control.o         \
-  setup.o           \
-  gauge_info.o      \
-  grsource_imp.o    \
-  d_action.o        \
-  meas_plaq.o       \
-  meas_link.o       \
-  update_o.o        \
-  update_h.o        \
-  update_u.o        \
-  block_N_fatten.o  \
-  force_nhyp.o      \
-  d_congrad_v6.o    \
-  d_congrad_helpers.o
+MY_OBJECTS =       \
+  control.o        \
+  setup.o          \
+  gauge_info.o     \
+  grsource_imp.o   \
+  action.o         \
+  meas_plaq.o      \
+  meas_link.o      \
+  update_o.o       \
+  update_h.o       \
+  update_u.o       \
+  block_N_fatten.o \
+  force_nhyp.o     \
+  congrad.o        \
+  congrad_helpers.o
 
 # Basic set from generic directory
 G_OBJECTS =         \
   check_unitarity.o \
-  d_plaq4.o         \
+  plaq.o            \
   io_helpers.o      \
   io_lat4.o         \
   io_lat_utils.o    \
+  linktrsum.o       \
   make_lattice.o    \
   nersc_cksum.o     \
   ploop.o           \
   ranmom.o          \
   ranstuff.o        \
-  reunitarize2.o    \
+  reunitarize.o     \
   remap_stdio_from_args.o
 
 ifeq ($(strip ${HAVEQIO}),true)

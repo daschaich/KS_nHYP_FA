@@ -56,7 +56,7 @@ G_OBJECTS = d_plaq4.o         \
             make_lattice.o    \
             nersc_cksum.o     \
             check_unitarity.o \
-            reunitarize2.o    \
+            reunitarize.o     \
             field_strength.o  \
             remap_stdio_from_args.o
 

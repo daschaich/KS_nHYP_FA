@@ -17,8 +17,7 @@ G_ALL = \
  com_mpi.o \
  com_qmp.o \
  com_vanilla.o \
- d_plaq2.o \
- d_plaq4.o \
+ plaq.o \
  discretize_wf.o \
  field_strength.o \
  field_translation.o \
@@ -58,6 +57,7 @@ G_ALL = \
  layout_squares.o \
  layout_hyper_sl32.o \
  layout_qcdoc.o \
+ linktrsum.o \
  map_milc_to_qopmilc.o \
  map_milc_to_qopqdp.o \
  milc_to_qop_utilities.o \
@@ -67,8 +67,6 @@ G_ALL = \
  nersc_cksum.o \
  path_product.o \
  phases.o \
- plaquette3.o \
- plaquette4.o \
  ploop.o \
  ploop2.o \
  ploop3.o \
@@ -90,7 +88,7 @@ G_ALL = \
  remap_stdio_from_args.o \
  report_invert_status.o \
  restrict_fourier.o \
- reunitarize2.o \
+ reunitarize.o \
  show_generic_opts.o \
  stout_smear.o
 
@@ -131,12 +129,6 @@ com_mpi.o: ../generic/com_mpi.c
 com_qmp.o: ../generic/com_qmp.c
 	${CC} -c ${CFLAGS} $<
 com_vanilla.o: ../generic/com_vanilla.c
-	${CC} -c ${CFLAGS} $<
-d_plaq2.o: ../generic/d_plaq2.c
-	${CC} -c ${CFLAGS} $<
-d_plaq4.o: ../generic/d_plaq4.c
-	${CC} -c ${CFLAGS} $<
-d_linktrsum.o: ../generic/d_linktrsum.c
 	${CC} -c ${CFLAGS} $<
 discretize_wf.o: ../generic/discretize_wf.c
 	${CC} -c ${CFLAGS} $<
@@ -219,6 +211,8 @@ layout_squares.o: ../generic/layout_squares.c
 	${CC} -c ${CFLAGS} $<
 layout_qcdoc.o: ../generic/layout_qcdoc.c
 	${CC} -c ${CFLAGS} $<
+linktrsum.o: ../generic/linktrsum.c
+	${CC} -c ${CFLAGS} $<
 make_lattice.o: ../generic/make_lattice.c
 	${CC} -c ${CFLAGS} $<
 map_milc_to_qopmilc.o: ../generic/map_milc_to_qopmilc.c ../generic/map_milc_to_qop_all.c
@@ -237,9 +231,7 @@ path_product.o: ../generic/path_product.c
 	${CC} -c ${CFLAGS} $<
 phases.o: ../generic/phases.c
 	${CC} -c ${CFLAGS} $<
-plaquette3.o: ../generic/plaquette3.c
-	${CC} -c ${CFLAGS} $<
-plaquette4.o: ../generic/plaquette4.c
+plaq.o: ../generic/plaq.c
 	${CC} -c ${CFLAGS} $<
 ploop.o: ../generic/ploop.c
 	${CC} -c ${CFLAGS} $<
@@ -283,7 +275,7 @@ restrict_fourier.o: ../generic/restrict_fourier.c
 	${CC} -c ${CFLAGS} $<
 report_invert_status.o: ../generic/report_invert_status.c
 	${CC} -c ${CFLAGS} $<
-reunitarize2.o: ../generic/reunitarize2.c
+reunitarize.o: ../generic/reunitarize.c
 	${CC} -c ${CFLAGS} $<
 show_generic_opts.o: ../generic/show_generic_opts.c
 	${CC} -c ${CFLAGS} $<

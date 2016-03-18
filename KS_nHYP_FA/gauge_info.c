@@ -36,7 +36,6 @@ void write_appl_gauge_info(FILE *fp) {
 
 #define INFOSTRING_MAX 2048
 // Follow USQCD style for record XML
-// Copied in from v7.7.8
 char *create_QCDML() {
   size_t bytes = 0;
   char *info = (char *)malloc(INFOSTRING_MAX);
@@ -45,27 +44,25 @@ char *create_QCDML() {
   char begin_info[] = "<info>";
   char end_info[] = "</info>";
   char end[] = "</usqcdInfo>";
-  Real myssplaq = g_ssplaq;  /* Precision conversion */
-  Real mystplaq = g_stplaq;  /* Precision conversion */
-  Real nersc_linktr = linktrsum.real/3.;  /* Convention and precision */
-//  Real gauge_fix_tol = GAUGE_FIX_TOL;
+  Real myssplaq = g_ssplaq;               // Precision conversion
+  Real mystplaq = g_stplaq;               // Precision conversion
+  Real nersc_linktr = linktr.real / 3.0;  // Convention and precision
   char sums[20];
 
   snprintf(info+bytes, max-bytes,"%s",begin);
   bytes = strlen(info);
 
-  snprintf(info+bytes, max-bytes,"<plaq>%e</plaq>",(myssplaq+mystplaq)/6.);
+  snprintf(info+bytes, max-bytes,"<plaq>%e</plaq>", (myssplaq + mystplaq) / 6.0);
   bytes = strlen(info);
 
-  snprintf(info+bytes, max-bytes,"<linktr>%e</linktr>",nersc_linktr);
+  snprintf(info+bytes, max-bytes,"<linktr>%e</linktr>", nersc_linktr);
   bytes = strlen(info);
 
   snprintf(info+bytes, max-bytes,"%s",begin_info);
   bytes = strlen(info);
 
-  /* The rest are optional */
-  if(startlat_p != NULL)
-    {
+  // The rest are optional
+  if (startlat_p != NULL) {
       /* To retain some info about the original (or previous)
    configuration */
       bytes = strlen(info);
@@ -80,23 +77,6 @@ char *create_QCDML() {
            "%s", sums,0,0);
     }
 
-//  if(fixflag==COULOMB_GAUGE_FIX)
-//    {
-//      bytes = strlen(info);
-//      sprint_gauge_info_item(info+bytes, max-bytes,"gauge.fix.description",
-//           "%s", "Coulomb",0,0);
-//      bytes = strlen(info);
-//      sprint_gauge_info_item(info+bytes, max-bytes,"gauge.fix.tolerance",
-//           "%g", (char *)&gauge_fix_tol,0,0);
-//    }
-//
-//  if(fixflag==AXIAL_GAUGE_FIX)
-//    {
-//      bytes = strlen(info);
-//      sprint_gauge_info_item(info+bytes, max-bytes,"gauge.fix.description",
-//           "%s", "axial",0,0);
-//    }
-
   snprintf(info+bytes, max-bytes,"%s",end_info);
   bytes = strlen(info);
 
@@ -104,7 +84,8 @@ char *create_QCDML() {
   return info;
 }
 
-void free_QCDML(char *info){
-  if(info != NULL)free(info);
+void free_QCDML(char *info) {
+  if (info != NULL)
+    free(info);
 }
 // -----------------------------------------------------------------

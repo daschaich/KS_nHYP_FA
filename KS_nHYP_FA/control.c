@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     // Take out the staggered phases to measure gauge observables
     rephase(OFF);
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     plp = ploop(TUP);
     xplp = ploop(XUP);
     node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
                  plp.real, plp.imag, xplp.real, xplp.imag);
 
     // Action adds adjoint plaquette term
-    d_plaquette_a(&ssplaq, &stplaq);
+    plaquette_a(&ssplaq, &stplaq);
     act = (ssplaq + stplaq) / 2;
     node0_printf("ACT %.8g\n", act);
     rephase(ON);
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
       meascount++;
       block_N_fatten(Nsmear);
       rephase(OFF);
-      d_plaquette(&ssplaq, &stplaq);    // To check meas_plaq()
+      plaquette(&ssplaq, &stplaq);    // To check meas_plaq()
       node0_printf("Plaquettes after smearing: %.8g %.8g\n",
                    ssplaq, stplaq);
       meas_plaq();

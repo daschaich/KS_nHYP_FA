@@ -103,6 +103,16 @@ msg_tag* start_gather_site(
          one of EVEN, ODD or EVENANDODD. */
   char **dest);  /* one of the vectors of pointers */
 
+void restart_gather_site(
+  field_offset field,    /* which field? Some member of structure "site" */
+  int size,        /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,        /* direction to gather from. eg XUP - index into
+               neighbor tables */
+  int parity,        /* parity of sites whose neighbors we gather.
+               one of EVEN, ODD or EVENANDODD. */
+  char ** dest,        /* one of the vectors of pointers */
+  msg_tag *mbuf);       /* previously returned by start_gather_site */
+
 msg_tag* declare_gather_field(
   void *field,   /* which field? pointer returned by malloc() */
   int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
@@ -130,6 +140,16 @@ msg_tag* start_gather_field(
   int parity,   /* parity of sites whose neighbors we gather.
          one of EVEN, ODD or EVENANDODD. */
   char **dest);  /* one of the vectors of pointers */
+
+void restart_gather_field(
+  void * field,        /* which field? pointer returned by malloc() */
+  int size,        /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,        /* direction to gather from. eg XUP - index into
+               neighbor tables */
+  int parity,        /* parity of sites whose neighbors we gather.
+               one of EVEN, ODD or EVENANDODD. */
+  char ** dest,        /* one of the vectors of pointers */
+  msg_tag *mbuf);       /* previously returned by start_gather_site */
 
 void accumulate_gather(
   msg_tag **mmtag,      /* msg_tag to accumulate into */

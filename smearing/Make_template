@@ -1,5 +1,4 @@
 # Smearing
-# MIMD version 7ish
 
 # Generic make-include file for smearing
 # This template file defines rules and macros common to all architectures
@@ -54,7 +53,7 @@ G_OBJECTS =         \
   io_lat_utils.o    \
   make_lattice.o    \
   nersc_cksum.o     \
-  reunitarize2.o    \
+  reunitarize.o     \
   gaugefix.o        \
   remap_stdio_from_args.o
 

@@ -130,12 +130,12 @@ void nhyp_force3(int dir3, int dir2) {
     if (dir != dir2 && dir != dir3) {
       for (dir1 = XUP; dir1 <= TUP; dir1++) {
         if (dir1 != dir && dir1 != dir2 && dir1 != dir3) {
-          compute_sigma23(tempmat1, gauge_field_thin[dir1],
+          compute_sigma23(tempmat, gauge_field_thin[dir1],
                           gauge_field_thin[dir], Lambda2[dir],
                           Lambda2[dir1], dir, dir1, EVENANDODD);
 
           FORALLSITES(i, s)
-            add_su3_matrix(Sigma[dir] + i, tempmat1 + i, Sigma[dir] + i);
+            add_su3_matrix(Sigma[dir] + i, tempmat + i, Sigma[dir] + i);
         }
       }
     }

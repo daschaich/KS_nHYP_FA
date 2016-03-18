@@ -44,7 +44,7 @@ char *create_QCDML() {
   char end[] = "</usqcdInfo>";
   Real myssplaq = g_ssplaq;  /* Precision conversion */
   Real mystplaq = g_stplaq;  /* Precision conversion */
-  Real nersc_linktr = linktrsum.real/3.;  /* Convention and precision */
+  Real nersc_linktr = linktr.real / 3.;  /* Convention and precision */
 //  Real gauge_fix_tol = GAUGE_FIX_TOL;
   char sums[20];
 

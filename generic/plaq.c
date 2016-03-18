@@ -3,7 +3,7 @@
 // mallocing the temporary su3_matrix
 #include "generic_includes.h"
 
-void d_plaquette(double *ss_plaq, double *st_plaq) {
+void plaquette(double *ss_plaq, double *st_plaq) {
   register int i, dir, dir2;
   register site *s;
   register su3_matrix *m1, *m4;
