@@ -1,5 +1,4 @@
 /******** layout_hyper_sl32.c *********/
-/* MIMD version 7 */
 /* ROUTINES WHICH DETERMINE THE DISTRIBUTION OF SITES ON NODES */
 /* NOT IN THE CURRENT TEST STREAM.  USE WITH CAUTION! */
 

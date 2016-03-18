@@ -1,5 +1,4 @@
 /************************** d_plaq4_lcl.c **************************/
-/* MIMD version 7 */
 /* This version mallocs the temporary su3_matrix */
 
 /* Double precision version of "plaquette4.c" including optional

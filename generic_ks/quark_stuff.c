@@ -1,5 +1,4 @@
 /****** quark_stuff.c  -- ******************/
-/* MIMD version 7 */
 /* Construct path tables and action coefficients for improved quark actions
  * (Formerly a catch-all file for improved quark action utilities)
  *

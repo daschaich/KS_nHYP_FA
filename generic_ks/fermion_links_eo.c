@@ -1,6 +1,4 @@
 /****** fermion_links_eo.c  -- ******************/
-/* MIMD version 7 */
-
 /* External entry points
 
    init_ferm_links

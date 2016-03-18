@@ -1,5 +1,4 @@
 /******* dslash.c - dslash for naive KS fermions ****/
-/* MIMD version 7 */
 /* D_slash routine - sets dest. on each site equal to sum of
    sources parallel transported to site, with minus sign for transport
    from negative directions */

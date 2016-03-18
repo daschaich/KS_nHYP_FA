@@ -1,5 +1,4 @@
 /************************* d_congrad_opt.c ***********************************/
-/* MIMD version 7 */
 /* Some data parallel operations for d_congrad */
 /* C. DeTar 12/05  split redundant code from various d_congrads */
 

@@ -1,6 +1,4 @@
 /******* ks_multicg.c - multi-mass CG for SU3/fermions ****/
-/* MIMD version 7 */
-
 /* Wrappers for multi-mass CG inverter for staggered fermions
 
    8/12 C. DeTar added macros for selecting the multicg inverter option

@@ -1,11 +1,8 @@
 #ifndef _GENERIC_PG_H
 #define _GENERIC_PG_H
 /************************ generic_pg.h **********************************
-*									*
 *  Macros and declarations for generic_pg routines                      *
 *  This header is for codes that call generic_pg routines               *
-*  MIMD version 7 							*
-*									*
 */
 
 #include "../include/macros.h"

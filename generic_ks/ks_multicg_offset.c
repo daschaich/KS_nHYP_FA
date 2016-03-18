@@ -1,6 +1,4 @@
 /******* ks_multicg_offset.c - multi-mass CG for SU3/fermions ****/
-/* MIMD version 7 */
-
 /* Multi-mass CG inverter for staggered fermions */
 
 /* Based on B. Jegerlehner, hep-lat/9612014.

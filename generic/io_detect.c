@@ -1,5 +1,4 @@
 /*********************** io_detect.c *************************/
-/* MIMD version 7 */
 
 /* Read the 32-bit magic number of a file and look it up in a table */
 /* Returns the file type number from the table, which must be >= 0 */

@@ -1,5 +1,4 @@
 /****** glueball_op.c  -- ******************/
-/* MIMD version 7 */
 
 /* C.D. 11/18/01 Patterned after gauge_stuff.c */
 

@@ -1,11 +1,8 @@
 #ifndef _GENERIC_WILSON_H
 #define _GENERIC_WILSON_H
 /************************ generic_wilson.h ******************************
-*									*
 *  Macros and declarations for generic_wilson routines                  *
 *  This header is for codes that call generic_wilson routines           *
-*  MIMD version 7 							*
-*									*
 */
 
 #include "../include/comdefs.h"

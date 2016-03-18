@@ -1,7 +1,5 @@
 /****************** msq_su3vec.c  (in su3.a) ****************************/
-/* MIMD version 7 */
-/*									*
-* Real magsq_su3vec( su3_vector *a )					*
+/* Real magsq_su3vec( su3_vector *a )         *
 * return squared magnitude of an SU3 vector
 */
 #include "../include/config.h"
@@ -13,7 +11,7 @@ Real magsq_su3vec( su3_vector *a ){
 register Real sum;
 register int i;
     for(i=0,sum=0.0;i<3;i++)sum += a->c[i].real*a->c[i].real
-	+ a->c[i].imag*a->c[i].imag;
+  + a->c[i].imag*a->c[i].imag;
     return(sum);
 }
 

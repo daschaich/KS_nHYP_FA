@@ -22,6 +22,10 @@
 #define NO_GAUGE_FIX 30
 #define COULOMB_GAUGE_FIX 31
 #define LANDAU_GAUGE_FIX 32
+
+// Shorthand
+#define ON 1
+#define OFF 0
 // -----------------------------------------------------------------
 
 
@@ -91,6 +95,11 @@ typedef int field_offset;
     i++,s++)
 #define FORALLSITES(i,s) \
     for(i=0,s=lattice;i<sites_on_node;i++,s++)
+
+#define FOREVENSITESDOMAIN FOREVENSITES
+#define FORODDSITESDOMAIN FORODDSITES
+#define FORALLSITESDOMAIN FORALLSITES
+#define FORSOMEPARITYDOMAIN FORSOMEPARITY
 // -----------------------------------------------------------------
 
 

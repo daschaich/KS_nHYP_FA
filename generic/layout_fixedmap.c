@@ -1,5 +1,4 @@
 /******** layout_fixedmap.c *********/
-/* MIMD version 6 */
 /* ROUTINES WHICH DETERMINE THE DISTRIBUTION OF SITES ON NODES */
 
 #define XBLOCKS 1

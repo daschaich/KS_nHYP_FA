@@ -1,6 +1,4 @@
 /****** path_transport.c  -- ******************/
-/* MIMD version 7 */
-
 #include "generic_ks_includes.h"	/* definitions files and prototypes */
 
 #define GOES_FORWARDS(dir) (dir<=TUP)

@@ -1,11 +1,8 @@
 #ifndef _GENERIC_FORM_H
 #define _GENERIC_FORM_H
 /************************ generic_form.h *************************************
-*									*
 *  Macros and declarations for miscellaneous generic routines           *
 *  This header is for codes that call generic_form routines             *
-*  MIMD version 7 							*
-*									*
 */
 
 #include "../include/macros.h"

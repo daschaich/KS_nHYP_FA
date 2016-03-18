@@ -1,6 +1,4 @@
 /******* ks_multicg_qdp_P.c - multi-mass CG for SU3/fermions ****/
-/* MIMD version 7 */
-
 /* Multi-mass CG inverter for staggered fermions */
 
 /* NOTE: This code is actually an include file for ks_multicg_qdp_F.c

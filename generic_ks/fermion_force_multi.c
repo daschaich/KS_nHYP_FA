@@ -1,6 +1,4 @@
 /****** fermion_force_asqtad.c  -- ******************/
-/* MIMD version 7 */
-
 /* External entry points 
 
     eo_fermion_force_multi

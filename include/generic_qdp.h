@@ -1,8 +1,6 @@
 #ifndef _GENERIC_QDP_H
 #define _GENERIC_QDP_H
-/******************** generic_qdp.h *********************************
-*  MIMD version 7 							*
-*/
+/******************** generic_qdp.h *********************************/
 
 #include <qdp.h>
 #include "../include/macros.h"

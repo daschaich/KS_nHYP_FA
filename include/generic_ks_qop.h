@@ -1,8 +1,6 @@
 #ifndef _GENERIC_KS_QOP_H
 #define _GENERIC_KS_QOP_H
-/******************** generic_ks_qop.h *********************************
-*  MIMD version 7 		  				       *
-*/
+/******************** generic_ks_qop.h *********************************/
 
 #include <qop.h>
 #include "../include/generic_ks.h"

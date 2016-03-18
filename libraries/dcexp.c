@@ -1,5 +1,4 @@
 /********************** dcexp.c (in complex.a) **********************/
-/* MIMD version 7 */
 /* Subroutines for operations on complex numbers */
 /* double complex exponential */
 #include "../include/config.h"

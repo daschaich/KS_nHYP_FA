@@ -1,7 +1,6 @@
 /************************** gaugefix.c *******************************/
 /* Fix Coulomb or Lorentz gauge by doing successive SU(2) gauge hits */
 /* Uses double precision global sums */
-/* MIMD version 7 */
 /* C. DeTar 10-22-90 */
 /* T. DeGrand 1993 */
 /* U.M. Heller 8-31-95 */

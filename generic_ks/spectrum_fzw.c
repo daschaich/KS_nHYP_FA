@@ -1,5 +1,4 @@
 /*************************** spectrum_fzw.c *********************************/
-/* MIMD version 6                                                           */
 /* This version uses gathers to get the neighbors                           */
 /*                                                                          */
 /* Version 4.0  08/06/05 by Ziwen Fu     For his Ph.D Thesis                */

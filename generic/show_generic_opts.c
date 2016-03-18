@@ -1,6 +1,4 @@
 /********************** show_opts.c *************************************/
-/* MIMD Version 7 */
-
 /* List options selected in the compilation */
 
 #include "generic_includes.h"

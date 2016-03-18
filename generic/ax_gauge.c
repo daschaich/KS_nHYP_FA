@@ -1,5 +1,4 @@
 /************************** ax_gauge.c *******************************/
-// MIMD version 7
 // This version uses gathers to get the neighbors
 
 // Gauge transform, in place, to axial gauge.

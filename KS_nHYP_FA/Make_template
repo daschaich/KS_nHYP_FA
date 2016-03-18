@@ -1,7 +1,5 @@
-# Kogut--Susskind fermions, 4/8/12/16 flavor (both checkerboard) codes
-# MIMD version 7ish
-
-# Generic make-include file for ks_dynamical codes
+# Kogut--Susskind HMC using both checkerboards
+# Generic make-include file
 # This template file defines rules and macros common to all architectures
 # It is intended to be an include file for other Makefiles.
 # Don't use it by itself!

@@ -1,6 +1,4 @@
 /******* ks_multicg_qop_P.c - multi-mass CG for SU3/fermions ****/
-/* MIMD version 7 */
-
 /* This is the MILC wrapper for the SciDAC Level 3 QOP inverter */
 
 /* NOTE: This code is actually an include file for ks_multicg_qop_F.c

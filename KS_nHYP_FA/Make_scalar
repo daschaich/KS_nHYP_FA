@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------
-MAKEFILE = Make_local
+MAKEFILE = Make_scalar
 
 MPP            = # true # Needed to activate SciDAC libraries
 PRECISION      = 2
@@ -45,7 +45,7 @@ CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
 
 MAKELIBRARIES  = Make_vanilla
 
-# Also check include/config.h.
+# Also check include/config.h
 # ------------------------------------------------------------------
 
 

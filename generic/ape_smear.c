@@ -1,5 +1,4 @@
 /********** ape_smear.c*********************************************/
-/* MIMD version 7 */
 
 /* Does APE smearing */
 /* Doug Toussaint 1/30/96 

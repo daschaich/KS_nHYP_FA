@@ -20,7 +20,6 @@ int initial_set() {
   if (mynode() == 0) {
     // Print banner
     printf("SU(3) Kogut--Susskind blocked eigenvalues\n");
-    printf("MIMD version 7ish with Kostas's Kalkreuter\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     printf("Twice-HYP smeared links, smearing parameters from infile\n");
     printf("  IR_STAB = %.4g\n", (Real)IR_STAB);

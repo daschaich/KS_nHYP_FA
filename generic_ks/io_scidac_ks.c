@@ -1,6 +1,5 @@
 /********************** io_scidac_ks.c **********************************/
-/* MILC/QIO interface for KS fields */
-/* MIMD version 7 */
+/* QIO interface for KS fields */
 /* CD 2/2005
    CD 6/2007 Converted standard routines to macros and moved to
    generic/io_scidac.c

@@ -46,7 +46,6 @@ int initial_set() {
     // Print banner
     printf("SU(3) with Kogut--Susskind fermions\n");
     printf("S4b phase order parameter measurement\n");
-    printf("MIMD version 7ish\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     printf("nHYP links, reading alpha_smear parameters from infile\n");
     printf("  IR_STAB = %.4g\n", (Real)IR_STAB);

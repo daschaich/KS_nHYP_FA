@@ -1,5 +1,4 @@
 /******** spectrum.c *************/
-/* MIMD version 7 with SG additions*/
 /* Last updated 2/21/95, by SG. */
 /* 12/11/95 DT change looping over source time slices */
 /* 7/29/96 DT fixed names of rho and rho2 propagators.

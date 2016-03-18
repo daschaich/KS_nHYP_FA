@@ -63,7 +63,6 @@ int initial_set() {
   if (mynode() == 0) {
     // Print banner
     printf("Smearing\n");
-    printf("MIMD version 7ish\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     time_stamp("start");
 

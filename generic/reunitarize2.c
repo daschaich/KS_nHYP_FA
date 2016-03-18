@@ -1,6 +1,4 @@
 /*********************** reunitarize2.c ***************************/
-/* MIMD version 7 */
-
 /* reunitarize the link matrices */
 
 /* Modifications ...

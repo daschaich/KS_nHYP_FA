@@ -1,5 +1,4 @@
 /****** gauge_force_symzk1_qop.c   ************/
-/* MIMD version 7 */
 /* Gauge action Symanzik improved 1x1 + 1x2 + 1x1x1 */
 /* 9/2006 started by L.L. */
 /* 10/06  CD standalone QDP */

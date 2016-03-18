@@ -1,11 +1,8 @@
 #ifndef _GENERIC_CLOVER_H
 #define _GENERIC_CLOVER_H
 /************************ generic_clover.h ******************************
-*									*
 *  Macros and declarations for generic_clover routines                  *
 *  This header is for codes that call generic_clover routines           *
-*  MIMD version 7 							*
-*									*
 */
 
 #include "../include/generic_quark_types.h"

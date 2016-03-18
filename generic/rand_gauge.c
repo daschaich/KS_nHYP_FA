@@ -1,6 +1,4 @@
 /*********************** rand_gauge.c ***************************/
-/* MIMD version 7 */
-
 /* original code by UMH */
 /* 2/19/98 Version 5 port CD */
 

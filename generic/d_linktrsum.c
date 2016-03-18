@@ -1,5 +1,4 @@
 /************************** d_linktrsum.c *******************************/
-/* MIMD version 7 */
 /* Computes the mean global sum of the trace of the gauge links --
    used to aid checking lattice file integrity */
 

@@ -1,6 +1,4 @@
 /******* ks_multicg_qop_milc.c - multi-mass CG for SU3/fermions ****/
-/* MIMD version 7 */
-
 /* This version implements the QOP API with the standard MILC algorithm
  * It is intended for comparing results with other QOP routines.
  * It is based only on d_congrad5_fn_qop_milc.c

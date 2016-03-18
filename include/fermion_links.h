@@ -1,10 +1,7 @@
 #ifndef _FERMION_LINKS_H
 #define _FERMION_LINKS_H
 /************************ fermion_links.h **********************************
-*									*
 *  Definitions for fermion links
-*  MIMD version 7 							*
-*									*
 */
 
 #include <quark_action.h>

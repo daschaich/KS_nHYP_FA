@@ -1,6 +1,4 @@
 /************************ nersc_cksum.c *******************************/
-/* MIMD version 7 */
-
 /* Two utilities used in the NERSC archive formate */
 
 /* Compute the low order 32 bits of the unsigned integer sum of the

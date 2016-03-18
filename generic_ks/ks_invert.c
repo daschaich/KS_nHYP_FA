@@ -1,6 +1,4 @@
 /********************** ks_invert.c *********************************/
-/* MIMD version 7 */
-
 /*  Generic wrapper for KS quark inverter
  *
  *  The source routine must be called outside before this

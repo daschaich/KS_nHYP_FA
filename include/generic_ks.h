@@ -1,11 +1,8 @@
 #ifndef _GENERIC_KS_H
 #define _GENERIC_KS_H
 /************************ generic_ks.h **********************************
-*                 *
 *  Macros and declarations for generic_ks routines                      *
 *  This header is for codes that call generic_ks routines               *
-*  MIMD version 7               *
-*                 *
 */
 
 #include "../include/complex.h"

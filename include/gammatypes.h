@@ -1,11 +1,7 @@
 #ifndef _GAMMATYPES_H
 #define _GAMMATYPES_H
 /*********************  gammatypes.h   **********************************
-*									*
-*  MIMD version 7 							*
-*                                                                       *
 *	A gamma matrix encoding scheme					*
-*                                                                       *
 */
 
 /*  DeGrand-Rossi convention

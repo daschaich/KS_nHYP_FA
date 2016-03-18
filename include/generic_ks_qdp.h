@@ -1,8 +1,6 @@
 #ifndef _GENERIC_KS_QDP_H
 #define _GENERIC_KS_QDP_H
-/******************** generic_ks_qdp.h *********************************
-*  MIMD version 7 							*
-*/
+/******************** generic_ks_qdp.h **********************************/
 
 #include <qdp.h>
 

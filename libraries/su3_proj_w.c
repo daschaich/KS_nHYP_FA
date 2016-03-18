@@ -1,7 +1,5 @@
 /***************** su3_proj_w.c  (in su3.a) ****************************/
-/* MIMD version 7 */
-/*									*
-* void su3_projector_w( wilson_vector *a, wilson_vector *b, su3_matrix *c )
+/* void su3_projector_w( wilson_vector *a, wilson_vector *b, su3_matrix *c )
 * C  <- sum over spins of outer product of A.d[i] and B.d[i]		*
 *  C_ij = sum( A_i * B_adjoint_j )					*
 */

@@ -1,5 +1,4 @@
 /***************** gauge_force_symzk1_qop_milc.c  -- ***********************/
-/* MIMD version 7 */
 /* MILC implementation of QOP gauge force routine for testing the interface */
 /* This routine is intended to be specific to the Symanzik 1 loop gauge action
  * but it uses the general improved action algorithm.

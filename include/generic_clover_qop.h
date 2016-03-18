@@ -1,8 +1,6 @@
 #ifndef _GENERIC_CLOVER_QOP_H
 #define _GENERIC_CLOVER_QOP_H
-/******************** generic_clover_qop.h *********************************
-*  MIMD version 7 		  				       *
-*/
+/******************** generic_clover_qop.h *********************************/
 
 #include <qop.h>
 

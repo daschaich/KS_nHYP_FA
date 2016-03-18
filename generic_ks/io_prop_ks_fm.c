@@ -1,5 +1,4 @@
 /********************** io_prop_ks_fm.c *********************************/
-/* MIMD version 7 */
 /* Reads and write KS quark propagators
    in a site major format compatible with Fermilab running
    (previous versions variously called io_prop_sgks.c io_prop_ks_write.c

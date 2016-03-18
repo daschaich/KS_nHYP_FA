@@ -1,7 +1,5 @@
 /******************* d_congrad5_two_src.c **********************************/
 /* wrapper for two calls to ks_congrad */
-/* MIMD version 7 */
-
 #include "generic_ks_includes.h"
 
 int ks_congrad_two_src(	/* Return value is number of iterations taken */

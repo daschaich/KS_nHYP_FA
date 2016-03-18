@@ -1,5 +1,4 @@
 /************************* ff_opt.c  *************************************/
-/* MIMD version 7 */
 #include "generic_ks_includes.h"
 
 #define GOES_FORWARDS(dir) (dir<=TUP)

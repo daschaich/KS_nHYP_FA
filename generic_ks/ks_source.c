@@ -1,6 +1,4 @@
 /************************** ks_source.c *****************************/
-/* MIMD version 7 */
-
 /* Initialize a source for the inverter */
 /* Initialize a sink */
 /* Interpret source and sink parameters */

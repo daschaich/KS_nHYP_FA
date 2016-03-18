@@ -1,5 +1,4 @@
 /********************** csqrt.c (in complex.a) **********************/
-/* MIMD version 7 */
 /* Subroutines for operations on complex numbers */
 /* complex square root */
 #include "../include/config.h"

@@ -65,13 +65,14 @@ nt 4
 iseed 41
 
 warms 0
-trajecs 1
+trajecs 3
 traj_length 1
 number_of_PF 1
 nstep 5
 nstep 2
 nstep_gauge 1
-traj_between_meas 1
+traj_between_meas 3
+
 beta 6
 beta_a -0.25
 mass 0.01
@@ -86,7 +87,7 @@ npbp 5
 max_cg_iterations 500
 max_cg_restarts 1
 error_per_site 1e-5
-reload_serial tests/c4444
+reload_serial config.4444
 forget
 # ------------------------------------------------------------------
 
@@ -103,13 +104,14 @@ nt 4
 iseed 41
 
 warms 0
-trajecs 1
+trajecs 3
 traj_length 1
 number_of_PF 2
 nstep 5                   # Number of steps for light-fermion outer level
 nstep 1                   # Number of inner Hasenbusch steps per outer step
 nstep_gauge 10
-traj_between_meas 1
+traj_between_meas 3
+
 beta 6
 beta_a -0.25
 mass 0.01
@@ -120,9 +122,10 @@ alpha_hyp0 0.5
 alpha_hyp1 0.5
 alpha_hyp2 0.4
 
+npbp 5
 max_cg_iterations 500
 max_cg_restarts 1
 error_per_site 1e-5
-reload_serial tests/c4444
+reload_serial config.4444
 forget
 # ------------------------------------------------------------------

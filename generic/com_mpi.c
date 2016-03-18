@@ -1,6 +1,5 @@
 /******************  com_mpi.c *****************************************/
 /* Communications routines for the SU3 program
-   MIMD version 7.
    This file is communications-scheme dependent.
    MPI version - allegedly machine independent
    This version breaks the MPI machine into a number of separate lattices

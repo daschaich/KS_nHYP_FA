@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------
-MAKEFILE = Make_cluster_gcc
+MAKEFILE = Make_mpi
 
 MPP            = true
 PRECISION      = 2
@@ -45,7 +45,7 @@ CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
                  ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
                  ${KSFFMULTI} ${KSRHMCINT}
 
-MAKELIBRARIES  = Make_cluster_gcc
+MAKELIBRARIES  = Make_mpi
 
 # Also check include/config.h.
 # ------------------------------------------------------------------

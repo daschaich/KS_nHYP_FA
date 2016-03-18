@@ -18,7 +18,6 @@ int initial_set() {
   if (mynode() == 0) {
     // Print banner
     printf("SU3 hermitian-Wilson eigenvalue calculation\n");
-    printf("MIMD version 7ish\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     printf("nHYP links, reading alpha_smear parameters from infile\n");
     printf("  IR_STAB = %.4g\n", (Real)IR_STAB);

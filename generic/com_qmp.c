@@ -1,6 +1,5 @@
 /******************  com_qmp.c *****************************************/
 /* Communications routines for the SU3 program 
-   MIMD version 7.
    This file is communications-scheme dependent.
    QMP version - allegedly machine independent
 */

@@ -39,7 +39,6 @@ int initial_set() {
   if (mynode() == 0) {
     // Print banner
     printf("SU(3) lattice loading\n");
-    printf("MIMD version 7ish\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
 #ifdef NO_UNIT_CHECK
     printf("NOT checking unitarity when loading lattice\n");

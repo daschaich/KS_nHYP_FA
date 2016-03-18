@@ -1,5 +1,4 @@
 /********************* gauge_force_symzk1_qop.c  -- *************************/
-/* MIMD version 7 */
 /* Wrapper for QOP gauge force for Symanzik 1 loop gauge action
 * T.D. and A.H. general gauge action updating code
 * D.T. modified  5/97

@@ -2,34 +2,39 @@
 # This script needs to be run from the testsuite/scalar directory
 
 # Require user to specify both directory and target
-if [ $# -gt 1 ]; then
-  dir=$1
-  target=$2
+if [ $# -lt 2 ]; then
+  echo "Try these:"
+  echo "./run_tests KS_nHYP_FA hmc"
+  echo "./run_tests KS_nHYP_FA hmc_APBC"
+  echo "./run_tests wilson_flow bWflow"
+  exit 0
+fi
 
-  cd ../../$dir/
+dir=$1
+target=$2
 
-  # Compile
-  echo "Compiling su3_$target..."
-  if ! make -f Make_scalar su3_$target >& /dev/null ; then
-    echo "ERROR: su3_$target compilation failed"
-    make -f Make_scalar su3_$target
-    exit
-  fi
-
-  # Run
-  cd ../testsuite/
-  rm -f scalar/$target.out
-  echo "Running su3_$target..."
-  ../$dir/su3_$target < in.$target > scalar/$target.out
-
-  # Check
-  cd scalar/
-  d="`diff -I'Time' -I'time' -I'seconds' -I'^start' -I'^exit:' $target.ref $target.out`"
-  if [ -n "$d" ] ; then   # Non-zero string length
-    echo "$target.ref and $target.out differ:"
-    echo "$d"
-  else
-    echo "PASS: su3_$target reproduces reference output"
-  fi
+# Compile
+cd ../../$dir/
+echo "Compiling su3_$target..."
+if ! make -f Make_scalar su3_$target >& /dev/null ; then
+  echo "ERROR: su3_$target compilation failed"
+  make -f Make_scalar su3_$target
   exit
 fi
+
+# Run
+cd ../testsuite/
+rm -f scalar/$target.out
+echo "Running su3_$target..."
+../$dir/su3_$target < in.$target > scalar/$target.out
+
+# Check
+cd scalar/
+d="`diff -I'Time' -I'time' -I'seconds' -I'^start' -I'^exit:' $target.ref $target.out`"
+if [ -n "$d" ] ; then   # Non-zero string length
+  echo "$target.ref and $target.out differ:"
+  echo "$d"
+else
+  echo "PASS: su3_$target reproduces reference output"
+fi
+exit

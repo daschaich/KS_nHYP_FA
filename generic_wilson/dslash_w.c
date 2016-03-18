@@ -1,5 +1,4 @@
 /*************  dslash_w3.c ************************************/
-/* MIMD version 7 */
 /* This version includes gathers from temp */
 
 /* 9/06/03 added gathers from temp - CD */

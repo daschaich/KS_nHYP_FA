@@ -1,8 +1,6 @@
 /*************************** eigen_stuff_qdp.c  ***************************/
 /* Eigenvalue and Eigevector computation routines.  QDP version.
  * K.O. 8/99 Started.
- * MIMD version 7
- *
  * These routines are for the computation of the Eigenvalues and Eigevectors
  * of the Kogut-Susskind dslash^2.
  */

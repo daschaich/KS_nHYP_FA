@@ -1,8 +1,6 @@
 #ifndef _GENERIC_QOP_H
 #define _GENERIC_QOP_H
-/******************** generic_qop.h *********************************
-*  MIMD version 7 	 				            *
-*/
+/******************** generic_qop.h *********************************/
 
 #include <qop.h>
 #include "../include/su3.h"

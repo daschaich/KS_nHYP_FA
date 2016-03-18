@@ -19,7 +19,6 @@ int initial_set() {
   if (mynode() == 0) {
     // Print banner
     printf("Wilson flow with optional MCRG blocking\n");
-    printf("MIMD version 7ish\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     time_stamp("start");
     status = get_prompt(stdin, &prompt);

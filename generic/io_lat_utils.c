@@ -1,5 +1,4 @@
 /*********************** io_lat_utils.c *************************/
-/* MIMD version 7 */
 
 /* routines for gauge configuration input/output. */
 /* This works for most machines.  Wrappers for parallel I/O
