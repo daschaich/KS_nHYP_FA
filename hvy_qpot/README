@@ -1,0 +1,48 @@
+Measure time-like Wilson loops with once-HYP-smeared links for the space-like segments, giving better overlap for the extraction of the heavy quark potential.
+
+Always measure planar, time-like Wilson loops (w_loop2.c).
+The input parameter "off_axis_flag 1" turns on measurement of off-axis time-like loops with space-like parts along the directions (1, 1, 0), (2, 1, 0) and (1, 1, 1) (and all others related by the lattice symmetry).
+
+We first HYP-smear the links, then perform a gauge transformation to axial gauge.
+The gauge transformation code copies the nontrivial timelike link to all timeslices to simplify the Wilson loop measurement code.
+(For APE smearing or for iterating smearing, we'd presumably want to go to axial gauge first, then smear only the spatial links.)
+
+DS removed code for some simple glueball operators, which would need to be checked before being used.
+
+The sample input file is rather simple:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+off_axis_flag 1
+reload_serial tests/lat.sample
++++
+
+The output is a bit less simple:
+First, (x+1)*(t+1) rectangular Wilson loops are tagged
+WILS_LOOP1_1 x t value
+
+Next, the length-(t+1) off-axis loops (assuming that the spatial volumes are cubic L^3) are tagged
+WILS_LOOP2_1 v t value
+v = 0 to L/2 - 1 are "45 degree" loops, r = (i + j)N, N = 1, 2, 3...
+v = L/2 to L/2 + (L/4 - 1) are "sqrt 5" loops, r = (2i + j)N, N = 1, 2, 3...
+v = L/2 + L/4 to (L - 1) + L/4 are "111" loops, r = (i + j + k)N, N = 1, 2, 3...
+
+For example, if L = 12, then L/2 - 1 = 5 and L/4 - 1 = 2, so
+0 to 5 are (1, 1) to (6, 6) loops
+6, 7 and 8 are (2, 1), (4, 2) and (6, 3) loops
+9 to 14 are (1, 1, 1) to (6, 6, 6) loops
+
+Fitting done in a separate directory with a nest of shell scripts.
+
+DS cheats:
+make -f Make_local su3_hqp
+make -f Make_cluster_gcc su3_hqp
+make -f Make_livermore_icc su3_hqp

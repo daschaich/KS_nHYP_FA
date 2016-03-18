@@ -1,0 +1,13 @@
+magic_number 20103
+time_stamp "Wed Dec 31 14:07:26 1997"
+checksums "38abcb08 70225d93"
+nx 4
+ny 4
+nz 4
+nt 4
+action.description "Gauge plus fermion"
+gauge.description "One plaquette gauge action"
+gauge.beta11 5.600000
+quark.description "KS fermions"
+quark.flavors 4
+quark.mass 0.010000

@@ -1,0 +1,74 @@
+Features:
+  nHYP-smeared staggered eigenvalues
+  Arbitrary number of nHYP smearings
+  Start from arbitrary minimum
+  Can break total number of eigenvalues into multiple blocks
+
+Parameters:
+  nsmear, alpha_hyp0, alpha_hyp1, alpha_hyp2
+    Number of smearings and smearing parameters
+
+  maxIter
+    Roughly the maximum number of matrix--vector multiplications
+    This limit should not be reached
+
+  eig_tol
+    Convergence criterion
+
+  start
+    Minimum eigenvector to be calculated
+
+  Nvecs, block
+    Total number of eigenvectors to calculate in blocks of this size
+    Only full blocks will be calculated, until we have enough
+    Example: If Nvecs=750 and block=200, the program will calculate
+      0--199, 200--399, 400--599, 600--799
+
+Sample infile:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+start 0
+Nvecs 14
+block 14
+eig_tol 1e-7
+maxIter 2000
+
+reload_serial tests/c4444.d
++++
+
+# Set path in ../PRIMME/Make_flags
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_local Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_local su3_eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_cluster Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_cluster_gcc su3_eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_bc Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_bc su3_eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_gordon Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_gordon_icc su3_eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_stampede Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_stampede_icc su3_eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_livermore Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_livermore_icc su3_eig
+
+# Janus
+module load intel/intel-13.0.0
+module load slurm
+module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_janus Make_flags && make -f make libz && cd ../eig_KS_PRIMME
+make -f Make_janus su3_eig

@@ -1,0 +1,128 @@
+# ------------------------------------------------------------------
+nHYP-smeared staggered HMC
+
+Features:
+  nHYP-smeared staggered fermions with adjoint plaquette term
+  HMC with three time scales (two fermion scales and gauge)
+  Omelyan integrator
+  Optional Hasenbusch preconditioning with one heavier mass
+  Arbitrary number of staggered fermion fields (4x flavors)
+  Arbitrary number of stochastic sources for fermionic measurements
+  Arbitrary number of nHYP smearings
+
+References:
+  Omelyan tuning: hep-lat/0505020
+  Hasenbusch preconditioning with multiple time scales: hep-lat/0506011
+
+This HMC essentially merges parts of three different versions of the MILC code
+Lots of cruft stripped for simplicity and readability
+Examples include removing CHEM_POT, fixing NCOL=3 and fundamental fermion rep
+
+nHYP smearing is now hard-coded, with alpha as input (example below)
+Nsmear is the number of smearings to do
+  If you don't want to smear, set Nsmear=1 and alpha=(0, 0, 0)
+dt is no longer input; give traj_length instead (example below)
+All floats replaced by Reals
+Site variables xxx1 and xxx2 replaced by psi[MAX_FIELDS][MAX_MASSES]
+               phi1 and phi2 replaced by chi[MAX_FIELDS][MAX_MASSES]
+               ttt1 and ttt2 replaced by ttt[MAX_FIELDS][MAX_MASSES]
+               cg_p and resid renamed p and r, respectively
+               MAX_FIELDS and MAX_MASSES #defined in defines.h
+               See lattice.h for more details
+BEWARE: the F_OFFSET macro can hide mistakes from the compiler
+        (e.g., F_OFFSET(chi1) compiles but should be F_OFFSET(chi1[i]))
+
+defines.h defines Omelyan parameters, nHYP IR_STAB and EPS_SQ, as well as CG_DEBUG and NHYP_DEBUG
+
+congrad_helpers.c added to hold CG helper functions that were in a v6 congrad file
+
+Debugging checks:
+  PASSED: The usual check that Delta S scales quadratically with step size
+          (Make sure error_per_site is sufficiently small!)
+  PASSED: Reversibility
+  PASSED: Comparison with same action in QHMC
+  Set Hasenbusch_mass=mass and generate random numbers only for the
+    first pseudofermion (copying them into the second)
+    At the least, PF=1 and PF=2 should then produce identical results
+  Compare single-pseudofermion code with single-level Omelyan (if I wrote one)
+# ------------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------------
+# Sample input files not including Hasenbusch preconditioning:
+# Both inner and outer loops work on the same fermion fields
+# Still need to specify nstep for both loops
+# Roughly, dt = traj_length / N where N = 2 * nstep[0] * nstep[1]
+#          (update_step does two inner loops for each outer step)
+# nstep_gauge is number of (cheap) gauge steps per inner fermion step
+prompt 0
+nflavors 12
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+warms 0
+trajecs 1
+traj_length 1
+number_of_PF 1
+nstep 5
+nstep 2
+nstep_gauge 1
+traj_between_meas 1
+beta 6
+beta_a -0.25
+mass 0.01
+Hasenbusch_mass 0.1           # Unused but specified by request
+
+Nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+npbp 5
+max_cg_iterations 500
+max_cg_restarts 1
+error_per_site 1e-5
+reload_serial tests/c4444
+forget
+# ------------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------------
+# Sample input file with Hasenbusch preconditioning:
+prompt 0
+nflavors 12
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+warms 0
+trajecs 1
+traj_length 1
+number_of_PF 2
+nstep 5                   # Number of steps for light-fermion outer level
+nstep 1                   # Number of inner Hasenbusch steps per outer step
+nstep_gauge 10
+traj_between_meas 1
+beta 6
+beta_a -0.25
+mass 0.01
+Hasenbusch_mass 0.1
+
+Nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+max_cg_iterations 500
+max_cg_restarts 1
+error_per_site 1e-5
+reload_serial tests/c4444
+forget
+# ------------------------------------------------------------------

@@ -1,0 +1,99 @@
+# ------------------------------------------------------------------
+MAKEFILE = Make_local
+
+MPP            =
+PRECISION      = 2
+CC             = gcc
+OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
+CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
+               # Large files gcc only
+MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
+
+WANTQOP        =
+WANTQDP        =
+WANTQIO        = # true
+WANTQMP        =
+
+SCIDAC         = # /home/schaich/current/lqcd/install
+QIOSNG         = # $(SCIDAC)/qio-single
+QIOPAR         = # $(SCIDAC)/qio
+QMPSNG         = # ${SCIDAC}/qmp-single
+QMPPAR         = # ${SCIDAC}/qmp
+QDP            = # ${SCIDAC}/qdp
+QLA            = # ${SCIDAC}/qla
+QOP            = # ${SCIDAC}/qop
+QOPQDP         = # ${SCIDAC}/qopqdp
+
+include ../Make_template_qop
+include ../Make_template_scidac
+
+LD             = ${CC}
+IMPI           =
+LMPI           =
+LIBADD         =
+INLINEOPT      = # -DINLINE # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
+CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
+CPROF          =
+CDEBUG         =
+KSCGSTORE      = # -DDBLSTORE_FN -DD_FN_GATHER13
+CPREFETCH      =
+KSCGMULTI      = # -DKS_MULTICG=HYBRID
+KSFFMULTI      = # -DKS_MULTIFF=FNMAT
+KSRHMCINT      =
+
+CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
+                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
+                 ${KSFFMULTI} ${KSRHMCINT}
+
+MAKELIBRARIES  = Make_vanilla
+
+# Also check include/config.h.
+# ------------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------------
+# Stuff below shouldn't change
+ifeq ($(strip ${MPP}),true)
+  ifeq ($(strip ${HAVEQMP}),true)
+     COMMTYPE = QMP
+     COMMPKG = com_qmp.o
+  else
+     COMMTYPE = MPI
+     COMMPKG = com_mpi.o
+  endif
+else
+  ifeq ($(strip ${HAVEQMP}),true)
+     COMMTYPE = SINGLE
+     COMMPKG = com_qmp.o
+  else
+     COMMTYPE = SINGLE
+     COMMPKG = com_vanilla.o
+  endif
+endif
+
+ifeq ($(strip ${HAVEQDP}),true)
+  QDPPREC = -DQDP_Precision=${PRECISION}
+endif
+
+ifeq ($(strip ${HAVEQOP}),true)
+  QOPPREC = -DQOP_Precision=${PRECISION}
+endif
+
+PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
+
+# Complete set of compiler flags - do not change
+CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} \
+         ${PREC} ${CLFS} ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} \
+         ${DARCH} ${IMPI}
+
+ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
+
+check:
+	make -f Make_test check
+
+test_clean:
+	make -f Make_test test_clean
+
+include Make_template
+# ------------------------------------------------------------------

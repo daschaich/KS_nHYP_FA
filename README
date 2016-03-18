@@ -1,0 +1,35 @@
+MILC-based code for nHYP-smeared staggered fermions and more
+
+Top-level directories follow the MILC layout
+generic        -- Procedures common to most applications: communications, I/O, data layout, pure-gauge computations, etc.
+generic_ks     -- Procedures common to staggered-fermion (Kogut--Susskind) applications
+generic_nhyp   -- Procedures common to nHYP-smeared applications
+generic_wilson -- Procedures common to Wilson-fermion applications
+include        -- Header files for common procedures
+libraries      -- Single processor linear algebra routines
+
+Then there are various application directories, each with more detailed READMEs:
+KS_nHYP_FA        -- nHYP-smeared staggered HMC with fundamental and adjoint plaquette terms in gauge action
+S4b_params        -- Order parameters for S4-broken lattice phase
+blocked_eig       -- Measure eigenvalues on RG-blocked lattice
+check_load        -- Just load lattice to check plaquette and link trace
+double_lattice    -- Save lattice doubled in all four directions with periodic boundary conditions
+eig_KS_Kalkreuter -- Native staggered Dirac eigenvalue calculations using Kalkreuter algorithm
+eig_KS_PRIMME     -- Good staggered Dirac eigenvalue calculations using PRIMME
+eig_Wilson_PRIMME -- Good (hermitian) Wilson Dirac eigenvalue calculations using PRIMME
+hvy_qpot          -- Wilson loops for heavy quark (static) potential
+ks_spectrum       -- Staggered spectrum
+ks_vacpol         -- Staggered vacuum polarization tensors for S parameter
+mcrg_blocking     -- RG blocking and related measurements
+mode_number       -- Stochastic staggered eigenvalue mode number nu(lambda)
+smearing          -- HYP smear and save for analyses using different code bases
+wilson_flow       -- Wilson flow with optional RG-blocking and measurements
+
+Finally, the testsuite directory contains some sample input files and corresponding output for testing
+
+Dependences:
+The good eigenvalue measurements require PRIMME and LAPACK
+
+Feel free to contact David Schaich with any questions, requests for new
+features, or (especially) bug reports:
+http://www.davidschaich.net

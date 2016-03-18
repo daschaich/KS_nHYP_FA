@@ -1,0 +1,41 @@
+Measure Wilson and Polyakov loops after repeated two-nHYP blocking steps.
+The total number of blocking steps is determined by the smallest side of the lattice.
+The input file must specify the number of outer nHYP smearing parameters to use ("num_alpha"), as well as their values ("alpha_mcrg").
+The specialized block_nhyp_mcrg(num, block) routine handles "neighboring" sites separated by 2^block links.
+
+Sample input file:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+alpha_hyp1 0.2    # Fixed inner smearing parameters
+alpha_hyp2 0.2
+
+num_alpha 5       # Number of outer smearing parameters
+alpha_mcrg 0.50   # Values of outer smearing parameters
+alpha_mcrg 0.55   # (Must be exactly num_alpha of them!)
+alpha_mcrg 0.60
+alpha_mcrg 0.65
+alpha_mcrg 0.70
+
+reload_serial tests/c44.d
++++
+
+DS cheats:
+make -f Make_local su3_mcrg
+make -f Make_cluster_gcc su3_mcrg
+make -f Make_gordon_icc su3_mcrg
+make -f Make_livermore_icc su3_mcrg
+
+# Janus
+module load intel/intel-13.0.0
+module load slurm
+module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
+make -f Make_janus su3_mcrg
+
+# Jlab
+module load openmpi-1.5.3
+make -f Make_jlab_gcc su3_mcrg

@@ -1,0 +1,80 @@
+Measure Wilson flow using Runge--Kutta integration
+At specified points in the flow, measure MCRG-blocked observables
+Option to save the Wilson-flowed lattice at the end of the calculation
+
+Parameters:
+  epsilon
+    Runge--Kutta step size, 0.02 should be safe
+
+  tmax
+    How far to integrate
+    If tmax=0, the program will try to decide when to stop,
+    but this has not been carefully tested
+
+  alpha_hyp{0,1,2}
+    HYP smearing parameters for the twice-HYP smeared blocking transformation
+
+  num_block, tblock
+    The number MCRG-blocked observable measurements to do, at the times
+    at which to do them.
+
+Output:
+  WFLOW  t  plaq  E  t^2*E  t*d(t^2*E)/dt  12t^2*(3-plaq)  top.charge
+  E and the topological charge are calculated from the clover term
+  The alternative based on the plaquette should approach t^2*E for t>~1
+
+  Wilson flow time t prepended to MCRG-blocked output
+
+Sample input file:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+epsilon 0.01
+tmax 0.3
+
+alpha_hyp0 0.6
+alpha_hyp1 0.2
+alpha_hyp2 0.2
+
+num_block 5
+tblock 0
+tblock 0.1
+tblock 0.15
+tblock 0.2
+tblock 0.3
+
+reload_serial tests/c44.d
+forget
++++
+
+# DS cheats:
+make -f Make_scalar su3_bWflow
+make -f Make_cluster_gcc su3_bWflow
+make -f Make_jpsi_gcc su3_bWflow
+make -f Make_gordon_icc su3_bWflow
+make -f Make_livermore su3_bWflow
+make -f Make_stampede_icc su3_bWflow
+
+# Fermilab SciDAC libraries need special paths
+export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0-mpiexec/bin:$PATH 
+export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0-mpiexec/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
+make -f Make_ds su3_bWflow
+
+export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0-mpiexec/bin:$PATH 
+export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0-mpiexec/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
+make -f Make_bc su3_bWflow
+
+# Janus
+module load intel/intel-13.0.0
+module load slurm
+module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
+make -f Make_janus su3_bWflow
+
+# Gordon gcc
+module purge
+module load gnu openmpi
+make -f Make_gordon_icc su3_bWflow

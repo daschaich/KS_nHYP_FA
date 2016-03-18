@@ -1,0 +1,51 @@
+Features:
+  nHYP-smeared hermitian-Wilson eigenvalues
+  Arbitrary number of nHYP smearings
+
+Parameters:
+  nsmear, alpha_hyp0, alpha_hyp1, alpha_hyp2
+    Number of smearings and smearing parameters
+
+  maxIter
+    Roughly the maximum number of matrix--vector multiplications
+    This limit should not be reached
+
+  eig_tol
+    Convergence criterion
+
+  Nvecs
+    Total number of eigenvectors to calculate
+
+Sample infile:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+mass 1.0
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+Nvecs 10
+eig_tol 1e-6
+maxIter 2000
+
+reload_serial tests/c4444.d
++++
+
+# Set path in ../PRIMME/Make_flags
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_local Make_flags && make -f make libz && cd ../eig_Wilson_PRIMME
+make -f Make_local su3_DDdag_eig
+make -f Make_local su3_H4eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_livermore Make_flags && make -f make libz && cd ../eig_Wilson_PRIMME
+make -f Make_livermore_icc su3_DDdag_eig
+make -f Make_livermore_icc su3_H4eig
+
+cd ../PRIMME/ && rm -f Make_flags && ln -s Make_flags_jpsi Make_flags && make -f make libz && cd ../eig_Wilson_PRIMME
+make -f Make_jpsi su3_DDdag_eig
+make -f Make_jpsi su3_H4eig

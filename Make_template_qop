@@ -1,0 +1,67 @@
+# This is not a standalone Makefile
+# It is intended to be included in other Makefiles
+
+# It defines macros for QOP (SciDAC Level 3)
+# HAVEQOP          What we are compiling with
+# LIBQOP INCQOP    The -L and -I compiler and linker lists
+# INCDEPQOP LIBDEPQOP  Lists for make dependencies
+# ASQFORCEQOP
+
+# Requires input macros
+# WANTQOP                 User requests (true or otherwise)
+# PRECISION
+
+ifneq ($(strip ${WANTQOP}),)
+  HAVEQOP = true
+
+  # Fermion links
+  FLINKS_FNQOP = load_qop_asqtad_coeffs_D.o load_qop_asqtad_coeffs_F.o
+
+  ifeq ($(strip ${WANTQOP}),QDP)
+    # Requires QDP whether or not the user requested it
+    WANTQDP = true
+
+    # QOPQDP package
+
+    # We always need the qop.h header
+    QOPINCDIR = $(strip ${QOPQDP})/include
+    # Path to the qopqdp library
+    QOPLIBDIR = $(strip ${QOPQDP})/lib
+
+    IQOP = -I${QOPINCDIR}
+    INCDEPQOP = ${QOPINCDIR}
+    LQOP = -L${QOPLIBDIR} -lqopqdp
+
+  else
+    # Default: MILC nonoptimized routines.  They are non-packaged.
+
+    # We always need the qop.h header
+    QOPINCDIR = $(strip ${QOP})/include
+
+    IQOP = -I${QOPINCDIR}
+    INCDEPQOP = ${QOPINCDIR}
+
+    # General requirement
+    GENERICQOP = qop_milc.o qop_milc_D.o qop_milc_F.o qop_milc_utilities.o
+    # Gauge force
+    SYMZK1FORCEQOP = gauge_force_symzk1_qop_milc.o
+    # Fermion links
+    FLINKS_FNQOP += fermion_links_fn_qop_milc_D.o \
+      fermion_links_fn_qop_milc_F.o
+    # Conjugate gradient
+    ASQINVERTQOP = d_congrad5_fn_qop_milc_D.o d_congrad5_fn_qop_milc_F.o \
+       dslash_fn_qop_milc_D.o dslash_fn_qop_milc_F.o
+    ASQINVERTQOP += ks_multicg_qop_milc_D.o ks_multicg_qop_milc_F.o
+    # Fermion force
+    ASQFORCEQOP = fermion_force_asqtad_qop_milc.o ff_opt.o
+  endif
+
+  ifneq ($(strip ${WANTQOP}),)
+    LIBQOP = ${LQOP}
+    INCQOP = ${IQOP}
+  endif
+
+else
+  # Nothing needs to be defined here if we don't want QOP
+  HAVEQOP = 
+endif  # if HAVEQOP

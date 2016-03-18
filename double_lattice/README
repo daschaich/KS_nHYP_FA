@@ -1,0 +1,16 @@
+Save lattice doubled in all four directions with periodic boundary conditions
+
+Sample input file:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+reload_serial tests/c44.d
+save_serial tests/c44.doubled
++++
+
+DS cheats:
+make -f Make_local su3_double
+make -f Make_livermore_icc su3_double

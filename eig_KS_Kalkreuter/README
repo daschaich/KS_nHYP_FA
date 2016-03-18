@@ -1,0 +1,65 @@
+Features:
+  nHYP-smeared staggered eigenvalues
+  Arbitrary number of nHYP smearing parameters
+
+Parameters:
+  nsmear, alpha_hyp0, alpha_hyp1, alpha_hyp2
+    Number of smearings and smearing parameters
+
+  maxIter
+    Maximum iterations allowed for Ritz functional minimization, 200--300
+    This limit should be rarely reached
+
+  restart
+    Ritz functional minimization loses orthogonality and has to be restarted
+    This should be a number in the range 10 to 30
+
+  kiters
+    The maximum number of Kalkruter iterations
+    Each iteration is a Ritz minimization for each eigenvector
+    followed by a diagonalization of the resulting matrix
+
+  eig_tol
+    See comments in eig.c about the convergence criterion
+
+  error_decr
+    Ritz functional minimization stops after the error decreases by this factor
+    Kalkreuter suggests 0.3 as the optimum value
+    This prevents wasting time minimizing the Ritz functional
+    Instead, converge a little for each eigenvector and then move on to the next
+    The goal is to achieve uniform convergence for all the eigenvectors
+
+Sample infile:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+Nvecs 12
+eig_tol 1e-7
+maxIter 300
+restart 10
+kiters 20
+error_decr 0.3
+
+reload_serial tests/c4444.d
++++
+
+DS cheats:
+make -f Make_local su3_eig
+make -f Make_cluster_gcc su3_eig
+make -f Make_gordon_icc su3_eig
+
+# Janus
+module load intel/intel-13.0.0
+module load slurm
+module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
+make -f Make_janus su3_eig

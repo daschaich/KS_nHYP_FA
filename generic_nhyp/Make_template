@@ -1,0 +1,56 @@
+#  Generic routines for Kogut-Susskind fermions
+#  MIMD version 7
+#
+#  Generic make-include file for generic_ks codes
+#  This template file defines rules and macros common to all applications
+#  It is intended to be an include file for other Makefiles.
+#  Don't use it by itself!
+#
+#  The paths are relative to the application directory.
+
+G_NHYP_ALL =    \
+  block_nhyp.o  \
+  nhyp.o        \
+  scalar_add.o  \
+  switch.o      \
+  unphased_switch.o
+
+# Must match our headers in nhyp_includes.h
+G_NHYP_HEADERS = \
+  ../include/config.h \
+  lattice.h \
+  ../include/complex.h \
+  ../include/su3.h \
+  ../include/macros.h \
+  ../include/dirs.h \
+  ../include/comdefs.h \
+  ../include/generic.h \
+  ../include/generic_ks.h \
+  ../include/generic_nhyp.h
+
+G_NHYP_ALL_DEPEND = \
+  ../generic_nhyp/nhyp_includes.h \
+  ../generic_nhyp/Make_template \
+  ../include \
+  ${LASTMAKE} \
+  ${G_NHYP_HEADERS}
+
+${G_NHYP_ALL} : ${G_NHYP_ALL_DEPEND}
+
+block_nhyp.o: ../generic_nhyp/block_nhyp.c
+	${CC} -c ${CFLAGS} ../generic_nhyp/block_nhyp.c
+
+boundary_flip_nhyp.o: ../generic_nhyp/boundary_flip_nhyp.c
+	${CC} -c ${CFLAGS}  ../generic_nhyp/boundary_flip_nhyp.c
+
+nhyp.o: ../generic_nhyp/nhyp.c
+	${CC} -c ${CFLAGS} ../generic_nhyp/nhyp.c
+
+scalar_add.o: ../generic_nhyp/scalar_add.c
+	${CC} -c ${CFLAGS} ../generic_nhyp/scalar_add.c
+
+switch.o: ../generic_nhyp/switch.c
+	${CC} -c ${CFLAGS} ../generic_nhyp/switch.c
+
+unphased_switch.o: ../generic_nhyp/unphased_switch.c
+	${CC} -c ${CFLAGS} ../generic_nhyp/unphased_switch.c

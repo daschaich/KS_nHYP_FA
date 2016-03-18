@@ -1,0 +1,53 @@
+Measure eigenvalues on RG-blocked lattice, which can optionally be saved
+
+Right now, two HYP smearings are hard-coded in the blocking transformation
+An arbitrary number (including zero) can be done after the blocking, with a different set of smearing parameters
+Before blocking and smearing, we run the Wilson flow until time tmax
+We keep the general block_nhyp_mcrg(num, block) routine even though num=0 and block=1 are fixed
+
+Sample input file:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+alpha_mcrg0 0.6
+alpha_mcrg1 0.2
+alpha_mcrg2 0.2
+
+dx 0  # Where in the hypercube the blocked lattice originates
+dy 0
+dz 0
+dt 0
+
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+tmax 0.1
+epsilon 0.01
+
+Nvecs 14
+eig_tol 1e-6
+maxIter 300
+restart 10
+kiters 20
+error_decr 0.3
+
+mass 0.00
+npbp 5
+max_cg_iterations 5000
+max_cg_restarts 1
+error_per_site 1e-6
+
+reload_serial tests/c44.d
+save_serial tests/c44.blocked
++++
+
+DS cheats:
+make -f Make_local su3_block
+make -f Make_cluster_gcc su3_block

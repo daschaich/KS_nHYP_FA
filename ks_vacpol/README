@@ -1,0 +1,40 @@
+Measure vector and axial vacuum polarization tensors
+with staggered phases and nHYP smearing
+
+Sample input file:
++++
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 1411
+
+mass 0.02
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+src_x 0
+src_y 0
+src_z 0
+src_t 0
+
+max_cg_iterations 1000
+max_cg_restarts 1
+error_per_site 1e-8
+reload_serial tests/c4444.d
+outpat .TEST
++++
+
+make -f Make_local su3_vacpol
+make -f Make_livermore su3_vacpol
+
+# Fermilab SciDAC libraries need special paths
+export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0b/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0b/lib:/usr/local/mvapich2-2.0b/lib64:/usr/local/ofed/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
+make -f Make_ds su3_vacpol
+
+export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0-mpiexec/bin:$PATH 
+export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0-mpiexec/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
+make -f Make_bc su3_vacpol

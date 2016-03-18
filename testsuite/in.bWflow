@@ -1,0 +1,22 @@
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+epsilon 0.01
+tmax 0.5
+
+alpha_hyp0 0.6
+alpha_hyp1 0.2
+alpha_hyp2 0.2
+num_block 6
+tblock 0
+tblock 0.1
+tblock 0.2
+tblock 0.3
+tblock 0.4
+tblock 0.5
+
+reload_serial config.4444
+forget
