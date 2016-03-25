@@ -42,37 +42,35 @@ HEADERS = ${GLOBAL_HEADERS} ${MY_HEADERS}
 
 # All required object files
 # Basic set from current directory
-MY_OBJECTS =       \
-  control.o        \
-  setup.o          \
-  gauge_info.o     \
-  grsource_imp.o   \
-  action.o         \
-  meas_plaq.o      \
-  meas_link.o      \
-  update_o.o       \
-  update_h.o       \
-  update_u.o       \
-  block_N_fatten.o \
-  force_nhyp.o     \
-  congrad.o        \
-  congrad_helpers.o
+MY_OBJECTS = control.o        \
+             setup.o          \
+             gauge_info.o     \
+             grsource_imp.o   \
+             action.o         \
+             meas_plaq.o      \
+             meas_link.o      \
+             update_o.o       \
+             update_h.o       \
+             update_u.o       \
+             block_N_fatten.o \
+             force_nhyp.o     \
+             congrad.o        \
+             congrad_helpers.o
 
-# Basic set from generic directory
-G_OBJECTS =         \
-  check_unitarity.o \
-  plaq.o            \
-  io_helpers.o      \
-  io_lat4.o         \
-  io_lat_utils.o    \
-  linktrsum.o       \
-  make_lattice.o    \
-  nersc_cksum.o     \
-  ploop.o           \
-  ranmom.o          \
-  ranstuff.o        \
-  reunitarize.o     \
-  remap_stdio_from_args.o
+# Basic set from generic directory (alphabetically)
+G_OBJECTS = check_unitarity.o \
+            io_helpers.o      \
+            io_lat4.o         \
+            io_lat_utils.o    \
+            linktrsum.o       \
+            make_lattice.o    \
+            nersc_cksum.o     \
+            plaq.o            \
+            ploop.o           \
+            ranmom.o          \
+            ranstuff.o        \
+            reunitarize.o     \
+            remap_stdio_from_args.o
 
 ifeq ($(strip ${HAVEQIO}),true)
   G_OBJECTS += io_scidac.o io_scidac_types.o
@@ -82,13 +80,10 @@ endif
 G_KS_OBJECTS = rephase.o
 
 # Basic set from generic_nhyp directory
-G_NHYP_OBJECTS =  \
-  nhyp.o          \
-  block_nhyp.o    \
-  switch.o        \
-  scalar_add.o
-
-# Objects depending on architecture and software package
+G_NHYP_OBJECTS = nhyp.o       \
+                 block_nhyp.o \
+                 switch.o     \
+                 scalar_add.o
 
 # Selection of layout
 ifeq ($(strip ${HAVEQDP}),true)
@@ -124,14 +119,13 @@ ${LASTMAKE}: ${ALL_MAKES}
 	touch ${LASTMAKE}
 
 # All make files used in this compilation
-ALL_MAKES =                   \
-  Make_template               \
-  ${MAKEFILE}                 \
-  ../Make_template_qop        \
-  ../Make_template_scidac     \
-  ../generic/Make_template    \
-  ../generic_ks/Make_template \
-  ../generic_nhyp/Make_template
+ALL_MAKES = Make_template               \
+            ${MAKEFILE}                 \
+            ../Make_template_qop        \
+            ../Make_template_scidac     \
+            ../generic/Make_template    \
+            ../generic_ks/Make_template \
+            ../generic_nhyp/Make_template
 
 # To force a remake when changing any make file, header, or target
 ${OBJECTS} : ${HEADERS} ${LASTMAKE} ${ALL_MAKES}

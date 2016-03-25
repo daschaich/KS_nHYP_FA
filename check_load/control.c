@@ -1,13 +1,9 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) MCRG-blocked measuremenst
+// Main procedure for SU(3) lattice loading check
 #define CONTROL
 #include "load_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
-int main(int argc, char *argv[])  {
+int main(int argc, char *argv[]) {
   int prompt;
 
   // Setup

@@ -48,14 +48,15 @@ MY_OBJECTS = control.o         \
              stout_step_rk.o   \
              blocked_gauge_loops.o
 
-# Basic set from generic directory
-G_OBJECTS = d_plaq4.o         \
+# Basic set from generic directory (alphabetically)
+G_OBJECTS = check_unitarity.o \
             io_helpers.o      \
             io_lat4.o         \
             io_lat_utils.o    \
+            linktrsum.o       \
             make_lattice.o    \
             nersc_cksum.o     \
-            check_unitarity.o \
+            plaq.o            \
             reunitarize.o     \
             field_strength.o  \
             remap_stdio_from_args.o

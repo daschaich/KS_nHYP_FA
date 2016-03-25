@@ -41,8 +41,3 @@ For example, if L = 12, then L/2 - 1 = 5 and L/4 - 1 = 2, so
 9 to 14 are (1, 1, 1) to (6, 6, 6) loops
 
 Fitting done in a separate directory with a nest of shell scripts.
-
-DS cheats:
-make -f Make_local su3_hqp
-make -f Make_cluster_gcc su3_hqp
-make -f Make_livermore_icc su3_hqp

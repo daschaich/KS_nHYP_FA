@@ -229,7 +229,7 @@ gauge_file *reload_lattice(int flag, char *filename) {
     node0_printf("CHECK PLAQ: %e %e\n",g_ssplaq, g_stplaq);
     node0_printf("CHECK NERSC LINKTR: %e CKSUM: %x\n",
                  linktr.real / 3.0, nersc_checksum);
-#else               // Double precision
+#else     // Double precision
     node0_printf("CHECK PLAQ: %.16e %.16e\n",g_ssplaq, g_stplaq);
     node0_printf("CHECK NERSC LINKTR: %.16e CKSUM: %x\n",
                  linktr.real / 3.0, nersc_checksum);
@@ -246,7 +246,8 @@ gauge_file *reload_lattice(int flag, char *filename) {
   reunitarize();
   max_deviation2 = check_unitarity();
   g_floatmax(&max_deviation2);
-  node0_printf("Reunitarized for double precision. Max deviation %.2g changed to %.2g\n",
+  node0_printf("Reunitarized for double precision.  ");
+  node0_printf("Max deviation %.2g changed to %.2g\n",
                max_deviation, max_deviation2);
 #endif
   fflush(stdout);

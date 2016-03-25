@@ -156,13 +156,14 @@ int main(int argc, char *argv[])  {
       }
     }
     g_doublesum(&E);
-    E /= (volume * 64); // Normalization factor of 1/8 for each F_munu
+    E /= (volume * 64.0); // Normalization factor of 1/8 for each F_munu
     new_value = t * t * E;
     der_value = fabs(t) * (new_value - old_value) / fabs(epsilon);
     // Any negative signs in t and epsilon should cancel out anyway...
 
     // Might as well extract topology
-    topo = 0;
+    // Normalization is 1/4pi^2 again with 1/8 for each F_munu
+    topo = 0.0;
     FORALLSITES(i, s) {
       mult_su3_nn(&(s->FS[0]), &(s->FS[5]), &t_mat); // XYZT
       tc = trace_su3(&t_mat);
@@ -177,21 +178,18 @@ int main(int argc, char *argv[])  {
       topo -= (double)tc.real;
     }
     g_doublesum(&topo);
-    // Same normalization
-    topo /= (volume * 64 * 0.02533029591058444286); // 1 / (volume / 4pi^2)
-    // Correct normalization
-//    topo *= 0.02533029591058444286 / 64; // 1/4pi^2
+    topo *= 0.000395785873603;
 
     // Check with plaquette
-    d_plaquette(&ssplaq, &stplaq);
-    td = (ssplaq + stplaq) / 2;
-    check = 12 * t * t * (3 - td);
+    plaquette(&ssplaq, &stplaq);
+    td = (ssplaq + stplaq) / 2.0;
+    check = 12.0 * t * t * (3.0 - td);
     node0_printf("WFLOW %g %g %g %g %g %g %g\n",
                  t, td, E, new_value, der_value, check, topo);
 
     // Does MCRG blocking at specified t
     if (block_count < num_block
-        && fabs(t + epsilon / 2) >= fabs(tblock[block_count])) {
+        && fabs(t + epsilon / 2.0) >= fabs(tblock[block_count])) {
       mcrg_block(tblock[block_count], blmax);
       block_count++;
     }

@@ -27,7 +27,5 @@ void write_appl_gauge_info(FILE *fp) {
   write_gauge_info_item(fp, "gauge.description", "%s",
                         "\"Fundamental--adjoint plaquette gauge action\"",
                         0, 0);
-  write_gauge_info_item(fp, "quark.description", "%s",
-                        "\"nHYP KS fermions\"", 0, 0);
 }
 // -----------------------------------------------------------------

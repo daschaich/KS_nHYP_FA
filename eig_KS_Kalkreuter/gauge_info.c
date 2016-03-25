@@ -11,8 +11,6 @@
 // where n is an integer.
 //
 // Possible keywords are listed in io_lat.h
-//
-// Includes and definitions
 #include "eig_includes.h"
 // -----------------------------------------------------------------
 
@@ -26,9 +24,6 @@
 void write_appl_gauge_info(FILE *fp) {
   write_gauge_info_item(fp, "action.description", "%s",
                         "\"Gauge plus fermion\"", 0, 0);
-  write_gauge_info_item(fp, "gauge.description", "%s",
-                        "\"Fundamental--adjoint plaquette gauge action\"",
-                        0, 0);
   write_gauge_info_item(fp, "quark.description", "%s",
                         "\"nHYP KS fermions\"", 0, 0);
 }

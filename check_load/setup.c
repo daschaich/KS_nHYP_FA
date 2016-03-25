@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// SU(3) MCRG-blocked measurements setup
+// SU(3) lattice loading setup
 #include "load_includes.h"
 #include <string.h>
 
