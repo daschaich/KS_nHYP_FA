@@ -1,7 +1,7 @@
-CC = /usr/local/mvapich2-2.0b/bin/mpicc
-COPT = -Wall -O3 -std=c99
+CC = mpiicc
+COPT = -O3 -std=c99 -Wall -Wno-strict-aliasing
 
-SCIDAC = /home/schaich/lqcd/install
+SCIDAC = /g/g10/schaich2/work/lqcd/install
 QMPDIR = $(SCIDAC)/qmp
 QLADIR = $(SCIDAC)/qla
 QIODIR = $(SCIDAC)/qio
@@ -38,7 +38,6 @@ PROGS = KSdecomp
 all: $(PROGS)
 
 KSdecomp: KSdecomp.o
-KSdecay: KSdecay.o
 
 clean:
 	-rm -rf $(PROGS) *.o
