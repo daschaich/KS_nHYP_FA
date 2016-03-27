@@ -1,7 +1,6 @@
-# Makefile for Libraries for QCD programs
-#
-# Library routines involve no communication, so are compiled
-# as for a scalar processor.
+# ------------------------------------------------------------------
+# Library routines involve no communication
+# Compile as for a scalar processor.
 
 # The specialized Makefiles are for processors for which we
 # have some assembly coded substitutes.
@@ -16,18 +15,12 @@
 
 # The SHORT32 option is required on machines with 64-bit int's
 
-MAKEFILE = Make_cluster_gcc
-
-# See Make_RS6K for IBM RS6000 assembly code
-# See Make_t3e for the Cray T3E assembly code
-# See Make_alpha for  DEC alpha assembly code
-# See Make_SSE_nasm for P3/P4 assembly code
+MAKEFILE = Make_mpi
 
 #----------------------------------------------------------------------
 #  User choices - edit to suit 
 #----------------------------------------------------------------------
 # 1. Compiler
-#CC               = /usr/local/mpich-1.2.7p1-64bit/bin/mpicc    # ( cc89 gcc xlc gcc pgcc cl g++ )
 CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
 
 #----------------------------------------------------------------------
@@ -37,8 +30,7 @@ OPT              = -O3 # ( -g -O, etc )
 #----------------------------------------------------------------------
 # 3. Other compiler optimization flags.  Uncomment stanza to suit.
 #-------------- Gnu C -------------------------------------
-#OCFLAGS = -Wall
-
+OCFLAGS = -Wall
 
 #OCFLAGS =  -fexpensive-optimizations   -fpeephole   -fstrength-reduce  -march=i586  # Simone's pick for PIII/gcc version 2.95.2.1 19991024 (release)
 #-------------- Portland Group ----------------------------

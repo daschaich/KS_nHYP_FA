@@ -18,17 +18,11 @@
 
 MAKEFILE = Make_vanilla
 
-# See Make_RS6K for IBM RS6000 assembly code
-# See Make_t3e for the Cray T3E assembly code
-# See Make_alpha for  DEC alpha assembly code
-# See Make_SSE_nasm for P3/P4 assembly code
-
 #----------------------------------------------------------------------
 #  User choices - edit to suit 
 #----------------------------------------------------------------------
 # 1. Compiler
 CC               = gcc # ( cc89 gcc xlc gcc pgcc cl g++ )
-#CC = env GCC_EXEC_PREFIX=$(GCC_EXEC_PREFIX) powerpc-gnu-elf-gcc # QCDOC
 
 #----------------------------------------------------------------------
 # 2. Compiler optimization level
