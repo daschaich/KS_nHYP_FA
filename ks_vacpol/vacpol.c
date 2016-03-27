@@ -2,7 +2,6 @@
 // Calculate the connected part of hadronic vacuum polarization
 // (two-point function of the conserved staggered vector current)
 #include "vacpol_includes.h"
-#define TOL 1.0e-8
 // -----------------------------------------------------------------
 
 
@@ -15,7 +14,7 @@ int vacuum_polarization() {
   char src_parity;
   double invtime;
   complex tc, tempvec, tempaxi, contact[4];
-  Real neg = -1.0;
+  Real neg = -1.0, tol = sqrt(rsqmin);
   site* s;
   msg_tag *tag0, *tag1;
   su3_matrix tmat, tmat2, sourcelink[4];
@@ -228,9 +227,9 @@ int vacuum_polarization() {
       CSUB(contact[nu], tc, contact[nu]);
 
       // Make sure contact term is really real
-      if (fabs(contact[nu].imag) > TOL) {
+      if (fabs(contact[nu].imag) > tol) {
         printf("WARNING: Im[contact^{%d}(%d %d %d %d)] = %.4g > %.4g\n",
-               nu, x_src, y_src, z_src, t_src, contact[nu].imag, TOL);
+               nu, x_src, y_src, z_src, t_src, contact[nu].imag, tol);
       }
       lattice[i].vacpol[nu][nu] -= contact[nu].real;
       lattice[i].axial[nu][nu] -= contact[nu].real;
@@ -247,7 +246,7 @@ int vacuum_polarization() {
 void divergence() {
   int i, mu, nu;
   site *s;
-  Real div;
+  Real div, tol = sqrt(rsqmin);
   msg_tag* tag[4];
 
   FORALLUPDIR(mu) {
@@ -262,9 +261,9 @@ void divergence() {
       div = 0.0;
       FORALLUPDIR(mu)
         div += s->vacpol[mu][nu] - ((Real *)gen_pt[mu][i])[nu];
-      if (fabs(div) > TOL)
+      if (fabs(div) > tol)
         printf("DIV^%d(%d %d %d %d) %.4g\n",
-                nu, s->x, s->y, s->z, s->t, div);
+               nu, s->x, s->y, s->z, s->t, div);
     }
   }
 

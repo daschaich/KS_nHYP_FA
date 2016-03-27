@@ -1,12 +1,11 @@
 # SU(3) Wilson flow measurements with optional MCRG blocking
-
-# Generic make-include file for Wilson flow with optional MCRG blocking
+# Generic make-include file
 # This template file defines rules and macros common to all architectures
 # It is intended to be an include file for other Makefiles
 # Don't use it by itself!
 
 # Targets:
-#   su3_bWflow
+#   su3_Wflow
 
 # Features:
 #   nHYP smearing (handles "neighboring" sites separated by 2^block links)
@@ -50,6 +49,7 @@ MY_OBJECTS = control.o         \
 
 # Basic set from generic directory (alphabetically)
 G_OBJECTS = check_unitarity.o \
+            field_strength.o  \
             io_helpers.o      \
             io_lat4.o         \
             io_lat_utils.o    \
@@ -58,7 +58,6 @@ G_OBJECTS = check_unitarity.o \
             nersc_cksum.o     \
             plaq.o            \
             reunitarize.o     \
-            field_strength.o  \
             remap_stdio_from_args.o
 
 ifeq ($(strip ${HAVEQIO}),true)
@@ -73,7 +72,7 @@ G_NHYP_OBJECTS = nhyp.o \
 ifeq ($(strip ${HAVEQDP}),true)
   LAYOUT = layout_qdp.o # Required
 else
-  LAYOUT = layout_hyper_prime.o # (layout_squares.o doesn't compile)
+  LAYOUT = layout_hyper_prime.o
 endif
 
 ADD_OBJECTS = ${MACHINE_DEP_IO} ${COMMPKG} ${QDP_OBJECTS} ${SCIDAC_OBJECTS}
@@ -132,7 +131,7 @@ endif
 DARCH = ${DHAVE_QMP} ${DHAVE_QIO} ${DHAVE_QDP} ${DHAVE_QOP}
 
 ##### Targets:
-su3_bWflow::
+su3_Wflow::
 	${MAKE} -f ${MAKEFILE} target "MYTARGET= $@"
 
 clean:

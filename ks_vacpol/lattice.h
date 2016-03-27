@@ -81,9 +81,9 @@ EXTERN double g_ssplaq, g_stplaq;
 EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME], outpat[MAXFILENAME];
-EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH
+EXTERN int startflag; // Beginning lattice: CONTINUE, RELOAD, FRESH
 EXTERN int total_iters;
-EXTERN int phases_in;   // 1 if KS and BC phases absorbed into matrices
+EXTERN int phases_in; // 1 if KS and BC phases absorbed into matrices
 
 // Some of these global variables are node dependent
 // They are set in "make_lattice()"
@@ -94,7 +94,7 @@ EXTERN int number_of_nodes;     // Number of nodes in use
 EXTERN int this_node;           // Node number of this node
 
 // Each node maintains a structure with the pseudorandom number
-//generator state
+// generator state
 EXTERN double_prn node_prn;
 
 EXTERN gauge_file *startlat_p;
@@ -123,6 +123,6 @@ EXTERN su3_matrix *Staple1[4][4];
 EXTERN su3_matrix *Staple2[4][4];
 EXTERN su3_matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
+EXTERN su3_matrix *tempmat;     // Used in ../generic_nhyp/block_nhyp.c
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

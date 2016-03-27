@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------
-MAKEFILE = Make_local
+MAKEFILE = Make_scalar
 
-MPP            =
+MPP            = true # Needed to activate SciDAC libraries
 PRECISION      = 2
 CC             = gcc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
@@ -9,7 +9,7 @@ CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                # Large files gcc only
 MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
 
-WANTQOP        = # true
+WANTQOP        =
 WANTQDP        = true
 WANTQIO        = true
 WANTQMP        = true
@@ -29,7 +29,7 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
+INLINEOPT      = -DSSE_GLOBAL_INLINE # -DC_GLOBAL_INLINE # -DC_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =

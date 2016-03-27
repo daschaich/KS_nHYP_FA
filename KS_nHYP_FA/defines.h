@@ -7,7 +7,6 @@
 //#define TIMING
 //#define CGTIME
 //#define CG_DEBUG
-//#define ANTI_PBC          // Anti-periodic BCs in all four directions
 // -----------------------------------------------------------------
 
 

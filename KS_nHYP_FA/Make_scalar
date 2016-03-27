@@ -15,13 +15,13 @@ WANTQIO        = # true
 WANTQMP        =
 
 SCIDAC         = # /home/schaich/current/lqcd/install
-QIOSNG         = # $(SCIDAC)/qio-single
+QIOSNG         = # $(SCIDAC)/qio
 QIOPAR         = # $(SCIDAC)/qio
-QMPSNG         = # ${SCIDAC}/qmp-single
+QMPSNG         = # ${SCIDAC}/qmp
 QMPPAR         = # ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
+QOP            = # ${SCIDAC}/qopqdp
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
@@ -71,19 +71,18 @@ else
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 
 # Complete set of compiler flags - do not change
-CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} \
-         ${PREC} ${CLFS} ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} \
-         ${DARCH} ${IMPI}
+CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
+         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} ${IMPI}
 
 ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
 

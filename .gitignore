@@ -6,5 +6,6 @@
 .lastmake*
 gmon.out
 localmake
-su3_hmc*
-su3_bWflow*
+su3_hmc
+su3_Wflow
+su3_vacpol

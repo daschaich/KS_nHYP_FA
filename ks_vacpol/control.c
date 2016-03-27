@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
   // Smear, then calculate vector and axial vacuum polarization tensors
   block_and_fatten();
   rephase(OFF);
-  d_plaquette(&ssplaq, &stplaq);
+  plaquette(&ssplaq, &stplaq);
   rephase(ON);
   node0_printf("Plaquettes after smearing: %.8g %.8g\n", ssplaq, stplaq);
   total_iters = vacuum_polarization();
