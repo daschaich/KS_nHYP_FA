@@ -4,7 +4,6 @@
 /* Interpret source and sink parameters */
 
 #include "generic_ks_includes.h"
-#include "../include/io_ksprop.h"
 #include <string.h>
 #ifdef HAVE_QIO
 #include <qio.h>

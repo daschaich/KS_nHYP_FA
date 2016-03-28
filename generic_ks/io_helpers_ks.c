@@ -9,7 +9,6 @@
 
 #include "generic_ks_includes.h"
 #include "../include/io_lat.h"
-#include "../include/io_ksprop.h"
 #include "../include/file_types.h"
 #include <string.h>
 #ifdef HAVE_QIO

@@ -21,7 +21,6 @@
 #include <time.h>
 #include <assert.h>
 #include "../include/io_lat.h" /* for utilities like get_f ,etc */
-#include "../include/io_ksprop.h"
 
 #define PARALLEL 1
 #define SERIAL 0
