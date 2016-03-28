@@ -69,11 +69,7 @@ G_NHYP_OBJECTS = nhyp.o \
                  scalar_add.o
 
 # Selection of layout
-ifeq ($(strip ${HAVEQDP}),true)
-  LAYOUT = layout_qdp.o # Required
-else
-  LAYOUT = layout_hyper_prime.o
-endif
+LAYOUT = layout_hyper_prime.o
 
 ADD_OBJECTS = ${MACHINE_DEP_IO} ${COMMPKG} ${QDP_OBJECTS} ${SCIDAC_OBJECTS}
 

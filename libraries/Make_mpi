@@ -7,7 +7,7 @@
 
 MAKEFILE = Make_mpi
 
-CC       = /usr/local/mpich2-1.4.1p1/bin/mpicc
+CC       = mpiicc
 OPT      = -O3    # Keep optimization by itself to omit below
 OCFLAGS  = -Wall
 CODETYPE = -DFAST

@@ -1,0 +1,153 @@
+initialize_machine: MPI won't give me an upper limit on the number of message types
+initialize_machine: setting the limit to 1024
+SU(3) with Kogut--Susskind fermions
+Microcanonical simulation with refreshing
+Machine = MPI (portable), with 2 nodes
+nHYP links, reading alpha_smear parameters from infile
+  IR_STAB = 1e-06
+  EPS_SQ = 1e-05
+NHYP_DEBUG turned on
+Hybrid Monte Carlo algorithm
+Phi algorithm
+start: Sun Mar 27 17:58:24 2016
+
+type 0 for no prompts or 1 for prompts
+nflavors 12
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+full_fields=1, half_fields=1
+LAYOUT = Hypercubes, options = hyper_prime,
+automatic hyper_prime layout
+ON EACH NODE 2 x 4 x 4 x 4
+Mallocing 0.4 MBytes per node for lattice
+Mallocing 1.8 MBytes per node for fields
+Using antiperiodic boundary conditions in all directions
+
+
+warms 0
+trajecs 3
+traj_length 1
+number_of_PF 2
+nstep 5
+nstep 1
+nstep_gauge 10
+traj_between_meas 3
+beta 6
+beta_a -0.25
+mass 0.01
+Hasenbusch_mass 0.1
+Nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+npbp 5
+max_cg_iterations 500
+max_cg_restarts 1
+error_per_site 1e-05
+reload_serial config.4444
+forget 
+Restored binary gauge configuration serially from file config.4444
+Time stamp Wed Dec 31 14:07:26 1997
+Checksums 38abcb08 70225d93 OK
+Time to reload gauge configuration = 0.001101 seconds
+CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
+CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
+Reunitarized for double precision.  Max deviation 1.4e-06 changed to 5.6e-16
+Time to check unitarity = 9.799e-05 seconds
+
+FUNDAMENTAL--ADJOINT GAUGE ACTION WITH beta_a/beta_f COEFFICIENT -0.250
+f_eps0 0.2 f_eps1 0.1 g_eps 0.005
+WARMUPS COMPLETED
+D_ACTION: g, h, f, tot = -4848.9906 4040.3806 2254.6094 1445.9995
+D_ACTION: g, h, f, tot = -4321.9351 3542.7647 2225.1256 1445.9552
+ACCEPT: delta S = -0.04428 start 1445.99946275 end 1445.95518355
+MONITOR_FORCE_FERMION0 0.0001926 0.000281
+MONITOR_FORCE_FERMION1 0.01404 0.01836
+MONITOR_FORCE_GAUGE    0.006414 0.006567
+GMES 0.84253531 -0.028482455 617 1.6897451 1.6495732
+POLYA 0.84253531 -0.028482455 0.85832581 0.012521876
+ACT 1.4068799
+D_ACTION: g, h, f, tot = -4321.9351 4154.3836 2312.5599 2145.0083
+D_ACTION: g, h, f, tot = -4121.0309 3943.8333 2322.1873 2144.9897
+ACCEPT: delta S = -0.01864 start 2145.00833232 end 2144.98969699
+MONITOR_FORCE_FERMION0 0.0002617 0.0003456
+MONITOR_FORCE_FERMION1 0.0158 0.02036
+MONITOR_FORCE_GAUGE    0.006275 0.006336
+GMES 0.66540208 0.0078643297 854 1.6198756 1.5505613
+POLYA 0.66540208 0.0078643297 0.88594057 0.01519466
+ACT 1.3414814
+D_ACTION: g, h, f, tot = -4121.0309 4074.8329 2324.7142 2278.5162
+D_ACTION: g, h, f, tot = -4004.5054 3968.8659 2314.1567 2278.5172
+ACCEPT: delta S = 0.00105 start 2278.516161 end 2278.51721062
+MONITOR_FORCE_FERMION0 0.0002967 0.0003896
+MONITOR_FORCE_FERMION1 0.01598 0.02008
+MONITOR_FORCE_GAUGE    0.006206 0.006251
+GMES 0.5932003 -0.16154455 827 1.5656905 1.5063078
+POLYA 0.5932003 -0.16154455 0.91904045 -0.040771954
+ACT 1.3035499
+
+ANTIPERIODIC BC in time direction
+Plaquettes after smearing: 2.648596 2.6160601
+Check plaquettes: 2.648596 2.6160601
+StaggPlaq t 1.3095817 1.3064785
+StaggPlaq x 1.3309889 1.3158068
+StaggPlaq y 1.3047 1.3271114
+StaggPlaq z 1.3130763 1.3215688
+StaggPlaq a 0.33213503 0.32765841
+PBP: mass 0.01, 0.0095554922 0.0088972807 0.012214914 0.012213067 ( 1 of 5 ) 17
+PBP1: mass 0.01, 0.33264947 0.35925949 0.042278588 0.0041191662 ( 1 of 5 ) 17
+PBPt: mass 0.01, 0.32903437 0.36287458 0.013449793 0.032947961 ( 1 of 5 ) 17
+PBPx: mass 0.01, 0.35849962 0.36591348 0.051260995 -0.077878429 ( 1 of 5 ) 17
+PBPy: mass 0.01, 0.35007968 0.32980682 -0.039367823 0.0064152747 ( 1 of 5 ) 17
+PBPz: mass 0.01, 0.36556415 0.33728169 0.027158242 -0.037463216 ( 1 of 5 ) 17
+FACTION: mass = 0.01, 1.450315 ( 1 of 5 )
+TR_MM_INV: mass 0.01, -0.46124163 ( 1 of 5 )
+PBP: mass 0.01, 0.048246866 -0.029248369 0.021958075 0.021957978 ( 2 of 5 ) 16
+PBP1: mass 0.01, 0.27755628 0.41588784 0.068520974 0.024776032 ( 2 of 5 ) 16
+PBPt: mass 0.01, 0.35634535 0.33709878 0.041867868 0.051429139 ( 2 of 5 ) 16
+PBPx: mass 0.01, 0.41339404 0.29872931 -0.060616468 -0.003512033 ( 2 of 5 ) 16
+PBPy: mass 0.01, 0.3902302 0.37272787 -0.0092010852 -0.066074433 ( 2 of 5 ) 16
+PBPz: mass 0.01, 0.43041349 0.37127569 0.024633141 0.021533807 ( 2 of 5 ) 16
+FACTION: mass = 0.01, 1.4528122 ( 2 of 5 )
+TR_MM_INV: mass 0.01, -0.47489983 ( 2 of 5 )
+PBP: mass 0.01, -0.01605227 0.034013502 0.015995074 0.015995151 ( 3 of 5 ) 16
+PBP1: mass 0.01, 0.3388486 0.43902563 0.029159254 -0.03722914 ( 3 of 5 ) 16
+PBPt: mass 0.01, 0.36920569 0.40866855 0.021342516 -0.029412402 ( 3 of 5 ) 16
+PBPx: mass 0.01, 0.37719505 0.3350852 0.0073375085 -0.00046777054 ( 3 of 5 ) 16
+PBPy: mass 0.01, 0.37323994 0.25079637 -0.092449674 -0.011447299 ( 3 of 5 ) 16
+PBPz: mass 0.01, 0.39559502 0.35608868 0.040222936 -0.015569948 ( 3 of 5 ) 16
+FACTION: mass = 0.01, 1.5075858 ( 3 of 5 )
+TR_MM_INV: mass 0.01, -0.44898048 ( 3 of 5 )
+PBP: mass 0.01, -0.083438249 0.10311092 -0.070355115 -0.07035488 ( 4 of 5 ) 16
+PBP1: mass 0.01, 0.43446489 0.34727137 0.023305385 0.041794647 ( 4 of 5 ) 16
+PBPt: mass 0.01, 0.34537101 0.43636524 0.055959957 0.0091400748 ( 4 of 5 ) 16
+PBPx: mass 0.01, 0.41961572 0.37655124 0.0071148995 -0.025685539 ( 4 of 5 ) 16
+PBPy: mass 0.01, 0.3715714 0.47955757 -0.00032480679 0.044622496 ( 4 of 5 ) 16
+PBPz: mass 0.01, 0.3438924 0.35248691 -0.059689991 -0.00101867 ( 4 of 5 ) 16
+FACTION: mass = 0.01, 1.5063939 ( 4 of 5 )
+TR_MM_INV: mass 0.01, -0.49174368 ( 4 of 5 )
+PBP: mass 0.01, 0.02068344 -0.0021324144 -0.090672099 -0.090672767 ( 5 of 5 ) 17
+PBP1: mass 0.01, 0.4216844 0.34679417 0.044761466 -0.053574697 ( 5 of 5 ) 17
+PBPt: mass 0.01, 0.35037848 0.4181001 0.015235706 -0.024048937 ( 5 of 5 ) 17
+PBPx: mass 0.01, 0.3993002 0.41494462 0.018714596 -0.01954922 ( 5 of 5 ) 17
+PBPy: mass 0.01, 0.40594246 0.35493888 0.075009408 0.033455194 ( 5 of 5 ) 17
+PBPz: mass 0.01, 0.45645375 0.28923653 -0.028342068 -0.051484803 ( 5 of 5 ) 17
+FACTION: mass = 0.01, 1.4690822 ( 5 of 5 )
+TR_MM_INV: mass 0.01, -0.46367869 ( 5 of 5 )
+pbp: mass 0.01, -0.53772083 2.9348076 -2.8379942 -2.8380531 ( ave over 5 )
+pbp1: mass 0.01, 46.213213 48.850906 5.3254571 -0.51491816 ( ave over 5 )
+pbpt: mass 0.01, 44.808573 50.255545 3.7851095 1.0254294 ( ave over 5 )
+pbpx: mass 0.01, 50.380919 45.855331 0.60957521 -3.2535806 ( ave over 5 )
+pbpy: mass 0.01, 48.41123 45.768384 -1.6981499 0.17846359 ( ave over 5 )
+pbpz: mass 0.01, 50.993122 43.683059 0.10194586 -2.1504724 ( ave over 5 )
+RUNNING COMPLETED
+Average CG iters for steps: 766
+Average CG iters for measurements: 82
+Time = 2.722 seconds
+total_iters = 3831
+
+exit: Sun Mar 27 17:58:27 2016
+

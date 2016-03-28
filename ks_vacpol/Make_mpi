@@ -1,23 +1,23 @@
 # ------------------------------------------------------------------
-MAKEFILE = Make_mpi
+MAKEFILE = Make_livermore
 
 MPP            = true
 PRECISION      = 2
-CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
+CC             = mpiicc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
-CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
+CLFS           = # -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                # Large files gcc only
-MACHINE_DEP_IO = io_ansi.o
+MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
 
 WANTQOP        =
 WANTQDP        = true
 WANTQIO        = true
 WANTQMP        = true
 
-SCIDAC         = /nfs/beowulf03/schaich/lqcd/install
-QIOSNG         =
+SCIDAC         = /g/g10/schaich2/work/lqcd/install
+QIOSNG         = # $(SCIDAC)/qio-single
 QIOPAR         = $(SCIDAC)/qio
-QMPSNG         =
+QMPSNG         = # ${SCIDAC}/qmp-single
 QMPPAR         = ${SCIDAC}/qmp
 QDP            = ${SCIDAC}/qdp
 QLA            = ${SCIDAC}/qla
@@ -28,10 +28,8 @@ include ../Make_template_qop
 include ../Make_template_scidac
 
 LD             = ${CC}
-IMPI           = # -I/usr/local/mpich2-1.4.1p1/include           # CU
-LMPI           = # -L/usr/local/mpich2-1.4.1p1/lib -lmpich       # CU
 LIBADD         =
-INLINEOPT      = -DSSE_GLOBAL_INLINE # -DC_GLOBAL_INLINE # -DC_INLINE
+INLINEOPT      = # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =
@@ -45,7 +43,7 @@ CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
                  ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
                  ${KSFFMULTI} ${KSRHMCINT}
 
-MAKELIBRARIES  = Make_mpi
+MAKELIBRARIES  = Make_livermore
 
 # Also check include/config.h
 # ------------------------------------------------------------------
