@@ -12,14 +12,14 @@
             32 sublattice versions - UMH
    11/27/98 Corrected g_wvectorsumfloat and made independent of su3.h. C.D.
     9/02/97 Revised to allow gathers from temporary fields.  neighbor[]
-	    is now list of indices, add start/restart_gather_field D.T.
+      is now list of indices, add start/restart_gather_field D.T.
     8/05/97 ANSI prototyping for all routines C.D.
    10/05/96 Moved parallel I/O wrappers to io_ansi.c C.D.
     9/23/96 Explicit void types for modules with empty returns C.D.
-    9/20/96 Added restore/save_checkpoint C.D.  
-    9/20/96 Improved sort_site_list C.D.  
+    9/20/96 Added restore/save_checkpoint C.D.
+    9/20/96 Improved sort_site_list C.D.
     9/20/96 Added broadcast_bytes and wrappers for system-dependent
-            parallel file system calls C.D.   
+            parallel file system calls C.D.
 */
 /*
   Exported Functions:
@@ -35,20 +35,20 @@
    numjobs()             returns number of jobs
    g_sync()              provides a synchronization point for all nodes.
    g_floatsum()          sums a floating point number over all nodes.
-   g_vecfloatsum()       sums a vector of generic floats over all nodes 
+   g_vecfloatsum()       sums a vector of generic floats over all nodes
    g_doublesum()         sums a double over all nodes.
    g_vecdoublesum()      sums a vector of doubles over all nodes.
    g_complexsum()        sums a generic precision complex number over all nodes.
    g_veccomplexsum()     sums a vector of generic precision complex numbers
                            over all nodes.
    g_dcomplexsum()       sums a double precision complex number over all nodes.
-   g_vecdcomplexsum()    sums a vector of double_complex over all nodes 
+   g_vecdcomplexsum()    sums a vector of double_complex over all nodes
    g_wvectorsumfloat()   sums a generic precision wilson vector over all nodes.
    g_xor32()             finds global exclusive or of 32-bit word
    g_floatmax()          finds maximum floating point number over all nodes.
    g_doublemax()         finds maximum double over all nodes.
    broadcast_float()     broadcasts a generic precision number from
-	                   node 0 to all nodes.
+                     node 0 to all nodes.
    broadcast_double()    broadcasts a double precision number
    broadcast_complex()   broadcasts a generic precision complex number
    broadcast_dcomplex()  broadcasts a double precision complex number
@@ -79,7 +79,7 @@
    cleanup_gather()      frees all the buffers that were allocated, WHICH
                            MEANS THAT THE GATHERED DATA MAY SOON DISAPPEAR.
    accumulate_gather()   combines gathers into single message tag
-   declare_accumulate_gather_site()  does declare_gather_site() and 
+   declare_accumulate_gather_site()  does declare_gather_site() and
                                   accumulate_gather() in single step.
    declare_accumulate_gather_field()  does declare_gather_field() and
                                             accumulate_gather() in single step.
@@ -88,15 +88,15 @@
    start_gather_field()  older function which does
                                declare/prepare/do_gather_field
    restart_gather_site()      older function which is obsoleted by do_gather()
-   restart_gather_field() older function which is obsoleted by do_gather() 
+   restart_gather_field() older function which is obsoleted by do_gather()
    start_general_gather_site()  starts asynchronous sends and receives required
                              to gather fields at arbitrary displacement.
-   start_general_gather_field() starts asynchronous sends and receives 
+   start_general_gather_field() starts asynchronous sends and receives
                              required to gather neighbors from an
-			     array of fields.
+           array of fields.
    wait_general_gather()   waits for receives to finish, insuring that the
                              data has actually arrived, and sets pointers to
-			     received data.
+           received data.
    cleanup_general_gather()  frees all the buffers that were allocated, WHICH
                                MEANS THAT THE GATHERED DATA MAY SOON DISAPPEAR.
    myjobid()                 The index number of this job
@@ -118,7 +118,7 @@
 #define MILC_MPI_REAL MPI_DOUBLE
 #endif
 
-#define NOWHERE -1	/* Not an index in array of fields */
+#define NOWHERE -1  /* Not an index in array of fields */
 
 /* message types used here */
 #define SEND_INTEGER_ID    1  /* send an integer to one other node */
@@ -195,7 +195,7 @@ typedef struct gather_t {
   comlink *neighborlist;         /* comlink for receiving messages */
   comlink *neighborlist_send;    /* comlink for sending messages */
   id_list_t *id_list;            /* list of id offsets for sending */
-  int n_recv_msgs, n_send_msgs;  /* number of messages to receive and send */ 
+  int n_recv_msgs, n_send_msgs;  /* number of messages to receive and send */
   int offset_increment; /* total number of message ids used for this gather */
 } gather_t;
 
@@ -245,7 +245,7 @@ struct msg_tag {
    the message corresponding to the right one. */
 /* for computing message id in gather */
 /* not needed anymore, but may be used for a check later */
-static int id_offset;	    /* label gathers by round-robin */
+static int id_offset;     /* label gathers by round-robin */
 static int num_gather_ids;  /* number of id offsets allowed */
 
 /* keep track of used ids */
@@ -276,7 +276,7 @@ err_func(MPI_Comm *comm, int *stat, ...)
 
 static void
 get_arg(int argc, char **argv, char *tag, int *first, int *last,
-	char **c, int **a)
+  char **c, int **a)
 {
   int i;
   *first = -1;
@@ -288,24 +288,24 @@ get_arg(int argc, char **argv, char *tag, int *first, int *last,
       *first = i;
       //printf("%i %i\n", i, argc);
       if( ((i+1)<argc) && !(isdigit(argv[i+1][0])) ) {
-	//printf("c %i %s\n", i+1, argv[i+1]);
-	*c = argv[i+1];
-	*last = i+1;
+  //printf("c %i %s\n", i+1, argv[i+1]);
+  *c = argv[i+1];
+  *last = i+1;
       } else {
-	//printf("a %i %s\n", i+1, argv[i+1]);
-	while( (++i<argc) && isdigit(argv[i][0]) );
-	*last = i-1;
-	int n = *last - *first;
-	if(n) {
-	  int j;
-	  *a = (int *) malloc(n*sizeof(int));
-	  //printf("%i %p\n", n, *a);
-	  for(j=0; j<n; j++) {
-	    (*a)[j] = atoi(argv[*first+1+j]);
-	    //printf(" %i", (*a)[j]);
-	  }
-	  //printf("\n");
-	}
+  //printf("a %i %s\n", i+1, argv[i+1]);
+  while( (++i<argc) && isdigit(argv[i][0]) );
+  *last = i-1;
+  int n = *last - *first;
+  if(n) {
+    int j;
+    *a = (int *) malloc(n*sizeof(int));
+    //printf("%i %p\n", n, *a);
+    for(j=0; j<n; j++) {
+      (*a)[j] = atoi(argv[*first+1+j]);
+      //printf(" %i", (*a)[j]);
+    }
+    //printf("\n");
+  }
       }
     }
   }
@@ -322,7 +322,7 @@ remove_from_args(int *argc, char ***argv, int first, int last)
   }
 }
 
-static int 
+static int
 lex_rank(const int coords[], int dim, int size[])
 {
   int d;
@@ -348,7 +348,7 @@ repartition_switch_machine(void){
   /* localgeom gives the number of nodes in the job partition */
   if(num_nodes % num_jobs != 0){
     printf("num_jobs %i must divide number of nodes %i\n",
-	   num_jobs, num_nodes);
+     num_jobs, num_nodes);
     terminate(1);
   }
   localgeom = num_nodes/num_jobs;
@@ -361,9 +361,9 @@ repartition_switch_machine(void){
 
   flag = MPI_Comm_rank(jobcomm, &localnodeid);
   if(flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
-  
+
   /* Make MPI on this node think I live in just this one job partition */
-  
+
   flag = MPI_Comm_free(&MPI_COMM_THISJOB);
   if(flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
 
@@ -388,7 +388,7 @@ repartition_mesh_machine(void){
   for(i=0; i<nd; i++){
     if(geom[i] % jobgeomvals[i] != 0){
       printf( "job partition[%i] = %i must divide machine geometry %i\n",
-	      i, jobgeomvals[i], geom[i]);fflush(stdout);
+        i, jobgeomvals[i], geom[i]);fflush(stdout);
       terminate(1);
     }
     localgeom[i] = geom[i]/jobgeomvals[i];
@@ -441,7 +441,7 @@ initialize_machine(int *argc, char ***argv)
   int first, last, *a = NULL;
   char *c = NULL;
   char myname[] = "initialize_machine";
-  
+
   MPI_Comm comm;
   MPI_Errhandler errhandler;
 
@@ -454,13 +454,13 @@ initialize_machine(int *argc, char ***argv)
 #ifdef SHORT_IS_32BIT
   if(sizeof(unsigned short)!=4) {
     printf("node %d: SHORT_IS_32BIT is set but sizeof(unsigned short)=%d\n",
-	   mynode(), sizeof(unsigned short));
+     mynode(), sizeof(unsigned short));
     terminate(1);
   }
 #else
   if(sizeof(unsigned int)!=4) {
     printf("node %d: SHORT_IS_32BIT is not set but sizeof(unsigned int)=%d\n",
-	   mynode(), (int)sizeof(unsigned int));
+     mynode(), (int)sizeof(unsigned int));
     terminate(1);
   }
 #endif
@@ -481,7 +481,7 @@ initialize_machine(int *argc, char ***argv)
       node0_printf("%s: found %d -geom values, but wanted 4\n",myname, nd);
       terminate(1);
     }
-    
+
     geom = (int *)malloc(4*sizeof(int));
     for(i = 0; i < 4; i++)
       geom[i] = a[i];
@@ -493,7 +493,7 @@ initialize_machine(int *argc, char ***argv)
       n /= geom[i];
     }
   }
-    
+
   remove_from_args(argc, argv, first, last);
 
   /* process -jobs */
@@ -528,12 +528,12 @@ initialize_machine(int *argc, char ***argv)
     }
     for(i=0; i<nj; i++){
       if(jobgeomvals[i]<=0){
-	printf("%s: job partition division[%i] = %d <= 0\n", myname,
-	       i, jobgeomvals[i]);
+  printf("%s: job partition division[%i] = %d <= 0\n", myname,
+         i, jobgeomvals[i]);
       }
       num_jobs *= jobgeomvals[i];
     }
-    
+
     if(nj==1)
       repartition_switch_machine();
     else
@@ -554,7 +554,7 @@ initialize_machine(int *argc, char ***argv)
 
   /* Note: with MPI-2 MPI_Comm_create_errhandler and
      MPI_Comm_set_errorhandler are preferred, but we keep MPI_Attr_get
-     until MPI-2 is more widely available */ 
+     until MPI-2 is more widely available */
   flag = MPI_Errhandler_create(err_func, &errhandler);
   if(flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
   flag = MPI_Errhandler_set(MPI_COMM_THISJOB, errhandler);
@@ -562,17 +562,17 @@ initialize_machine(int *argc, char ***argv)
 
   /* get the number of message types */
   /* Note: with MPI-2 MPI_Comm_get_attr is preferred,
-     but we keep MPI_Attr_get until MPI-2 is more widely available */ 
+     but we keep MPI_Attr_get until MPI-2 is more widely available */
   flag = MPI_Attr_get(MPI_COMM_THISJOB, MPI_TAG_UB, &tag_ub, &found);
   if(flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
   if(found == 0){
     num_gather_ids = 1024;
     if(mynode() == 0){
-      printf("%s: MPI won't give me an upper limit on the number of message types\n", 
-	     myname);
+      printf("%s: MPI won't give me an upper limit on the number of message types\n",
+       myname);
       printf("%s: setting the limit to %d\n",myname, num_gather_ids);
-    
-    } 
+
+    }
   } else {
     num_gather_ids = *tag_ub + 1 - GATHER_BASE_ID;
   }
@@ -613,7 +613,7 @@ normal_exit(int status)
 ** UTC time as ASCII string
 */
 
-void 
+void
 get_utc_datetime(char *time_string)
 {
   time_t time_stamp;
@@ -622,7 +622,7 @@ get_utc_datetime(char *time_string)
   time(&time_stamp);
   gmtime_stamp = gmtime(&time_stamp);
   strncpy(time_string,asctime(gmtime_stamp),64);
-  
+
   /* Remove trailing end-of-line character */
   if(time_string[strlen(time_string) - 1] == '\n')
     time_string[strlen(time_string) - 1] = '\0';
@@ -754,11 +754,11 @@ g_uint32sum(u_int32type *pt)
 {
   u_int32type work;
 #ifdef SHORT_IS_32BIT
-  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED_SHORT, 
-		 MPI_SUM, MPI_COMM_THISJOB );
+  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED_SHORT,
+     MPI_SUM, MPI_COMM_THISJOB );
 #else
-  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED, 
-		 MPI_SUM, MPI_COMM_THISJOB );
+  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED,
+     MPI_SUM, MPI_COMM_THISJOB );
 #endif
   *pt = work;
 }
@@ -881,11 +881,11 @@ g_xor32(u_int32type *pt)
 {
   u_int32type work;
 #ifdef SHORT_IS_32BIT
-  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED_SHORT, 
-		 MPI_BXOR, MPI_COMM_THISJOB );
+  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED_SHORT,
+     MPI_BXOR, MPI_COMM_THISJOB );
 #else
-  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED, 
-		 MPI_BXOR, MPI_COMM_THISJOB );
+  MPI_Allreduce( pt, &work, 1, MPI_UNSIGNED,
+     MPI_BXOR, MPI_COMM_THISJOB );
 #endif
   *pt = work;
 }
@@ -980,7 +980,7 @@ receive_integer(int fromnode, int *address)
 {
   MPI_Status status;
   MPI_Recv( address, 1, MPI_INT, fromnode, SEND_INTEGER_ID,
-	    MPI_COMM_THISJOB, &status );
+      MPI_COMM_THISJOB, &status );
 }
 
 
@@ -1005,7 +1005,7 @@ get_field(char *buf, int size, int fromnode)
 {
   MPI_Status status;
   MPI_Recv( buf, size, MPI_BYTE, fromnode, SEND_FIELD_ID, MPI_COMM_THISJOB,
-	    &status );
+      &status );
 }
 
 
@@ -1018,7 +1018,7 @@ get_field(char *buf, int size, int fromnode)
 */
 double
 dclock_cpu(void)
-{ 
+{
   long fine;
   fine = clock();
   return( ((double)fine)/CLOCKS_PER_SEC);
@@ -1182,7 +1182,7 @@ copy_list_switch(comlink *old_compt, int *send_subl)
     if( old_compt->nextcomlink != NULL)
       compt->nextcomlink = (comlink *)malloc( sizeof(comlink) );
     else compt->nextcomlink = NULL;
-    old_compt = old_compt->nextcomlink; 
+    old_compt = old_compt->nextcomlink;
     compt = compt->nextcomlink;
   } while( old_compt!=NULL );
   return(firstpt);
@@ -1194,12 +1194,12 @@ copy_list_switch(comlink *old_compt, int *send_subl)
 */
 static void
 sort_site_list(
-  int n,		/* number of elements in list */
-  int *list,	        /* pointer to list */
+  int n,    /* number of elements in list */
+  int *list,          /* pointer to list */
   void (*func)(int, int, int, int, int *, int, int *, int *, int *, int *),
                         /* function which defines mapping */
-  int *args,	        /* arguments to pass to function */
-  int forw_back)	/* look forwards or backwards in map */
+  int *args,          /* arguments to pass to function */
+  int forw_back)  /* look forwards or backwards in map */
 {
   register int j,k,in1,in2,flag;
   register site *s;
@@ -1227,12 +1227,12 @@ sort_site_list(
       in1 = key[k];
       in2 = key[k+1];
       if(in1>in2){
-	flag=1;
-	key[k]   = in2;
-	key[k+1] = in1;
-	in1 = list[k];
-	list[k] = list[k+1];
-	list[k+1] = in1;
+  flag=1;
+  key[k]   = in2;
+  key[k+1] = in1;
+  in1 = list[k];
+  list[k] = list[k+1];
+  list[k+1] = in1;
       }
     }
     if(flag==0)break;
@@ -1246,19 +1246,19 @@ sort_site_list(
 static comlink *
 make_send_receive_list(
   void (*func)(int, int, int, int, int *, int, int *, int *, int *, int *),
-        		/* function which defines sites to gather from */
-  int *args,		/* list of arguments, to be passed to function */
-  int want_even_odd,	/* ALLOW_EVEN_ODD or NO_EVEN_ODD */
-  int forw_back,	/* FORWARDS or BACKWARDS */
+            /* function which defines sites to gather from */
+  int *args,    /* list of arguments, to be passed to function */
+  int want_even_odd,  /* ALLOW_EVEN_ODD or NO_EVEN_ODD */
+  int forw_back,  /* FORWARDS or BACKWARDS */
   int send_recv,        /* SEND or RECEIVE list */
   int *n_msgs)          /* returns number of messages in list */
 {
-  int i,j,subl;	        /* scratch */
-  site *s;	        /* scratch */
-  int x,y,z,t;		/* coordinates */
-  int *sbuf[NUM_SUBL];	/* to be malloc'd */
-  int *tbuf;	        /* to be malloc'd */
-  comlink **combuf;	/* to be malloc'd, remember where comlinks are */
+  int i,j,subl;         /* scratch */
+  site *s;          /* scratch */
+  int x,y,z,t;    /* coordinates */
+  int *sbuf[NUM_SUBL];  /* to be malloc'd */
+  int *tbuf;          /* to be malloc'd */
+  comlink **combuf; /* to be malloc'd, remember where comlinks are */
   comlink *compt,**comptpt;
   comlink *firstpt;
 
@@ -1304,8 +1304,8 @@ make_send_receive_list(
 
     compt = (comlink *)malloc( sizeof(comlink) );
     *comptpt = compt;
-    combuf[j] = compt;	/* to make it easy to find again */
-    compt->nextcomlink = NULL;	/* currently terminates list */
+    combuf[j] = compt;  /* to make it easy to find again */
+    compt->nextcomlink = NULL;  /* currently terminates list */
     compt->othernode = j;
     compt->n_subl_connected[NUM_SUBL] = tbuf[j];
     for(subl=0; subl<NUM_SUBL; subl++) {
@@ -1316,8 +1316,8 @@ make_send_receive_list(
     for(subl=1; subl<NUM_SUBL; subl++)
       compt->sitelist[subl] = (compt->sitelist[subl-1]) + sbuf[subl-1][j];
     /* sitelist[...] must be filled in later */
-    comptpt = &(compt->nextcomlink);	/* linked list, if we
-		      extend it this will get address of next comlink. */
+    comptpt = &(compt->nextcomlink);  /* linked list, if we
+          extend it this will get address of next comlink. */
     ++(*n_msgs);
   }
 
@@ -1356,7 +1356,7 @@ make_send_receive_list(
     else i = -forw_back;
     for(subl=0; subl<NUM_SUBL; subl++)
       sort_site_list( compt->n_subl_connected[subl],
-		      compt->sitelist[subl], func, args, i );
+          compt->sitelist[subl], func, args, i );
   }
 
   /* free temporary storage */
@@ -1387,7 +1387,7 @@ make_id_list(
   for(i=0; recv!=NULL; ++i, recv=recv->nextcomlink) {
     buf[i] = i;
     MPI_Isend( &buf[i], 1, MPI_INT, recv->othernode, 0, MPI_COMM_THISJOB,
-	       &req[i] );
+         &req[i] );
   }
   if(i!=n_recv) {printf("error i!=n_recv\n"); terminate(1);}
 
@@ -1430,20 +1430,20 @@ int
 make_gather(
   void (*func)(int, int, int, int, int *, int, int *, int *, int *, int *),
                         /* function which defines sites to gather from */
-  int *args,		/* list of arguments, to be passed to function */
-  int inverse,		/* OWN_INVERSE, WANT_INVERSE, or NO_INVERSE */
-  int want_even_odd,	/* ALLOW_EVEN_ODD or NO_EVEN_ODD */
-  int parity_conserve)	/* {SAME,SWITCH,SCRAMBLE}_PARITY */
+  int *args,    /* list of arguments, to be passed to function */
+  int inverse,    /* OWN_INVERSE, WANT_INVERSE, or NO_INVERSE */
+  int want_even_odd,  /* ALLOW_EVEN_ODD or NO_EVEN_ODD */
+  int parity_conserve)  /* {SAME,SWITCH,SCRAMBLE}_PARITY */
 {
-  int i,j,subl;	        /* scratch */
-  site *s;	        /* scratch */
-  int dir;		/* direction */
-  int x,y,z,t;		/* coordinates */
+  int i,j,subl;         /* scratch */
+  site *s;          /* scratch */
+  int dir;    /* direction */
+  int x,y,z,t;    /* coordinates */
   int *send_subl;       /* sublist of sender for a given receiver */
 
   /* we will have one or two more gathers */
   if( inverse==WANT_INVERSE ) n_gathers += 2;
-  else			      n_gathers += 1;
+  else            n_gathers += 1;
 
   if(n_gathers>gather_array_len) {
     gather_array_len = n_gathers;
@@ -1452,14 +1452,14 @@ make_gather(
       (gather_t *)realloc(gather_array, gather_array_len*sizeof(gather_t));
   }
 
-  dir = n_gathers - 1;	/* index of gather we are working on */
+  dir = n_gathers - 1;  /* index of gather we are working on */
   gather_array[dir].neighbor = (int *)malloc( sites_on_node*sizeof(int) );
   if( gather_array[dir].neighbor==NULL ) {
     printf("make_gather: NODE %d: no room for neighbor vector\n",this_node);
     terminate(1);
   }
   if( inverse==WANT_INVERSE ) {
-    dir = n_gathers - 2;	/* index of gather we are working on */
+    dir = n_gathers - 2;  /* index of gather we are working on */
     gather_array[dir].neighbor = (int *)malloc( sites_on_node*sizeof(int) );
     if( gather_array[dir].neighbor==NULL ) {
       printf("make_gather: NODE %d no room for neighbor vector\n",this_node);
@@ -1487,7 +1487,7 @@ make_gather(
     if( x<0 || y<0 || z<0  || t<0 || x>=nx || y>=ny || z>=nz || t>=nt){
       printf("DUMMY! Your gather mapping does not stay in lattice\n");
       printf("It mapped %d %d %d %d to %d %d %d %d\n",
-	     s->x,s->y,s->z,s->t,x,y,z,t);
+       s->x,s->y,s->z,s->t,x,y,z,t);
       terminate(1);
     }
 
@@ -1498,42 +1498,42 @@ make_gather(
       s_subl = parity_function(x,y,z,t);
 
       if( want_even_odd==ALLOW_EVEN_ODD ) {
-	if( send_subl[r_subl] == NOWHERE ) {
-	  send_subl[r_subl] = s_subl;
-	}
-	else if( send_subl[r_subl] != s_subl ){
-	  printf("DUMMY! Your gather mixes up sublattices: %d vs %d\n",
-		 send_subl[r_subl], s_subl);
-	  printf("on mapping %i %i %i %i -> %i %i %i %i\n",
-		 s->x,s->y,s->z,s->t, x,y,z,t);
-	  terminate(1);
-	}
+  if( send_subl[r_subl] == NOWHERE ) {
+    send_subl[r_subl] = s_subl;
+  }
+  else if( send_subl[r_subl] != s_subl ){
+    printf("DUMMY! Your gather mixes up sublattices: %d vs %d\n",
+     send_subl[r_subl], s_subl);
+    printf("on mapping %i %i %i %i -> %i %i %i %i\n",
+     s->x,s->y,s->z,s->t, x,y,z,t);
+    terminate(1);
+  }
       }
 
       if( parity_conserve==SAME_PARITY && s_subl!=r_subl ){
-	printf("DUMMY! Your gather mapping does not obey claimed parity");
-	printf(", namely SAME_PARITY\n");
-	printf("It mapped %d %d %d %d with %d to %d %d %d %d with %d\n",
-	       s->x,s->y,s->z,s->t,r_subl,x,y,z,t,s_subl);
-	terminate(1);
+  printf("DUMMY! Your gather mapping does not obey claimed parity");
+  printf(", namely SAME_PARITY\n");
+  printf("It mapped %d %d %d %d with %d to %d %d %d %d with %d\n",
+         s->x,s->y,s->z,s->t,r_subl,x,y,z,t,s_subl);
+  terminate(1);
       }
       if( parity_conserve==SWITCH_PARITY && s_subl==r_subl ){
-	printf("DUMMY! Your gather mapping does not obey claimed parity");
-	printf(", namely SWITCH_PARITY\n");
-	printf("It mapped %d %d %d %d with %d to %d %d %d %d with %d\n",
-	       s->x,s->y,s->z,s->t,r_subl,x,y,z,t,s_subl);
-	terminate(1);
+  printf("DUMMY! Your gather mapping does not obey claimed parity");
+  printf(", namely SWITCH_PARITY\n");
+  printf("It mapped %d %d %d %d with %d to %d %d %d %d with %d\n",
+         s->x,s->y,s->z,s->t,r_subl,x,y,z,t,s_subl);
+  terminate(1);
       }
 
       if( inverse==OWN_INVERSE ) {
-	int x2,y2,z2,t2;
-	func( x, y, z, t, args, FORWARDS, &x2,&y2,&z2,&t2);
-	if( s->x!=x2 || s->y!=y2 || s->z!=z2 || s->t!=t2 ) {
-	  printf("DUMMY! Your gather mapping is not its own inverse\n");
-	  printf("It's square mapped %d %d %d %d to %d %d %d %d\n",
-		 s->x,s->y,s->z,s->t,x2,y2,z2,t2);
-	  terminate(1);
-	}
+  int x2,y2,z2,t2;
+  func( x, y, z, t, args, FORWARDS, &x2,&y2,&z2,&t2);
+  if( s->x!=x2 || s->y!=y2 || s->z!=z2 || s->t!=t2 ) {
+    printf("DUMMY! Your gather mapping is not its own inverse\n");
+    printf("It's square mapped %d %d %d %d to %d %d %d %d\n",
+     s->x,s->y,s->z,s->t,x2,y2,z2,t2);
+    terminate(1);
+  }
       }
     }
   }
@@ -1544,42 +1544,42 @@ make_gather(
   FORALLSITES(i,s){
     /* find coordinates of neighbor who sends us data */
     func( s->x, s->y, s->z, s->t, args, FORWARDS, &x,&y,&z,&t);
-    j = node_number(x,y,z,t);	/* node for neighbor site */
+    j = node_number(x,y,z,t); /* node for neighbor site */
     /* if neighbor is on node, set up pointer */
     if( j == mynode() ) gather_array[dir].neighbor[i] = node_index(x,y,z,t);
-    else		gather_array[dir].neighbor[i] = NOWHERE;
+    else    gather_array[dir].neighbor[i] = NOWHERE;
   }
 
   /* make lists of sites which get data from other nodes.  */
   gather_array[dir].neighborlist =
     make_send_receive_list( func, args, want_even_odd, FORWARDS, RECEIVE,
-			    &gather_array[dir].n_recv_msgs );
+          &gather_array[dir].n_recv_msgs );
 
   /* SEND LISTS: */
   /* Now make lists of sites to which we send */
   /* Under some conditions, if mapping is its own inverse we can use
      the lists we have already made */
-  if( inverse==OWN_INVERSE && 
+  if( inverse==OWN_INVERSE &&
       ( want_even_odd!=ALLOW_EVEN_ODD || parity_conserve!=SCRAMBLE_PARITY ) ) {
     if( want_even_odd==NO_EVEN_ODD || parity_conserve==SAME_PARITY ) {
       gather_array[dir].neighborlist_send = gather_array[dir].neighborlist;
       gather_array[dir].n_send_msgs = gather_array[dir].n_recv_msgs;
     } else {
       gather_array[dir].neighborlist_send =
-	copy_list_switch( gather_array[dir].neighborlist, send_subl );
+  copy_list_switch( gather_array[dir].neighborlist, send_subl );
       gather_array[dir].n_send_msgs = gather_array[dir].n_recv_msgs;
     }
   } else {
     /* Make new linked list of comlinks for send lists */
     gather_array[dir].neighborlist_send =
       make_send_receive_list( func, args, want_even_odd, FORWARDS, SEND,
-			      &gather_array[dir].n_send_msgs );
+            &gather_array[dir].n_send_msgs );
   } /* End general case for send lists */
 
   gather_array[dir].id_list =
     make_id_list( gather_array[dir].neighborlist,
-		  gather_array[dir].n_recv_msgs,
-		  gather_array[dir].neighborlist_send );
+      gather_array[dir].n_recv_msgs,
+      gather_array[dir].neighborlist_send );
 
   gather_array[dir].offset_increment =
     get_max_receives( gather_array[dir].n_recv_msgs );
@@ -1597,18 +1597,18 @@ make_gather(
   /* In most cases, we can use the same lists as the gather, in one
      form or another.  Of course, by the time you get to here
      you know that inverse = WANT_INVERSE */
-  dir++;	/* inverse gather has direction one more than original */
+  dir++;  /* inverse gather has direction one more than original */
 
   /* Always set up pointers to sites on this node */
   /* scan sites in lattice */
   FORALLSITES(i,s) {
     /* find coordinates of neighbor who sends us data */
     func( s->x, s->y, s->z, s->t, args, BACKWARDS, &x,&y,&z,&t);
-    j = node_number(x,y,z,t);	/* node for neighbor site */
+    j = node_number(x,y,z,t); /* node for neighbor site */
 
     /* if neighbor is on node, set up pointer */
     if( j == mynode() ) gather_array[dir].neighbor[i] = node_index(x,y,z,t);
-    else 		gather_array[dir].neighbor[i] = NOWHERE;
+    else    gather_array[dir].neighbor[i] = NOWHERE;
   }
 
   if( parity_conserve==SAME_PARITY || want_even_odd==NO_EVEN_ODD ) {
@@ -1621,28 +1621,28 @@ make_gather(
   } else if( parity_conserve==SWITCH_PARITY ) {
     /* make new comlinks, but use same lists as inverse gather, switching
        send and receive, switching even and odd. */
-    gather_array[dir].neighborlist = 
+    gather_array[dir].neighborlist =
       copy_list_switch( gather_array[dir-1].neighborlist_send, send_subl );
-    gather_array[dir].neighborlist_send = 
+    gather_array[dir].neighborlist_send =
       copy_list_switch( gather_array[dir-1].neighborlist, send_subl );
     gather_array[dir].n_recv_msgs = gather_array[dir-1].n_send_msgs;
     gather_array[dir].n_send_msgs = gather_array[dir-1].n_recv_msgs;
   } else {  /* general case.  Really only get here if ALLOW_EVEN_ODD
-	       and SCRAMBLE_PARITY */
+         and SCRAMBLE_PARITY */
     /* RECEIVE LISTS */
     gather_array[dir].neighborlist =
       make_send_receive_list( func, args, want_even_odd, BACKWARDS, RECEIVE,
-			      &gather_array[dir].n_recv_msgs );
+            &gather_array[dir].n_recv_msgs );
     /* SEND LISTS */
     gather_array[dir].neighborlist_send =
       make_send_receive_list( func, args, want_even_odd, BACKWARDS, SEND,
-			      &gather_array[dir].n_send_msgs );
+            &gather_array[dir].n_send_msgs );
   } /* End making new lists for inverse gather */
 
   gather_array[dir].id_list =
     make_id_list( gather_array[dir].neighborlist,
-		  gather_array[dir].n_recv_msgs,
-		  gather_array[dir].neighborlist_send );
+      gather_array[dir].n_recv_msgs,
+      gather_array[dir].neighborlist_send );
 
   gather_array[dir].offset_increment =
     get_max_receives(gather_array[dir].n_recv_msgs);
@@ -1676,27 +1676,27 @@ make_gather(
  cleanup_gather() frees memory allocated for the gather including the msg_tag.
 
    example:
-	msg_tag *tag;
-	tag = declare_gather_site( F_OFFSET(phi), sizeof(su3_vector), XUP,
-	                      EVEN, gen_pt[0] );
+  msg_tag *tag;
+  tag = declare_gather_site( F_OFFSET(phi), sizeof(su3_vector), XUP,
+                        EVEN, gen_pt[0] );
         prepare_gather(tag);  ** this step is optional **
         do_gather(tag);
-	  ** do other stuff, but don't modify tag or gen_pt[0] **
-	wait_gather(tag);
-	  ** gen_pt[0][i] now contains the address of the phi
-	   vector (or a copy thereof) on the neighbor of site i in the
-	   XUP direction for all even sites i.
-	   Do whatever you want with it here, but don't modify tag or
-	   gen_pt[0].
-	   Do modify the source field phi. **
-	do_gather(tag);
-	  ** do other stuff **
-	wait_gather(tag);
-	  ** gen_pt[0][i] now contains the address of the modified phi.
-	   The restart-wait may be repeated as often as desired.  **
-	cleanup_gather(tag);
-	  ** subsequent calls will overwrite the gathered fields. but if you
-	   don't clean up, you will eventually run out of space **
+    ** do other stuff, but don't modify tag or gen_pt[0] **
+  wait_gather(tag);
+    ** gen_pt[0][i] now contains the address of the phi
+     vector (or a copy thereof) on the neighbor of site i in the
+     XUP direction for all even sites i.
+     Do whatever you want with it here, but don't modify tag or
+     gen_pt[0].
+     Do modify the source field phi. **
+  do_gather(tag);
+    ** do other stuff **
+  wait_gather(tag);
+    ** gen_pt[0][i] now contains the address of the modified phi.
+     The restart-wait may be repeated as often as desired.  **
+  cleanup_gather(tag);
+    ** subsequent calls will overwrite the gathered fields. but if you
+     don't clean up, you will eventually run out of space **
 
 */
 
@@ -1706,21 +1706,21 @@ make_gather(
 */
 msg_tag *
 declare_strided_gather(
-  void *field,	        /* source buffer aligned to desired field */
+  void *field,          /* source buffer aligned to desired field */
   int stride,           /* bytes between fields in source buffer */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int subl,		/* subl of sites whose neighbors we gather.
-			   It is EVENANDODD, if all sublattices are done. */
-  char ** dest)		/* one of the vectors of pointers */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int subl,   /* subl of sites whose neighbors we gather.
+         It is EVENANDODD, if all sublattices are done. */
+  char ** dest)   /* one of the vectors of pointers */
 {
-  int i;	        /* scratch */
-  site *s;	        /* scratch pointer to site */
-  msg_tag *mtag;	/* message tag structure we will return a pointer to */
+  int i;          /* scratch */
+  site *s;          /* scratch pointer to site */
+  msg_tag *mtag;  /* message tag structure we will return a pointer to */
   msg_sr_t *mrecv, *msend; /* arrays for send and receive lists */
   gmem_t *gmem;
-  comlink *compt;	/* pointer to current comlink */
+  comlink *compt; /* pointer to current comlink */
   gather_t *gt;         /* pointer to current gather */
   id_list_t *idl;
 
@@ -1855,11 +1855,11 @@ prepare_gather(msg_tag *mtag)
     for(i=0, j=id_offset; i<nids; i++, j=(j+1)%num_gather_ids) {
       /* find next available type */
       while(id_array[j]!=0) {
-	j = (j+1)%num_gather_ids;
-	if(j==id_offset) {
-	  printf("error: not enough message ids\n");
-	  terminate(1);
-	}
+  j = (j+1)%num_gather_ids;
+  if(j==id_offset) {
+    printf("error: not enough message ids\n");
+    terminate(1);
+  }
       }
       ids[i] = j;
       id_array[j] = 1;
@@ -1886,7 +1886,7 @@ prepare_gather(msg_tag *mtag)
     gmem = mrecv[i].gmem;
     do {
       for(j=0; j<gmem->num; ++j,tpt+=gmem->size) {
-	((char **)gmem->mem)[gmem->sitelist[j]] = tpt;
+  ((char **)gmem->mem)[gmem->sitelist[j]] = tpt;
       }
     } while((gmem=gmem->next)!=NULL);
   }
@@ -1908,8 +1908,8 @@ prepare_gather(msg_tag *mtag)
 void
 do_gather(msg_tag *mtag)  /* previously returned by start_gather_site */
 {
-  register int i,j;	/* scratch */
-  register char *tpt;	/* scratch pointer in buffers */
+  register int i,j; /* scratch */
+  register char *tpt; /* scratch pointer in buffers */
   msg_sr_t *mbuf;
   gmem_t *gmem;
 
@@ -1920,8 +1920,8 @@ do_gather(msg_tag *mtag)  /* previously returned by start_gather_site */
   for(i=0; i<mtag->nrecvs; i++) {
     /* post receive */
     MPI_Irecv( mbuf[i].msg_buf, mbuf[i].msg_size+CRCBYTES, MPI_BYTE, MPI_ANY_SOURCE,
-	       GATHER_ID(mtag->ids[mbuf[i].id_offset]), MPI_COMM_THISJOB,
-	       &mbuf[i].msg_req );
+         GATHER_ID(mtag->ids[mbuf[i].id_offset]), MPI_COMM_THISJOB,
+         &mbuf[i].msg_req );
   }
 
   mbuf = mtag->send_msgs;
@@ -1932,7 +1932,7 @@ do_gather(msg_tag *mtag)  /* previously returned by start_gather_site */
     gmem = mbuf[i].gmem;
     do {
       for(j=0; j<gmem->num; ++j,tpt+=gmem->size) {
-	memcpy( tpt, gmem->mem + gmem->sitelist[j]*gmem->stride, gmem->size );
+  memcpy( tpt, gmem->mem + gmem->sitelist[j]*gmem->stride, gmem->size );
       }
     } while((gmem=gmem->next)!=NULL);
     /* start the send */
@@ -1950,20 +1950,20 @@ do_gather(msg_tag *mtag)  /* previously returned by start_gather_site */
       *crc = crc32(0, tpt, msg_size );
 #ifdef CRC_DEBUG
       {
-	char filename[128];
-	FILE *dump;
-	sprintf(filename,"/tmp/send.%d.to.%d.dir%d.msg%d",
-		mynode(),mbuf[i].msg_node,mtag->index,i);
-	dump = fopen(filename,"w");
-	fwrite(tpt, 1, msg_size + CRCBYTES, dump);
-	fclose(dump);
+  char filename[128];
+  FILE *dump;
+  sprintf(filename,"/tmp/send.%d.to.%d.dir%d.msg%d",
+    mynode(),mbuf[i].msg_node,mtag->index,i);
+  dump = fopen(filename,"w");
+  fwrite(tpt, 1, msg_size + CRCBYTES, dump);
+  fclose(dump);
       }
-#endif      
+#endif
     }
 #endif
     MPI_Isend( mbuf[i].msg_buf, mbuf[i].msg_size+CRCBYTES, MPI_BYTE, mbuf[i].msg_node,
-	       GATHER_ID(mtag->ids[mbuf[i].id_offset]), MPI_COMM_THISJOB,
-	       &mbuf[i].msg_req );
+         GATHER_ID(mtag->ids[mbuf[i].id_offset]), MPI_COMM_THISJOB,
+         &mbuf[i].msg_req );
   }
 }
 
@@ -2007,22 +2007,22 @@ wait_gather(msg_tag *mtag)
       crcgot = crc32(0, tpt, msg_size );
 
       if(*crc != crcgot){
-	fprintf(stderr,
-		"Node %d received checksum %x != node %d sent checksum %x\n",
-		mynode(),*crc, mbuf[i].msg_node, crcgot);
-	fflush(stdout);
-	fail = 1;
+  fprintf(stderr,
+    "Node %d received checksum %x != node %d sent checksum %x\n",
+    mynode(),*crc, mbuf[i].msg_node, crcgot);
+  fflush(stdout);
+  fail = 1;
 #ifdef CRC_DEBUG
-	{
-	  char filename[128];
-	  FILE *dump;
-	  sprintf(filename,"/tmp/receive.%d.from.%d.dir%d.msg%d",mynode(),
-		  mbuf[i].msg_node,mtag->index,i);
-	  dump = fopen(filename,"w");
-	  fwrite(tpt, 1, msg_size + CRCBYTES, dump);
-	  fclose(dump);
-	}
-#endif      
+  {
+    char filename[128];
+    FILE *dump;
+    sprintf(filename,"/tmp/receive.%d.from.%d.dir%d.msg%d",mynode(),
+      mbuf[i].msg_node,mtag->index,i);
+    dump = fopen(filename,"w");
+    fwrite(tpt, 1, msg_size + CRCBYTES, dump);
+    fclose(dump);
+  }
+#endif
       }
     }
   }
@@ -2081,16 +2081,16 @@ cleanup_gather(msg_tag *mtag)
 */
 msg_tag *
 declare_gather_site(
-  field_offset field,	/* which field? Some member of structure "site" */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  field_offset field, /* which field? Some member of structure "site" */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   return declare_strided_gather( (char *)lattice + field, sizeof(site), size,
-				 index, parity, dest );
+         index, parity, dest );
 }
 
 /*
@@ -2098,18 +2098,18 @@ declare_gather_site(
 */
 msg_tag *
 start_gather_site(
-  field_offset field,	/* which field? Some member of structure "site" */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  field_offset field, /* which field? Some member of structure "site" */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   msg_tag *mt;
 
   mt = declare_strided_gather( (char *)lattice + field, sizeof(site), size,
-			       index, parity, dest );
+             index, parity, dest );
   prepare_gather(mt);
   do_gather(mt);
 
@@ -2123,13 +2123,13 @@ start_gather_site(
 */
 void
 restart_gather_site(
-  field_offset field,	/* which field? Some member of structure "site" */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest,		/* one of the vectors of pointers */
+  field_offset field, /* which field? Some member of structure "site" */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest,   /* one of the vectors of pointers */
   msg_tag *mtag)        /* previously returned by start_gather_site */
 {
   msg_sr_t *mbuf;
@@ -2169,13 +2169,13 @@ restart_gather_site(
 */
 msg_tag *
 declare_gather_field(
-  void * field,		/* which field? Pointer returned by malloc() */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  void * field,   /* which field? Pointer returned by malloc() */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   return declare_strided_gather( field, size, size, index, parity, dest );
 }
@@ -2185,13 +2185,13 @@ declare_gather_field(
 */
 msg_tag *
 start_gather_field(
-  void * field,		/* which field? Pointer returned by malloc() */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  void * field,   /* which field? Pointer returned by malloc() */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   msg_tag *mt;
 
@@ -2209,13 +2209,13 @@ start_gather_field(
 */
 void
 restart_gather_field(
-  void *field,		/* which field? Pointer returned by malloc() */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest,		/* one of the vectors of pointers */
+  void *field,    /* which field? Pointer returned by malloc() */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest,   /* one of the vectors of pointers */
   msg_tag *mtag)          /* previously returned by start_gather_field */
 {
   msg_sr_t *mbuf;
@@ -2263,9 +2263,9 @@ restart_gather_field(
    msg_tag *tag1, *tag2, *mtag;
 
    tag1 = declare_gather_site( F_OFFSET(phi), sizeof(su3_vector), XUP,
-	                  EVEN, gen_pt1 );
+                    EVEN, gen_pt1 );
    tag2 = declare_gather_site( F_OFFSET(phi), sizeof(su3_vector), XDOWN,
-	                  EVEN, gen_pt2 );
+                    EVEN, gen_pt2 );
    mtag = NULL;
    accumulate_gather( &mtag, tag1 );
    accumulate_gather( &mtag, tag2 );
@@ -2289,9 +2289,9 @@ restart_gather_field(
 
    mtag = NULL;
    declare_accumulate_gather_site( &mtag, F_OFFSET(phi), sizeof(su3_vector), XUP,
-	                      EVEN, gen_pt1 );
+                        EVEN, gen_pt1 );
    declare_accumulate_gather_site( &mtag, F_OFFSET(phi), sizeof(su3_vector), XDOWN,
-	                      EVEN, gen_pt2 );
+                        EVEN, gen_pt2 );
    prepare_gather( mtag );  ** optional **
    do_gather( mtag );
    wait_gather( mtag );
@@ -2303,10 +2303,10 @@ restart_gather_field(
  one coule also replace
    mtag = NULL;
    declare_accumulate_gather_site( &mtag, F_OFFSET(phi), sizeof(su3_vector), XUP,
-	                      EVEN, gen_pt1 );
+                        EVEN, gen_pt1 );
  with
    mtag = declare_gather_site( F_OFFSET(phi), sizeof(su3_vector), XUP,
-	                  EVEN, gen_pt1 );
+                    EVEN, gen_pt1 );
  since they do the same thing, however the first form is a bit more uniform
  in the given example.
 */
@@ -2343,8 +2343,8 @@ add_msgt(msg_sr_t **dest, int *ndest, msg_sr_t *src, int nsrc, int nids)
   for(i=0; i<nsrc; ++i) {
     for(j=0; j<*ndest; ++j) {
       if((*dest)[j].msg_node==src[i].msg_node) {
-	++n;
-	break;
+  ++n;
+  break;
       }
     }
   }
@@ -2358,18 +2358,18 @@ add_msgt(msg_sr_t **dest, int *ndest, msg_sr_t *src, int nsrc, int nids)
     }
     for(i=0; i<nsrc; ++i) {
       for(j=0; j<*ndest; ++j) {
-	if((*dest)[j].msg_node==src[i].msg_node) break;
+  if((*dest)[j].msg_node==src[i].msg_node) break;
       }
       if(j<*ndest) {
-	(*dest)[j].msg_size += src[i].msg_size;
-	copy_gmem(&((*dest)[j].gmem), src[i].gmem);
+  (*dest)[j].msg_size += src[i].msg_size;
+  copy_gmem(&((*dest)[j].gmem), src[i].gmem);
       } else {
-	(*dest)[*ndest+i].msg_node = src[i].msg_node;
-	(*dest)[*ndest+i].id_offset = nids + src[i].id_offset;
-	(*dest)[*ndest+i].msg_size = src[i].msg_size;
-	(*dest)[*ndest+i].msg_buf = NULL;
-	(*dest)[*ndest+i].gmem = NULL;
-	copy_gmem(&((*dest)[*ndest+i].gmem), src[i].gmem);
+  (*dest)[*ndest+i].msg_node = src[i].msg_node;
+  (*dest)[*ndest+i].id_offset = nids + src[i].id_offset;
+  (*dest)[*ndest+i].msg_size = src[i].msg_size;
+  (*dest)[*ndest+i].msg_buf = NULL;
+  (*dest)[*ndest+i].gmem = NULL;
+  copy_gmem(&((*dest)[*ndest+i].gmem), src[i].gmem);
       }
     }
   }
@@ -2402,9 +2402,9 @@ accumulate_gather(msg_tag **mmtag, msg_tag *mtag)
   }
 
   add_msgt( &(amtag->recv_msgs), &(amtag->nrecvs),
-	    mtag->recv_msgs, mtag->nrecvs, amtag->nids );
+      mtag->recv_msgs, mtag->nrecvs, amtag->nids );
   add_msgt( &(amtag->send_msgs), &(amtag->nsends),
-	    mtag->send_msgs, mtag->nsends, amtag->nids );
+      mtag->send_msgs, mtag->nsends, amtag->nids );
   amtag->nids += mtag->nids;
 }
 
@@ -2415,14 +2415,14 @@ accumulate_gather(msg_tag **mmtag, msg_tag *mtag)
 static void
 declare_accumulate_strided_gather(
   msg_tag **mmtag,      /* tag to accumulate gather into */
-  void *field,	        /* which field? Some member of structure "site" */
+  void *field,          /* which field? Some member of structure "site" */
   int stride,           /* bytes between fields in source buffer */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   msg_tag *mtag;
 
@@ -2441,16 +2441,16 @@ declare_accumulate_strided_gather(
 void
 declare_accumulate_gather_site(
   msg_tag **mmtag,
-  field_offset field,	/* which field? Some member of structure "site" */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  field_offset field, /* which field? Some member of structure "site" */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   declare_accumulate_strided_gather( mmtag, (char *)lattice + field,
-				     sizeof(site), size, index, parity, dest );
+             sizeof(site), size, index, parity, dest );
 }
 
 /*
@@ -2459,16 +2459,16 @@ declare_accumulate_gather_site(
 void
 declare_accumulate_gather_field(
   msg_tag **mmtag,
-  void * field,		/* which field? Pointer returned by malloc() */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int index,		/* direction to gather from. eg XUP - index into
-			   neighbor tables */
-  int parity,		/* parity of sites whose neighbors we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  void * field,   /* which field? Pointer returned by malloc() */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int index,    /* direction to gather from. eg XUP - index into
+         neighbor tables */
+  int parity,   /* parity of sites whose neighbors we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   declare_accumulate_strided_gather( mmtag, field, size, size, index, parity,
-				     dest );
+             dest );
 }
 
 
@@ -2482,30 +2482,30 @@ declare_accumulate_gather_field(
 
    usage: tag = start_general_gather_site( source, size, displacement, parity, dest)
    example:
-	msg_tag *tag;
-	int disp[4]; 
+  msg_tag *tag;
+  int disp[4];
         disp[XUP]=1; disp[YUP]= -1; disp[ZUP] = disp[TUP] = 0;
-	tag = start_general_gather_site( F_OFFSET(phi), sizeof(su3_vector), disp,
-	    EVEN, gen_pt[0] );
-	  ** do other stuff **
-	wait_general_gather(tag);
-	  ** gen_pt[0][i] now contains the address of the phi
-	   vector (or a copy thereof) on the neighbor of site i in the
-	   XUP direction for all even sites i.
-	   Do whatever you want with it here.
-	  **
-	cleanup_general_gather(tag);
-	  ** subsequent calls will overwrite the gathered fields. but if you
-	   don't clean up, you will eventually run out of space **
+  tag = start_general_gather_site( F_OFFSET(phi), sizeof(su3_vector), disp,
+      EVEN, gen_pt[0] );
+    ** do other stuff **
+  wait_general_gather(tag);
+    ** gen_pt[0][i] now contains the address of the phi
+     vector (or a copy thereof) on the neighbor of site i in the
+     XUP direction for all even sites i.
+     Do whatever you want with it here.
+    **
+  cleanup_general_gather(tag);
+    ** subsequent calls will overwrite the gathered fields. but if you
+     don't clean up, you will eventually run out of space **
 */
 
 struct msg_tmp { int node, count; }; /* temporary structure for keeping track
-					of messages to be sent or received */
-static struct msg_tmp *to_nodes, *from_nodes;	/* arrays for messages */
+          of messages to be sent or received */
+static struct msg_tmp *to_nodes, *from_nodes; /* arrays for messages */
 static int g_gather_flag=0; /* flag to tell if general gather in progress */
-static int tsize;	    /* size of entry in messages =2*sizeof(int)+size */
-static char ** tdest;	    /* tdest is copy of dest */
-/* from_nodes, tsize and tdest are global because they are set in 
+static int tsize;     /* size of entry in messages =2*sizeof(int)+size */
+static char ** tdest;     /* tdest is copy of dest */
+/* from_nodes, tsize and tdest are global because they are set in
    start_general_gather_site() and used in wait_general_gather().  This
    works because we allow only one general_gather in progress at a
    time. */
@@ -2514,24 +2514,24 @@ static char ** tdest;	    /* tdest is copy of dest */
 
 msg_tag *
 start_general_strided_gather(
-  char *field,	        /* source buffer aligned to desired field */
+  char *field,          /* source buffer aligned to desired field */
   int stride,           /* bytes between fields in source buffer */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int *displacement,	/* displacement to gather from. four components */
-  int parity,		/* parity of sites to which we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int *displacement,  /* displacement to gather from. four components */
+  int parity,   /* parity of sites to which we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
-  register int i,j;	/* scratch */
-  register site *s;	/* scratch pointer to site */
-  register char *tpt;	/* scratch pointer in buffers */
-  int nsites;		/* number of sites in this receive or send */
-  int disp_parity;	/* parity of displacement vector */
-  int send_parity;	/* parity of sites that may be sent */
-  int tx,ty,tz,tt;	/* temporary coordinates */
-  int othernode;		/* node sent to or received from */
+  register int i,j; /* scratch */
+  register site *s; /* scratch pointer to site */
+  register char *tpt; /* scratch pointer in buffers */
+  int nsites;   /* number of sites in this receive or send */
+  int disp_parity;  /* parity of displacement vector */
+  int send_parity;  /* parity of sites that may be sent */
+  int tx,ty,tz,tt;  /* temporary coordinates */
+  int othernode;    /* node sent to or received from */
   msg_sr_t *mrecv,*msend;
-  msg_tag *mtag; 		/* message tag, to be returned */
+  msg_tag *mtag;    /* message tag, to be returned */
   int n_send_msgs, n_recv_msgs;
 
   /* check for gather already in progress */
@@ -2558,8 +2558,8 @@ start_general_strided_gather(
       break;
     default: /* EVENANDODD */
       if(parity!=EVENANDODD) {
-	printf("ERROR: bad parity\n");
-	terminate(parity);
+  printf("ERROR: bad parity\n");
+  terminate(parity);
       }
       send_parity = EVENANDODD;
       break;
@@ -2584,22 +2584,22 @@ start_general_strided_gather(
     else{
       for(j=0;j<n_recv_msgs;j++) if(from_nodes[j].node==othernode) break;
       if(j < n_recv_msgs) {
-	from_nodes[j].count++;
+  from_nodes[j].count++;
       }
       else {
-	if(n_recv_msgs==0) {
-	  from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
-	  from_nodes[0].node = othernode;
-	  from_nodes[0].count = 1;
-	  n_recv_msgs++;
-	}
-	else{
-	  from_nodes = (struct msg_tmp *)
-	    realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
-	  from_nodes[j].node = othernode;
-	  from_nodes[j].count = 1;
-	  n_recv_msgs++;
-	}
+  if(n_recv_msgs==0) {
+    from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
+    from_nodes[0].node = othernode;
+    from_nodes[0].count = 1;
+    n_recv_msgs++;
+  }
+  else{
+    from_nodes = (struct msg_tmp *)
+      realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
+    from_nodes[j].node = othernode;
+    from_nodes[j].count = 1;
+    n_recv_msgs++;
+  }
       }
     }
   }
@@ -2619,22 +2619,22 @@ start_general_strided_gather(
     if( othernode != this_node ) {
       for(j=0;j<n_send_msgs;j++) if(to_nodes[j].node==othernode) break;
       if(j < n_send_msgs) {
-	to_nodes[j].count++;
+  to_nodes[j].count++;
       }
       else {
-	if(n_send_msgs==0) {
-	  to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
-	  to_nodes[0].node = othernode;
-	  to_nodes[0].count = 1;
-	  n_send_msgs++;
-	}
-	else{
-	  to_nodes = (struct msg_tmp *)
-	    realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
-	  to_nodes[j].node = othernode;
-	  to_nodes[j].count = 1;
-	  n_send_msgs++;
-	}
+  if(n_send_msgs==0) {
+    to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
+    to_nodes[0].node = othernode;
+    to_nodes[0].count = 1;
+    n_send_msgs++;
+  }
+  else{
+    to_nodes = (struct msg_tmp *)
+      realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
+    to_nodes[j].node = othernode;
+    to_nodes[j].count = 1;
+    n_send_msgs++;
+  }
       }
     }
   }
@@ -2676,8 +2676,8 @@ start_general_strided_gather(
     }
     /* post receive */
     MPI_Irecv( mrecv[i].msg_buf, nsites*tsize, MPI_BYTE,
-	       from_nodes[i].node, GENERAL_GATHER_ID, 
-	       MPI_COMM_THISJOB, &mrecv[i].msg_req );
+         from_nodes[i].node, GENERAL_GATHER_ID,
+         MPI_COMM_THISJOB, &mrecv[i].msg_req );
   }
 
   /* for each node whose neighbors I have */
@@ -2718,8 +2718,8 @@ start_general_strided_gather(
   for(i=0; i<n_send_msgs; i++) {
     nsites = to_nodes[i].count;
     MPI_Isend( msend[i].msg_buf, nsites*tsize, MPI_BYTE,
-	       to_nodes[i].node, GENERAL_GATHER_ID, 
-	       MPI_COMM_THISJOB, &msend[i].msg_req );
+         to_nodes[i].node, GENERAL_GATHER_ID,
+         MPI_COMM_THISJOB, &msend[i].msg_req );
   }
 
   /* free temporary arrays */
@@ -2730,27 +2730,27 @@ start_general_strided_gather(
   return mtag;
 }
 
-#else	/* N_SUBL32 */
+#else /* N_SUBL32 */
 
 msg_tag *
 start_general_strided_gather(
-  char *field,	        /* source buffer aligned to desired field */
+  char *field,          /* source buffer aligned to desired field */
   int stride,           /* bytes between fields in source buffer */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int *displacement,	/* displacement to gather from. four components */
-  int subl,		/* subl of sites whose neighbors we gather.
-			   It is EVENANDODD, if all sublattices are done. */
-  char ** dest)		/* one of the vectors of pointers */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int *displacement,  /* displacement to gather from. four components */
+  int subl,   /* subl of sites whose neighbors we gather.
+         It is EVENANDODD, if all sublattices are done. */
+  char ** dest)   /* one of the vectors of pointers */
 {
-  register int i,j;	/* scratch */
-  register site *s;	/* scratch pointer to site */
-  register char *tpt;	/* scratch pointer in buffers */
-  int nsites;		/* number of sites in this receive or send */
-  int send_subl;		/* sublattice of sites that may be sent */
-  int tx,ty,tz,tt;	/* temporary coordinates */
-  int othernode;		/* node sent to or received from */
+  register int i,j; /* scratch */
+  register site *s; /* scratch pointer to site */
+  register char *tpt; /* scratch pointer in buffers */
+  int nsites;   /* number of sites in this receive or send */
+  int send_subl;    /* sublattice of sites that may be sent */
+  int tx,ty,tz,tt;  /* temporary coordinates */
+  int othernode;    /* node sent to or received from */
   msg_sr_t *mrecv,*msend;
-  msg_tag *mtag;		/* message tag, to be returned */
+  msg_tag *mtag;    /* message tag, to be returned */
   int n_send_msgs, n_recv_msgs;
 
   /* check for gather already in progress */
@@ -2810,28 +2810,28 @@ start_general_strided_gather(
       else                     tt = s->t;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode==this_node ) {
-	dest[i] = field + node_index(tx,ty,tz,tt) * stride;
+  dest[i] = field + node_index(tx,ty,tz,tt) * stride;
       }
       else{
-	for(j=0;j<n_recv_msgs;j++) if(from_nodes[j].node==othernode) break;
-	if(j < n_recv_msgs) {
-	  from_nodes[j].count++;
-	}
-	else {
-	  if(n_recv_msgs==0) {
-	    from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
-	    from_nodes[0].node = othernode;
-	    from_nodes[0].count = 1;
-	    n_recv_msgs++;
-	  }
-	  else{
-	    from_nodes = (struct msg_tmp *)
-	      realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
-	    from_nodes[j].node = othernode;
-	    from_nodes[j].count = 1;
-	    n_recv_msgs++;
-	  }
-	}
+  for(j=0;j<n_recv_msgs;j++) if(from_nodes[j].node==othernode) break;
+  if(j < n_recv_msgs) {
+    from_nodes[j].count++;
+  }
+  else {
+    if(n_recv_msgs==0) {
+      from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
+      from_nodes[0].node = othernode;
+      from_nodes[0].count = 1;
+      n_recv_msgs++;
+    }
+    else{
+      from_nodes = (struct msg_tmp *)
+        realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
+      from_nodes[j].node = othernode;
+      from_nodes[j].count = 1;
+      n_recv_msgs++;
+    }
+  }
       }
     }
   }
@@ -2847,28 +2847,28 @@ start_general_strided_gather(
       else                     tt = s->t;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode==this_node ) {
-	dest[i] = field + node_index(tx,ty,tz,tt) * stride;
+  dest[i] = field + node_index(tx,ty,tz,tt) * stride;
       }
       else {
-	for(j=0;j<n_recv_msgs;j++) if(from_nodes[j].node==othernode) break;
-	if(j < n_recv_msgs) {
-	  from_nodes[j].count++;
-	}
-	else {
-	  if(n_recv_msgs==0) {
-	    from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
-	    from_nodes[0].node = othernode;
-	    from_nodes[0].count = 1;
-	    n_recv_msgs++;
-	  }
-	  else{
-	    from_nodes = (struct msg_tmp *)
-	      realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
-	    from_nodes[j].node = othernode;
-	    from_nodes[j].count = 1;
-	    n_recv_msgs++;
-	  }
-	}
+  for(j=0;j<n_recv_msgs;j++) if(from_nodes[j].node==othernode) break;
+  if(j < n_recv_msgs) {
+    from_nodes[j].count++;
+  }
+  else {
+    if(n_recv_msgs==0) {
+      from_nodes = (struct msg_tmp *)malloc( sizeof(struct msg_tmp) );
+      from_nodes[0].node = othernode;
+      from_nodes[0].count = 1;
+      n_recv_msgs++;
+    }
+    else{
+      from_nodes = (struct msg_tmp *)
+        realloc( from_nodes, (n_recv_msgs+1)*sizeof(struct msg_tmp) );
+      from_nodes[j].node = othernode;
+      from_nodes[j].count = 1;
+      n_recv_msgs++;
+    }
+  }
       }
     }
   }
@@ -2887,25 +2887,25 @@ start_general_strided_gather(
       else                     tt = s->t;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode != this_node ) {
-	for(j=0;j<n_send_msgs;j++) if(to_nodes[j].node==othernode) break;
-	if(j < n_send_msgs) {
-	  to_nodes[j].count++;
-	}
-	else {
-	  if(n_send_msgs==0) {
-	    to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
-	    to_nodes[0].node = othernode;
-	    to_nodes[0].count = 1;
-	    n_send_msgs++;
-	  }
-	  else {
-	    to_nodes = (struct msg_tmp *)
-	      realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
-	    to_nodes[j].node = othernode;
-	    to_nodes[j].count = 1;
-	    n_send_msgs++;
-	  }
-	}
+  for(j=0;j<n_send_msgs;j++) if(to_nodes[j].node==othernode) break;
+  if(j < n_send_msgs) {
+    to_nodes[j].count++;
+  }
+  else {
+    if(n_send_msgs==0) {
+      to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
+      to_nodes[0].node = othernode;
+      to_nodes[0].count = 1;
+      n_send_msgs++;
+    }
+    else {
+      to_nodes = (struct msg_tmp *)
+        realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
+      to_nodes[j].node = othernode;
+      to_nodes[j].count = 1;
+      n_send_msgs++;
+    }
+  }
       }
     }
   }
@@ -2921,25 +2921,25 @@ start_general_strided_gather(
       else                     tt = s->t;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode != this_node ) {
-	for(j=0;j<n_send_msgs;j++) if(to_nodes[j].node==othernode) break;
-	if(j < n_send_msgs) {
-	  to_nodes[j].count++;
-	}
-	else {
-	  if(n_send_msgs==0) {
-	    to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
-	    to_nodes[0].node = othernode;
-	    to_nodes[0].count = 1;
-	    n_send_msgs++;
-	  }
-	  else {
-	    to_nodes = (struct msg_tmp *)
-	      realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
-	    to_nodes[j].node = othernode;
-	    to_nodes[j].count = 1;
-	    n_send_msgs++;
-	  }
-	}
+  for(j=0;j<n_send_msgs;j++) if(to_nodes[j].node==othernode) break;
+  if(j < n_send_msgs) {
+    to_nodes[j].count++;
+  }
+  else {
+    if(n_send_msgs==0) {
+      to_nodes = (struct msg_tmp *)malloc(sizeof(struct msg_tmp));
+      to_nodes[0].node = othernode;
+      to_nodes[0].count = 1;
+      n_send_msgs++;
+    }
+    else {
+      to_nodes = (struct msg_tmp *)
+        realloc( to_nodes, (n_send_msgs+1)*sizeof(struct msg_tmp) );
+      to_nodes[j].node = othernode;
+      to_nodes[j].count = 1;
+      n_send_msgs++;
+    }
+  }
       }
     }
   }
@@ -2982,8 +2982,8 @@ start_general_strided_gather(
     }
     /* post receive */
     MPI_Irecv( mrecv[i].msg_buf, nsites*tsize, MPI_BYTE,
-	       from_nodes[i].node, GENERAL_GATHER_ID,
-	       MPI_COMM_THISJOB, &mrecv[i].msg_req );
+         from_nodes[i].node, GENERAL_GATHER_ID,
+         MPI_COMM_THISJOB, &mrecv[i].msg_req );
   }
 
   /* for each node whose neighbors I have */
@@ -3012,12 +3012,12 @@ start_general_strided_gather(
       tt = (s->t - displacement[TUP] + nt)%nt;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode != this_node ) {
-	for(j=0; j<n_send_msgs; j++) if(to_nodes[j].node==othernode) break;
-	tpt = msend[j].msg_buf + to_nodes[j].count*tsize;
-	*(int *)tpt = node_index(tx,ty,tz,tt);
-	/* index of site on other node */
-	memcpy( tpt+2*sizeof(int), field+i*stride, size);
-	to_nodes[j].count++;
+  for(j=0; j<n_send_msgs; j++) if(to_nodes[j].node==othernode) break;
+  tpt = msend[j].msg_buf + to_nodes[j].count*tsize;
+  *(int *)tpt = node_index(tx,ty,tz,tt);
+  /* index of site on other node */
+  memcpy( tpt+2*sizeof(int), field+i*stride, size);
+  to_nodes[j].count++;
       }
     }
   }
@@ -3029,12 +3029,12 @@ start_general_strided_gather(
       tt = (s->t - displacement[TUP] + nt)%nt;
       othernode = node_number(tx,ty,tz,tt);
       if( othernode != this_node ) {
-	for(j=0; j<n_send_msgs; j++) if(to_nodes[j].node==othernode) break;
-	tpt = msend[j].msg_buf + to_nodes[j].count*tsize;
-	*(int *)tpt = node_index(tx,ty,tz,tt);
-	/* index of site on other node */
-	memcpy( tpt+2*sizeof(int), field+i*stride, size);
-	to_nodes[j].count++;
+  for(j=0; j<n_send_msgs; j++) if(to_nodes[j].node==othernode) break;
+  tpt = msend[j].msg_buf + to_nodes[j].count*tsize;
+  *(int *)tpt = node_index(tx,ty,tz,tt);
+  /* index of site on other node */
+  memcpy( tpt+2*sizeof(int), field+i*stride, size);
+  to_nodes[j].count++;
       }
     }
   }
@@ -3043,8 +3043,8 @@ start_general_strided_gather(
   for(i=0; i<n_send_msgs; i++) {
     nsites = to_nodes[i].count;
     MPI_Isend( msend[i].msg_buf, nsites*tsize, MPI_BYTE,
-	       to_nodes[i].node, GENERAL_GATHER_ID,
-	       MPI_COMM_THISJOB, &msend[i].msg_req );
+         to_nodes[i].node, GENERAL_GATHER_ID,
+         MPI_COMM_THISJOB, &msend[i].msg_req );
   }
 
   /* free temporary arrays */
@@ -3055,32 +3055,32 @@ start_general_strided_gather(
   return mtag;
 }
 
-#endif	/* N_SUBL32 */
+#endif  /* N_SUBL32 */
 
 msg_tag *
 start_general_gather_site(
-  field_offset field,	/* which field? Some member of structure "site" */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int *displacement,	/* displacement to gather from. four components */
-  int parity,		/* parity of sites to which we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  field_offset field, /* which field? Some member of structure "site" */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int *displacement,  /* displacement to gather from. four components */
+  int parity,   /* parity of sites to which we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   return start_general_strided_gather( (char *)lattice + field, sizeof(site),
-				       size, displacement, parity, dest );
+               size, displacement, parity, dest );
 }
 
 msg_tag *
 start_general_gather_field(
-  void * field,	        /* which field? Pointer returned by malloc() */
-  int size,		/* size in bytes of the field (eg sizeof(su3_vector))*/
-  int *displacement,	/* displacement to gather from. four components */
-  int parity,		/* parity of sites to which we gather.
-			   one of EVEN, ODD or EVENANDODD. */
-  char ** dest)		/* one of the vectors of pointers */
+  void * field,         /* which field? Pointer returned by malloc() */
+  int size,   /* size in bytes of the field (eg sizeof(su3_vector))*/
+  int *displacement,  /* displacement to gather from. four components */
+  int parity,   /* parity of sites to which we gather.
+         one of EVEN, ODD or EVENANDODD. */
+  char ** dest)   /* one of the vectors of pointers */
 {
   return start_general_strided_gather( field, size, size,
-				       displacement, parity, dest );
+               displacement, parity, dest );
 }
 
 /*
@@ -3134,12 +3134,12 @@ cleanup_general_gather(msg_tag *mtag)
 ** compute crc32 checksum
 */
 /* Taken from the GNU CVS distribution and
-   modified for SciDAC use  C. DeTar 10/11/2003 
+   modified for SciDAC use  C. DeTar 10/11/2003
    and MILC use 5/3/2005 */
 
 /* crc32.c -- compute the CRC-32 of a data stream
  * Copyright (C) 1995-1996 Mark Adler
- * For conditions of distribution and use, see copyright notice in zlib.h 
+ * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 /* Copyright notice reproduced from zlib.h -- (C. DeTar)
@@ -3211,7 +3211,7 @@ local void make_crc_table OF((void));
   the information needed to generate CRC's on data a byte at a time for all
   combinations of CRC register values and incoming bytes.
 */
-local void 
+local void
 make_crc_table()
 {
   uLong c;
@@ -3224,7 +3224,7 @@ make_crc_table()
   poly = 0L;
   for (n = 0; n < sizeof(p)/sizeof(Byte); n++)
     poly |= 1L << (31 - p[n]);
- 
+
   for (n = 0; n < 256; n++)
   {
     c = (uLong)n;
@@ -3312,7 +3312,7 @@ static uLongf *get_crc_table()
 #define DO8(buf)  DO4(buf); DO4(buf);
 
 /* ========================================================================= */
-u_int32type 
+u_int32type
 crc32(u_int32type crc, const unsigned char *buf, size_t len)
 {
     if (buf == Z_NULL) return 0L;

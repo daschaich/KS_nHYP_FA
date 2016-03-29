@@ -121,7 +121,7 @@ EXTERN site *lattice;
 // Vectors for addressing
 // Generic pointers, for gather routines
 // We need 8 mostly, but 10 for force_nhyp and 16 for nl_spectrum
-#define N_POINTERS 10   // Needed by ../generic/make_lattice.c
+#define N_POINTERS 10
 EXTERN char **gen_pt[N_POINTERS];
 
 EXTERN su3_matrix *gauge_field[4];
