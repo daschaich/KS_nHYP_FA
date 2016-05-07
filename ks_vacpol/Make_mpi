@@ -28,10 +28,8 @@ include ../Make_template_qop
 include ../Make_template_scidac
 
 LD             = ${CC}
-IMPI           = # -I/usr/local/mpich2-1.4.1p1/include           # CU
-LMPI           = # -L/usr/local/mpich2-1.4.1p1/lib -lmpich       # CU
 LIBADD         =
-INLINEOPT      = -DSSE_GLOBAL_INLINE # -DC_GLOBAL_INLINE # -DC_INLINE
+INLINEOPT      = # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =

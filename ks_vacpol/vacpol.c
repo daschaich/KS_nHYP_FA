@@ -9,14 +9,14 @@
 // -----------------------------------------------------------------
 // Return CG iteration count
 int vacuum_polarization() {
-  int i, j, k, icol, cgTot = 0, cgs, mu, nu;
+  int i, j, k, icol, cgTot = 0, cgs, mu, nu, tmp_parity = 0;
   int x = x_src, y = y_src, z = z_src, t = t_src;
   char src_parity;
   double invtime;
   complex tc, tempvec, tempaxi, contact[4];
   Real neg = -1.0, tol = sqrt(rsqmin);
   site* s;
-  msg_tag *tag0, *tag1;
+  msg_tag *tag, *tag2;
   su3_matrix tmat, tmat2, sourcelink[4];
 
   // Initialize link at source point
@@ -36,9 +36,15 @@ int vacuum_polarization() {
     sourcelink[YUP] = lattice[i].link[YUP];
     sourcelink[ZUP] = lattice[i].link[ZUP];
     sourcelink[TUP] = lattice[i].link[TUP];
-    src_parity = lattice[i].parity;   // Set src_parity
+    if (lattice[i].parity == ODD)
+      tmp_parity = 1;     // Default above is even
   }
-  broadcast_bytes(&src_parity, 1);
+  // Sum parity and sourcelink to "broadcast" them to all nodes
+  g_intsum(&tmp_parity);
+  if (tmp_parity == 1)
+    src_parity = ODD;
+  else
+    src_parity = EVEN;
   FORALLUPDIR(nu)
     g_veccomplexsum((complex*)&sourcelink[nu], 9);
 
@@ -70,7 +76,7 @@ int vacuum_polarization() {
   }
 
   // Invert on point sources for each color at each y+nu
-  for (nu = 0; nu < 4; nu++) {
+  FORALLUPDIR(nu) {
     // Move point source by nu
     x = x_src;  y = y_src;  z = z_src;  t = t_src;
     switch(nu) {
@@ -108,19 +114,19 @@ int vacuum_polarization() {
     }
   }
 
-  for (nu = 0; nu < 4; nu++) {    // Source direction -- call src pt y
+  FORALLUPDIR(nu) {               // Source direction -- call src pt y
     FORALLUPDIR(mu) {             // Sink direction   -- call sink pt x
       // gen_pt[0] is D_{x + mu; y + nu}
       // gen_pt[1] is D_{x + mu; y}
-      tag0 = start_gather_site(F_OFFSET(propnu[nu]), sizeof(su3_matrix),
+      tag = start_gather_site(F_OFFSET(propnu[nu]), sizeof(su3_matrix),
                                mu, EVENANDODD, gen_pt[0]);
-      tag1 = start_gather_site(F_OFFSET(prop), sizeof(su3_matrix),
+      tag2 = start_gather_site(F_OFFSET(prop), sizeof(su3_matrix),
                                mu, EVENANDODD, gen_pt[1]);
-      wait_gather(tag0);
-      wait_gather(tag1);
+      wait_gather(tag);
+      wait_gather(tag2);
 
       // Construct the vector and axial two-point functions
-      // NB the staggered phases are already in the links!
+      // NB the staggered phases and BCs are already in the links!
       FORALLSITES(i, s) {
         // [U_{mu}(x) D_{x + mu; y + nu}]^{dag} D_{x; y} U_{nu}(y)
         mult_su3_nn(&(s->link[mu]), (su3_matrix*)gen_pt[0][i], &tmat);
@@ -190,8 +196,8 @@ int vacuum_polarization() {
         s->vacpol[mu][nu] = tempvec.real;
         s->axial[mu][nu] = tempaxi.real;
       }
-      cleanup_gather(tag0);
-      cleanup_gather(tag1);
+      cleanup_gather(tag);
+      cleanup_gather(tag2);
     } // Sink direction mu
 
     // Contact terms
@@ -214,7 +220,7 @@ int vacuum_polarization() {
       // Factor of 2 for each propagator from MILC conventions
       // Factor of 1/2 for each current, so do nothing
     }
-    // Sum contact[nu] to put it on all links "broadcast" it */
+    // Sum contact[nu] to broadcast it to all nodes
     g_complexsum(&(contact[nu]));
 
     // Second contact term: x = src

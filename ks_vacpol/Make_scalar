@@ -7,7 +7,7 @@ CC             = gcc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
 CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                # Large files gcc only
-MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
+MACHINE_DEP_IO = io_ansi.o
 
 WANTQOP        =
 WANTQDP        = true
@@ -15,9 +15,9 @@ WANTQIO        = true
 WANTQMP        = true
 
 SCIDAC         = /home/schaich/current/lqcd/install
-QIOSNG         = $(SCIDAC)/qio
+QIOSNG         =
 QIOPAR         = $(SCIDAC)/qio
-QMPSNG         = ${SCIDAC}/qmp
+QMPSNG         =
 QMPPAR         = ${SCIDAC}/qmp
 QDP            = ${SCIDAC}/qdp
 QLA            = ${SCIDAC}/qla

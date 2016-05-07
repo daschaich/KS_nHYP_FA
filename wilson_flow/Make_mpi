@@ -10,28 +10,26 @@ CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
 MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
 
 WANTQOP        =
-WANTQDP        =
-WANTQIO        =
-WANTQMP        =
+WANTQDP        = true
+WANTQIO        = true
+WANTQMP        = true
 
-SCIDAC         =
-QIOSNG         = # $(SCIDAC)/qio-single
-QIOPAR         = # $(SCIDAC)/qio
-QMPSNG         = # ${SCIDAC}/qmp-single
-QMPPAR         = # ${SCIDAC}/qmp
-QDP            = # ${SCIDAC}/qdp
-QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
+SCIDAC         = /nfs/beowulf03/schaich/lqcd/install
+QIOSNG         =
+QIOPAR         = $(SCIDAC)/qio
+QMPSNG         =
+QMPPAR         = ${SCIDAC}/qmp
+QDP            = ${SCIDAC}/qdp
+QLA            = ${SCIDAC}/qla
+QOP            = # ${SCIDAC}/qopqdp
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
 include ../Make_template_scidac
 
 LD             = ${CC}
-IMPI           = # -I/usr/local/mpich2-1.4.1p1/include           # CU
-LMPI           = # -L/usr/local/mpich2-1.4.1p1/lib -lmpich       # CU
 LIBADD         =
-INLINEOPT      = # -DINLINE # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
+INLINEOPT      = # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =

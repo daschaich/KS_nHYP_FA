@@ -14,6 +14,5 @@
 #include "../include/generic_quark_types.h"
 #include "../include/generic_ks.h"
 #include "../include/dirs.h"
-#include "../include/io_ksprop.h"
 #include "../include/check_malloc.h"
 // -----------------------------------------------------------------

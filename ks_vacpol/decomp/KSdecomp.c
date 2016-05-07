@@ -12,7 +12,7 @@
 
 
 // -----------------------------------------------------------------
-// Function usage just prints lengthy usage information if necessary
+// Print usage information if necessary
 void print_usage(char *argv0) {
   char *fmt = " %-9s %s\n";
 
@@ -29,7 +29,7 @@ void print_usage(char *argv0) {
 
 
 // -----------------------------------------------------------------
-// Function getPoint sets up source point
+// Set up source point
 void getPoint(int j, int ndim, int *pnt, int argc, char *argv[]) {
   int i;
 
@@ -55,7 +55,7 @@ void getPoint(int j, int ndim, int *pnt, int argc, char *argv[]) {
 
 
 // -----------------------------------------------------------------
-// Function getQ calculates Qhat_mu, Qhat^2 and Q^2
+// Calculate Qhat_mu, Qhat^2 and Q^2
 void getQ(int *pnt, int *size, double *Qhat, double *Qhatsq, double *Qsq) {
   double td;
   Qhatsq[0] = 0;
@@ -78,7 +78,7 @@ void getQ(int *pnt, int *size, double *Qhat, double *Qhatsq, double *Qsq) {
 
 
 // -----------------------------------------------------------------
-// Helper function getIndex returns the row-major index for a 4d point
+// Return the row-major index for a 4d point
 int getIndex(int pnt[4], int *size) {
   return pnt[3] + size[3] * (pnt[2] + size[2] * (pnt[1] + size[1] * pnt[0]));
 }
@@ -87,8 +87,8 @@ int getIndex(int pnt[4], int *size) {
 
 
 // -----------------------------------------------------------------
-// Function map matches a given Qsq to the appropriate component
-// in the given array, adding it if necessary
+// Match a given Qsq to the appropriate component in the given array,
+// extending that array if necessary
 int map(double Qsq, double *moms, int *lenpt) {
   int i, len = lenpt[0];
   int test, key = floor(1e4 * Qsq);     // Avoid roundoff shenanigans
@@ -112,7 +112,7 @@ int map(double Qsq, double *moms, int *lenpt) {
 
 
 // -----------------------------------------------------------------
-// Function decomp performs Fourier transform and consolidates results
+// Perform Fourier transform and consolidate results
 int decomp(QDP_Real *pix[4][4], int *latsize, QLA_Real Qmax,
            double *moms, complex double *longi, complex double *trans,
            int *src) {
@@ -219,7 +219,7 @@ int decomp(QDP_Real *pix[4][4], int *latsize, QLA_Real Qmax,
 
 
 // -----------------------------------------------------------------
-// Main method -- load correlators and perform Fourier transforms
+// Load correlators and perform Fourier transforms
 int main(int argc, char *argv[]) {
   int i, j, mu, nu, ndim, *latsize, N, len = 0, src[] = {0,0,0,0};
   double *moms, Qmax = 10;
@@ -300,14 +300,14 @@ int main(int argc, char *argv[]) {
   printf("Loading correlator files %s and KSvec%s\n", fn, outpat);
   md = QDP_string_create();
   qr = QDP_open_read(md, fn);   // Set to KSaxi above
-  for (mu = 0; mu < 4; mu++)
+  for (mu = 0; mu < ndim; mu++)
     QDP_vread_R(qr, md, corr[mu], 4);
   QDP_close_read(qr);
   decomp(corr, latsize, Qmax, moms, longia, transa, src);
 
   sprintf(fn, "KSvec%s", outpat);
   qr = QDP_open_read(md, fn);
-  for (mu = 0; mu < 4; mu++)
+  for (mu = 0; mu < ndim; mu++)
     QDP_vread_R(qr, md, corr[mu], 4);
   QDP_close_read(qr);
   len = decomp(corr, latsize, Qmax, moms, longiv, transv, src);
@@ -340,7 +340,6 @@ int main(int argc, char *argv[]) {
     for (nu = 0; nu < ndim; nu++)
       QDP_destroy_R(corr[mu][nu]);
   }
-
   QDP_finalize();
   return 0;
 }

@@ -37,6 +37,7 @@ PROGS = KSdecomp
 
 all: $(PROGS)
 
+KSdecay: KSdecay.o
 KSdecomp: KSdecomp.o
 
 clean:
