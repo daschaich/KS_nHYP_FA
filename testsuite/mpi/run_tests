@@ -1,5 +1,9 @@
 #!/bin/bash
-# This script needs to be run from the testsuite/scalar directory
+# This script needs to be run from the testsuite/mpi directory
+
+# Customization for the HET cluster at the University of Colorado
+makefile=Make_mpi
+run="/usr/local/mpich2-1.4.1p1/bin/mpirun -np 2"
 
 # Require user to specify both directory and target
 if [ $# -lt 2 ]; then
@@ -17,20 +21,20 @@ target=$2
 # Compile
 cd ../../$dir/
 echo "Compiling su3_$target..."
-if ! make -f Make_scalar su3_$target >& /dev/null ; then
+if ! make -f $makefile su3_$target >& /dev/null ; then
   echo "ERROR: su3_$target compilation failed"
-  make -f Make_scalar su3_$target
+  make -f $makefile su3_$target
   exit
 fi
 
 # Run
 cd ../testsuite/
-rm -f scalar/$target.out
+rm -f mpi/$target.out
 echo "Running su3_$target..."
-../$dir/su3_$target < in.$target > scalar/$target.out
+$run ../$dir/su3_$target < in.$target > mpi/$target.out
 
 # Check
-cd scalar/
+cd mpi/
 d="`diff -I'Time' -I'time' -I'seconds' -I'secs' -I'^start' -I'^exit:' $target.ref $target.out`"
 if [ -n "$d" ] ; then   # Non-zero string length
   echo "$target.ref and $target.out differ:"
