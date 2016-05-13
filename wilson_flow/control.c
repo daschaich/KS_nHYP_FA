@@ -91,9 +91,11 @@ void mcrg_block(Real t, int blmax) {
 int main(int argc, char *argv[])  {
   register int i, dir;
   register site *s;
-  int j, prompt, istep, block_count = 0, blmax = 0;
-  double dtime, t=0, E, old_value, new_value=0, der_value;
-  double ssplaq, stplaq, td, check, topo;
+  int j, prompt, istep, block_count = 0, blmax = 0, L;
+  double dtime, t = 0, E, old_value, new_value = 0, der_value;
+  double ssplaq, stplaq, plaq, check, topo, base_eps;
+  double oldPlaq, dPlaq = -1.0, old_dPlaq = -1.0;
+  double magicC = 0.05, magicT;
   complex tc;
   su3_matrix t_mat, *S[4];
   anti_hermitmat *A[4];
@@ -111,7 +113,7 @@ int main(int argc, char *argv[])  {
     node0_printf("ERROR in readin, aborting\n");
     terminate(1);
   }
-  dtime =-dclock();
+  dtime = -dclock();
 
   // Allocate fields used by integrator
   for (dir = 0; dir < 4; dir++) {
@@ -121,13 +123,26 @@ int main(int argc, char *argv[])  {
 
   // Determine maximum number of blockings from smallest dimension
   // Works even if we can only block down to odd j > 4
-  if (nx < nt)
+  // Simultaneously compute appropriate 0.05L)^2/8 
+  if (nx < nt) {
     j = nx;
-  else
+    L = nx;
+  }
+  else {
     j = nt;
+    L = nt;
+  }
   while (j % 2 == 0 && j > 2) {    // While j is even
     j /= 2;
     blmax++;
+  }
+
+  // Set first magicT = (0.05L)^2 / 8, with L = min(nx, nt) set above
+  // Special case: Make sure we don't pass this before resetting epsilon
+  magicT = magicC * magicC  * L * L / 8.0;
+  while (magicT < 2.0 * start_eps) {
+    magicC += 0.05;
+    magicT = magicC * magicC * L * L / 8.0;
   }
 
   // Special case: measure MCRG-blocked observables before any flow
@@ -137,7 +152,15 @@ int main(int argc, char *argv[])  {
   }
 
   // Wilson flow!
-  for (istep = 0; tmax == 0 || fabs(t) <  fabs(tmax) - fabs(epsilon) / 2; istep++) {
+  epsilon = start_eps;
+  base_eps = start_eps;
+  node0_printf("EPS %g\n", epsilon);
+  plaquette(&ssplaq, &stplaq);
+  oldPlaq = 0.5 * (ssplaq + stplaq);
+  for (istep = 0;
+       tmax == 0 || fabs(t) < fabs(tmax) - 0.5 * fabs(start_eps);
+       istep++) {
+
     stout_step_rk(S, A);
     t += epsilon;
 
@@ -182,17 +205,12 @@ int main(int argc, char *argv[])  {
 
     // Check with plaquette
     plaquette(&ssplaq, &stplaq);
-    td = (ssplaq + stplaq) / 2.0;
-    check = 12.0 * t * t * (3.0 - td);
+    plaq = 0.5 * (ssplaq + stplaq);
+    check = 12.0 * t * t * (3.0 - plaq);
     node0_printf("WFLOW %g %g %g %g %g %g %g\n",
-                 t, td, E, new_value, der_value, check, topo);
+                 t, plaq, E, new_value, der_value, check, topo);
 
-    // Does MCRG blocking at specified t
-    if (block_count < num_block
-        && fabs(t + epsilon / 2.0) >= fabs(tblock[block_count])) {
-      mcrg_block(tblock[block_count], blmax);
-      block_count++;
-    }
+
 
     // For the tmax == 0 case, figure out if we can stop
     // Never stop before t=1
@@ -201,6 +219,49 @@ int main(int argc, char *argv[])  {
     if (tmax == 0 && fabs(t) > 1 && istep % 20 == 0) {
       if (new_value > 0.45 && der_value > 0.35)
         break;
+    }
+
+    // Reset epsilon when appropriate
+    dPlaq = fabs(plaq - oldPlaq);         // Make it positive!
+//    node0_printf("dPlaq = %.4g\n", dPlaq);
+    if (istep > 9 && epsilon < max_eps) {
+      // Start by scaling from base_eps (in case epsilon is reset below)
+      epsilon = base_eps * old_dPlaq / dPlaq;
+      if (epsilon > max_eps)
+        epsilon = max_eps;
+      base_eps = epsilon;
+      node0_printf("EPS %g", epsilon);
+
+      // Special cases:
+      // Reset to hit tmax or next c/0.05
+      // Don't let it get smaller than start_eps
+      // Don't change base_eps, or else the whole procedure would be reset
+      if (fabs(t + epsilon) > fabs(tmax)) {
+        epsilon = tmax - t;
+        if (epsilon < start_eps)
+          epsilon = start_eps;
+        node0_printf(" --> %g", epsilon);
+      }
+      if (fabs(t + epsilon) > fabs(magicT)) {
+        epsilon = magicT - t;
+        if (epsilon < start_eps)
+          epsilon = start_eps;
+        node0_printf(" --> %g", epsilon);
+
+        // Recall L is min(nx, nt)
+        magicC += 0.05;
+        magicT = magicC * magicC * L * L / 8.0;
+      }
+      node0_printf("\n");
+    }
+    oldPlaq = plaq;
+    old_dPlaq = dPlaq;
+
+    // Do MCRG blocking at specified t, given new value of epsilon
+    if (block_count < num_block
+        && fabs(t + 0.5 * epsilon) >= fabs(tblock[block_count])) {
+      mcrg_block(tblock[block_count], blmax);
+      block_count++;
     }
   }
 

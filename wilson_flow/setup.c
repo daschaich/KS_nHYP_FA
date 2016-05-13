@@ -88,14 +88,22 @@ int readin(int prompt) {
     status = 0;
 
     // Wilson flow parameters
-    IF_OK status += get_f(stdin, prompt, "epsilon", &par_buf.epsilon);
-    if (par_buf.epsilon == 0) {
+    IF_OK status += get_f(stdin, prompt, "start_eps", &par_buf.start_eps);
+    IF_OK status += get_f(stdin, prompt, "max_eps", &par_buf.max_eps);
+    if (par_buf.start_eps == 0) {
       node0_printf("ERROR: epsilon=%g won't get you anywhere\n",
-                   par_buf.epsilon);
+                   par_buf.start_eps);
       status++;
     }
+    if (fabs(par_buf.start_eps) > fabs(par_buf.max_eps)) {
+      node0_printf("WARNING: Resetting the starting epsilon (%.4g)",
+                   par_buf.start_eps);
+      node0_printf(" to the maximum epsilon (%.4g)\n", par_buf.max_eps);
+      par_buf.start_eps = par_buf.max_eps;
+    }
+
     IF_OK status += get_f(stdin, prompt, "tmax", &par_buf.tmax);
-    if (par_buf.epsilon * par_buf.tmax < 0)
+    if (par_buf.start_eps * par_buf.tmax < 0)
       node0_printf("WARNING: epsilon and tmax have different signs\n");
 
     // Smearing parameters
@@ -139,11 +147,12 @@ int readin(int prompt) {
   if (par_buf.stopflag != 0)
     normal_exit(0);
 
-  epsilon = par_buf.epsilon;
-  tmax    = par_buf.tmax;
+  start_eps = par_buf.start_eps;
+  max_eps = par_buf.max_eps;
+  tmax = par_buf.tmax;
   num_block = par_buf.num_block;
-  for (i=0; i<num_block;i++)
-    tblock[i]=par_buf.tblock[i];
+  for (i = 0; i < num_block; i++)
+    tblock[i] = par_buf.tblock[i];
 
   alpha_smear[0] = par_buf.alpha_hyp0;
   alpha_smear[1] = par_buf.alpha_hyp1;

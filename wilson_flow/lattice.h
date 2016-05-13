@@ -92,8 +92,7 @@ EXTERN site *lattice;
 EXTERN char **gen_pt[N_POINTERS];
 
 // Wilson flow stuff
-EXTERN double tmax;
-EXTERN double epsilon;
+EXTERN Real tmax, start_eps, max_eps, epsilon;
 EXTERN su3_matrix *tempmat, *tempmat2;
 
 // MCRG blocking stuff
