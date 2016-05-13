@@ -93,7 +93,7 @@ int main(int argc, char *argv[])  {
   register site *s;
   int j, prompt, istep, block_count = 0, blmax = 0, L;
   double dtime, t = 0, E, old_value, new_value = 0, der_value;
-  double ssplaq, stplaq, plaq, check, topo, base_eps;
+  double ssplaq, stplaq, plaq, check, topo;
   double oldPlaq, dPlaq = -1.0, old_dPlaq = -1.0;
   double magicC = 0.05, magicT;
   complex tc;
@@ -153,7 +153,6 @@ int main(int argc, char *argv[])  {
 
   // Wilson flow!
   epsilon = start_eps;
-  base_eps = start_eps;
   node0_printf("EPS %g\n", epsilon);
   plaquette(&ssplaq, &stplaq);
   oldPlaq = 0.5 * (ssplaq + stplaq);
@@ -223,36 +222,11 @@ int main(int argc, char *argv[])  {
 
     // Reset epsilon when appropriate
     dPlaq = fabs(plaq - oldPlaq);         // Make it positive!
-//    node0_printf("dPlaq = %.4g\n", dPlaq);
     if (istep > 9 && epsilon < max_eps) {
-      // Start by scaling from base_eps (in case epsilon is reset below)
-      epsilon = base_eps * old_dPlaq / dPlaq;
+      epsilon *= old_dPlaq / dPlaq;
       if (epsilon > max_eps)
         epsilon = max_eps;
-      base_eps = epsilon;
-      node0_printf("EPS %g", epsilon);
-
-      // Special cases:
-      // Reset to hit tmax or next c/0.05
-      // Don't let it get smaller than start_eps
-      // Don't change base_eps, or else the whole procedure would be reset
-      if (fabs(t + epsilon) > fabs(tmax)) {
-        epsilon = tmax - t;
-        if (epsilon < start_eps)
-          epsilon = start_eps;
-        node0_printf(" --> %g", epsilon);
-      }
-      if (fabs(t + epsilon) > fabs(magicT)) {
-        epsilon = magicT - t;
-        if (epsilon < start_eps)
-          epsilon = start_eps;
-        node0_printf(" --> %g", epsilon);
-
-        // Recall L is min(nx, nt)
-        magicC += 0.05;
-        magicT = magicC * magicC * L * L / 8.0;
-      }
-      node0_printf("\n");
+      node0_printf("EPS %g\n", epsilon);
     }
     oldPlaq = plaq;
     old_dPlaq = dPlaq;
