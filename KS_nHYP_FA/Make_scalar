@@ -40,7 +40,7 @@ KSFFMULTI      = # -DKS_MULTIFF=FNMAT
 KSRHMCINT      =
 
 CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
-                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
+                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI} \
                  ${KSFFMULTI} ${KSRHMCINT}
 
 MAKELIBRARIES  = Make_vanilla

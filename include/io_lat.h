@@ -5,29 +5,29 @@
 
 // Definitions of restore and save lattice flags used in io_helpers.c
 /* Some are also used for Wilson propagators */
-#define CONTINUE                         10
-#define FRESH                            11
-#define RELOAD_ASCII                     12
-#define RELOAD_SERIAL                    13
-#define RELOAD_MULTIDUMP                 18
-#define RELOAD_PARALLEL                  19
-#define FORGET                           40
-#define SAVE_ASCII                       41
-#define SAVE_SERIAL                      42
-#define SAVE_CHECKPOINT                  43
-#define SAVE_SERIAL_FM                   44
-#define SAVE_SERIAL_FM_SC                45
-#define SAVE_SERIAL_ILDG                 46
-#define SAVE_PARALLEL_ILDG               47
-#define SAVE_MULTIFILE_ILDG              48
-#define SAVE_PARTFILE_ILDG               49
-#define SAVE_SERIAL_SCIDAC               50
-#define SAVE_PARALLEL_SCIDAC             51
-#define SAVE_MULTIFILE_SCIDAC            52
-#define SAVE_PARTFILE_SCIDAC             53
-#define SAVE_PARALLEL                    54
-#define SAVE_MULTIDUMP                   55
-#define SAVE_SERIAL_ARCHIVE              56
+#define CONTINUE              10
+#define FRESH                 11
+#define RELOAD_ASCII          12
+#define RELOAD_SERIAL         13
+#define RELOAD_MULTIDUMP      18
+#define RELOAD_PARALLEL       19
+#define FORGET                40
+#define SAVE_ASCII            41
+#define SAVE_SERIAL           42
+#define SAVE_CHECKPOINT       43
+#define SAVE_SERIAL_FM        44
+#define SAVE_SERIAL_FM_SC     45
+#define SAVE_SERIAL_ILDG      46
+#define SAVE_PARALLEL_ILDG    47
+#define SAVE_MULTIFILE_ILDG   48
+#define SAVE_PARTFILE_ILDG    49
+#define SAVE_SERIAL_SCIDAC    50
+#define SAVE_PARALLEL_SCIDAC  51
+#define SAVE_MULTIFILE_SCIDAC 52
+#define SAVE_PARTFILE_SCIDAC  53
+#define SAVE_PARALLEL         54
+#define SAVE_MULTIDUMP        55
+#define SAVE_SERIAL_ARCHIVE   56
 
 /* Format for NERSC archive files */
 #define ARCHIVE_3x2   0
@@ -37,7 +37,7 @@
 #define SAVE_SERIAL_TSLICE 932
 #define SAVE_ASCII_TSLICE 933
 
-/* Helps in defining globals */
+// Helps global variable definitions
 #ifdef CONTROL
 #define EXTERN
 #else
@@ -413,6 +413,7 @@ int sprint_gauge_info_item(
           of type (Real) */
   int count,       /* number of data items if > 1 */
   int stride);      /* byte stride of data if count > 1 */
+
 void write_generic_gauge_info(FILE *fp, gauge_file *gf);
 void write_gauge_info_file(gauge_file *gf);
 gauge_file *setup_input_gauge_file(char *filename);
@@ -438,3 +439,4 @@ void r_parallel_f(gauge_file *gf);
 void byterevn(int32type w[], int n);
 
 #endif /* _IO_LAT_H */
+// -----------------------------------------------------------------

@@ -1,5 +1,5 @@
 
-Double precision inline SSE routines for MILC V6
+Double precision inline SSE routines
 
 November 2004 Amitoj Singh and D.J. Holmgren authors
 November 2004 C. DeTar: names of sse/libraries/*.nas files
@@ -109,12 +109,12 @@ set for Intel P3, P4 processors.  Here is how to invoke them.
 
     Edit the libraries/Make_vanilla file as follows:
 
-      CC = gcc (or equivalent)    
+      CC = gcc (or equivalent)
 
     If you don't use gcc, inline substitution won't take place.
     Instead the modules in su3.a will be used.
-    
-3. Inline SSE: source-file-by-source-file compilation invocation 
+
+3. Inline SSE: source-file-by-source-file compilation invocation
 
     Same as 2 above, except do not define -DSSE_INLINE in Make_<ARCH>
 
@@ -127,7 +127,7 @@ set for Intel P3, P4 processors.  Here is how to invoke them.
 
     (The inclusion of "inline_sse.h" is automatic in this release.)
 
-4. Inline SSE: call-by-call compilation invocation 
+4. Inline SSE: call-by-call compilation invocation
 
     Same as 2 above, except do not define -DSSE_INLINE in Make_<ARCH>
     and do not, as in 3, define SSE_INLINE at the top of the source
@@ -144,7 +144,7 @@ set for Intel P3, P4 processors.  Here is how to invoke them.
     necessary to define a temporary intermediate.  For example
 
       foo(a,2*b,c,...); -> {float temp = 2*b; _inline_foo(a,temp,c,...);}
-    
+
 
 C. DeTar, Utah
 detar@physics.utah.edu

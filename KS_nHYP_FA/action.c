@@ -3,30 +3,7 @@
 // When this routine is called the conjugate gradient should already
 // have been run on both even and odd sites, depending on Nf
 // The vectors psi[j] contain (M^dag.M)^(-1) chi
-
 #include "ks_dyn_includes.h"
-Real ahmat_mag_sq(anti_hermitmat *pt);
-double hmom_action();
-double fermion_action();
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-double action() {
-  double ssplaq, stplaq, g_action, h_action, f_action;
-
-  rephase(OFF);
-  plaquette_a(&ssplaq, &stplaq);
-  rephase(ON);
-  g_action = -beta * volume * (ssplaq + stplaq);
-  h_action = hmom_action();
-  f_action = fermion_action();
-  node0_printf("D_ACTION: g, h, f, tot = %.8g %.8g %.8g %.8g\n",
-               g_action, h_action, f_action,
-               g_action + h_action + f_action);
-  return g_action + h_action + f_action;
-}
 // -----------------------------------------------------------------
 
 
@@ -73,24 +50,6 @@ double fermion_action() {
     }
   }
   g_doublesum(&sum);
-  return(sum);
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Gauge momentum contribution to the action
-double hmom_action() {
-  register int i, dir;
-  register site *s;
-  double sum = 0;
-
-  for(dir = XUP; dir <= TUP; dir++) {
-   FORALLSITES(i, s)
-    sum += (double)ahmat_mag_sq(&(s->mom[dir]));
-  }
-  g_doublesum(&sum);
   return sum;
 }
 // -----------------------------------------------------------------
@@ -101,6 +60,7 @@ double hmom_action() {
 // Magnitude squared of an antihermition matrix
 Real ahmat_mag_sq(anti_hermitmat *pt) {
   register Real x, sum;
+
   x = pt->m00im;      sum  = 0.5 * x * x;
   x = pt->m11im;      sum += 0.5 * x * x;
   x = pt->m01.real;   sum += x * x;
@@ -117,15 +77,52 @@ Real ahmat_mag_sq(anti_hermitmat *pt) {
 
 
 // -----------------------------------------------------------------
+// Gauge momentum contribution to the action
+double hmom_action() {
+  register int i, dir;
+  register site *s;
+  double sum = 0.0;
+
+  FORALLUPDIR(dir) {
+   FORALLSITES(i, s)
+    sum += (double)ahmat_mag_sq(&(s->mom[dir]));
+  }
+  g_doublesum(&sum);
+  return sum;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+double action() {
+  double ssplaq, stplaq, g_action, h_action, f_action;
+
+  rephase(OFF);
+  plaquette_a(&ssplaq, &stplaq);
+  rephase(ON);
+  g_action = -beta * volume * (ssplaq + stplaq);
+  h_action = hmom_action();
+  f_action = fermion_action();
+  node0_printf("D_ACTION: g, h, f, tot = %.8g %.8g %.8g %.8g\n",
+               g_action, h_action, f_action,
+               g_action + h_action + f_action);
+  return g_action + h_action + f_action;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
 // Copy a gauge field as an array of four su3_matrices
 void gauge_field_copy(field_offset src, field_offset dest) {
-register int i, dir, src2, dest2;
-register site *s;
+  register int i, dir, src2, dest2;
+  register site *s;
 
   FORALLSITES(i, s) {
     src2 = src;
     dest2 = dest;
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       su3mat_copy((su3_matrix *)F_PT(s, src2),
                   (su3_matrix *)F_PT(s, dest2));
       src2 += sizeof(su3_matrix);
@@ -149,32 +146,36 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
   msg_tag *mtag, *mtag2;
   su3_matrix tmat;
 
+  // We can exploit a symmetry under dir<-->dir2
   for (dir = YUP; dir <= TUP; dir++) {
     for (dir2 = XUP; dir2 < dir; dir2++) {
+      // gen_pt[0] is U_b(x+a), gen_pt[1] is U_a(x+b)
       mtag = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
                                dir, EVENANDODD, gen_pt[0]);
       mtag2 = start_gather_site(F_OFFSET(link[dir]), sizeof(su3_matrix),
                                 dir2, EVENANDODD, gen_pt[1]);
 
+      // tempmat = Udag_b(x) U_a(x)
       FORALLSITES(i, s) {
         m1 = &(s->link[dir]);
         m4 = &(s->link[dir2]);
         mult_su3_an(m4, m1, &tempmat[i]);
       }
-
       wait_gather(mtag);
       wait_gather(mtag2);
+
+      // Compute tc = tr[Udag_a(x+b) Udag_b(x) U_a(x) U_b(x+a)] / 3
+      // and combine tc.real + beta_A * |tc|^2
       FORALLSITES(i, s) {
         m1 = (su3_matrix *)(gen_pt[0][i]);
         m4 = (su3_matrix *)(gen_pt[1][i]);
         mult_su3_nn(&tempmat[i], m1, &tmat);
         tc = complextrace_su3(m4, &tmat);
-        td = (tc.real / 3.0);
-        td += beta_a * (tc.real * tc.real + tc.imag * tc.imag) / 9.0;
+
         if (dir == TUP)
-          st_sum += td;
+          st_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
         else
-          ss_sum += td;
+          ss_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
       }
       cleanup_gather(mtag);
       cleanup_gather(mtag2);

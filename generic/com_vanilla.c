@@ -3,19 +3,6 @@
    This file is communications-scheme dependent.
    Version for single processor machines.
 */
-/* Modifications
-
-   4/20/02 added start_general_gather_field C.D.
-   1/28/00 combined with Schroedinger functional and
-           32 sublattice versions - UMH
-   9/2/97  Revised to allow gathers from temporary fields.  neighbor[]
-           is now list of indices, add start/restart_gather_field D.T.
-   8/05/97 ANSI prototyping for all routines C.D.
-   10/5/96 Removed parallel I/O wrappers. Use io_ansi.c now.
-   8/30/96 Added restore/save_checkpoint for compatibility
-   8/05/96 Added broadcast_bytes and wrappers for system-dependent
-           parallel file system calls C.D.
-*/
 /*
    This is a trivial version, where there is only one node, every site
    is on node ...
@@ -40,7 +27,6 @@
                            over all nodes.
    g_dcomplexsum()       sums a double precision complex number over all nodes.
    g_vecdcomplexsum()    sums a vector of double_complex over all nodes 
-   g_wvectorsumfloat()   sums a single precision wilson vector over all nodes.
    g_xor32()             finds global exclusive or of 32-bit word
    g_floatmax()          finds maximum Realing point number over all nodes.
    g_doublemax()         finds maximum double over all nodes.
@@ -366,14 +352,6 @@ g_dcomplexsum(double_complex *cpt)
 */
 void
 g_vecdcomplexsum(double_complex *cpt, int ncomplex)
-{
-}
-
-/*
-**  Sum wilson_vector over all nodes
-*/
-void
-g_wvectorsumfloat(wilson_vector *wvpt)
 {
 }
 

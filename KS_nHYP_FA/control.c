@@ -1,6 +1,5 @@
 // -----------------------------------------------------------------
 // Main procedure for nHYP-smeared staggered SU(3) evolution
-// Includes and definitions
 // For benchmarking, define CGTIME in defines.h
 #define CONTROL
 #include "ks_dyn_includes.h"
@@ -10,7 +9,7 @@
 
 // -----------------------------------------------------------------
 int main(int argc, char *argv[]) {
-  int meascount = 0, traj_done, prompt;
+  int Nmeas = 0, traj_done, prompt;
   int s_iters = 0, avm_iters = 0, avs_iters = 0;
   Real f_eps0, f_eps1, g_eps;
   double ssplaq, stplaq, act, dtime;
@@ -48,12 +47,10 @@ int main(int argc, char *argv[]) {
   // Perform warmup trajectories
   for (traj_done = 0; traj_done < warms; traj_done++)
     update();
-
   node0_printf("WARMUPS COMPLETED\n");
 
   // Perform trajectories, reunitarizations and measurements
   for (traj_done = 0; traj_done < trajecs; traj_done++) {
-    // Do the trajectories
     s_iters = update();
     avs_iters += s_iters;
 
@@ -81,7 +78,7 @@ int main(int argc, char *argv[]) {
       node0_printf("\nPERIODIC BC in time direction\n");
 #endif
 
-      meascount++;
+      Nmeas++;
       block_N_fatten(Nsmear);
       rephase(OFF);
       plaquette(&ssplaq, &stplaq);    // To check meas_plaq()
@@ -94,14 +91,14 @@ int main(int argc, char *argv[]) {
       leanlinks();
       fflush(stdout);
     }
-  } // End loop over trajectories
+  }
 
   node0_printf("RUNNING COMPLETED\n");
   node0_printf("Average CG iters for steps: %.4g\n",
                (double)avs_iters / trajecs);
-  if (meascount > 0) {
+  if (Nmeas > 0) {
     node0_printf("Average CG iters for measurements: %.4g\n",
-                 (double)avm_iters / meascount);
+                 (double)avm_iters / Nmeas);
   }
   dtime += dclock();
   node0_printf("Time = %.4g seconds\n", dtime);

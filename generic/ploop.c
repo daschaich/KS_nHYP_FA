@@ -14,7 +14,7 @@ complex ploop(int dir) {
   int d[4], N = nt;
 
   sum = cmplx(0, 0);
-  for (i = XUP; i <= TUP; i++)
+  FORALLUPDIR(i)
     d[i] = 0;
 
   switch(dir) {
@@ -75,6 +75,6 @@ complex ploop(int dir) {
   g_complexsum(&sum);
   plp.real = sum.real * N / ((double)volume);
   plp.imag = sum.imag * N / ((double)volume);
-  return(plp);
+  return plp;
 }
 // -----------------------------------------------------------------

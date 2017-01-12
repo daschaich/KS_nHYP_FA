@@ -20,8 +20,8 @@
 // Systems that do: IBM SP.  Most do not.
 #undef NATIVEDOUBLE
 
-// Define if the cache line is 64 bytes (if not, we assume 32 bytes).
-// Processors that do: P4 (actually fetches 128), EV67, EV68 
+// Define if the cache line is 64 bytes (if not, we assume 32 bytes)
+// Processors that do: P4 (actually fetches 128), EV67, EV68
 // Used only for prefetching, so it only affects performance
 //#undef HAVE_64_BYTE_CACHELINE   // Janus v6
 #define HAVE_64_BYTE_CACHELINE 1

@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------
 // Update the momenta with the gauge force
 double gauge_force(Real eps) {
-  register int i, dir1, dir2;
+  register int i, dir, dir2;
   register site *st;
   register Real eb3 = eps * beta / 3.0;
   msg_tag *tag0, *tag1, *tag2;
@@ -18,97 +18,98 @@ double gauge_force(Real eps) {
   complex ctmp;
   double norm = 0;
 
-  // Loop over directions, update mom[dir1]
-  for (dir1 = XUP; dir1 <= TUP; dir1++) {
+  // Loop over directions, update mom[dir]
+  FORALLUPDIR(dir) {
     start = 1; // Indicates staple sum not initialized
     FORALLSITES(i, st)
       clear_su3mat(&(st->staple));    // Initialize staple
 
     // Loop over other directions
-    // Compute force from plaquettes in the dir1, dir2 plane
-    for (dir2 = XUP; dir2 <= TUP; dir2++) {
-      if (dir2 != dir1) {
-        // Get link[dir2] from direction dir1
-        tag0 = start_gather_site(F_OFFSET(link[dir2]),
-                                 sizeof(su3_matrix),
-                                 dir1, EVENANDODD, gen_pt[0]);
+    // Compute force from plaquettes in the dir, dir2 plane
+    FORALLUPDIR(dir2) {
+      if (dir2 == dir)
+        continue;
 
-        // Start gather for the "upper staple"
-       tag2 = start_gather_site(F_OFFSET(link[dir1]),
-                                sizeof(su3_matrix),
-                                dir2, EVENANDODD, gen_pt[2]);
+      // Get link[dir2] from direction dir
+      tag0 = start_gather_site(F_OFFSET(link[dir2]),
+                               sizeof(su3_matrix),
+                               dir, EVENANDODD, gen_pt[0]);
 
-        // Begin the computation "at the dir2DOWN point"
-        // We will later gather the intermediate result "to the home point"
-        wait_gather(tag0);
+      // Start gather for the "upper staple"
+     tag2 = start_gather_site(F_OFFSET(link[dir]),
+                              sizeof(su3_matrix),
+                              dir2, EVENANDODD, gen_pt[2]);
+
+      // Begin the computation "at the dir2DOWN point"
+      // We will later gather the intermediate result "to the home point"
+      wait_gather(tag0);
+      FORALLSITES(i, st) {
+        mult_su3_an(&(st->link[dir2]), &(st->link[dir]), &tmat1);
+        mult_su3_nn(&tmat1, (su3_matrix *)gen_pt[0][i],
+                    (su3_matrix *)&(st->tempmat1));
+      }
+
+      // Gather lower staple "up to home site"
+      tag1 = start_gather_site(F_OFFSET(tempmat1), sizeof(su3_matrix),
+                               OPP_DIR(dir2), EVENANDODD, gen_pt[1]);
+
+      // The "upper" staple
+      // One of the links has already been gathered,
+      // since it was used in computing
+      // the "lower" staple of the site above (in dir2)
+      wait_gather(tag2);
+      if (start) {  // This is the first contribution to staple
         FORALLSITES(i, st) {
-          mult_su3_an(&(st->link[dir2]), &(st->link[dir1]), &tmat1);
-          mult_su3_nn(&tmat1, (su3_matrix *)gen_pt[0][i],
-                      (su3_matrix *)&(st->tempmat1));
-        }
-
-        // Gather lower staple "up to home site"
-        tag1 = start_gather_site(F_OFFSET(tempmat1), sizeof(su3_matrix),
-                                 OPP_DIR(dir2), EVENANDODD, gen_pt[1]);
-
-        // The "upper" staple
-        // One of the links has already been gathered,
-        // since it was used in computing
-        // the "lower" staple of the site above (in dir2)
-        wait_gather(tag2);
-        if (start) {  // This is the first contribution to staple
-          FORALLSITES(i, st) {
-            mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
-            mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &(st->staple));
-            mult_su3_na(&(st->link[dir1]), &(st->staple), &tmat1);
-            ctmp = trace_su3(&tmat1);
-            ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
-            ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
-
-            c_scalar_mult_su3mat(&(st->staple), &ctmp, &(st->staple));
-          }
-          start = 0;
-        }
-        else {
-          FORALLSITES(i, st) {
-            mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
-            mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &tmat2);
-            mult_su3_na(&(st->link[dir1]), &tmat2, &tmat1);
-            ctmp = trace_su3(&tmat1);
-            ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
-            ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
-
-            c_scalar_mult_add_su3mat(&(st->staple), &tmat2, &ctmp,
-                                     &(st->staple));
-          }
-        }
-
-        wait_gather(tag1);
-        FORALLSITES(i, st) {
-          mult_su3_na(&(st->link[dir1]), (su3_matrix *)gen_pt[1][i], &tmat1);
+          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
+          mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &(st->staple));
+          mult_su3_na(&(st->link[dir]), &(st->staple), &tmat1);
           ctmp = trace_su3(&tmat1);
           ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
           ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
 
-          c_scalar_mult_add_su3mat(&(st->staple),
-                                   (su3_matrix *)gen_pt[1][i], &ctmp,
+          c_scalar_mult_su3mat(&(st->staple), &ctmp, &(st->staple));
+        }
+        start = 0;
+      }
+      else {
+        FORALLSITES(i, st) {
+          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
+          mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &tmat2);
+          mult_su3_na(&(st->link[dir]), &tmat2, &tmat1);
+          ctmp = trace_su3(&tmat1);
+          ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
+          ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
+
+          c_scalar_mult_add_su3mat(&(st->staple), &tmat2, &ctmp,
                                    &(st->staple));
         }
-        cleanup_gather(tag0);
-        cleanup_gather(tag1);
-        cleanup_gather(tag2);
       }
-    } // End of loop over other directions
+
+      wait_gather(tag1);
+      FORALLSITES(i, st) {
+        mult_su3_na(&(st->link[dir]), (su3_matrix *)gen_pt[1][i], &tmat1);
+        ctmp = trace_su3(&tmat1);
+        ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
+        ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
+
+        c_scalar_mult_add_su3mat(&(st->staple),
+                                 (su3_matrix *)gen_pt[1][i], &ctmp,
+                                 &(st->staple));
+      }
+      cleanup_gather(tag0);
+      cleanup_gather(tag1);
+      cleanup_gather(tag2);
+    }
 
     // Now multiply the staple sum by the link, then update momentum
     FORALLSITES(i, st) {
-      mult_su3_na(&(st->link[dir1]), &(st->staple), &tmat1);
-      uncompress_anti_hermitian(&(st->mom[dir1]), &tmat2);
+      mult_su3_na(&(st->link[dir]), &(st->staple), &tmat1);
+      uncompress_anti_hermitian(&(st->mom[dir]), &tmat2);
       scalar_mult_add_su3_matrix(&tmat2, &tmat1, eb3, &(st->staple));
-      make_anti_hermitian(&(st->staple), &(st->mom[dir1]));
+      make_anti_hermitian(&(st->staple), &(st->mom[dir]));
       norm += (double)realtrace_su3(&tmat1, &tmat1);
     }
-  } // End of loop over dir1
+  }
 
   g_doublesum(&norm);
   return (eb3 * sqrt(norm) / volume);

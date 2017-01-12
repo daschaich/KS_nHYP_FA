@@ -1,39 +1,11 @@
 // -----------------------------------------------------------------
 // Dynamical nHYP staggered setup
 #include "ks_dyn_includes.h"
-#include <string.h>
-
-int initial_set();
-void make_fields();
 #define IF_OK if (status == 0)
 
 // Each node has a params structure for passing simulation parameters
 #include "params.h"
 params par_buf;
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-int setup() {
-  int prompt;
-
-  // Print banner, get volume, nflavors, seed
-  prompt = initial_set();
-  // Initialize the node random number generator
-  initialize_prn(&node_prn, iseed, volume + mynode());
-  // Initialize the layout functions, which decide where sites live
-  setup_layout();
-  // Allocate space for lattice, set up coordinate fields
-  make_lattice();
-  // Set up neighbor pointers and comlink structures
-  make_nn_gathers();
-  // Allocate space for fields
-  make_fields();
-  // Set up staggered phase vectors, boundary conditions
-  phaseset();
-  return(prompt);
-}
 // -----------------------------------------------------------------
 
 
@@ -125,6 +97,59 @@ int initial_set() {
   number_of_nodes = numnodes();
   volume = nx * ny * nz * nt;
   total_iters = 0;
+  return prompt;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Allocate all space for fields
+// Changed to mimic allocation order in v6/KS_nHYP_FA/control.c
+void make_fields() {
+  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
+
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
+  FIELD_ALLOC_MAT(SigmaH2, su3_matrix, 4, 4);
+
+  FIELD_ALLOC(tempmat, su3_matrix);
+  FIELD_ALLOC(tempmat2, su3_matrix);
+  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
+  FIELD_ALLOC_VEC(LambdaU, su3_matrix, 4);
+  FIELD_ALLOC_VEC(Lambda1, su3_matrix, 4);
+  FIELD_ALLOC_VEC(Lambda2, su3_matrix, 4);
+  FIELD_ALLOC_VEC(SigmaH, su3_matrix, 4);
+  FIELD_ALLOC_VEC(Sigma, su3_matrix, 4);
+
+  node0_printf("Mallocing %.1f MBytes per node for fields\n",
+               (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+int setup() {
+  int prompt;
+
+  // Print banner, get volume, nflavors, seed
+  prompt = initial_set();
+  // Initialize the node random number generator
+  initialize_prn(&node_prn, iseed, volume + mynode());
+  // Initialize the layout functions, which decide where sites live
+  setup_layout();
+  // Allocate space for lattice, set up coordinate fields
+  make_lattice();
+  // Set up neighbor pointers and comlink structures
+  make_nn_gathers();
+  // Allocate space for fields
+  make_fields();
+  // Set up staggered phase vectors, boundary conditions
+  phaseset();
   return prompt;
 }
 // -----------------------------------------------------------------
@@ -264,34 +289,5 @@ int readin(int prompt) {
     exit(1);
   }
   return 0;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Allocate all space for fields
-// Changed to mimic allocation order in v6/KS_nHYP_FA/control.c
-void make_fields() {
-  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
-  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
-
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
-  FIELD_ALLOC_MAT(SigmaH2, su3_matrix, 4, 4);
-
-  FIELD_ALLOC(tempmat, su3_matrix);
-  FIELD_ALLOC(tempmat2, su3_matrix);
-  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
-  FIELD_ALLOC_VEC(LambdaU, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Lambda1, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Lambda2, su3_matrix, 4);
-  FIELD_ALLOC_VEC(SigmaH, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Sigma, su3_matrix, 4);
-
-  node0_printf("Mallocing %.1f MBytes per node for fields\n",
-               (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
 }
 // -----------------------------------------------------------------

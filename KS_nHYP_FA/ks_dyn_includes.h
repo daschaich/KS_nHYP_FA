@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Include files for dynamical staggered fermions
+// Include files for dynamical nHYP-smeared staggered HMC
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>             // For strlen
@@ -22,7 +22,7 @@
 
 
 // -----------------------------------------------------------------
-// Prototypes for functions in high level code
+// Prototypes for functions in high-level code
 int setup();
 int readin(int prompt);
 

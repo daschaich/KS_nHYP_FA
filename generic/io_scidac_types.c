@@ -1,7 +1,5 @@
 /*********************** io_scidac_types.c **************************/
 /* Functions for reading and writing MILC fields through QIO        */
-/* C. DeTar 6/7/07
-*/
 
 /* Conversion of MILC types between prevailing and fixed precision */
 
@@ -99,48 +97,6 @@ p2d_vec(dsu3_vector *dest, su3_vector *src){
   for(i = 0; i < 3; i++){
     dest->c[i].real = src->c[i].real;
     dest->c[i].imag = src->c[i].imag;
-  }
-}
-
-/* Wilson vector */
-
-static void 
-f2p_wvec(wilson_vector *dest, fwilson_vector *src){
-  int i,j;
-  
-  for(j = 0; j < 4; j++)for(i = 0; i < 3; i++){
-    dest->d[j].c[i].real = src->d[j].c[i].real;
-    dest->d[j].c[i].imag = src->d[j].c[i].imag;
-  }
-}
-
-static void 
-p2f_wvec(fwilson_vector *dest, wilson_vector *src){
-  int i,j;
-  
-  for(j = 0; j < 4; j++)for(i = 0; i < 3; i++){
-    dest->d[j].c[i].real = src->d[j].c[i].real;
-    dest->d[j].c[i].imag = src->d[j].c[i].imag;
-  }
-}
-
-static void 
-d2p_wvec(wilson_vector *dest, dwilson_vector *src){
-  int i,j;
-  
-  for(j = 0; j < 4; j++)for(i = 0; i < 3; i++){
-    dest->d[j].c[i].real = src->d[j].c[i].real;
-    dest->d[j].c[i].imag = src->d[j].c[i].imag;
-  }
-}
-
-static void 
-p2d_wvec(dwilson_vector *dest, wilson_vector *src){
-  int i,j;
-  
-  for(j = 0; j < 4; j++)for(i = 0; i < 3; i++){
-    dest->d[j].c[i].real = src->d[j].c[i].real;
-    dest->d[j].c[i].imag = src->d[j].c[i].imag;
   }
 }
 
@@ -267,24 +223,20 @@ void vput_##P##C##_##T##_to_field(char *buf, size_t index, int count, \
 make_vget(F,  , R, float,          Real,          p2f_real);
 make_vget(F,  , C, fcomplex,       complex,       p2f_complex);
 make_vget(F, 3, V, fsu3_vector,    su3_vector,    p2f_vec);
-make_vget(F, 3, D, fwilson_vector, wilson_vector, p2f_wvec);
 make_vget(F, 3, M, fsu3_matrix,    su3_matrix,    p2f_mat);
 
 make_vput(F,  , R, float,          Real,          f2p_real);
 make_vput(F,  , C, fcomplex,       complex,       f2p_complex);
 make_vput(F, 3, V, fsu3_vector,    su3_vector,    f2p_vec);
-make_vput(F, 3, D, fwilson_vector, wilson_vector, f2p_wvec);
 make_vput(F, 3, M, fsu3_matrix,    su3_matrix,    f2p_mat);
 
 /* Double precision */
 
 make_vget(D,  , C, dcomplex,       complex,       p2d_complex);
 make_vget(D, 3, V, dsu3_vector,    su3_vector,    p2d_vec);
-make_vget(D, 3, D, dwilson_vector, wilson_vector, p2d_wvec);
 
 make_vput(D,  , C, dcomplex,       complex,       d2p_complex);
 make_vput(D, 3, V, dsu3_vector,    su3_vector,    d2p_vec);
-make_vput(D, 3, D, dwilson_vector, wilson_vector, d2p_wvec);
 make_vput(D, 3, M, dsu3_matrix,    su3_matrix,    d2p_mat);
 
 /* Write MILC site structure data */
@@ -425,21 +377,17 @@ make_write_all(F, "F",  , 0, 0, R, "QLA_F_Real", float, Real, float);
 make_write_all(F, "F",  , 0, 0, C, "QLA_F_Complex", fcomplex, complex, float);
 make_write_all(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fsu3_vector, su3_vector, float);
 make_write_all(F, "F", 3, 3, 0, M, "USQCD_F3_ColorMatrix", fsu3_matrix, su3_matrix, float);
-make_write_all(F, "F", 3, 3, 4, D, "USQCD_F3_DiracFermion", fwilson_vector, wilson_vector, float);
 
 make_write_tslice(F, "F",  , 0, 0, R, "QLA_F_Real", float, Real, float);
 make_write_tslice(F, "F",  , 0, 0, C, "QLA_F_Complex", fcomplex, complex, float);
 make_write_tslice(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fsu3_vector, su3_vector, float);
-make_write_tslice(F, "F", 3, 3, 4, D, "USQCD_F3_DiracFermion", fwilson_vector, wilson_vector, float);
 
 /* Double precision */
 
 make_write_all(D, "D",  , 0, 0, C, "QLA_D_Complex", dcomplex, complex, double);
 make_write_all(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dsu3_vector, su3_vector, double);
-make_write_all(D, "D", 3, 3, 4, D, "USQCD_D3_DiracFermion", dwilson_vector, wilson_vector, double);
 make_write_tslice(D, "D",  , 0, 0, C, "QLA_D_Complex", dcomplex, complex, double);
 make_write_tslice(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dsu3_vector, su3_vector, double);
-make_write_tslice(D, "D", 3, 3, 4, D, "USQCD_D3_DiracFermion", dwilson_vector, wilson_vector, double);
 
 
 /* Read MILC site structure data */
@@ -501,13 +449,11 @@ make_read(F,  , R, float, Real, float);
 make_read(F,  , C, fcomplex, complex, float);
 make_read(F, 3, V, fsu3_vector, su3_vector, float);
 make_read(F, 3, M, fsu3_matrix, su3_matrix, float);
-make_read(F, 3, D, fwilson_vector, wilson_vector, float);
 
 /* Double precision */
 make_read(D,  , C, dcomplex, complex, double);
 make_read(D, 3, V, dsu3_vector, su3_vector, double);
 make_read(D, 3, M, dsu3_matrix, su3_matrix, double);
-make_read(D, 3, D, dwilson_vector, wilson_vector, double);
 
 /* Factory function for moving random generator state from site structure to
    output */

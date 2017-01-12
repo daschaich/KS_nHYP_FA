@@ -24,16 +24,16 @@ void nhyp_force1() {
   // Loop over the link directions,
   // compute sigma from the link itself,
   // construct the Lambdas
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     Sigma_update1(dir, Sigma[dir], Staple3[dir], LambdaU,
-                  1 - alpha_smear[0], alpha_smear[0] / 6.0, 0);
+                  1.0 - alpha_smear[0], alpha_smear[0] / 6.0, 0);
   }
 
   // Construct field_offsets pointing to the links in dir2 direction
   // where dir1 is excluded.  Here, this makes no sense, however this
   // mechanism makes compute_sigma23 re-useable on each level
-  for (dir2 = XUP; dir2 <= TUP; dir2++) {
-    for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir2) {
+    FORALLUPDIR(dir) {
       if (dir != dir2)
        compute_sigma23(SigmaH[dir], hyplink2[dir][dir2], hyplink2[dir2][dir],
                        LambdaU[dir], LambdaU[dir2], dir, dir2, EVENANDODD);
@@ -57,18 +57,18 @@ void nhyp_force2(int dir2) {
   // dir3 is the main direction of the twice-smeared hyplink2
   // dir2 is the secondary direction of the twice-smeared hyplink2
   // dir is the main direction of the once-smeared link
-  for (dir3 = XUP; dir3 <= TUP; dir3++) {
+  FORALLUPDIR(dir3) {
     if (dir3 != dir2) {
       Sigma_update1(dir3, SigmaH[dir3], Staple2[dir2][dir3], Lambda1,
                     1 - alpha_smear[1], alpha_smear[1] / 4.0, 1);
     }
   }
 
-  for (dir3 = XUP; dir3 <= TUP; dir3++) {
-    if( dir3 != dir2) {
-      for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir3) {
+    if (dir3 != dir2) {
+      FORALLUPDIR(dir) {
         if (dir3 != dir && dir != dir2) {
-          for (dir4 = XUP; dir4 <= TUP; dir4++) {
+          FORALLUPDIR(dir4) {
             if (dir4 != dir && dir4 != dir2 && dir4 != dir3)
               break;
           }
@@ -89,55 +89,55 @@ void nhyp_force2(int dir2) {
       if (dir2 < dir3) {
         iimap = imap[dir2][dir3];
         FORALLSITES(i, s) {
-          for (dir = XUP; dir <= TUP; dir++)
+          FORALLUPDIR(dir)
             su3mat_copy(SigmaH[dir] + i, SigmaH2[iimap][dir] + i);
         }
       }
       else {
         iimap = imap[dir2][dir3];
         FORALLSITES(i, s) {
-          for (dir = XUP; dir <= TUP; dir++)
+          FORALLUPDIR(dir) {
             add_su3_matrix(SigmaH[dir] + i, SigmaH2[iimap][dir] + i,
                            SigmaH[dir] + i);
+          }
         }
         nhyp_force3(dir2, dir3);
       }
     }
-  } // Loop over dir3
+  }
 }
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
+// Third-level force
 void nhyp_force3(int dir3, int dir2) {
-  int dir, dir1, dir4;
-  int i;
-  site* s;
+  register int i, dir, dir1, dir4;
+  register site *s;
 
-  for (dir = XUP; dir <= TUP; dir++) {
-    if (dir != dir2 && dir != dir3) {
-      for (dir4 = XUP; dir4 <= TUP; dir4++) {
-        if (dir4 != dir && dir4 != dir3 && dir4 != dir2)
-          break;
-      }
-      Sigma_update1(dir, SigmaH[dir], Staple1[dir4][dir], Lambda2,
-                    1 - alpha_smear[2], alpha_smear[2] / 2.0, 1);
+  FORALLUPDIR(dir) {
+    if (dir == dir2 || dir == dir3)
+      continue;
+    FORALLUPDIR(dir4) {
+      if (dir4 != dir && dir4 != dir3 && dir4 != dir2)
+        break;
     }
+    Sigma_update1(dir, SigmaH[dir], Staple1[dir4][dir], Lambda2,
+                  1.0 - alpha_smear[2], alpha_smear[2] / 2.0, 1);
   }
 
-  for (dir = XUP; dir <= TUP; dir++) {
-    if (dir != dir2 && dir != dir3) {
-      for (dir1 = XUP; dir1 <= TUP; dir1++) {
-        if (dir1 != dir && dir1 != dir2 && dir1 != dir3) {
-          compute_sigma23(tempmat, gauge_field_thin[dir1],
-                          gauge_field_thin[dir], Lambda2[dir],
-                          Lambda2[dir1], dir, dir1, EVENANDODD);
+  FORALLUPDIR(dir) {
+    if (dir == dir2 || dir == dir3)
+      continue;
+    FORALLUPDIR(dir1) {
+      if (dir1 == dir || dir1 == dir2 || dir1 == dir3)
+        continue;
+      compute_sigma23(tempmat, gauge_field_thin[dir1], gauge_field_thin[dir],
+                      Lambda2[dir], Lambda2[dir1], dir, dir1, EVENANDODD);
 
-          FORALLSITES(i, s)
-            add_su3_matrix(Sigma[dir] + i, tempmat + i, Sigma[dir] + i);
-        }
-      }
+      FORALLSITES(i, s)
+        add_su3_matrix(Sigma[dir] + i, tempmat + i, Sigma[dir] + i);
     }
   }
 }
@@ -146,6 +146,7 @@ void nhyp_force3(int dir3, int dir2) {
 
 
 // -----------------------------------------------------------------
+// Compute Gamma
 void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
                    su3_matrix **lambda, const Real alpha1,
                    const Real alpha2, const int sigfresh) {

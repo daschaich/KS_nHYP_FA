@@ -50,7 +50,7 @@ Debugging checks:
 
 
 # ------------------------------------------------------------------
-# Sample input files not including Hasenbusch preconditioning:
+# Sample input file not including Hasenbusch preconditioning:
 # Both inner and outer loops work on the same fermion fields
 # Still need to specify nstep for both loops
 # Roughly, dt = traj_length / N where N = 2 * nstep[0] * nstep[1]

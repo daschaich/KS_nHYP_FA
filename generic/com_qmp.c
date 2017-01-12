@@ -3,24 +3,6 @@
    This file is communications-scheme dependent.
    QMP version - allegedly machine independent
 */
-/* Modifications
-
-    5/09/02 officially split from com_mpi.c and modified for QMP
-    4/20/02 added start_general_gather_field C.D.
-   10/15/01 condensed and modified to use multiple gathers - JCO
-    1/30/00 combined with Schroedinger functional and
-            32 sublattice versions - UMH
-   11/27/98 Corrected g_wvectorsumfloat and made independent of su3.h. C.D.
-    9/02/97 Revised to allow gathers from temporary fields.  neighbor[]
-	    is now list of indices, add start/restart_gather_field D.T.
-    8/05/97 ANSI prototyping for all routines C.D.
-   10/05/96 Moved parallel I/O wrappers to io_ansi.c C.D.
-    9/23/96 Explicit void types for modules with empty returns C.D.
-    9/20/96 Added restore/save_checkpoint C.D.  
-    9/20/96 Improved sort_site_list C.D.  
-    9/20/96 Added broadcast_bytes and wrappers for system-dependent
-            parallel file system calls C.D.   
-*/
 /*
   Exported Functions:
 
@@ -41,7 +23,6 @@
                            over all nodes.
    g_dcomplexsum()       sums a double precision complex number over all nodes.
    g_vecdcomplexsum()    sums a vector of double_complex over all nodes 
-   g_wvectorsumfloat()        sums a single precision wilson vector over all nodes.
    g_xor32()             finds global exclusive or of 32-bit word
    g_floatmax()          finds maximum floating point number over all nodes.
    g_doublemax()         finds maximum double over all nodes.
@@ -504,15 +485,6 @@ void
 g_vecdcomplexsum(double_complex *cpt, int ncomplex)
 {
   QMP_sum_double_array((double *)cpt, 2*ncomplex);
-}
-
-/*
-**  Sum wilson_vector over all nodes
-*/
-void
-g_wvectorsumfloat(wilson_vector *wvpt)
-{
-  QMP_sum_Real_array((Real *)wvpt, 24);
 }
 
 /*

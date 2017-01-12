@@ -8,7 +8,6 @@
 // from negative directions, and has an extra lattice loop devoted to
 // exclusively to sub_four_vectors.  I stripped the dslash timing
 
-// This version looks at the initial vector every "niter" passes
 // "chi" is the source vector
 // "psi" is the initial guess and answer
 // "r" is the residual vector

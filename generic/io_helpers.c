@@ -130,13 +130,13 @@ gauge_file *save_lattice(int flag, char *filename, char *stringLFN) {
 
 
 // -----------------------------------------------------------------
-// Set links to unit matrices
+// Set link matrices to unit matrices
 void coldlat() {
   register int i, j, k, dir;
   register site *s;
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++){
+    FORALLUPDIR(dir) {
       for (j = 0; j < 3; j++) {
         for (k = 0; k < 3; k++) {
           if (j != k)
@@ -160,11 +160,10 @@ void funnylat() {
   register site *s;
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       for (j = 0; j < 3; ++j) {
-        for (k = 0; k < 3; ++k) {
-          s->link[dir].e[j][k] = cmplx(0.0,0.0);
-        }
+        for (k = 0; k < 3; ++k)
+          s->link[dir].e[j][k] = cmplx(0.0, 0.0);
       }
       s->link[dir].e[0][0].real = dir;
       s->link[dir].e[1][1].real = 10 * s->x;
@@ -192,12 +191,12 @@ gauge_file *reload_lattice(int flag, char *filename) {
 #endif
 
   dtime = -dclock();
-  switch(flag){
-    case CONTINUE:  /* return NULL.  We lose information if we do this  */
+  switch(flag) {
+    case CONTINUE:      // Return NULL, losing information
       node0_printf("reload_lattice: WARNING: gaugefile struct set to NULL\n");
       gf = NULL;
       break;
-    case FRESH:           // Cold lattice
+    case FRESH:         // Cold lattice
       coldlat();
       gf = NULL;
       break;
@@ -217,9 +216,6 @@ gauge_file *reload_lattice(int flag, char *filename) {
   dtime += dclock();
   if (flag != FRESH && flag != CONTINUE)
     node0_printf("Time to reload gauge configuration = %.4g seconds\n", dtime);
-#ifdef SCHROED_FUN
-  set_boundary_fields();
-#endif
 #ifndef NOLINKS
   plaquette(&g_ssplaq, &g_stplaq);
   linktrsum(&linktr);
@@ -259,17 +255,17 @@ gauge_file *reload_lattice(int flag, char *filename) {
 
 /* Get next tag, but skip past end of line if we encounter # for comments */
 #define MAX_TAG 512
-char *get_next_tag(FILE *fp, char *tag, char *myname){
+char *get_next_tag(FILE *fp, char *tag, char *myname) {
   static char line[MAX_TAG];
   int s;
 
-  while(1){
+  while(1) {
     s = fscanf(fp, "%s",line);
     if (s == EOF) {
       printf("%s(%d): EOF on input\n", myname, this_node);
       return NULL;
     }
-    if (s == 0){
+    if (s == 0) {
       printf("%s(%d): Error reading %s\n",myname,this_node,tag);
       return NULL;
     }
@@ -277,7 +273,7 @@ char *get_next_tag(FILE *fp, char *tag, char *myname){
     if (strchr(line,'#')==NULL)break;
     else {
       printf("%s",line);  /* Print string with # character*/
-      if (fgets(line,MAX_TAG,fp)==NULL){
+      if (fgets(line,MAX_TAG,fp)==NULL) {
   printf("%s(%d) EOF on input.\n",myname,this_node);
   return NULL;
       }
@@ -291,13 +287,13 @@ char *get_next_tag(FILE *fp, char *tag, char *myname){
 /* Comments begin with # and apply to the rest of the line */
 /* Verify that the input tag agrees with the expected tag */
 
-int get_check_tag(FILE *fp, char *tag, char *myname){
+int get_check_tag(FILE *fp, char *tag, char *myname) {
   char *checktag;
 
   checktag = get_next_tag(fp, tag, myname);
   if (checktag == NULL)return 1;
 
-  if (strcmp(checktag,tag) != 0){
+  if (strcmp(checktag,tag) != 0) {
     printf("\n%s: ERROR IN INPUT: expected %s but found %s\n",
      myname,tag,checktag);
     return 1;
@@ -307,14 +303,14 @@ int get_check_tag(FILE *fp, char *tag, char *myname){
 }
 
 /* Check return value of scanf */
-static int check_read(int s, char *myname, char *tag){
+static int check_read(int s, char *myname, char *tag) {
 
-  if (s == EOF){
+  if (s == EOF) {
     printf("\n%s: Expecting value for %s but found EOF.\n",
      myname,tag);
     return 1;
   }
-  else if (s == 0){
+  else if (s == 0) {
     printf("\n%s: Format error reading value for %s\n",
      myname,tag);
     return 1;
@@ -327,33 +323,34 @@ static int check_read(int s, char *myname, char *tag){
 /* find out what kind of starting lattice to use, and lattice name if
    necessary.  This routine is only called by node 0.
 */
-int ask_starting_lattice( FILE *fp, int prompt, int *flag, char *filename ){
+int ask_starting_lattice(FILE *fp, int prompt, int *flag, char *filename) {
   char *savebuf;
   int status;
   char myname[] = "ask_starting_lattice";
 
-  if (prompt!=0) printf(
-      "enter 'continue', 'fresh', 'reload_ascii', 'reload_serial', or 'reload_parallel'\n");
+  if (prompt != 0)
+    printf("enter 'continue', 'fresh', 'reload_ascii', 'reload_serial', or 'reload_parallel'\n");
 
   savebuf = get_next_tag(fp, "read lattice command", myname);
-  if (savebuf == NULL)return 1;
+  if (savebuf == NULL)
+    return 1;
 
-  printf("%s ",savebuf);
-  if (strcmp("fresh",savebuf) == 0 ){
+  printf("%s ", savebuf);
+  if (strcmp("fresh", savebuf) == 0) {
     *flag = FRESH;
     printf("\n");
   }
-  else if (strcmp("continue",savebuf) == 0 ) {
+  else if (strcmp("continue",savebuf) == 0) {
     *flag = CONTINUE;
     printf("\n");
   }
-  else if (strcmp("reload_ascii",savebuf) == 0 ) {
+  else if (strcmp("reload_ascii",savebuf) == 0) {
     *flag = RELOAD_ASCII;
   }
-  else if (strcmp("reload_serial",savebuf) == 0 ) {
+  else if (strcmp("reload_serial",savebuf) == 0) {
     *flag = RELOAD_SERIAL;
   }
-  else if (strcmp("reload_parallel",savebuf) == 0 ) {
+  else if (strcmp("reload_parallel",savebuf) == 0) {
     *flag = RELOAD_PARALLEL;
   }
   else {
@@ -362,7 +359,7 @@ int ask_starting_lattice( FILE *fp, int prompt, int *flag, char *filename ){
   }
 
   /*read name of file and load it */
-  if ( *flag != FRESH && *flag != CONTINUE ){
+  if (*flag != FRESH && *flag != CONTINUE) {
     if (prompt!=0)printf("enter name of file containing lattice\n");
     status=fscanf(fp," %s",filename);
     if (status !=1) {
@@ -378,102 +375,93 @@ int ask_starting_lattice( FILE *fp, int prompt, int *flag, char *filename ){
 /* find out what do to with lattice at end, and lattice name if
    necessary.  This routine is only called by node 0.
 */
-int ask_ending_lattice(FILE *fp, int prompt, int *flag, char *filename ){
+int ask_ending_lattice(FILE *fp, int prompt, int *flag, char *filename) {
   char *savebuf;
   int status;
   char myname[] = "ask_ending_lattice";
 
-  if (prompt!=0) printf(
-      "'forget' lattice at end,  'save_ascii', 'save_serial', 'save_parallel', 'save_checkpoint', 'save_serial_fm', 'save_serial_scidac', 'save_parallel_scidac', 'save_multifile_scidac', 'save_partfile_scidac', 'save_serial_archive', 'save_serial_ildg', 'save_parallel_ildg', 'save_partfile_ildg', or 'save_multifile_ildg'\n");
+  if (prompt != 0)
+    printf("'forget' lattice at end,  'save_ascii', 'save_serial', 'save_parallel', 'save_checkpoint', 'save_serial_fm', 'save_serial_scidac', 'save_parallel_scidac', 'save_multifile_scidac', 'save_partfile_scidac', 'save_serial_archive', 'save_serial_ildg', 'save_parallel_ildg', 'save_partfile_ildg', or 'save_multifile_ildg'\n");
 
   savebuf = get_next_tag(fp, "save lattice command", myname);
-  if (savebuf == NULL)return 1;
+  if (savebuf == NULL)
+    return 1;
 
-  printf("%s ",savebuf);
-  if (strcmp("save_ascii",savebuf) == 0 )  {
-    *flag=SAVE_ASCII;
+  printf("%s", savebuf);
+  if (strcmp("save_ascii", savebuf) == 0)
+    *flag = SAVE_ASCII;
+  else if (strcmp("save_serial", savebuf) == 0)
+    *flag = SAVE_SERIAL;
+  else if (strcmp("save_parallel",savebuf) == 0)
+    *flag = SAVE_PARALLEL;
+  else if (strcmp("save_checkpoint",savebuf) == 0)
+    *flag = SAVE_CHECKPOINT;
+  else if (strcmp("save_serial_fm",savebuf) == 0)
+    *flag = SAVE_SERIAL_FM;
+  else if (strcmp("save_serial_scidac",savebuf) == 0) {
+    *flag = SAVE_SERIAL_SCIDAC;
+#ifndef HAVE_QIO
+    node0_printf("requires QIO compilation!\n");
+    terminate(1);
+#endif
   }
-  else if (strcmp("save_serial",savebuf) == 0 ) {
-    *flag=SAVE_SERIAL;
+  else if (strcmp("save_parallel_scidac",savebuf) == 0) {
+    *flag = SAVE_PARALLEL_SCIDAC;
+#ifndef HAVE_QIO
+    node0_printf("requires QIO compilation!\n");
+    terminate(1);
+#endif
   }
-  else if (strcmp("save_parallel",savebuf) == 0 ) {
-    *flag=SAVE_PARALLEL;
+  else if (strcmp("save_multifile_scidac",savebuf) == 0) {
+    *flag = SAVE_MULTIFILE_SCIDAC;
+#ifndef HAVE_QIO
+    node0_printf("requires QIO compilation!\n");
+    terminate(1);
+#endif
   }
-  else if (strcmp("save_checkpoint",savebuf) == 0 ) {
-    *flag=SAVE_CHECKPOINT;
+  else if (strcmp("save_partfile_scidac",savebuf) == 0) {
+    *flag = SAVE_PARTFILE_SCIDAC;
+#ifndef HAVE_QIO
+    node0_printf("requires QIO compilation!\n");
+    terminate(1);
+#endif
   }
-  else if (strcmp("save_serial_fm",savebuf) == 0 ) {
-    *flag=SAVE_SERIAL_FM;
+  else if (strcmp("save_serial_archive",savebuf) == 0) {
+    *flag = SAVE_SERIAL_ARCHIVE;
   }
-  else if (strcmp("save_serial_scidac",savebuf) == 0 ) {
+  else if (strcmp("save_serial_ildg",savebuf) == 0) {
 #ifdef HAVE_QIO
-    *flag=SAVE_SERIAL_SCIDAC;
+    *flag = SAVE_SERIAL_ILDG;
 #else
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_parallel_scidac",savebuf) == 0 ) {
+  else if (strcmp("save_parallel_ildg",savebuf) == 0) {
 #ifdef HAVE_QIO
-    *flag=SAVE_PARALLEL_SCIDAC;
+    *flag = SAVE_PARALLEL_ILDG;
 #else
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_multifile_scidac",savebuf) == 0 ) {
+  else if (strcmp("save_partfile_ildg",savebuf) == 0) {
 #ifdef HAVE_QIO
-    *flag=SAVE_MULTIFILE_SCIDAC;
+    *flag = SAVE_PARTFILE_ILDG;
 #else
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_partfile_scidac",savebuf) == 0 ) {
-#ifdef HAVE_QIO
-    *flag=SAVE_PARTFILE_SCIDAC;
-#else
+  else if (strcmp("save_multifile_ildg",savebuf) == 0) {
+    *flag = SAVE_MULTIFILE_ILDG;
+#ifndef HAVE_QIO
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_serial_archive",savebuf) == 0 ) {
-    *flag=SAVE_SERIAL_ARCHIVE;
-  }
-  else if (strcmp("save_serial_ildg",savebuf) == 0 ) {
-#ifdef HAVE_QIO
-    *flag=SAVE_SERIAL_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_parallel_ildg",savebuf) == 0 ) {
-#ifdef HAVE_QIO
-    *flag=SAVE_PARALLEL_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_partfile_ildg",savebuf) == 0 ) {
-#ifdef HAVE_QIO
-    *flag=SAVE_PARTFILE_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_multifile_ildg",savebuf) == 0 ) {
-#ifdef HAVE_QIO
-    *flag=SAVE_MULTIFILE_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("forget",savebuf) == 0 ) {
-    *flag=FORGET;
+  else if (strcmp("forget",savebuf) == 0) {
+    *flag = FORGET;
     printf("\n");
   }
   else {
@@ -484,15 +472,16 @@ int ask_ending_lattice(FILE *fp, int prompt, int *flag, char *filename ){
   if (*flag != FORGET) {
     if (prompt != 0)
       printf("enter filename\n");
-    status = fscanf(fp,"%s",filename);
+    status = fscanf(fp, "%s", filename);
     if (status != 1) {
-      printf("\nask_ending_lattice: ERROR IN INPUT: error reading filename\n");
+      printf("\nask_ending_lattice: ERROR reading filename\n");
       return 1;
     }
-    printf("%s\n",filename);
+    printf("%s\n", filename);
   }
   return 0;
 }
+// -----------------------------------------------------------------
 
 
 
@@ -534,7 +523,7 @@ int ask_gauge_fix(FILE *fp, int prompt, int *flag) {
 /*--------------------------------------------------------------------*/
 
 /* For FNAL formatted ASCII correlator files */
-int ask_corr_file( FILE *fp, int prompt, int *flag, char* filename) {
+int ask_corr_file(FILE *fp, int prompt, int *flag, char* filename) {
   char *savebuf;
   int status;
   char myname[] = "ask_corr_file";
@@ -551,7 +540,7 @@ int ask_corr_file( FILE *fp, int prompt, int *flag, char* filename) {
   if (strcmp("forget_corr", savebuf) == 0) {
     *flag = FORGET;
   }
-  else if (strcmp("save_corr_fnal",savebuf) == 0 ) {
+  else if (strcmp("save_corr_fnal",savebuf) == 0) {
     *flag = SAVE_ASCII;  /* Lazy borrowing of lattice flags! */
   }
   else {
@@ -559,32 +548,29 @@ int ask_corr_file( FILE *fp, int prompt, int *flag, char* filename) {
     return 1;
   }
 
-  if ( *flag == FORGET )
+  if (*flag == FORGET)
     printf("\n");
   else {
-    if (prompt!=0)printf("enter filename\n");
-    status=fscanf(fp,"%s",filename);
-    if (status !=1){
-      printf("\n%s: ERROR reading filename\n",myname);
+    if (prompt != 0)
+      printf("enter filename\n");
+    status = fscanf(fp,"%s",filename);
+    if (status != 1) {
+      printf("\n%s: ERROR reading filename\n", myname);
       return 1;
     }
-    printf("%s\n",filename);
+    printf("%s\n", filename);
   }
-
   return 0;
+}
 
-} /* ask_corr_file */
-
-/*--------------------------------------------------------------------*/
-
-int ask_ildg_LFN(FILE *fp, int prompt, int flag, char *stringLFN){
+int ask_ildg_LFN(FILE *fp, int prompt, int flag, char *stringLFN) {
   int status = 0;
 
   /* For ILDG output formats we require a logical file name next */
-  if ( flag == SAVE_SERIAL_ILDG ||
+  if (flag == SAVE_SERIAL_ILDG ||
       flag == SAVE_PARALLEL_ILDG ||
       flag == SAVE_PARTFILE_ILDG ||
-      flag == SAVE_MULTIFILE_ILDG ){
+      flag == SAVE_MULTIFILE_ILDG) {
     status = get_s(fp, prompt, "ILDG_LFN", stringLFN);
   }
   else
@@ -592,35 +578,37 @@ int ask_ildg_LFN(FILE *fp, int prompt, int flag, char *stringLFN){
   return status;
 }
 
-
 /* get_f is used to get a floating point number.  If prompt is non-zero,
 it will prompt for the input value with the variable_name_string.  If
 prompt is zero, it will require that variable_name_string precede the
 input value.  get_i gets an integer.
 get_i and get_f return the values, and exit on error */
 
-int get_f( FILE *fp, int prompt, char *tag, Real *value ){
+int get_f(FILE *fp, int prompt, char *tag, Real *value) {
     int s;
     char checkvalue[80];
     char myname[] = "get_f";
 
-    if (prompt)  {
+    if (prompt) {
   s = 0;
-  while(s != 1){
+  while(s != 1) {
     printf("enter %s ",tag);
     fscanf(fp,"%s",checkvalue);
 #if PRECISION == 1
-    s=sscanf(checkvalue,"%e",value);
+    s = sscanf(checkvalue, "%e", value);
 #else
-    s=sscanf(checkvalue,"%le",value);
+    s = sscanf(checkvalue, "%le", value);
 #endif
-    if (s==EOF)return 1;
-    if (s==0)printf("Data format error.\n");
+    if (s == EOF)
+      return 1;
+    if (s == 0)
+      printf("Data format error.\n");
     else printf("%s %g\n",tag,*value);
   }
     }
     else  {
-      if (get_check_tag(fp, tag, myname) == 1)return 1;
+      if (get_check_tag(fp, tag, myname) == 1)
+        return 1;
 
 #if PRECISION == 1
       s = fscanf(fp,"%e",value);
@@ -639,46 +627,47 @@ int get_i(FILE *fp, int prompt, char *tag, int *value) {
   char checkvalue[80];
   char myname[] = "get_i";
 
-  if (prompt)  {
+  if (prompt) {
     s = 0;
     while(s != 1) {
-      printf("enter %s ",tag);
-      fscanf(fp,"%s",checkvalue);
-      s = sscanf(checkvalue,"%d",value);
+      printf("enter %s ", tag);
+      fscanf(fp,"%s", checkvalue);
+      s = sscanf(checkvalue, "%d", value);
       if (s == EOF)
         return 1;
       if (s == 0)
         printf("Data format error\n");
       else
-        printf("%s %d\n",tag,*value);
+        printf("%s %d\n", tag, *value);
     }
   }
-  else  {
-    if (get_check_tag(fp, tag, myname) == 1)return 1;
+  else {
+    if (get_check_tag(fp, tag, myname) == 1)
+      return 1;
 
-    s = fscanf(fp,"%d",value);
-    if (check_read(s,myname,tag) == 1)return 1;
-    printf("%d\n",*value);
+    s = fscanf(fp, "%d", value);
+    if (check_read(s, myname, tag) == 1)
+      return 1;
+    printf("%d\n", *value);
   }
-
   return 0;
-
 }
 
-/* Read a single word as a string without printing an end-of-line  */
-
-int get_sn( FILE *fp, int prompt, char *tag, char *value ){
+// Read a single word as a string without printing a new line
+int get_sn(FILE *fp, int prompt, char *tag, char *value) {
     int s;
     char myname[] = "get_sn";
 
-    if (prompt)  {
+    if (prompt) {
       s = 0;
-      while(s != 1){
+      while(s != 1) {
       printf("enter %s ",tag);
       s=fscanf(fp,"%s",value);
-  if (s==EOF)return 1;
-  if (s==0)printf("Data format error.\n");
-  else printf("%s %s",tag,value);
+  if (s == EOF)
+    return 1;
+  if (s == 0)
+    printf("Data format error\n");
+  else printf("%s %s", tag, value);
       }
     }
     else  {
@@ -691,9 +680,8 @@ int get_sn( FILE *fp, int prompt, char *tag, char *value ){
     return 0;
 }
 
-/* Read a single word as a string */
-
-int get_s( FILE *fp, int prompt, char *tag, char *value ){
+// Read a single word as a string
+int get_s(FILE *fp, int prompt, char *tag, char *value) {
     int s;
 
     s = get_sn(fp, prompt, tag, value);
@@ -702,16 +690,16 @@ int get_s( FILE *fp, int prompt, char *tag, char *value ){
 }
 
 /* Read a vector of integers */
-int get_vi( FILE* fp, int prompt, char *tag,
-      int *value, int nvalues ){
+int get_vi(FILE* fp, int prompt, char *tag,
+      int *value, int nvalues) {
     int s,i;
     char myname[] = "get_vi";
 
-    if (prompt)  {
+    if (prompt) {
       s = 0;
       printf("enter %s with %d values",tag, nvalues);
-      for (i = 0; i < nvalues; i++){
-  while(s != 1){
+      for (i = 0; i < nvalues; i++) {
+  while(s != 1) {
     printf("\n[%d] ",i);
     s=fscanf(fp,"%d",value+i);
     if (s==EOF)return 1;
@@ -723,7 +711,7 @@ int get_vi( FILE* fp, int prompt, char *tag,
     else  {
       if (get_check_tag(fp, tag, myname) == 1)return 1;
 
-      for (i = 0; i < nvalues; i++){
+      for (i = 0; i < nvalues; i++) {
   s = fscanf(fp,"%d",value + i);
   if (check_read(s,myname,tag) == 1)return 1;
   printf("%d ",value[i]);
@@ -736,16 +724,16 @@ int get_vi( FILE* fp, int prompt, char *tag,
 }
 
 /* Read a vector of reals */
-int get_vf( FILE* fp, int prompt, char *tag,
-      Real *value, int nvalues ){
+int get_vf(FILE* fp, int prompt, char *tag,
+      Real *value, int nvalues) {
     int s,i;
     char myname[] = "get_vf";
 
-    if (prompt)  {
+    if (prompt) {
       s = 0;
       printf("enter %s with %d values",tag, nvalues);
-      for (i = 0; i < nvalues; i++){
-  while(s != 1){
+      for (i = 0; i < nvalues; i++) {
+  while(s != 1) {
     printf("\n[%d] ",i);
 #if PRECISION == 1
     s=scanf("%e",value+i);
@@ -759,9 +747,10 @@ int get_vf( FILE* fp, int prompt, char *tag,
       }
     }
     else  {
-      if (get_check_tag(fp, tag, myname) == 1)return 1;
+      if (get_check_tag(fp, tag, myname) == 1)
+        return 1;
 
-      for (i = 0; i < nvalues; i++){
+      for (i = 0; i < nvalues; i++) {
 #if PRECISION == 1
   s = fscanf(fp,"%e",value + i);
 #else
@@ -788,7 +777,7 @@ int get_vs(FILE* fp, int prompt, char *tag, char **value, int nvalues) {
   if (prompt) {
     s = 0;
     printf("enter %s with %d values", tag, nvalues);
-    for (i = 0; i < nvalues; i++){
+    for (i = 0; i < nvalues; i++) {
       while (s != 1) {
         printf("\n[%d] ", i);
         s = scanf("%s", value[i]);
@@ -836,8 +825,9 @@ int get_prompt(FILE *fp, int *prompt) {
       printf("\n%s: Can't read input\n", myname);
       terminate(1);
     }
-    if (strchr(initial_prompt,'#') == NULL) break;
-    // Provide for comment lines with # before "prompt"
+    if (strchr(initial_prompt, '#') == NULL)
+      break;
+    // Handle comment lines with # before "prompt"
     else {
       printf("%s", initial_prompt);
       if (fgets(initial_prompt, 512, fp) == NULL) {

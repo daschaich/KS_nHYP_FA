@@ -2,9 +2,9 @@
 // Reunitarize the link matrices
 #include "generic_includes.h"
 
-#define TOLERANCE (0.0001)
+#define TOLERANCE 0.0001
 #define MAXERRCOUNT 100
-/**#define UNIDEBUG**/
+//#define UNIDEBUG
 
 Real max_deviation;
 double av_deviation;
@@ -52,33 +52,33 @@ static int check_deviation(Real deviation) {
   if (max_deviation<deviation) max_deviation=deviation;
   av_deviation += deviation*deviation;
 
-  if (deviation<TOLERANCE){
+  if (deviation<TOLERANCE) {
     return 0;
   }
   else
     return 1;
 }
 
-void reunit_report_problem_matrix(su3_matrix *mat, int i,int dir) {
-  int ii,jj;
+void reunit_report_problem_matrix(su3_matrix *mat, int i, int dir) {
+  int ii, jj;
   union {
     Real fval;
     int ival;
   } ifval;
 
   printf("Unitarity problem on node %d, site %d, dir %d tolerance=%e\n",
-   mynode(),i,dir,TOLERANCE);
+   mynode(), i, dir, TOLERANCE);
   printf("SU3 matrix:\n");
-  for(ii=0;ii<=2;ii++){
-    for(jj=0;jj<=2;jj++){
+  for(ii=0;ii<=2;ii++) {
+    for(jj=0;jj<=2;jj++) {
       printf("%f ",(*mat).e[ii][jj].real);
       printf("%f ",(*mat).e[ii][jj].imag);
     }
     printf("\n");
   }
   printf("repeat in hex:\n");
-  for(ii=0;ii<=2;ii++){
-    for(jj=0;jj<=2;jj++){
+  for(ii=0;ii<=2;ii++) {
+    for(jj=0;jj<=2;jj++) {
       ifval.fval = (*mat).e[ii][jj].real;
       printf("%08x ", ifval.ival);
       ifval.fval = (*mat).e[ii][jj].imag;
@@ -109,7 +109,7 @@ int reunit_su3(su3_matrix *c) {
      deviation = fabs(ar - 1.);
      errors += check_deviation(deviation);
 
-     ar = 1.0 / sqrt( (double)ar);         /* used to normalize row */
+     ar = 1.0 / sqrt((double)ar);         /* used to normalize row */
      (*c).e[0][0].real *= ar;
      (*c).e[0][0].imag *= ar;
      (*c).e[0][1].real *= ar;
@@ -153,7 +153,7 @@ int reunit_su3(su3_matrix *c) {
      deviation = fabs(ar - 1.);
      errors += check_deviation(deviation);
 
-     ar = 1.0 / sqrt( (double)ar);         /* used to normalize row */
+     ar = 1.0 / sqrt((double)ar);         /* used to normalize row */
      (*c).e[1][0].real *= ar;
      (*c).e[1][0].imag *= ar;
      (*c).e[1][1].real *= ar;
@@ -186,7 +186,7 @@ int reunit_su3(su3_matrix *c) {
 
 void reunitarize() {
   register su3_matrix *mat;
-  register int i,dir;
+  register int i, dir;
   register site *s;
   int errcount = 0;
   int errors;
@@ -194,14 +194,14 @@ void reunitarize() {
   max_deviation = 0.0;
   av_deviation = 0.0;
 
-  FORALLSITES(i,s){
+  FORALLSITES(i, s) {
 #ifdef SCHROED_FUN
-    for(dir=XUP; dir<=TUP; dir++ ) if (dir==TUP || s->t>0 ){
+    for(dir=XUP; dir<=TUP; dir++) if (dir==TUP || s->t>0) {
 #else
-    for(dir=XUP; dir<=TUP; dir++ ){
+    for(dir=XUP; dir<=TUP; dir++) {
 #endif
       mat = (su3_matrix *)&(s->link[dir]);
-      errors = reunit_su3( mat );
+      errors = reunit_su3(mat);
       errcount += errors;
       if (errors)
         reunit_report_problem_matrix(mat, i, dir);
@@ -213,12 +213,12 @@ void reunitarize() {
   }
 
 #ifdef UNIDEBUG
-  printf("Deviation from unitarity on node %d: max %.3e, avrg %.3e\n",
+  printf("Deviation from unitarity on node %d: max %.4g, ave %.4g\n",
          mynode(), max_deviation, av_deviation);
 #endif
   if (max_deviation> TOLERANCE) {
     printf("reunitarize: Node %d unitarity problem, maximum deviation=%e\n",
-        mynode(),max_deviation);
+           mynode(), max_deviation);
     errcount++;
     if (errcount > MAXERRCOUNT) {
       printf("Unitarity error count exceeded.\n");

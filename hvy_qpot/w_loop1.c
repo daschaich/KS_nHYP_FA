@@ -18,7 +18,7 @@ void w_loop1(int tot_smear) {
   su3_matrix tmat1, tmat2;
   msg_tag *mtag[4];
 
-  if (nx != ny || nx != ny) {
+  if (nx != ny || nx != nz) {
     node0_printf("w_loop1 gives wrong results for nx != ny != nz");
     return;
   }

@@ -47,13 +47,6 @@ typedef struct {
 
 // -----------------------------------------------------------------
 // Definition of global variables
-#ifdef CONTROL
-#define EXTERN
-#else
-#define EXTERN extern
-#endif
-
-// Global scalars
 EXTERN int nx, ny, nz, nt;    // Lattice dimensions
 EXTERN int volume;            // Volume of lattice
 EXTERN int iseed;             // Random number seed

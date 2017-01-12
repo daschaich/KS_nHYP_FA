@@ -108,10 +108,10 @@ typedef int field_offset;
 // Timing switches
 #ifdef TIMING
 #define TIC(n) tmptime[n] = -dclock();
-#define TOC(n,mytimer) tmptime[n] += dclock(); mytimer+=tmptime[n];
+#define TOC(n, mytimer) tmptime[n] += dclock(); mytimer += tmptime[n];
 #else
 #define TIC(n)
-#define TOC(n,mytimer)
+#define TOC(n, mytimer)
 #endif
 
 #endif
