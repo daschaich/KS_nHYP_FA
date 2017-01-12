@@ -43,7 +43,6 @@
                            over all nodes.
    g_dcomplexsum()       sums a double precision complex number over all nodes.
    g_vecdcomplexsum()    sums a vector of double_complex over all nodes
-   g_wvectorsumfloat()   sums a generic precision wilson vector over all nodes.
    g_xor32()             finds global exclusive or of 32-bit word
    g_floatmax()          finds maximum floating point number over all nodes.
    g_doublemax()         finds maximum double over all nodes.
@@ -862,15 +861,6 @@ g_vecdcomplexsum(double_complex *cpt, int ncomplex)
   MPI_Allreduce( cpt, work, 2*ncomplex, MPI_DOUBLE, MPI_SUM, MPI_COMM_THISJOB );
   for(i=0; i<ncomplex; i++) cpt[i] = work[i];
   free(work);
-}
-
-/*
-**  Sum wilson_vector over all nodes
-*/
-void
-g_wvectorsumfloat(wilson_vector *wvpt)
-{
-  g_veccomplexsum((complex *)wvpt, 12);
 }
 
 /*
