@@ -9,11 +9,9 @@
 #  The paths are relative to the application directory.
 
 G_KS_ALL = \
-  d_congrad5.cppacs.o \
   d_congrad5.o \
   d_congrad5_eo.o \
   d_congrad5_fn.o \
-  d_congrad5_fn.old.o \
   d_congrad5_fn_fewsums.o \
   d_congrad5_fn_qop.o \
   d_congrad5_fn_qop_D.o \
@@ -85,19 +83,10 @@ G_KS_ALL = \
   ks_multicg_qop_milc_F.o \
   ks_source.o \
   ks_utilities.o \
-  load_qop_asqtad_coeffs_D.o \
-  load_qop_asqtad_coeffs_F.o \
   mat_invert.o \
-  mu.c \
-  mu_fast.c \
-  multimass_inverter.o \
   path_transport.o \
   nl_spectrum.o \
   quark_stuff.o \
-  quark_stuff4.o \
-  quark_stuff5.o \
-  quark_stuff6.o \
-  quark_stuff_hisq.o \
   show_generic_ks_opts.o \
   smear_links.o \
   spectrum.o \
@@ -109,8 +98,7 @@ G_KS_ALL = \
   spectrum_nd.o \
   spectrum_nlpi2.o \
   spectrum_pt.o \
-  spectrum_singlets.o \
-  su3_mat_op.o
+  spectrum_singlets.o
 
 # Must match our headers in generic_ks_includes.h
 G_KS_HEADERS = \
@@ -137,8 +125,6 @@ G_KS_ALL_DEPEND = \
 
 ${G_KS_ALL} : ${G_KS_ALL_DEPEND}
 
-d_congrad5.cppacs.o: ../generic_ks/d_congrad5.cppacs.c
-	${CC} -c ${CFLAGS} $<
 d_congrad5.o: ../generic_ks/d_congrad5.c
 	${CC} -c ${CFLAGS} $<
 d_congrad5_hl.o: ../generic_ks/d_congrad5_hl.c
@@ -146,8 +132,6 @@ d_congrad5_hl.o: ../generic_ks/d_congrad5_hl.c
 d_congrad5_eo.o: ../generic_ks/d_congrad5_eo.c
 	${CC} -c ${CFLAGS} $<
 d_congrad5_fn.o: ../generic_ks/d_congrad5_fn.c
-	${CC} -c ${CFLAGS} $<
-d_congrad5_fn.old.o: ../generic_ks/d_congrad5_fn.old.c
 	${CC} -c ${CFLAGS} $<
 d_congrad5_fn_qop.o: ../generic_ks/d_congrad5_fn_qop.c
 	${CC} -c ${CFLAGS} $<
@@ -299,25 +283,11 @@ load_qop_asqtad_coeffs_F.o: ../generic_ks/load_qop_asqtad_coeffs_F.c ../generic_
 	${CC} -c ${CFLAGS} $<
 mat_invert.o: ../generic_ks/mat_invert.c
 	${CC} -c ${CFLAGS} $<
-mu.o: ../generic_ks/mu.c
-	${CC} -c ${CFLAGS} $<
-mu_fast.o: ../generic_ks/mu_fast.c
-	${CC} -c ${CFLAGS} $<
-multimass_inverter.o: ../generic_ks/multimass_inverter.c
-	${CC} -c ${CFLAGS} $<
 nl_spectrum.o: ../generic_ks/nl_spectrum.c
 	${CC} -c ${CFLAGS} $<
 path_transport.o: ../generic_ks/path_transport.c
 	${CC} -c ${CFLAGS} $<
 quark_stuff.o: ../generic_ks/quark_stuff.c
-	${CC} -c ${CFLAGS} $<
-quark_stuff4.o: ../generic_ks/quark_stuff4.c
-	${CC} -c ${CFLAGS} $<
-quark_stuff5.o: ../generic_ks/quark_stuff5.c
-	${CC} -c ${CFLAGS} $<
-quark_stuff6.o: ../generic_ks/quark_stuff6.c
-	${CC} -c ${CFLAGS} $<
-quark_stuff_hisq.o: ../generic_ks/quark_stuff_hisq.c
 	${CC} -c ${CFLAGS} $<
 rephase.o: ../generic_ks/rephase.c
 	${CC} -c ${CFLAGS} $<
@@ -345,8 +315,6 @@ spectrum_nlpi2.o: ../generic_ks/spectrum_nlpi2.c
 	${CC} -c ${CFLAGS} $<
 spectrum_singlets.o: ../generic_ks/spectrum_singlets.c
 	${CC} -c ${CFLAGS} $<
-su3_mat_op.o: ../generic_ks/su3_mat_op.c
-	${CC} -c ${CFLAGS} $<
 
 ifeq ($(strip ${HAVEQDP}),true)
 
@@ -371,7 +339,6 @@ G_KS_ALL_DEPEND_QDP = \
   ${G_KS_ALL_DEPEND}
 
 ${G_KS_ALL_QDP} : ${G_KS_ALL_DEPEND_QDP}
-su3_mat_op.o: ../include/su3_mat_op.h
 
 d_congrad5_fn_1sum_qdp.o: ../generic_ks/d_congrad5_fn_1sum_qdp.c
 	${CC} -c ${CFLAGS} $<

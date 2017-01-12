@@ -11,11 +11,6 @@
 #include "../include/comdefs.h"
 #include "../include/generic.h"
 #include <lattice.h>
-
-#ifdef SSE
-#define SSE_SUBS
-#include "../sse/include/inline_sse.h"
-#endif
 // -----------------------------------------------------------------
 
 

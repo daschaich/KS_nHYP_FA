@@ -66,6 +66,12 @@ typedef struct {
 
 // -----------------------------------------------------------------
 // Definition of global variables
+#ifdef CONTROL
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
+
 EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int dx, dy, dz, dt;  // Hypercube origin
 EXTERN int volume;          // Volume of lattice

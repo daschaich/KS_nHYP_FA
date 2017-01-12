@@ -13,11 +13,6 @@
 #include "../include/generic.h"
 #include "../include/generic_ks.h"    // For rephase
 #include "../include/generic_nhyp.h"
-
-#ifdef SSE
-#define SSE_SUBS
-#include "../sse/include/inline_sse.h"
-#endif
 // -----------------------------------------------------------------
 
 

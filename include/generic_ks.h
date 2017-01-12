@@ -1,9 +1,7 @@
 #ifndef _GENERIC_KS_H
+// -----------------------------------------------------------------
+// Macros and declarations for generic KS routines
 #define _GENERIC_KS_H
-/************************ generic_ks.h **********************************
-*  Macros and declarations for generic_ks routines                      *
-*  This header is for codes that call generic_ks routines               *
-*/
 
 #include "../include/complex.h"
 #include "../include/su3.h"
@@ -19,17 +17,21 @@
 #define ALL_T_SLICES -1
 #define MAXDESCRP 128
 #define MAXSRCLABEL 8
+// -----------------------------------------------------------------
 
+
+
+// -----------------------------------------------------------------
 /* Structure defining staggered quark source */
 /* There must be a color member */
-/* Add other members to suit the generic_ks code 
+/* Add other members to suit the generic_ks code
    that builds the source.  Ignore the members you don't need. */
 typedef struct {
   int type;           /* source type for most source builders */
   char descrp[MAXDESCRP]; /* alpha description for most */
   char label[MAXSRCLABEL]; /* Abbreviation of description */
   int color;          /* source color */
-  int x0,y0,z0,t0;    /* source coordinates for most */ 
+  int x0,y0,z0,t0;    /* source coordinates for most */
   char source_file[MAXFILENAME]; /* file name for some sources */
   int flag;           /* mode of reading or writing for some sources */
   int file_initialized;  /* has source file been initialized? */
@@ -77,7 +79,7 @@ typedef struct {
 typedef struct {
   // Flags: 1 if the corresponding link field is valid
   // (valid means it corresponds to the current links in the site structure)
-  int valid_U_links, valid_V_links, valid_W_links, valid_Y_links, 
+  int valid_U_links, valid_V_links, valid_W_links, valid_Y_links,
     valid_X_links;
   int valid_all_links; // should be 1 if ALL links are valid
   Real valid_Xfat_mass, valid_Xlong_mass;
@@ -144,15 +146,15 @@ void prefetch_matrix(su3_matrix *);
 
 // Replaced in KS_nHYP_FA
 //int ks_congrad(field_offset src, field_offset dest, Real mass,
-//    int niter, int nrestart, Real rsqmin, int prec, 
+//    int niter, int nrestart, Real rsqmin, int prec,
 //    int parity, Real *rsq, ferm_links_t *fn);
 
-int ks_congrad_field(su3_vector *src, su3_vector *dest, 
+int ks_congrad_field(su3_vector *src, su3_vector *dest,
           quark_invert_control *qic, Real mass,
           ferm_links_t *fn);
 
 // Replaced in KS_nHYP_FA
-//int ks_congrad_site(field_offset src, field_offset dest, 
+//int ks_congrad_site(field_offset src, field_offset dest,
 //         quark_invert_control *qic, Real mass,
 //         ferm_links_t *fn);
 
@@ -212,9 +214,9 @@ int congrad_ks(           /* Return value is number of iterations taken */
     );
 
 int ks_invert(/* Return value is number of iterations taken */
-    field_offset src,   /* type su3_vector or multi_su3_vector 
+    field_offset src,   /* type su3_vector or multi_su3_vector
          (preloaded source) */
-    field_offset dest,  /* type su3_vector or multi_su3_vector 
+    field_offset dest,  /* type su3_vector or multi_su3_vector
          (answer and initial guess) */
     int (*invert_func)(field_offset src, field_offset dest,
            quark_invert_control *qic,
@@ -226,11 +228,11 @@ int ks_invert(/* Return value is number of iterations taken */
 
 int ks_invert_ksqs(/* Return value is number of iterations taken */
     ks_quark_source *ksqs, /* source parameters */
-    int (*source_func_field)(su3_vector *src, 
+    int (*source_func_field)(su3_vector *src,
             ks_quark_source *ksqs),  /* source function */
     su3_vector *dest,  /* answer and initial guess */
     int (*invert_func)(su3_vector *src, su3_vector *dest,
-           quark_invert_control *qic, Real mass, 
+           quark_invert_control *qic, Real mass,
            ferm_links_t *fn),
     quark_invert_control *qic, /* inverter control */
     Real mass,
@@ -351,7 +353,7 @@ void clear_latvec(field_offset v,int parity);
 
 void scalar_mult_add_latvec(field_offset src1, field_offset src2,
           Real scalar, field_offset dest, int parity);
-void scalar2_mult_add_su3_vector(su3_vector *a, Real s1, su3_vector *b, 
+void scalar2_mult_add_su3_vector(su3_vector *a, Real s1, su3_vector *b,
          Real s2, su3_vector *c);
 void scalar2_mult_add_latvec(field_offset src1,Real scalar1,
            field_offset src2,Real scalar2,
@@ -370,40 +372,40 @@ void eo_fermion_force_oneterm(Real eps, Real weight, field_offset x_off,
              ks_action_paths *ap);
 void eo_fermion_force_twoterms(Real eps, Real weight1, Real weight2,
         field_offset x1_off, field_offset x2_off,
-        int prec, ferm_links_t *fn, 
+        int prec, ferm_links_t *fn,
         ks_action_paths *ap);
-void fermion_force_asqtad_block(Real eps, Real *residues, 
-         su3_vector **xxx, int nterms, int veclength, 
-         int prec, ferm_links_t *fn, 
+void fermion_force_asqtad_block(Real eps, Real *residues,
+         su3_vector **xxx, int nterms, int veclength,
+         int prec, ferm_links_t *fn,
          ks_action_paths *ap);
-void fermion_force_asqtad_multi(Real eps, Real *residues, 
+void fermion_force_asqtad_multi(Real eps, Real *residues,
          su3_vector **xxx, int nterms, int prec,
          ferm_links_t *fn, ks_action_paths *ap);
 
 /* fermion_force_fn_multi.c */
 
 enum ks_multiff_opt_t {ASVEC, FNMAT, FNMATREV};
-  
+
 const char *ks_multiff_opt_chr();
 
 int eo_fermion_force_set_opt(char opt_string[]);
-void eo_fermion_force_multi(Real eps, Real *residues, su3_vector **xxx, 
+void eo_fermion_force_multi(Real eps, Real *residues, su3_vector **xxx,
            int nterms, int prec, ferm_links_t *fn,
            ks_action_paths *ap);
-void fermion_force_asqtad_block(Real eps, Real *residues, 
-         su3_vector **xxx, int nterms, int veclength, 
+void fermion_force_asqtad_block(Real eps, Real *residues,
+         su3_vector **xxx, int nterms, int veclength,
          int prec, ferm_links_t *fn,
          ks_action_paths *ap);
-void fermion_force_asqtad_multi(Real eps, Real *residues, su3_vector **xxx, 
+void fermion_force_asqtad_multi(Real eps, Real *residues, su3_vector **xxx,
          int nterms, int prec,
          ferm_links_t *fn, ks_action_paths *ap);
-void fermion_force_fn_multi(Real eps, Real *residues, su3_vector **multi_x, 
+void fermion_force_fn_multi(Real eps, Real *residues, su3_vector **multi_x,
            int nterms, int prec, ferm_links_t *fn,
              ks_action_paths *ap);
-void fermion_force_fn_multi_reverse(Real eps, Real *residues, 
+void fermion_force_fn_multi_reverse(Real eps, Real *residues,
              su3_vector **multi_x, int nterms,
              ferm_links_t *fn, ks_action_paths *ap);
-void fermion_force_fn_multi_june05(Real eps, Real *residues, 
+void fermion_force_fn_multi_june05(Real eps, Real *residues,
             su3_vector **multi_x, int nterms,
             ferm_links_t *fn, ks_action_paths *ap);
 
@@ -422,9 +424,9 @@ void load_fatbacklinks(ferm_links_t *fn);
 void free_fn_links(ferm_links_t *fn);
 void free_fn_links_dmdu0(ferm_links_t *fn);
 #ifdef HISQ
-void load_fatlinks_hisq(su3_matrix **Src, ks_component_paths *app, 
+void load_fatlinks_hisq(su3_matrix **Src, ks_component_paths *app,
        su3_matrix **Dest);
-void load_longlinks_hisq(su3_matrix **Src, ks_component_paths *app, 
+void load_longlinks_hisq(su3_matrix **Src, ks_component_paths *app,
         su3_matrix **Dest);
 #endif
 void custom_rephase(su3_matrix **internal_links, int flag, int *status_now);
@@ -437,7 +439,7 @@ void custom_rephase(su3_matrix **internal_links, int flag, int *status_now);
 typedef struct { su3_vector v[VECLENGTH]; } veclist;
 void mult_adj_su3_fieldlink_latveclist(su3_matrix *link,
                veclist **src_pt, veclist *dest, int listlength);
-void mult_su3_sitelink_latveclist(int dir, 
+void mult_su3_sitelink_latveclist(int dir,
    veclist **src_pt, veclist *dest, int listlength);
 void scalar_mult_add_latveclist_proj(anti_hermitmat *mom,
            veclist *back, veclist *forw, Real *coeff, int listlength);
@@ -474,7 +476,7 @@ void alloc_ksqs_c_src(ks_quark_source *ksqs);
 void alloc_ksqs_cv_src(ks_quark_source *ksqs);
 void clear_ksqs(ks_quark_source *ksqs);
 int ask_ks_quark_source(FILE *fp, int prompt, int *type, char *descrp);
-int ask_output_ks_quark_source_file(FILE *fp, int prompt, 
+int ask_output_ks_quark_source_file(FILE *fp, int prompt,
              int *flag, int *source_type,
              int *t0, char *descrp, char *filename);
 int choose_usqcd_ks_file_type(int source_type);
@@ -508,10 +510,10 @@ int mat_invert_uml(field_offset src, field_offset dest,
                    field_offset temp, Real mass);
 
 /* mu.c and mu_fast.c */
-void M_derivatives(field_offset phi_off, field_offset xxx_off, 
+void M_derivatives(field_offset phi_off, field_offset xxx_off,
        field_offset xxx1_off, Real mass,
        ferm_links_t *fn, ferm_links_t *fn_dmdu0);
-void Deriv_O6(field_offset phi_off, field_offset xxx_off, 
+void Deriv_O6(field_offset phi_off, field_offset xxx_off,
         field_offset xxx1_off, Real mass,
         ferm_links_t *fn, ferm_links_t *fn_dmdu0);
 
@@ -534,11 +536,11 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
      field_offset tempmat1, field_offset tempmat2);
 
 /* path_transport.c */
-void link_gather_connection_hisq(su3_matrix *src, 
+void link_gather_connection_hisq(su3_matrix *src,
           su3_matrix *dest, su3_matrix *work, int dir);
 void path_transport_site(field_offset src, field_offset dest, int parity,
         int *dir, int length);
-void path_transport_field(su3_vector * src, su3_vector * dest, int parity, 
+void path_transport_field(su3_vector * src, su3_vector * dest, int parity,
          int *dir, int length);
 void path_transport_hwv_site(field_offset src, field_offset dest, int parity,
             int *dir, int length);
@@ -575,11 +577,11 @@ int spectrum_mom(Real qmass, Real amass, field_offset temp, Real tol,
       ferm_links_t *fn);
 
 /* spectrum_multimom.c */
-int spectrum_multimom(Real dyn_mass, Real low_mass, Real mass_inc, 
+int spectrum_multimom(Real dyn_mass, Real low_mass, Real mass_inc,
            int nmasses, Real tol, ferm_links_t *fn);
 
 /* spectrum_nd.c */
-int spectrum_nd(Real mass1, Real mass2, Real tol, 
+int spectrum_nd(Real mass1, Real mass2, Real tol,
      ferm_links_t *fn);
 
 /* spectrum_nlpi2.c */
@@ -591,16 +593,5 @@ void mult_rhos(int fdir, field_offset src, field_offset dest);
 /* spectrum_singlets */
 int spectrum_singlets(Real mass, Real tol, field_offset temp_offset,
            ferm_links_t *fn);
-/* su3_mat_op.c */
-void su3_unitarize(su3_matrix *a, su3_matrix *b);
-void su3_spec_unitarize(su3_matrix *a, su3_matrix *b, complex *detA);
-void su3_unit_der(su3_matrix *u, su3_tensor4 *dwdu, su3_tensor4 *dwdagdu);
-void su3_unit_der_spec(su3_matrix *u, su3_matrix *w, su3_matrix *wdag, 
-                       su3_tensor4 *dwdu, su3_tensor4 *dwdagdu,
-                       su3_tensor4 *dvdu, su3_tensor4 *dvdagdu);
-void su3_unitarize_analytic(su3_matrix *V, su3_matrix *W);
-void su3_unit_der_analytic(su3_matrix *V, 
-          su3_tensor4 *dwdv, su3_tensor4 *dwdagdv);
-void su3_unit_der_rational(su3_matrix *V, su3_tensor4 *dwdv, su3_tensor4 *dwdagdv);
-void su3_unitarize_rational(su3_matrix *V, su3_matrix *W);
 #endif
+// -----------------------------------------------------------------

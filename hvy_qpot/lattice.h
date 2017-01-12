@@ -31,6 +31,12 @@ typedef struct {
 
 // -----------------------------------------------------------------
 // Definition of global variables
+#ifdef CONTROL
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
+
 EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
 EXTERN int off_axis_flag;   // Whether to calculate off-axis loops
