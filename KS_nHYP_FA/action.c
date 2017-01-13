@@ -141,7 +141,7 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
   register int i, dir, dir2;
   register site *s;
   register su3_matrix *m1, *m4;
-  double ss_sum = 0.0, st_sum = 0.0, td;
+  double ss_sum = 0.0, st_sum = 0.0;
   complex tc;
   msg_tag *mtag, *mtag2;
   su3_matrix tmat;

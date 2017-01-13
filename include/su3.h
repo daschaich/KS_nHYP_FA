@@ -220,8 +220,14 @@ void scalar_mult_sub_su3_matrix(su3_matrix *src1, su3_matrix *src2,
   Real scalar, su3_matrix *dest);
 void c_scalar_mult_su3mat(su3_matrix *src, complex *scalar,
   su3_matrix *dest);
-void c_scalar_mult_add_su3mat(su3_matrix *src1, su3_matrix *src2,
-  complex *scalar, su3_matrix *dest);
+
+// c <-- c + s * b, in "cs_m_a_mat.c"
+void c_scalar_mult_sum_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
+
+// c <-- a + s * b, in "cs_m_a_mat.c"
+void c_scalar_mult_add_su3mat(su3_matrix *a, su3_matrix *b, complex *s,
+                              su3_matrix *c);
+
 void su3_adjoint(su3_matrix *a, su3_matrix *b);
 void make_anti_hermitian(su3_matrix *m3, anti_hermitmat *ah3);
 void random_anti_hermitian(anti_hermitmat *mat_antihermit, double_prn *prn_pt);
@@ -276,33 +282,17 @@ void byterevn64(int32type w[], int n);
    changes in the code.  SSE macros are inlined globally by defining
    SSE_GLOBAL_INLINE.  */
 
-/* C macros are similarly inlined selectively with C_INLINE and
-   globally with C_GLOBAL_INLINE */
-
 /* SSE macros for selected library functions are available in single
    and double precision */
 
 #if defined SSE_INLINE || defined SSE_GLOBAL_INLINE
-#if PRECISION == 1
-#ifdef SSEOPTERON
-#include "../sse_opteron/include/inline_sse.h"
-#else
-#include "../sse/include/inline_sse.h"
-#endif
-#else
+#if PRECISION == 2
 #include "../sse2/include/inline_sse.h"
 #endif
 #endif
 
-/* C macros are similarly available for selected library functions in
-   both precisions */
-
-#if defined C_INLINE || defined C_GLOBAL_INLINE
-#include "../libraries/include/inline_C.h"
-#endif
-
 /* The following definitions cause the macros to be invoked globally
-   if SSE_INLINE and/or C_INLINE is defined.  Note that in each stanza
+   if SSE_INLINE is defined.  Note that in each stanza
    the same library routines are repeated, but with either a macro
    definition when available or a prototype definition. */
 
@@ -353,83 +343,14 @@ void byterevn64(int32type w[], int n);
 #endif // PRECISION
 #endif // SSE_GLOBAL_INLINE
 
-#if defined C_GLOBAL_INLINE
-
-/********************************************************************/
-/* Our available C-inline macros */
-
-#ifndef add_su3_matrix
-#define add_su3_matrix(...) _inline_C_add_su3_matrix(__VA_ARGS__)
-#endif
-
-#ifndef add_su3_vector
-#define add_su3_vector(...) _inline_C_add_su3_vector(__VA_ARGS__)
-#endif
-
-#ifndef grow_add_four_wvecs
-#define grow_add_four_wvecs(...)  _inline_C_grow_add_four_wvecs(__VA_ARGS__)
-#endif
-
-#ifndef magsq_su3vec
-#define magsq_su3vec(...) _inline_C_magsq_su3vec(__VA_ARGS__)
-#endif
-
-#ifndef mult_su3_nn
-#define mult_su3_nn(...) _inline_C_mult_su3_nn(__VA_ARGS__)
-#endif
-
-#ifndef mult_su3_na
-#define mult_su3_na(...) _inline_C_mult_su3_na(__VA_ARGS__)
-#endif
-
-#ifndef mult_adj_su3_mat_hwvec
-#define mult_adj_su3_mat_hwvec(...) _inline_C_mult_adj_su3_mat_hwvec(__VA_ARGS__)
-#endif
-
-#ifndef mult_su3_mat_hwvec
-#define mult_su3_mat_hwvec(...) _inline_C_mult_su3_mat_hwvec(__VA_ARGS__)
-#endif
-
-#ifndef  mult_su3_mat_vec_sum_4dir
-#define  mult_su3_mat_vec_sum_4dir(...) _inline_C_mult_su3_mat_vec_sum_4dir(__VA_ARGS__)
-#endif
-
-#ifndef scalar_mult_add_su3_matrix
-#define scalar_mult_add_su3_matrix(a, b, c, d) {Real _temp = c; _inline_C_scalar_mult_add_su3_matrix(a, b,_temp, d);}
-#endif
-
-#ifndef scalar_mult_add_su3_vector
-#define scalar_mult_add_su3_vector(a, b, c, d) {Real _temp = c; _inline_C_scalar_mult_add_su3_vector(a, b,_temp, d);}
-#endif
-
-#ifndef su3_projector
-#define su3_projector(...) _inline_C_su3_projector(__VA_ARGS__)
-#endif
-
-#ifndef su3_rdot
-#define su3_rdot(...) _inline_C_su3_rdot(__VA_ARGS__)
-#endif
-
-#ifndef sub_su3_vector
-#define sub_su3_vector(...) _inline_C_sub_su3_vector(__VA_ARGS__)
-#endif
-
-#ifndef sub_four_su3vecs
-#define sub_four_su3vecs(...) _inline_C_sub_four_su3vecs(__VA_ARGS__)
-#endif
-
-#ifndef wp_shrink_4dir
-#define wp_shrink_4dir(...) _inline_C_wp_shrink_4dir(__VA_ARGS__)
-#endif
-
-/********************************************************************/
-
-#endif // C_GLOBAL_INLINE
-
 /********************************************************************/
 /* Use standard prototypes if macros are not defined */
 
+// c <-- c + b, in "addmat.c"
+void sum_su3_matrix(su3_matrix *b, su3_matrix *c);
+
 #ifndef add_su3_matrix
+// c <-- a + b, in "addmat.c"
 void add_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 #endif
 
@@ -442,15 +363,15 @@ Real magsq_su3vec(su3_vector *a);
 #endif
 
 #ifndef mult_su3_nn
-void mult_su3_nn (su3_matrix *a, su3_matrix *b, su3_matrix *c);
+void mult_su3_nn(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 #endif
 
 #ifndef mult_su3_na
-void mult_su3_na (su3_matrix *a, su3_matrix *b, su3_matrix *c);
+void mult_su3_na(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 #endif
 
 #ifndef mult_su3_an
-void mult_su3_an (su3_matrix *a, su3_matrix *b, su3_matrix *c);
+void mult_su3_an(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 #endif
 
 #ifndef mult_su3_mat_vec
@@ -470,7 +391,11 @@ void mult_su3_mat_vec_sum_4dir(su3_matrix *a, su3_vector *b0,
   su3_vector *b1, su3_vector *b2, su3_vector *b3, su3_vector *c);
 #endif
 
+// c <-- c + s * b, in "s_m_a_mat.c"
+void scalar_mult_sum_su3_matrix(su3_matrix *b, Real s, su3_matrix *c);
+
 #ifndef scalar_mult_add_su3_matrix
+// c <-- a + s * b, in "s_m_a_mat.c"
 void scalar_mult_add_su3_matrix(su3_matrix *src1, su3_matrix *src2,
   Real scalar, su3_matrix *dest);
 #endif

@@ -14,8 +14,8 @@ double gauge_force(Real eps) {
   register Real eb3 = eps * beta / 3.0;
   msg_tag *tag0, *tag1, *tag2;
   int start;
-  su3_matrix tmat1, tmat2;
-  complex ctmp;
+  su3_matrix tmat, tmat2;
+  complex tc;
   double norm = 0;
 
   // Loop over directions, update mom[dir]
@@ -44,8 +44,8 @@ double gauge_force(Real eps) {
       // We will later gather the intermediate result "to the home point"
       wait_gather(tag0);
       FORALLSITES(i, st) {
-        mult_su3_an(&(st->link[dir2]), &(st->link[dir]), &tmat1);
-        mult_su3_nn(&tmat1, (su3_matrix *)gen_pt[0][i],
+        mult_su3_an(&(st->link[dir2]), &(st->link[dir]), &tmat);
+        mult_su3_nn(&tmat, (su3_matrix *)gen_pt[0][i],
                     (su3_matrix *)&(st->tempmat1));
       }
 
@@ -60,40 +60,41 @@ double gauge_force(Real eps) {
       wait_gather(tag2);
       if (start) {  // This is the first contribution to staple
         FORALLSITES(i, st) {
-          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
-          mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &(st->staple));
-          mult_su3_na(&(st->link[dir]), &(st->staple), &tmat1);
-          ctmp = trace_su3(&tmat1);
-          ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
-          ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
+          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat);
+          mult_su3_na(&tmat, (su3_matrix *)gen_pt[0][i], &(st->staple));
+          mult_su3_na(&(st->link[dir]), &(st->staple), &tmat);
+          tc = trace_su3(&tmat);
+          tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
+          tc.imag = -2.0 * beta_a / 3.0 * tc.imag;
 
-          c_scalar_mult_su3mat(&(st->staple), &ctmp, &(st->staple));
+          c_scalar_mult_su3mat(&(st->staple), &tc, &tmat);
+          su3mat_copy(&tmat, &(st->staple));
         }
         start = 0;
       }
       else {
         FORALLSITES(i, st) {
-          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat1);
-          mult_su3_na(&tmat1, (su3_matrix *)gen_pt[0][i], &tmat2);
-          mult_su3_na(&(st->link[dir]), &tmat2, &tmat1);
-          ctmp = trace_su3(&tmat1);
-          ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
-          ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
+          mult_su3_nn(&(st->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat);
+          mult_su3_na(&tmat, (su3_matrix *)gen_pt[0][i], &tmat2);
+          mult_su3_na(&(st->link[dir]), &tmat2, &tmat);
+          tc = trace_su3(&tmat);
+          tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
+          tc.imag = -2.0 * beta_a / 3.0 * tc.imag;
 
-          c_scalar_mult_add_su3mat(&(st->staple), &tmat2, &ctmp,
+          c_scalar_mult_add_su3mat(&(st->staple), &tmat2, &tc,
                                    &(st->staple));
         }
       }
 
       wait_gather(tag1);
       FORALLSITES(i, st) {
-        mult_su3_na(&(st->link[dir]), (su3_matrix *)gen_pt[1][i], &tmat1);
-        ctmp = trace_su3(&tmat1);
-        ctmp.real = 1 - 2 * beta_a / 3.0 * ctmp.real;
-        ctmp.imag = -2 * beta_a / 3.0 * ctmp.imag;
+        mult_su3_na(&(st->link[dir]), (su3_matrix *)gen_pt[1][i], &tmat);
+        tc = trace_su3(&tmat);
+        tc.real = 1 - 2 * beta_a / 3.0 * tc.real;
+        tc.imag = -2 * beta_a / 3.0 * tc.imag;
 
         c_scalar_mult_add_su3mat(&(st->staple),
-                                 (su3_matrix *)gen_pt[1][i], &ctmp,
+                                 (su3_matrix *)gen_pt[1][i], &tc,
                                  &(st->staple));
       }
       cleanup_gather(tag0);
@@ -103,16 +104,16 @@ double gauge_force(Real eps) {
 
     // Now multiply the staple sum by the link, then update momentum
     FORALLSITES(i, st) {
-      mult_su3_na(&(st->link[dir]), &(st->staple), &tmat1);
+      mult_su3_na(&(st->link[dir]), &(st->staple), &tmat);
       uncompress_anti_hermitian(&(st->mom[dir]), &tmat2);
-      scalar_mult_add_su3_matrix(&tmat2, &tmat1, eb3, &(st->staple));
+      scalar_mult_add_su3_matrix(&tmat2, &tmat, eb3, &(st->staple));
       make_anti_hermitian(&(st->staple), &(st->mom[dir]));
-      norm += (double)realtrace_su3(&tmat1, &tmat1);
+      norm += (double)realtrace_su3(&tmat, &tmat);
     }
   }
 
   g_doublesum(&norm);
-  return (eb3 * sqrt(norm) / volume);
+  return eb3 * sqrt(norm) / (double)volume;
 }
 // -----------------------------------------------------------------
 
@@ -130,7 +131,7 @@ double fermion_force(int level, Real eps) {
   double norm = 0;
   msg_tag *tag0, *tag1;
   anti_hermitmat ahtmp;
-  su3_matrix tmat1, tmat2, tmat3;
+  su3_matrix tmat, tmat2, tmat3;
   su3_vector tvec;
 
   // Zero the force collectors
@@ -224,8 +225,8 @@ double fermion_force(int level, Real eps) {
   // Multiply a HYP field dagger from the left on the force
   for (dir = XUP; dir <= TUP; dir++) {
     FORALLSITES(i, st) {
-      mult_su3_an(gauge_field[dir] + i, Sigma[dir] + i, &tmat1);
-      su3mat_copy(&tmat1, Sigma[dir] + i);
+      mult_su3_an(gauge_field[dir] + i, Sigma[dir] + i, &tmat);
+      su3mat_copy(&tmat, Sigma[dir] + i);
     }
   }
 
@@ -271,17 +272,17 @@ double fermion_force(int level, Real eps) {
   for (dir = XUP; dir <= TUP; dir++) {
     FORALLSITES(i, st) {
       uncompress_anti_hermitian(&(st->mom[dir]), &tmat2);
-      mult_su3_nn(gauge_field_thin[dir] + i, Sigma[dir] + i, &tmat1);
-      make_anti_hermitian(&tmat1, &ahtmp);
+      mult_su3_nn(gauge_field_thin[dir] + i, Sigma[dir] + i, &tmat);
+      make_anti_hermitian(&tmat, &ahtmp);
 
-      uncompress_anti_hermitian(&ahtmp, &tmat1);
-      // tmat3 = tmat2 + ferm_epsilon * tmat1
-      scalar_mult_add_su3_matrix(&tmat2, &tmat1, ferm_epsilon, &tmat3);
+      uncompress_anti_hermitian(&ahtmp, &tmat);
+      // tmat3 = tmat2 + ferm_epsilon * tmat
+      scalar_mult_add_su3_matrix(&tmat2, &tmat, ferm_epsilon, &tmat3);
       make_anti_hermitian(&tmat3, &(st->mom[dir]));
-      norm += (double)realtrace_su3(&tmat1, &tmat1);
+      norm += (double)realtrace_su3(&tmat, &tmat);
     }
   }
   g_doublesum(&norm);
-  return ferm_epsilon * sqrt(norm) / volume * 2;
+  return 2.0 * ferm_epsilon * sqrt(norm) / (double)volume;
 }
 // -----------------------------------------------------------------

@@ -89,7 +89,6 @@ G_ALL = \
  report_invert_status.o \
  restrict_fourier.o \
  reunitarize.o \
- show_generic_opts.o \
  stout_smear.o
 
 # Must match our headers in generic_includes.h
@@ -276,8 +275,6 @@ restrict_fourier.o: ../generic/restrict_fourier.c
 report_invert_status.o: ../generic/report_invert_status.c
 	${CC} -c ${CFLAGS} $<
 reunitarize.o: ../generic/reunitarize.c
-	${CC} -c ${CFLAGS} $<
-show_generic_opts.o: ../generic/show_generic_opts.c
 	${CC} -c ${CFLAGS} $<
 stout_smear.o: ../generic/stout_smear.c
 	${CC} -c ${CFLAGS} $<

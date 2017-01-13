@@ -63,6 +63,4 @@ double fermion_force(int level, Real eps);
 // nHYP force stuff
 void block_N_fatten(int N);
 void nhyp_force1();
-void nhyp_force2(int dir2);
-void nhyp_force3(int dir3, int dir2);
 // -----------------------------------------------------------------

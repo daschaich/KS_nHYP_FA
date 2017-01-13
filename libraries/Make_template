@@ -1,8 +1,7 @@
-# Makefile for Libraries for QCD programs
-#
-#  This template file defines rules and macros common to all architectures
-#  It is intended to be an include file for other Makefiles.
-#  Don't use it by itself!
+# Makefile for libraries
+# This template file defines rules and macros common to all architectures
+# It is intended to be an include file for other Makefiles
+# Don't use it by itself!
 
 .SUFFIXES: .1o .2o
 

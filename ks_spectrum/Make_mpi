@@ -29,7 +29,7 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = #-DINLINE # -DC_GLOBAL_INLINE # -DSSE_GLOBAL_INLINE -DC_INLINE
+INLINEOPT      = #-DINLINE # -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =
