@@ -103,7 +103,7 @@ start:
   dslash(F_OFFSET(mp), F_OFFSET(mp), l_parity);
 
   // mp  <- mp - msq_x4 * psi
-  FORSOMEPARITYDOMAIN(i, s, l_parity) {
+  FORSOMEPARITY(i, s, l_parity) {
     scalar_mult_add_su3_vector(&(s->mp), (su3_vector *)F_PT(s, psi),
                                -msq_x4, &(s->mp));
 
@@ -179,7 +179,7 @@ start:
     // mp <- mp - msq_x4 * p
     // pkp <- p.mp
     pkp = 0;
-    FORSOMEPARITYDOMAIN(i, s, l_parity) {
+    FORSOMEPARITY(i, s, l_parity) {
       if (i < loopend - FETCH_UP)
         prefetch_VV(&((s + FETCH_UP)->mp), &((s + FETCH_UP)->p));
 
@@ -196,11 +196,11 @@ start:
     // psi <- psi - a * p
     // r <- r - a * mp
     rsq = 0;
-    FORSOMEPARITYDOMAIN(i, s, l_parity) {
+    FORSOMEPARITY(i, s, l_parity) {
       if (i < loopend - FETCH_UP)
         prefetch_VVVV((su3_vector *)F_PT(s + FETCH_UP, psi),
-                      &((s+FETCH_UP)->p), &((s+FETCH_UP)->r),
-                      &((s+FETCH_UP)->mp));
+                      &((s + FETCH_UP)->p), &((s+FETCH_UP)->r),
+                      &((s + FETCH_UP)->mp));
 
       scalar_mult_add_su3_vector((su3_vector *)F_PT(s, psi),
                                  &(s->p), a, (su3_vector *)F_PT(s, psi));
@@ -286,10 +286,8 @@ start:
 void dslash(field_offset chi, field_offset psi, int parity) {
   register int i, dir, otherparity = EVEN;
   register site *s;
-  msg_tag *tag[8];
-#ifdef INLINE
   register su3_vector *a, *b1, *b2, *b3, *b4;
-#endif
+  msg_tag *tag[8];
 
   switch(parity) {
     case EVEN:
@@ -304,12 +302,13 @@ void dslash(field_offset chi, field_offset psi, int parity) {
   }
 
   // Start gathers from positive directions
-  for (dir = XUP; dir <= TUP; dir++)
+  FORALLUPDIR(dir) {
     tag[dir] = start_gather_site(chi, sizeof(su3_vector), dir, parity,
                                  gen_pt[dir]);
+  }
 
   // Multiply by adjoint matrix at other sites
-  FORSOMEPARITYDOMAIN(i, s, otherparity) {
+  FORSOMEPARITY(i, s, otherparity) {
     if (i < loopend - FETCH_UP)
       prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
                      (su3_vector *)F_PT((s + FETCH_UP), chi),
@@ -320,13 +319,14 @@ void dslash(field_offset chi, field_offset psi, int parity) {
   } END_LOOP
 
   // Start gathers from negative directions
-  for (dir = XUP; dir <= TUP; dir++)
+  FORALLUPDIR(dir) {
     tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
                                           sizeof(su3_vector), OPP_DIR(dir),
                                           parity, gen_pt[OPP_DIR(dir)]);
+  }
 
   // Wait gathers from positive directions
-  for (dir = XUP; dir <= TUP; dir++)
+  FORALLUPDIR(dir)
     wait_gather(tag[dir]);
 
   // Multiply by matrix and accumulate
@@ -343,56 +343,46 @@ void dslash(field_offset chi, field_offset psi, int parity) {
                               (su3_vector *)gen_pt[YUP][i],
                               (su3_vector *)gen_pt[ZUP][i],
                               (su3_vector *)gen_pt[TUP][i],
-                              (su3_vector *)F_PT(s,psi));
+                              (su3_vector *)F_PT(s, psi));
   } END_LOOP
 
   // Wait gathers from negative directions
-  for (dir = XUP; dir <= TUP; dir++)
+  FORALLUPDIR(dir)
     wait_gather(tag[OPP_DIR(dir)]);
 
-  // Accumulate (negative)
-  FORSOMEPARITYDOMAIN(i, s, parity) {
-    if (i < loopend - FETCH_UP)
+  // Accumulate (negative), with manually inlined subtractions
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend - FETCH_UP) {
       prefetch_VVVV((su3_vector *)gen_pt[XDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[YDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[ZDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[TDOWN][i + FETCH_UP]);
-
-#ifndef INLINE
-    // Non-inline version
-    sub_four_su3_vecs((su3_vector *)F_PT(s, psi),
-                      (su3_vector *)(gen_pt[XDOWN][i]),
-                      (su3_vector *)(gen_pt[YDOWN][i]),
-                      (su3_vector *)(gen_pt[ZDOWN][i]),
-                      (su3_vector *)(gen_pt[TDOWN][i]));
-#else
-    // Inline version
-    a  = (su3_vector *)F_PT(s,psi);
+    }
+    a  = (su3_vector *)F_PT(s, psi);
     b1 = (su3_vector *)(gen_pt[XDOWN][i]);
     b2 = (su3_vector *)(gen_pt[YDOWN][i]);
     b3 = (su3_vector *)(gen_pt[ZDOWN][i]);
     b4 = (su3_vector *)(gen_pt[TDOWN][i]);
 
-    CSUB(a->c[0], b1->c[0], a->c[0]);
-    CSUB(a->c[1], b1->c[1], a->c[1]);
-    CSUB(a->c[2], b1->c[2], a->c[2]);
+    CDIF(a->c[0], b1->c[0]);
+    CDIF(a->c[1], b1->c[1]);
+    CDIF(a->c[2], b1->c[2]);
 
-    CSUB(a->c[0], b2->c[0], a->c[0]);
-    CSUB(a->c[1], b2->c[1], a->c[1]);
-    CSUB(a->c[2], b2->c[2], a->c[2]);
+    CDIF(a->c[0], b2->c[0]);
+    CDIF(a->c[1], b2->c[1]);
+    CDIF(a->c[2], b2->c[2]);
 
-    CSUB(a->c[0], b3->c[0], a->c[0]);
-    CSUB(a->c[1], b3->c[1], a->c[1]);
-    CSUB(a->c[2], b3->c[2], a->c[2]);
+    CDIF(a->c[0], b3->c[0]);
+    CDIF(a->c[1], b3->c[1]);
+    CDIF(a->c[2], b3->c[2]);
 
-    CSUB(a->c[0], b4->c[0], a->c[0]);
-    CSUB(a->c[1], b4->c[1], a->c[1]);
-    CSUB(a->c[2], b4->c[2], a->c[2]);
-#endif
+    CDIF(a->c[0], b4->c[0]);
+    CDIF(a->c[1], b4->c[1]);
+    CDIF(a->c[2], b4->c[2]);
   } END_LOOP
 
   // Free buffers
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     cleanup_gather(tag[dir]);
     cleanup_gather(tag[OPP_DIR(dir)]);
   }
@@ -413,9 +403,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
 
   register int i, dir, otherparity = EVEN;
   register site *s;
-#ifdef INLINE
   register su3_vector *a, *b1, *b2, *b3, *b4;
-#endif
 
   switch(parity) {
     case EVEN:
@@ -430,7 +418,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
   }
 
   // Start gathers from positive directions
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     if (start == 1)
       tag[dir] = start_gather_site(chi, sizeof(su3_vector), dir,
                                    parity, gen_pt[dir]);
@@ -440,7 +428,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
   }
 
   // Multiply by adjoint matrix at other sites
-  FORSOMEPARITYDOMAIN(i, s, otherparity) {
+  FORSOMEPARITY(i, s, otherparity) {
     if (i < loopend - FETCH_UP)
       prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
                      (su3_vector *)F_PT((s + FETCH_UP), chi),
@@ -451,7 +439,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
   } END_LOOP
 
   // Start gathers from negative directions
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     if (start == 1)
       tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
                                             sizeof(su3_vector), OPP_DIR(dir),
@@ -463,68 +451,57 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
     }
 
   // Wait gathers from positive directions
-  for (dir = XUP; dir <= TUP; dir++)
+  FORALLUPDIR(dir)
     wait_gather(tag[dir]);
 
   // Multiply by matrix and accumulate
   FORSOMEPARITY(i, s, parity) {
     if (i < loopend - FETCH_UP)
-      prefetch_4MVVVV(&((s + FETCH_UP)->link[XUP]),
-                      (su3_vector *)gen_pt[XUP][i + FETCH_UP],
-                      (su3_vector *)gen_pt[YUP][i + FETCH_UP],
-                      (su3_vector *)gen_pt[ZUP][i + FETCH_UP],
-                      (su3_vector *)gen_pt[TUP][i + FETCH_UP]);
+      prefetch_VVVV((su3_vector *)gen_pt[XUP][i + FETCH_UP],
+                    (su3_vector *)gen_pt[YUP][i + FETCH_UP],
+                    (su3_vector *)gen_pt[ZUP][i + FETCH_UP],
+                    (su3_vector *)gen_pt[TUP][i + FETCH_UP]);
 
     mult_su3_mat_vec_sum_4dir(s->link, (su3_vector *)gen_pt[XUP][i],
                               (su3_vector *)gen_pt[YUP][i],
                               (su3_vector *)gen_pt[ZUP][i],
                               (su3_vector *)gen_pt[TUP][i],
-                              (su3_vector *)F_PT(s,psi));
+                              (su3_vector *)F_PT(s, psi));
   } END_LOOP
 
   // Wait gathers from negative directions
-    for (dir = XUP; dir <= TUP; dir++)
-      wait_gather(tag[OPP_DIR(dir)]);
+  FORALLUPDIR(dir)
+    wait_gather(tag[OPP_DIR(dir)]);
 
-  // Accumulate (negative)
-  FORSOMEPARITYDOMAIN(i, s, parity) {
-    if (i < loopend-FETCH_UP)
+  // Accumulate (negative), with manually inlined subtractions
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend-FETCH_UP) {
       prefetch_VVVV((su3_vector *)gen_pt[XDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[YDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[ZDOWN][i + FETCH_UP],
                     (su3_vector *)gen_pt[TDOWN][i + FETCH_UP]);
-
-#ifndef INLINE
-    // Non-inline version
-    sub_four_su3_vecs((su3_vector *)F_PT(s, psi),
-                      (su3_vector *)(gen_pt[XDOWN][i]),
-                      (su3_vector *)(gen_pt[YDOWN][i]),
-                      (su3_vector *)(gen_pt[ZDOWN][i]),
-                      (su3_vector *)(gen_pt[TDOWN][i]));
-#else
-    // Inline version
+    }
     a  = (su3_vector *)F_PT(s, psi);
     b1 = (su3_vector *)(gen_pt[XDOWN][i]);
     b2 = (su3_vector *)(gen_pt[YDOWN][i]);
     b3 = (su3_vector *)(gen_pt[ZDOWN][i]);
     b4 = (su3_vector *)(gen_pt[TDOWN][i]);
 
-    CSUB(a->c[0], b1->c[0], a->c[0]);
-    CSUB(a->c[1], b1->c[1], a->c[1]);
-    CSUB(a->c[2], b1->c[2], a->c[2]);
+    CDIF(a->c[0], b1->c[0]);
+    CDIF(a->c[1], b1->c[1]);
+    CDIF(a->c[2], b1->c[2]);
 
-    CSUB(a->c[0], b2->c[0], a->c[0]);
-    CSUB(a->c[1], b2->c[1], a->c[1]);
-    CSUB(a->c[2], b2->c[2], a->c[2]);
+    CDIF(a->c[0], b2->c[0]);
+    CDIF(a->c[1], b2->c[1]);
+    CDIF(a->c[2], b2->c[2]);
 
-    CSUB(a->c[0], b3->c[0], a->c[0]);
-    CSUB(a->c[1], b3->c[1], a->c[1]);
-    CSUB(a->c[2], b3->c[2], a->c[2]);
+    CDIF(a->c[0], b3->c[0]);
+    CDIF(a->c[1], b3->c[1]);
+    CDIF(a->c[2], b3->c[2]);
 
-    CSUB(a->c[0], b4->c[0], a->c[0]);
-    CSUB(a->c[1], b4->c[1], a->c[1]);
-    CSUB(a->c[2], b4->c[2], a->c[2]);
-#endif
+    CDIF(a->c[0], b4->c[0]);
+    CDIF(a->c[1], b4->c[1]);
+    CDIF(a->c[2], b4->c[2]);
   } END_LOOP
 }
 // -----------------------------------------------------------------
