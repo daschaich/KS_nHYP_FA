@@ -246,9 +246,8 @@ void mult_su3_mat_vec_sum(su3_matrix *a, su3_vector *b, su3_vector *c);
 
 // Note the different orders of in/out arguments b/c
 void scalar_mult_su3_vector(su3_vector *src, Real scalar, su3_vector *dest);
-void scalar_mult_sum_su3_vector(su3_vector *src1, su3_vector *src2, Real scalar);
-void scalar_mult_sub_su3_vector(su3_vector *src1, su3_vector *src2,
-                                Real scalar, su3_vector *dest);
+void scalar_mult_sub_su3_vector(su3_vector *a, su3_vector *b, Real s,
+                                su3_vector *c);
 void c_scalar_mult_su3vec(su3_vector *b, complex *phase, su3_vector *c);
 void c_scalar_mult_add_su3vec(su3_vector *c, complex *phase, su3_vector *b);
 void c_scalar_mult_sub_su3vec(su3_vector *c, complex *phase, su3_vector *b);

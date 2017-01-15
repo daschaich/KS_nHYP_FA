@@ -112,6 +112,7 @@ int main(int argc, char *argv[]) {
     rephase(ON);
   }
   normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

@@ -17,7 +17,7 @@ void mcrg_block(Real t, int blmax) {
 
   // Save the original links
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++)
+    FORALLUPDIR(dir)
       su3mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
   }
 
@@ -30,12 +30,6 @@ void mcrg_block(Real t, int blmax) {
     for (k = 0; k < nreps; k++)
      node0_printf("LOOPS %g %d %d 0 0 %.8g\n",
                   t, j, k, rr[j + k * nloop] / volume / loop_num[j]);
-  }
-
-  // Save the original links
-  FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++)
-      su3mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
   }
 
   // Checked that this reproduces the original ploop() result
@@ -75,7 +69,7 @@ void mcrg_block(Real t, int blmax) {
 
   // Restore the original links
   FORALLSITES(i, s) {
-     for (dir = XUP; dir <= TUP; dir++)
+    FORALLUPDIR(dir)
       su3mat_copy(&(s->link[dir + 8]), &(s->link[dir]));
   }
 
@@ -114,7 +108,7 @@ int main(int argc, char *argv[])  {
   dtime = -dclock();
 
   // Allocate fields used by integrator
-  for (dir = 0; dir < 4; dir++) {
+  FORALLUPDIR(dir) {
     S[dir] = malloc(sites_on_node * sizeof(su3_matrix));
     A[dir] = malloc(sites_on_node * sizeof(anti_hermitmat));
   }
@@ -220,6 +214,7 @@ int main(int argc, char *argv[])  {
   if (saveflag != FORGET)
     save_lattice(saveflag, savefile, stringLFN);
   normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

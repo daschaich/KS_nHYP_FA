@@ -93,10 +93,9 @@ void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
     // If this is the first level, then Sigma has to be initialized.
     // On later levels, we accumulate contributions
     if (sigfresh == 0)
-        scalar_mult_su3_matrix(&Gamma, alpha1, Sigma[dir]+i);
+      scalar_mult_su3_matrix(&Gamma, alpha1, Sigma[dir]+i);
     else
-        scalar_mult_add_su3_matrix(Sigma[dir] + i, &Gamma, alpha1,
-                                   Sigma[dir] + i);
+      scalar_mult_sum_su3_matrix(&Gamma, alpha1, Sigma[dir] + i);
   }
 }
 // -----------------------------------------------------------------
@@ -258,7 +257,7 @@ void nhyp_force3(int dir3, int dir2) {
                       Lambda2[dir], Lambda2[dir1], dir, dir1, EVENANDODD);
 
       FORALLSITES(i, s)
-        add_su3_matrix(Sigma[dir] + i, tempmat + i, Sigma[dir] + i);
+        sum_su3_matrix(tempmat + i, Sigma[dir] + i);
     }
   }
 }
@@ -315,10 +314,8 @@ void nhyp_force2(int dir2) {
     }
     else {
       FORALLSITES(i, s) {
-        FORALLUPDIR(dir) {
-          add_su3_matrix(SigmaH[dir] + i, SigmaH2[iimap][dir] + i,
-                         SigmaH[dir] + i);
-        }
+        FORALLUPDIR(dir)
+          sum_su3_matrix(SigmaH2[iimap][dir] + i, SigmaH[dir] + i);
       }
       nhyp_force3(dir2, dir3);
     }

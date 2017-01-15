@@ -20,7 +20,7 @@ typedef struct {
   int propinterval;         // Number of trajectories between measurements
   int startflag;            // What to do for beginning lattice
   int saveflag;             // What to do with lattice at end
-  int num_masses;           // Number of Hasenbusch masses
+  int num_masses;           // Number of masses
   Real beta, mass;          // Gauge coupling, fermion mass
   Real beta_a;              // Adjoint-to-fundamental gauge coupling
 
