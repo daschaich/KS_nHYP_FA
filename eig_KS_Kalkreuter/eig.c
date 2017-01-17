@@ -117,7 +117,7 @@ void complex_vec_mult_sub(double_complex *cc, su3_vector *vec1,
   sc.real = (Real)(cc->real);
   sc.imag = (Real)(cc->imag);
   FOREVENSITES(i, s)
-    c_scalar_mult_sub_su3vec(&(vec2[i]), (&sc), &(vec1[i]));
+    c_scalar_mult_dif_su3vec(&(vec1[i]), &sc, &(vec2[i]));
 }
 // -----------------------------------------------------------------
 
@@ -205,7 +205,7 @@ void complex_vec_mult_add(double_complex *cc, su3_vector *vec1,
   sc.real = (Real)(cc->real);
   sc.imag = (Real)(cc->imag);
   FOREVENSITES(i, s)
-    c_scalar_mult_add_su3vec(&(vec2[i]), (&sc), &(vec1[i]));
+    c_scalar_mult_sum_su3vec(&(vec1[i]), &sc, &(vec2[i]));
 }
 // -----------------------------------------------------------------
 

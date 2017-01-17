@@ -96,18 +96,18 @@ double hmom_action() {
 
 // -----------------------------------------------------------------
 double action() {
-  double ssplaq, stplaq, g_action, h_action, f_action;
+  double ssplaq, stplaq, g_act, h_act, f_act, tot;
 
   rephase(OFF);
   plaquette_a(&ssplaq, &stplaq);
   rephase(ON);
-  g_action = -beta * volume * (ssplaq + stplaq);
-  h_action = hmom_action();
-  f_action = fermion_action();
+  g_act = -beta * volume * (ssplaq + stplaq);
+  h_act = hmom_action();
+  f_act = fermion_action();
+  tot = g_act + h_act + f_act;
   node0_printf("D_ACTION: g, h, f, tot = %.8g %.8g %.8g %.8g\n",
-               g_action, h_action, f_action,
-               g_action + h_action + f_action);
-  return g_action + h_action + f_action;
+               g_act, h_act, f_act, tot);
+  return tot;
 }
 // -----------------------------------------------------------------
 

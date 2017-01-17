@@ -29,6 +29,7 @@
 //    CONJG(a, b)         b = conjg(a)
 //    CADD(a, b, c)       c = a + b
 //    CSUM(a, b)          a += b
+//    CDIF(a, b)          a -= b
 //    CSUB(a, b, c)       c = a - b
 //    CMUL(a, b, c)       c = a * b
 //    CDIV(a, b, c)       c = a / b
@@ -107,6 +108,9 @@ double_complex dce_itheta(double theta);
 
 // a += b
 #define CSUM(a, b) { (a).real += (b).real; (a).imag += (b).imag; }
+
+// a -= b
+#define CDIF(a, b) { (a).real -= (b).real; (a).imag -= (b).imag; }
 
 // c = a - b
 #define CSUB(a, b, c) { (c).real = (a).real - (b).real; \

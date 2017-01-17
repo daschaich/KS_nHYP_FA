@@ -48,7 +48,7 @@ int initial_set() {
     IF_OK status += get_i(stdin, prompt, "nflavors", &par_buf.nflavors);
 #ifdef PHI_ALGORITHM
     IF_OK if ((par_buf.nflavors % 4) != 0) {
-      printf("Error. Use phi algorithm only for multiples of four flavors\n");
+      printf("Error: Use phi algorithm only for multiples of four flavors\n");
       status++;
     }
 #endif

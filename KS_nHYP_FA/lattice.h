@@ -91,10 +91,10 @@ EXTERN Real epsilon;
 EXTERN double g_ssplaq, g_stplaq;
 EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
-EXTERN char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
+EXTERN char stringLFN[MAXFILENAME];   // ILDG LFN if applicable
 EXTERN char startfile[MAXFILENAME], savefile[MAXFILENAME];
 EXTERN int startflag; // Beginning lattice: CONTINUE, RELOAD, FRESH
-EXTERN int saveflag;  // 1 if we will save the lattice;
+EXTERN int saveflag;  // 1 if we will save the lattice
 EXTERN int total_iters;
 EXTERN int phases_in; // 1 if KS and BC phases absorbed into matrices
 

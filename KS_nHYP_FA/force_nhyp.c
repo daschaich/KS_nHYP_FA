@@ -112,18 +112,16 @@ void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
                      int dir1, int dir2, int parity) {
 
   register int i;
-  register site *st;
+  register site *s;
   msg_tag *tag0, *tag1, *tag2, *tag3, *tag4;
   msg_tag *tag5, *tag6, *tag7, *tag8, *tag9;
   su3_matrix tmat, tmat2;
-  int disp[4];    // Displacement vector for general gather
+  int disp[4] = {0, 0, 0, 0};    // Displacement vector for general gather
 
   // Loop over other directions
   // Compute force from plaquettes in the dir1, dir2 plane
 
   // Displacement vector for bb_link 2 sites away
-  FORALLUPDIR(i)
-    disp[i] = 0;
   disp[dir1] = 1;
   disp[dir2] = -1;
 
@@ -179,8 +177,8 @@ void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
   wait_gather(tag8);
   wait_general_gather(tag9);
 
-  FORSOMEPARITY(i, st, parity) {
-    // Term 1
+  FORSOMEPARITY(i, s, parity) {
+    // Term 1 -- initialize sig
     mult_su3_nn(lambda2 + i, (su3_matrix *)gen_pt[1][i], &tmat);
     mult_su3_na((su3_matrix *)gen_pt[0][i], &tmat, sig + i);
 
@@ -193,26 +191,22 @@ void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
     // Term 3
     mult_su3_nn((su3_matrix *)gen_pt[3][i],
                 (su3_matrix *)gen_pt[9][i], &tmat);
-    mult_su3_an(&tmat, (su3_matrix *)gen_pt[2][i], &tmat2);
-    add_su3_matrix(sig + i, &tmat2, sig + i);
+    mult_su3_an_sum(&tmat, (su3_matrix *)gen_pt[2][i], sig + i);
 
     // Term 4
     mult_su3_nn((su3_matrix *)gen_pt[3][i],
                 (su3_matrix *)gen_pt[4][i], &tmat);
-    mult_su3_an(&tmat, (su3_matrix *)gen_pt[7][i], &tmat2);
-    add_su3_matrix(sig + i, &tmat2, sig + i);
+    mult_su3_an_sum(&tmat, (su3_matrix *)gen_pt[7][i], sig + i);
 
     // Term 5
     mult_su3_na((su3_matrix *)gen_pt[5][i],
                 (su3_matrix *)gen_pt[1][i], &tmat);
-    mult_su3_na(&tmat, lnk1+i, &tmat2);
-    add_su3_matrix(sig + i, &tmat2, sig + i);
+    mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
 
     // Term 6
     mult_su3_na((su3_matrix *)gen_pt[0][i],
                 (su3_matrix *)gen_pt[6][i], &tmat);
-    mult_su3_na(&tmat, lnk1 + i, &tmat2);
-    add_su3_matrix(sig + i, &tmat2, sig + i);
+    mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
   }
 
   cleanup_gather(tag0);
