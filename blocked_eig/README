@@ -46,8 +46,3 @@ error_per_site 1e-6
 
 reload_serial tests/c44.d
 save_serial tests/c44.blocked
-+++
-
-DS cheats:
-make -f Make_local su3_block
-make -f Make_cluster_gcc su3_block

@@ -25,16 +25,3 @@ max_cg_restarts 1
 error_per_site 1e-8
 reload_serial tests/c4444.d
 outpat .TEST
-+++
-
-make -f Make_local su3_vacpol
-make -f Make_livermore su3_vacpol
-
-# Fermilab SciDAC libraries need special paths
-export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0b/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0b/lib:/usr/local/mvapich2-2.0b/lib64:/usr/local/ofed/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
-make -f Make_ds su3_vacpol
-
-export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0-mpiexec/bin:$PATH 
-export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0-mpiexec/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
-make -f Make_bc su3_vacpol

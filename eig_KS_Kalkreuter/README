@@ -51,15 +51,3 @@ kiters 20
 error_decr 0.3
 
 reload_serial tests/c4444.d
-+++
-
-DS cheats:
-make -f Make_local su3_eig
-make -f Make_cluster_gcc su3_eig
-make -f Make_gordon_icc su3_eig
-
-# Janus
-module load intel/intel-13.0.0
-module load slurm
-module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
-make -f Make_janus su3_eig

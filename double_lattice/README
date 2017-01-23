@@ -9,8 +9,3 @@ nz 4
 nt 4
 reload_serial tests/c44.d
 save_serial tests/c44.doubled
-+++
-
-DS cheats:
-make -f Make_local su3_double
-make -f Make_livermore_icc su3_double

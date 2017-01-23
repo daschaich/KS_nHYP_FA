@@ -17,17 +17,24 @@ The function coefficients() in coeffs.c switches between the polynomials
 
 The polynomial P(X) itself depends on the gauge field (obviously)
   P(X) psi = sum_{i = 0}^n c_i T_i(Z) psi, where
-  X = 1 - 8Omega_*^2 / (D^dag D + Omega_*^2)
+  X = 1 - 8Omega_*^2 / (Ddag D + Omega_*^2)
   Z = (2X - 1 - epsilon) / (1 - epsilon)
 We apply it using the recursive Clenshaw algorithm
-Each iterations requires that we invert D^dag D + Omega_*^2 to apply Z
+Each iterations requires that we invert Ddag D + Omega_*^2 to apply Z
 
 NOTE: Due to MILC conventions for the normalization of the Dirac operator,
-  X has a factor of 8 in the numerator instead of a factor of 2
-  The input lambda is twice the Omega in the Dirac operator
+      X has a factor of 8 in the numerator instead of a factor of 2
+      The input lambda is twice the Omega in the Dirac operator
 
 The step function is then h(x) psi = (1 - X P(X^2) ) psi / 2
 We calculate |h(X)^2 psi|^2 to get a more accurate result for the mode number
+
+The coefficients c_i in P(X) are computed offline and copied into coeffs.c
+The serial (GSL-based) code is in the polynomial directory
+  https://www.gnu.org/software/gsl/
+It finds the smallest order that satisfies the input epsilon and delta
+It is based on code kindly shared by Agostino Patella
+  http://inspirehep.net/author/profile/A.Patella.1
 
 Sample infile:
 +++
@@ -36,9 +43,9 @@ nx 4
 ny 4
 nz 4
 nt 4
-iseed 1004
+iseed 41
 
-nsmear 1
+Nsmear 1
 alpha_hyp0 0.5
 alpha_hyp1 0.5
 alpha_hyp2 0.4
@@ -53,17 +60,4 @@ max_cg_iterations 5000
 max_cg_restarts 1
 error_per_site 1e-6
 
-reload_serial tests/c44.d
-+++
-
-DS cheats:
-make -f Make_local su3_mode
-make -f Make_cluster_gcc su3_mode
-make -f Make_stampede_icc su3_mode
-make -f Make_gordon_icc su3_mode
-
-# Janus
-module load intel/intel-13.0.0
-module load slurm
-module load openmpi/openmpi-1.7.3_intel-13.0.0_ib
-make -f Make_janus su3_mode
+reload_serial config.4444

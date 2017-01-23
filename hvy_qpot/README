@@ -26,10 +26,10 @@ reload_serial tests/lat.sample
 +++
 
 The output is a bit less simple:
-First, (x+1)*(t+1) rectangular Wilson loops are tagged
+First, (x+1)*(t+1) rectangular Wilson loops are printed as
 WILS_LOOP1_1 x t value
 
-Next, the length-(t+1) off-axis loops (assuming that the spatial volumes are cubic L^3) are tagged
+Next, the length-(t+1) off-axis loops (assuming that the spatial volumes are cubic L^3) are printed as
 WILS_LOOP2_1 v t value
 v = 0 to L/2 - 1 are "45 degree" loops, r = (i + j)N, N = 1, 2, 3...
 v = L/2 to L/2 + (L/4 - 1) are "sqrt 5" loops, r = (2i + j)N, N = 1, 2, 3...

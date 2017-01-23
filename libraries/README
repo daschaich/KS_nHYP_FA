@@ -35,5 +35,3 @@ Here are the steps for making the libraries:
 3. Build complex.a and su3.a using, for example
 
       make -f Make_foo all >& make.log &
-
-

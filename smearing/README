@@ -17,13 +17,3 @@ alpha_hyp2 0.4
 reload_serial tests/c4444.d
 landau_gauge_fix
 save_serial tests/c4444.d
-+++
-
-# DS cheats
-# Fermilab SciDAC libraries need special paths
-export PATH=/home/schaich/lqcd/bin:/usr/local/mvapich2-2.0b/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/mvapich2-2.0b/lib:/usr/local/mvapich2-2.0b/lib64:/usr/local/ofed/lib:/usr/local/ofed/lib64:$LD_LIBRARY_PATH
-make -f Make_ds smear
-make -f Make_bc smear
-
-make -f Make_livermore_icc smear
