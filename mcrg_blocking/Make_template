@@ -69,9 +69,7 @@ ifeq ($(strip ${HAVEQIO}),true)
 endif
 
 # Basic set from generic_nhyp directory
-G_NHYP_OBJECTS =  \
-  nhyp.o          \
-  scalar_add.o
+G_NHYP_OBJECTS = nhyp.o
 
 # Objects depending on architecture and software package
 

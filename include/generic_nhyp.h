@@ -35,6 +35,4 @@ void compute_fhb(su3_matrix *Q, Real *f, Real b[3][3], int compute_b);
 void compute_fhb(su3_matrix *Omega, su3_matrix *Q, Real *f,
                  Real b[3][3], int compute_b);
 #endif
-void scalar_add_diag_su3(su3_matrix *a, Real s);
-void c_scalar_add_diag_su3(su3_matrix *a, complex *c);
 // -----------------------------------------------------------------

@@ -12,7 +12,7 @@ typedef struct {
   char startfile[MAXFILENAME];
 
   // Smearing parameters
-  int nsmear;
+  int Nsmear;
   Real alpha_hyp0, alpha_hyp1, alpha_hyp2;
 
   // Inversion parameters

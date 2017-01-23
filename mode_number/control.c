@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
   // Smear however many times requested
   // Print out plaquette each time (unsmeared plaquette printed by setup)
-  for (ismear = 0; ismear < nsmear; ismear++) {
+  for (ismear = 0; ismear < Nsmear; ismear++) {
     block_and_fatten();   // Smears gauge_field_thin into gauge_field
     for (dir = XUP; dir <= TUP; dir++) {
       FORALLSITES(i, s)
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     }
 
     rephase(OFF);
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     rephase(ON);
     node0_printf("Plaquettes after smearing %d: %.8g %.8g\n",
         ismear + 1, ssplaq, stplaq);

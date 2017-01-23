@@ -55,7 +55,7 @@ MY_OBJECTS = control.o        \
              congrad.o        \
              congrad_helpers.o
 
-# Basic set from generic directory (alphabetically)
+# Basic set from generic directory
 G_OBJECTS = check_unitarity.o \
             io_helpers.o      \
             io_lat4.o         \
@@ -80,8 +80,7 @@ G_KS_OBJECTS = rephase.o
 # Basic set from generic_nhyp directory
 G_NHYP_OBJECTS = nhyp.o       \
                  block_nhyp.o \
-                 switch.o     \
-                 scalar_add.o
+                 switch.o
 
 # Selection of layout
 ifeq ($(strip ${HAVEQDP}),true)

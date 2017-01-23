@@ -1,5 +1,4 @@
 #  Generic routines for all applications
-#  MIMD version 7
 #
 #  Generic make-include file for generic directory codes
 #  This template file defines rules and macros common to all applications

@@ -11,7 +11,6 @@
 G_NHYP_ALL =    \
   block_nhyp.o  \
   nhyp.o        \
-  scalar_add.o  \
   switch.o      \
   unphased_switch.o
 
@@ -45,9 +44,6 @@ boundary_flip_nhyp.o: ../generic_nhyp/boundary_flip_nhyp.c
 
 nhyp.o: ../generic_nhyp/nhyp.c
 	${CC} -c ${CFLAGS} ../generic_nhyp/nhyp.c
-
-scalar_add.o: ../generic_nhyp/scalar_add.c
-	${CC} -c ${CFLAGS} ../generic_nhyp/scalar_add.c
 
 switch.o: ../generic_nhyp/switch.c
 	${CC} -c ${CFLAGS} ../generic_nhyp/switch.c

@@ -1,0 +1,78 @@
+SU(3) with Kogut--Susskind fermions
+Stochastic mode number measurement
+Machine = Scalar processor, with 1 nodes
+nHYP links, reading alpha_smear parameters from infile
+  IR_STAB = 1e-06
+  EPS_SQ = 1e-05
+NHYP_DEBUG turned on
+start: Mon Jan 23 22:05:02 2017
+
+type 0 for no prompts or 1 for prompts
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+LAYOUT = Hypercubes, options = with fixed node_geometry
+ON EACH NODE 4 x 4 x 4 x 4
+Mallocing 0.4 MBytes per node for lattice
+Mallocing 2.2 MBytes per node for fields
+
+
+Nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+npbp 5
+order 32
+npts 5
+startomega 0
+spacing 0.5
+max_cg_iterations 5000
+max_cg_restarts 1
+error_per_site 1e-06
+reload_serial config.4444
+Restored binary gauge configuration serially from file config.4444
+Time stamp Wed Dec 31 14:07:26 1997
+Checksums 38abcb08 70225d93 OK
+Time to reload gauge configuration = 0.000154 seconds
+CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
+Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
+Time to check unitarity = 0.0003891 seconds
+Plaquettes after smearing 1: 2.8036023 2.8025315
+
+Step function Norder 32, epsilon 0.01, delta 0.000435, star 0.9633
+NU(0.5): 2.684e-13 ( 1 of 5 )
+NU(0.5): 2.795e-13 ( 2 of 5 )
+NU(0.5): 2.831e-13 ( 3 of 5 )
+NU(0.5): 2.98e-13 ( 4 of 5 )
+NU(0.5): 2.82e-13 ( 5 of 5 )
+nu(0.5): 2.8221e-13 4.748e-15 ( ave over 5 )
+NU(1): 1.532 ( 1 of 5 )
+NU(1): 4.525 ( 2 of 5 )
+NU(1): 3.336 ( 3 of 5 )
+NU(1): 2.969 ( 4 of 5 )
+NU(1): 2.026 ( 5 of 5 )
+nu(1): 2.87754 0.5229 ( ave over 5 )
+NU(1.5): 33.67 ( 1 of 5 )
+NU(1.5): 31.64 ( 2 of 5 )
+NU(1.5): 37.08 ( 3 of 5 )
+NU(1.5): 54.35 ( 4 of 5 )
+NU(1.5): 47.52 ( 5 of 5 )
+nu(1.5): 40.8494 4.343 ( ave over 5 )
+NU(2): 48.3 ( 1 of 5 )
+NU(2): 50.5 ( 2 of 5 )
+NU(2): 57.55 ( 3 of 5 )
+NU(2): 71.64 ( 4 of 5 )
+NU(2): 71.64 ( 5 of 5 )
+nu(2): 59.9281 5.021 ( ave over 5 )
+NU(2.5): 119.9 ( 1 of 5 )
+NU(2.5): 139.6 ( 2 of 5 )
+NU(2.5): 129.3 ( 3 of 5 )
+NU(2.5): 153.7 ( 4 of 5 )
+NU(2.5): 163.5 ( 5 of 5 )
+nu(2.5): 141.182 7.915 ( ave over 5 )
+RUNNING COMPLETED
+Time = 3.235 seconds
+total_iters = 51019

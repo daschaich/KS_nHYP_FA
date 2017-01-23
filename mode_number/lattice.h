@@ -68,8 +68,8 @@ typedef struct {
 
 EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
-EXTERN int npbp;            // Number of stochastic sources
 EXTERN int iseed;           // Random number seed
+EXTERN int npbp;            // Number of stochastic sources
 EXTERN int niter, nrestart;
 EXTERN Real beta, beta_a, mass, rsqmin;
 EXTERN double g_ssplaq, g_stplaq;
@@ -78,7 +78,7 @@ EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH
 EXTERN int total_iters;
-EXTERN int phases_in;   // 1 if KS and BC phases absorbed into matrices
+EXTERN int phases_in;   // 1 if KS and BC phases absorbed into links
 
 // Some of these global variables are node dependent
 // They are set in "make_lattice()"
@@ -88,11 +88,11 @@ EXTERN int odd_sites_on_node;   // Number of odd sites on this node
 EXTERN int number_of_nodes;     // Number of nodes in use
 EXTERN int this_node;           // Node number of this node
 
-EXTERN gauge_file *startlat_p;
-
-// Each node maintains a structure with
-// the pseudorandom number generator state
+// Each node maintains a structure
+// with the pseudorandom number generator state
 EXTERN double_prn node_prn;
+
+EXTERN gauge_file *startlat_p;
 
 // The lattice is a single global variable
 // (actually this is the part of the lattice on this node)
@@ -106,8 +106,8 @@ EXTERN char **gen_pt[N_POINTERS];
 EXTERN su3_matrix *gauge_field[4];
 EXTERN su3_matrix *gauge_field_thin[4];
 
-// nHYP stuff -- hyplinks, Staples, tempmat used by generic_nhyp/block_nhyp.c
-EXTERN int nsmear;
+// nHYP stuff
+EXTERN int Nsmear;
 EXTERN Real alpha_smear[3];
 EXTERN su3_matrix *hyplink1[4][4];
 EXTERN su3_matrix *hyplink2[4][4];
@@ -115,7 +115,8 @@ EXTERN su3_matrix *Staple1[4][4];
 EXTERN su3_matrix *Staple2[4][4];
 EXTERN su3_matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
+// Temporary matrices
+EXTERN su3_matrix *tempmat;
 
 // Mode number stuff
 EXTERN int Npts;
@@ -131,4 +132,3 @@ EXTERN double starSq, star;     // Ratio (Omega / Omega_*)^2 and its sqrt
 EXTERN double *coeffs;
 #endif // _LATTICE_H
 // -----------------------------------------------------------------
-

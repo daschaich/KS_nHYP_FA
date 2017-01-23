@@ -28,8 +28,6 @@ include ../Make_template_qop
 include ../Make_template_scidac
 
 LD             = ${CC}
-IMPI           =
-LMPI           =
 LIBADD         =
 INLINEOPT      = # -DINLINE # -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
@@ -83,11 +81,10 @@ endif
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 
 # Complete set of compiler flags - do not change
-CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} \
-         ${PREC} ${CLFS} ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} \
-         ${DARCH} ${IMPI}
+CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
+         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH}
 
-ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
+ILIB = ${LIBSCIDAC} ${LIBADD}
 
 check:
 	make -f Make_test check

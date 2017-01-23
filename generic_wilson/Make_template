@@ -1,5 +1,4 @@
 #  Generic routines for Wilson fermions
-#  MIMD version 7ish
 #
 #  Generic make-include file for generic_wilson codes
 #  This template file defines rules and macros common to all applications

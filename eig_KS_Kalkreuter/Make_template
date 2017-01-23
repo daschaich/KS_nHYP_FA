@@ -74,8 +74,7 @@ G_KS_OBJECTS =  \
 G_NHYP_OBJECTS =  \
   nhyp.o          \
   block_nhyp.o    \
-  switch.o        \
-  scalar_add.o
+  switch.o
 
 # Objects depending on architecture and software package
 

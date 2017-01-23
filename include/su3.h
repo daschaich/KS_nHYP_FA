@@ -56,7 +56,7 @@ typedef struct { complex e[2][2]; } su2_matrix;
 
 #define GAMMAFIVE -1    // Some integer which is not a direction
 
-// Flags for selecting M or M_adjoint
+// Flags for selecting M or Mdag
 #define PLUS 1
 #define MINUS -1
 
@@ -215,16 +215,14 @@ complex trace_su3(su3_matrix *a);
 complex complextrace_su3(su3_matrix *a, su3_matrix *b);
 complex det_su3(su3_matrix *a);
 void sub_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
-void scalar_mult_su3_matrix(su3_matrix *src, Real scalar, su3_matrix *dest);
-void scalar_mult_sub_su3_matrix(su3_matrix *src1, su3_matrix *src2,
-  Real scalar, su3_matrix *dest);
-void c_scalar_mult_su3mat(su3_matrix *src, complex *scalar,
-  su3_matrix *dest);
+void scalar_mult_su3_matrix(su3_matrix *b, Real s, su3_matrix *c);
+void scalar_mult_sub_su3_matrix(su3_matrix *a, su3_matrix *b, Real s,
+                                su3_matrix *c);
+void c_scalar_mult_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
+void scalar_add_diag_su3(su3_matrix *a, Real s);
+void c_scalar_add_diag_su3(su3_matrix *a, complex *s);
 
-// c <-- c + s * b, in "cs_m_a_mat.c"
-void c_scalar_mult_sum_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
-
-// c <-- a + s * b, in "cs_m_a_mat.c"
+// In file cs_m_a_mat.c
 void c_scalar_mult_add_su3mat(su3_matrix *a, su3_matrix *b, complex *s,
                               su3_matrix *c);
 
@@ -244,6 +242,7 @@ void clearvec(su3_vector *v);
 
 void mult_su3_mat_vec_sum(su3_matrix *a, su3_vector *b, su3_vector *c);
 
+void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
 void scalar_mult_su3_vector(su3_vector *b, Real s, su3_vector *c);
 void scalar_mult_sub_su3_vector(su3_vector *a, su3_vector *b, Real s,
                                 su3_vector *c);
@@ -258,7 +257,9 @@ void mult_su2_mat_vec_elem_n(su2_matrix *u, complex *x0, complex *x1);
 void mult_su2_mat_vec_elem_a(su2_matrix *u, complex *x0, complex *x1);
 
 Real gaussian_rand_no(double_prn *prn_pt);
+
 Real z2_rand_no(double_prn *prn_pt);
+
 #include "../include/int32type.h"
 void byterevn(int32type w[], int n);
 void byterevn64(int32type w[], int n);
@@ -374,8 +375,6 @@ Real su3_rdot(su3_vector *a, su3_vector *b);
 
 void sub_four_su3_vecs(su3_vector *a, su3_vector *b1, su3_vector *b2,
                        su3_vector *b3, su3_vector *b4);
-
-void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
 
 #endif
 // -----------------------------------------------------------------

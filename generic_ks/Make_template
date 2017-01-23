@@ -1,5 +1,4 @@
 #  Generic routines for Kogut-Susskind fermions
-#  MIMD version 7
 #
 #  Generic make-include file for generic_ks codes
 #  This template file defines rules and macros common to all applications

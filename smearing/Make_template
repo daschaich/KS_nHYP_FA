@@ -65,7 +65,6 @@ endif
 G_NHYP_OBJECTS =  \
   nhyp.o          \
   block_nhyp.o    \
-  scalar_add.o    \
   unphased_switch.o
 
 # Objects depending on architecture and software package

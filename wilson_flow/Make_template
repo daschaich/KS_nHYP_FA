@@ -65,8 +65,7 @@ ifeq ($(strip ${HAVEQIO}),true)
 endif
 
 # Basic set from generic_nhyp directory
-G_NHYP_OBJECTS = nhyp.o \
-                 scalar_add.o
+G_NHYP_OBJECTS = nhyp.o
 
 # Selection of layout
 ifeq ($(strip ${HAVEQDP}),true)

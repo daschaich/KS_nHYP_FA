@@ -73,7 +73,6 @@ G_WILSON_OBJECTS = dslash_w.o
 G_NHYP_OBJECTS =    \
   nhyp.o            \
   block_nhyp.o      \
-  scalar_add.o      \
   unphased_switch.o \
   boundary_flip_nhyp.o
 

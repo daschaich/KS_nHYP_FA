@@ -67,8 +67,7 @@ G_KS_OBJECTS = mat_invert.o  \
 # Basic set from generic_nhyp directory
 G_NHYP_OBJECTS = nhyp.o       \
                  block_nhyp.o \
-                 switch.o     \
-                 scalar_add.o
+                 switch.o
 
 # Selection of layout
 LAYOUT = layout_hyper_prime.o

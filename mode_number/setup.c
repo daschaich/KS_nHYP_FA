@@ -106,8 +106,8 @@ int readin(int prompt) {
     printf("\n\n");
     status = 0;
 
-    // Number of smearings and smearing parameters
-    IF_OK status += get_i(stdin, prompt, "nsmear", &par_buf.nsmear);
+    // Smearing parameters
+    IF_OK status += get_i(stdin, prompt, "Nsmear", &par_buf.Nsmear);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp0", &par_buf.alpha_hyp0);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp1", &par_buf.alpha_hyp1);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp2", &par_buf.alpha_hyp2);
@@ -148,7 +148,7 @@ int readin(int prompt) {
   if (par_buf.stopflag != 0)
     normal_exit(0);
 
-  nsmear = par_buf.nsmear;
+  Nsmear = par_buf.Nsmear;
   alpha_smear[0] = par_buf.alpha_hyp0;
   alpha_smear[1] = par_buf.alpha_hyp1;
   alpha_smear[2] = par_buf.alpha_hyp2;
@@ -157,7 +157,7 @@ int readin(int prompt) {
   Norder = par_buf.order;
   Npts = par_buf.npts;
   spacing = par_buf.spacing;
-  M = 0.5*par_buf.startomega;    // !!!
+  M = 0.5 * par_buf.startomega;    // !!!
   niter = par_buf.niter;
   nrestart = par_buf.nrestart;
   rsqmin = par_buf.rsqmin;
@@ -192,7 +192,7 @@ void make_fields() {
   FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
   FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
 
-  FIELD_ALLOC(tempmat1, su3_matrix);
+  FIELD_ALLOC(tempmat, su3_matrix);
 
   node0_printf("Mallocing %.1f MBytes per node for fields\n",
                (double)sites_on_node * 61 * sizeof(su3_matrix) / 1e6);

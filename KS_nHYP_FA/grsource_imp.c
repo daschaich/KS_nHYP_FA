@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Construct a gaussian random vector g_rand, and either
-//   dest = M^dag g_rand
+//   dest = Mdag g_rand
 //   dest = (M_1^dag)^{-1} M_0^dag g_rand
 // depending on which Hasenbusch level we are dealing with
 // Stripped everything we don't use (ferm_links_t, z2rsource stuff)

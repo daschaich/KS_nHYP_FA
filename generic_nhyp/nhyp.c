@@ -3,32 +3,18 @@
 
 // The general calculation in compute_RS, which follows hep-lat/0702028,
 // crashes on the following conditions
-// (1) Q has three equal eigenvalues (e.g. ordered start)
-// (2) Q has zero eigenvalue
+// 1) Q has three equal eigenvalues (e.g. ordered start)
+// 2) Q has zero eigenvalue
 
 // Here we solve this by
-// (1) add IR regulator,   Q = Omega^dag Omega + IR_STAB
-// (2) use series approx for small S (and R)
+// 1) add IR regulator,   Q = Omega^dag Omega + IR_STAB
+// 2) use series approx for small S (and R)
 // If the eigenvalues are degenerate to O(epsilon),
 // then S=O(epsilon^2) and R=O(epsilon^3).
 
 // IR_STAB and EPS_SQ must be set by the application!
 // (Typically in defines.h)
-
-// Includes and definitions
 #include "nhyp_includes.h"
-
-void dump_math(su3_matrix *Q);
-
-#ifdef NHYP_DEBUG
-#define DUMP_STUFF            \
-  printf("\nOmega is:\n\n");  \
-  dump_math(Omega);           \
-  printf("\nQ is:\n\n");      \
-  dump_math(Q);               \
-  printf("\n");               \
-  fflush(stdout);
-#endif
 
 static inline double sqr(double x) {return x * x;}
 static inline double pow3(double x) {return x * x * x;}
@@ -66,7 +52,7 @@ void compute_RS(su3_matrix *Q, double *R, double *S) {
 
 
 // -----------------------------------------------------------------
-// Computes the Cayley Hamilton coefficients for the inverse square root
+// Compute the Cayley Hamilton coefficients for the inverse square root
 //   1 / sqrt(Q) = f[0] I + f[1] Q +f[2] Q^2
 // The b[][] matrix contains the derivatives of f wrt to the traces of Q
 //   b[i][j] = d f[i] / d c[j] with c[j] = 1/(j+1) trace Q^(j+1)
@@ -103,14 +89,12 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
   // to print out simultaneously
   if (S < 0) {
     printf("NHYP_DEBUG(1): S<0\n  S = %.12e, R = %.12e, g_avr = %.12e\n",
-           S, R, g_avr );
-    DUMP_STUFF
+           S, R, g_avr);
     nhyp_debug_flag = 1;
   }
   if (g_avr < 0) {
     printf("NHYP_DEBUG(2): g_avr<0\n  S = %.12e, R = %.12e, g_avr = %.12e\n",
-           S, R, g_avr );
-    DUMP_STUFF
+           S, R, g_avr);
     nhyp_debug_flag = 1;
   }
 #endif
@@ -127,7 +111,6 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
       printf("NHYP_DEBUG(3): S=0 in general case; ");
       printf("check EPS_SQ\n  S = %.12e, R = %.12e, acos_input = %.12e\n",
              S, R, acos_input);
-      DUMP_STUFF
       nhyp_debug_flag = 1;
     }
 #endif
@@ -141,7 +124,6 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
         printf("NHYP_DEBUG_WARNING(4): acos_input > 1.00001\n");
         printf("  S = %.12e, R = %.12e, acos_input = %.12e\n",
                S, R, acos_input);
-        DUMP_STUFF
         nhyp_debug_flag = 1;
       }
 #endif
@@ -154,7 +136,6 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
         printf("NHYP_DEBUG_WARNING(4): acos_input < -1.00001\n");
         printf("  S = %.12e, R = %.12e, acos_input = %.12e\n",
                S, R, acos_input);
-        DUMP_STUFF
         nhyp_debug_flag=1;
       }
 #endif
@@ -162,10 +143,10 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
     }
 
     // Now we can safely call acos
-    theta = acos( acos_input )/3.;
+    theta = acos(acos_input) / 3.0;
     costheta = cos(theta);
-    costheta_p_23pi = cos(theta+pi23);
-    costheta_m_23pi = cos(theta-pi23);
+    costheta_p_23pi = cos(theta + pi23);
+    costheta_m_23pi = cos(theta - pi23);
 
     // Eigenvalues of Q
     g[0] = g_avr + two_sqrt_S * costheta;
@@ -179,7 +160,6 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
              S, R, acos_input);
       printf("g[0] = %.12e, g[1] = %.12e, g[2] = %.12e\n",
              g[0], g[1], g[2]);
-      DUMP_STUFF
       nhyp_debug_flag = 1;
     }
 #endif
@@ -217,8 +197,7 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
     printf("NHYP_DEBUG(6): den=0\n");
     printf("  S = %.12e, R = %.12e, g_avr = %.12e, den = %.12e\n",
            S, R, g_avr, den);
-    DUMP_STUFF
-    nhyp_debug_flag=1;
+    nhyp_debug_flag = 1;
   }
 #endif
 
@@ -252,8 +231,7 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
     printf("NHYP_DEBUG(7): den=0\n");
     printf("  S = %.12e, R = %.12e, g_avr = %.12e, den = %.12e\n",
            S, R, g_avr, den);
-    DUMP_STUFF
-    nhyp_debug_flag=1;
+    nhyp_debug_flag = 1;
   }
 #endif
 
@@ -296,29 +274,4 @@ void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
   }
 #endif
 }
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-#ifdef NHYP_DEBUG
-void dump_math(su3_matrix *Q) {
-  register int i, j;
-  printf("{");
-  for (i = 0; i < 3; i++) {
-    printf("{");
-    for (j = 0; j < 3;j++) {
-      printf("(%.4g) + I*(%.4g)", Q->e[i][j].real, Q->e[i][j].imag);
-      if(j < 2)
-        printf(",\t");
-      else {
-        if(i < 2)
-          printf("},\n");
-        else
-          printf("}}\n");
-      }
-    }
-  }
-}
-#endif
 // -----------------------------------------------------------------

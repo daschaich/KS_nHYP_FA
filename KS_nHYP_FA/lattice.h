@@ -93,10 +93,10 @@ EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char stringLFN[MAXFILENAME];   // ILDG LFN if applicable
 EXTERN char startfile[MAXFILENAME], savefile[MAXFILENAME];
-EXTERN int startflag; // Beginning lattice: CONTINUE, RELOAD, FRESH
-EXTERN int saveflag;  // 1 if we will save the lattice
+EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH
+EXTERN int saveflag;    // 1 if we will save the lattice
 EXTERN int total_iters;
-EXTERN int phases_in; // 1 if KS and BC phases absorbed into matrices
+EXTERN int phases_in;   // 1 if KS and BC phases absorbed into links
 
 // Some of these global variables are node dependent
 // They are set in "make_lattice()"
@@ -106,8 +106,8 @@ EXTERN int odd_sites_on_node;   // Number of odd sites on this node
 EXTERN int number_of_nodes;     // Number of nodes in use
 EXTERN int this_node;           // Node number of this node
 
-// Each node maintains a structure with the pseudorandom number
-// generator state
+// Each node maintains a structure
+// with the pseudorandom number generator state
 EXTERN double_prn node_prn;
 
 EXTERN gauge_file *startlat_p;
@@ -130,7 +130,7 @@ EXTERN su3_matrix *gauge_field_temp[4];
 
 // nHYP stuff
 EXTERN int Nsmear;
-EXTERN double alpha_smear[3];
+EXTERN Real alpha_smear[3];
 EXTERN su3_matrix *hyplink1[4][4];
 EXTERN su3_matrix *hyplink2[4][4];
 EXTERN su3_matrix *Sigma[4];
@@ -145,7 +145,8 @@ EXTERN su3_matrix *LambdaU[4];
 EXTERN su3_matrix *Lambda1[4];
 EXTERN su3_matrix *Lambda2[4];
 
-EXTERN su3_matrix *tempmat, *tempmat2;    // Used in Polyakov loop calculation
+// Temporary matrices
+EXTERN su3_matrix *tempmat, *tempmat2;
 
 // Up to 20 concurrent timers for timing
 #ifdef TIMING

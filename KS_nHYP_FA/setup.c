@@ -209,10 +209,8 @@ int readin(int prompt) {
     // Number of stochastic sources
     IF_OK status += get_i(stdin, prompt, "npbp", &par_buf.npbp);
 
-    // Maximum conjugate gradient iterations
+    // Maximum conjugate gradient iterations and restarts
     IF_OK status += get_i(stdin, prompt, "max_cg_iterations", &par_buf.niter);
-
-    // Maximum conjugate gradient restarts
     IF_OK status += get_i(stdin, prompt, "max_cg_restarts", &par_buf.nrestart);
 
     // Error per site for conjugate gradient
