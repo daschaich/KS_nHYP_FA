@@ -5,7 +5,7 @@ nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Mon Jan 23 22:05:50 2017
+start: Thu Jan 26 20:58:43 2017
 
 type 0 for no prompts or 1 for prompts
 nx 4
@@ -15,8 +15,8 @@ nt 4
 iseed 41
 LAYOUT = Hypercubes, options = with fixed node_geometry
 ON EACH NODE 4 x 4 x 4 x 4
-Mallocing 0.4 MBytes per node for lattice
-Mallocing 2.2 MBytes per node for fields
+Mallocing 0.4 MBytes per core for lattice
+Mallocing 2.2 MBytes per core for fields
 Using antiperiodic boundary conditions in all directions
 
 
@@ -36,14 +36,14 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.0001411 seconds
+Time to reload gauge configuration = 0.000155 seconds
 CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.000376 seconds
+Time to check unitarity = 0.0004141 seconds
 Plaquettes after smearing 1: 2.8036023 2.8025315
 
-Step function Norder 32, epsilon 0.01, delta 0.000435, star 0.9633
+Step function Norder 32 epsilon 0.01 delta 0.000435 star 0.9633
 NU(0.5): 2.985e-13 ( 1 of 5 )
 NU(0.5): 2.712e-13 ( 2 of 5 )
 NU(0.5): 2.881e-13 ( 3 of 5 )
@@ -75,5 +75,5 @@ NU(2.5): 111.3 ( 4 of 5 )
 NU(2.5): 109.4 ( 5 of 5 )
 nu(2.5): 101.121 5.02 ( ave over 5 )
 RUNNING COMPLETED
-Time = 2.16 seconds
+Time = 2.199 seconds
 total_iters = 33695

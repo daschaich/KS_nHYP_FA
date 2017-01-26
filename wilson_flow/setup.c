@@ -102,7 +102,7 @@ int readin(int prompt) {
     IF_OK status += get_f(stdin, prompt, "alpha_hyp0", &par_buf.alpha_hyp0);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp1", &par_buf.alpha_hyp1);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp2", &par_buf.alpha_hyp2);
-    // A maximum of 100 tvalues to perfom blocking should be eough
+    // A maximum of 100 tvalues to perfom blocking should be enough
     IF_OK status += get_i(stdin, prompt, "num_block", &par_buf.num_block);
     if (par_buf.num_block > 100) {
       node0_printf("ERROR: Need to recompile for num_block > 100\n");

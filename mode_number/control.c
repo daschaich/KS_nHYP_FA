@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   // Print out plaquette each time (unsmeared plaquette printed by setup)
   for (ismear = 0; ismear < Nsmear; ismear++) {
     block_and_fatten();   // Smears gauge_field_thin into gauge_field
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       FORALLSITES(i, s)
         gauge_field_thin[dir][i] = gauge_field[dir][i];
     }
@@ -45,25 +45,21 @@ int main(int argc, char *argv[]) {
     plaquette(&ssplaq, &stplaq);
     rephase(ON);
     node0_printf("Plaquettes after smearing %d: %.8g %.8g\n",
-        ismear + 1, ssplaq, stplaq);
+                 ismear + 1, ssplaq, stplaq);
   }
   node0_printf("\n");
 
-  // Load Norder and coefficients of the polynomial
-  // We copy in "star" from Agostino's code
-  // This is actually (Omega / Omega_*)^2, so we take the square root
+  // Load coefficients of the polynomial
+  // "star" is actually (Omega / Omega_*)^2, so take the square root
   coefficients();
   starSq = star;
   star = sqrt(starSq);
-  node0_printf("Step function Norder %d, epsilon %.4g, delta %.4g, ",
-               Norder, epsilon, delta);
-  node0_printf("star %.4g\n", star);
+  node0_printf("Step function Norder %d epsilon %.4g delta %.4g star %.4g\n",
+               Norder, epsilon, delta, star);
 
   // Generate and save stochastic sources
-  source = (su3_vector **)malloc(npbp * sizeof(su3_vector *));
   for (ipbp = 0; ipbp < npbp; ipbp++) {
     grsource_plain();
-    FIELD_ALLOC(source[ipbp], su3_vector);
     FORALLSITES(i, s)
       su3vec_copy(&(s->g_rand), &(source[ipbp][i]));
   }
@@ -74,13 +70,10 @@ int main(int argc, char *argv[]) {
   for (count = 0; count < Npts; count++) {
     ave = 0;
     err = 0;
-    M += spacing / 2;
+    M += spacing / 2;         // !!! Note factor of 2
 
     for (ipbp = 0; ipbp < npbp; ipbp++) {
-      //grsource_plain();    // Construct gaussian random vector g_rand
-
       // Hit gaussian random vector twice with step function
-      //step(F_OFFSET(rand[ipbp]), F_OFFSET(chi));
       FORALLSITES(i, s)
         su3vec_copy(&(source[ipbp][i]), &(s->g_rand));
 
@@ -94,7 +87,8 @@ int main(int argc, char *argv[]) {
       g_doublesum(&nu);
       ave += nu;
       err += nu * nu;
-      node0_printf("NU(%.4g): %.4g ( %d of %d )\n", 2 * M, nu, ipbp + 1, npbp);
+      node0_printf("NU(%.4g): %.4g ( %d of %d )\n",
+                   2 * M, nu, ipbp + 1, npbp);          // Note factor of 2
     }
 
     // Average measurements and standard error
@@ -102,7 +96,8 @@ int main(int argc, char *argv[]) {
     err /= npbp;
     err -= ave * ave;
     err = sqrt(err / (npbp - 1));
-    node0_printf("nu(%.4g): %.6g %.4g ( ave over %d )\n", 2 * M, ave, err, npbp);
+    node0_printf("nu(%.4g): %.6g %.4g ( ave over %d )\n",
+                 2 * M, ave, err, npbp);                // Note factor of 2
   }
   node0_printf("RUNNING COMPLETED\n");
   dtime += dclock();

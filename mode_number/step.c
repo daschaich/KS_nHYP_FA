@@ -40,7 +40,7 @@ void Z(field_offset src, field_offset dest) {
   X(F_OFFSET(R1), F_OFFSET(Xsrc));
 
   FOREVENSITES(i, s) {
-    scalar_mult_su3_vector(&(s->Xsrc), 2, &(s->Xsrc));
+    scalar_mult_su3_vector(&(s->Xsrc), 2.0, &(s->Xsrc));
     scalar_mult_add_su3_vector(&(s->Xsrc), (su3_vector *)F_PT(s, src),
                                toAdd, (su3_vector *)F_PT(s, dest));
     scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), norm,
@@ -50,11 +50,12 @@ void Z(field_offset src, field_offset dest) {
 // -----------------------------------------------------------------
 
 
+
 // -----------------------------------------------------------------
 // Clenshaw algorithm:
-// P(x)R(0) = \sum_i^n c[i]T[i]R(0) = (b[0] - xb[1])R(0);
-// where b[i] = c[i] + 2zb[i + 1] - b[i + 2], b[n] = b[n + 1] = 0;
-// so want to compute b[0]-xb[1];
+// P(x)R(0) = \sum_i^n c[i]T[i]R(0) = (b[0] - xb[1])R(0),
+// where b[i] = c[i] + 2zb[i + 1] - b[i + 2], b[n] = b[n + 1] = 0
+// So want to compute b[0] - xb[1];
 // Hard-code EVEN parity
 void clenshaw(field_offset src, field_offset dest) {
   register int i;
@@ -70,7 +71,7 @@ void clenshaw(field_offset src, field_offset dest) {
     // Now subtract bjp2.src calculated in previous iterations
     if (j < Norder - 1) {
       FOREVENSITES(i, s)
-        scalar_mult_add_su3_vector(&(s->bj), &(s->bjp2), -1, &(s->bj));
+        sub_su3_vector(&(s->bj), &(s->bjp2), &(s->bj));
     }
 
     // Finally we need 2Z(bjp1.src)
@@ -78,7 +79,7 @@ void clenshaw(field_offset src, field_offset dest) {
     if (j < Norder) {
       Z(F_OFFSET(bjp1), F_OFFSET(Zbjp1));
       FOREVENSITES(i, s)
-        scalar_mult_add_su3_vector(&(s->bj), &(s->Zbjp1), 2, &(s->bj));
+        scalar_mult_add_su3_vector(&(s->bj), &(s->Zbjp1), 2.0, &(s->bj));
     }
 
     // Now move bjp1-->bjp2 and bj-->bjp1 for next iteration
@@ -94,6 +95,7 @@ void clenshaw(field_offset src, field_offset dest) {
     sub_su3_vector(&(s->bj), &(s->Zbjp1), (su3_vector *)F_PT(s, dest));
 }
 // -----------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------

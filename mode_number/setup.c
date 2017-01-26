@@ -3,37 +3,11 @@
 #include "mode_includes.h"
 #include <string.h>
 
-int initial_set();
-void make_fields();
 #define IF_OK if (status == 0)
 
 // Each node has a params structure for passing simulation parameters
 #include "params.h"
 params par_buf;
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-int setup() {
-  int prompt;
-
-  // Print banner, get volume, seed
-  prompt = initial_set();
-  // Initialize the node source number generator
-  initialize_prn(&node_prn, iseed, volume + mynode());
-  // Initialize the layout functions, which decide where sites live
-  setup_layout();
-  // Allocate space for lattice, set up coordinate fields
-  make_lattice();
-  // Set up neighbor pointers and comlink structures
-  make_nn_gathers();
-  // Allocate space for fields
-  make_fields();
-  // Set up staggered phase vectors, boundary conditions
-  phaseset();
-  return(prompt);
-}
 // -----------------------------------------------------------------
 
 
@@ -89,6 +63,55 @@ int initial_set() {
   volume = nx * ny * nz * nt;
   total_iters = 0;
   return prompt;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Allocate all space for fields
+void make_fields() {
+  int ipbp;
+  Real size = (Real)(8.0 * sizeof(su3_matrix));
+  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
+
+  size += (Real)((4.0 + 4.0 * 12.0) * sizeof(su3_matrix));
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
+  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
+
+  size += (Real)(sizeof(su3_matrix));
+  FIELD_ALLOC(tempmat, su3_matrix);
+
+  size *= sites_on_node;
+  node0_printf("Mallocing %.1f MBytes per core for fields\n", size / 1e6);
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+int setup() {
+  int prompt;
+
+  // Print banner, get volume, seed
+  prompt = initial_set();
+  // Initialize the node source number generator
+  initialize_prn(&node_prn, iseed, volume + mynode());
+  // Initialize the layout functions, which decide where sites live
+  setup_layout();
+  // Allocate space for lattice, set up coordinate fields
+  make_lattice();
+  // Set up neighbor pointers and comlink structures
+  make_nn_gathers();
+  // Allocate space for fields
+  make_fields();
+  // Set up staggered phase vectors, boundary conditions
+  phaseset();
+  return(prompt);
 }
 // -----------------------------------------------------------------
 
@@ -153,11 +176,18 @@ int readin(int prompt) {
   alpha_smear[1] = par_buf.alpha_hyp1;
   alpha_smear[2] = par_buf.alpha_hyp2;
 
+  // Include some mallocs here (which is called after make_fields)
   npbp = par_buf.npbp;
+  source = malloc(npbp * sizeof(su3_vector *));   // Stochastic sources
+  for (ipbp = 0; ipbp < npbp; ipbp++)
+    FIELD_ALLOC(source[ipbp], su3_vector);
+
   Norder = par_buf.order;
+  coeffs = malloc((Norder + 1) * sizeof(double)); // Polynomial coefficients
+
   Npts = par_buf.npts;
   spacing = par_buf.spacing;
-  M = 0.5 * par_buf.startomega;    // !!!
+  M = 0.5 * par_buf.startomega;    // !!! Note factor of 2
   niter = par_buf.niter;
   nrestart = par_buf.nrestart;
   rsqmin = par_buf.rsqmin;
@@ -174,27 +204,5 @@ int readin(int prompt) {
   phases_in = OFF;
   rephase(ON);
   return 0;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Allocate all space for fields
-// Amount Malloced is pure guesswork/imagination
-void make_fields() {
-  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
-  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
-
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
-
-  FIELD_ALLOC(tempmat, su3_matrix);
-
-  node0_printf("Mallocing %.1f MBytes per node for fields\n",
-               (double)sites_on_node * 61 * sizeof(su3_matrix) / 1e6);
 }
 // -----------------------------------------------------------------

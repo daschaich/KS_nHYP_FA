@@ -97,10 +97,11 @@ int readin(int prompt) {
     IF_OK status += get_f(stdin, prompt, "alpha_hyp1", &par_buf.alpha_hyp1);
     IF_OK status += get_f(stdin, prompt, "alpha_hyp2", &par_buf.alpha_hyp2);
 
-    // A maximum of 100 outer nHYP smearing parameters should be plenty
+    // A maximum of MAX_ALPHA outer nHYP smearing parameters should be plenty
     IF_OK status += get_i(stdin, prompt, "num_alpha", &par_buf.num_alpha);
-    if (par_buf.num_alpha > 100) {
-      node0_printf("ERROR: Need to recompile for num_alpha > 100\n");
+    if (par_buf.num_alpha > MAX_ALPHA) {
+      node0_printf("ERROR: Need to recompile for num_alpha > %d\n",
+                   MAX_ALPHA);
       status++;
     }
     for (i = 0; i < par_buf.num_alpha; i++)

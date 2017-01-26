@@ -127,7 +127,7 @@ EXTERN su3_vector **source;
 // For now Norder selects between options hard-coded in coeffs.c
 EXTERN int Norder;
 EXTERN double epsilon;
-EXTERN double delta;    // Unused, but may be useful to record in the output
+EXTERN double delta;            // Just recorded in the output
 EXTERN double starSq, star;     // Ratio (Omega / Omega_*)^2 and its sqrt
 EXTERN double *coeffs;
 #endif // _LATTICE_H

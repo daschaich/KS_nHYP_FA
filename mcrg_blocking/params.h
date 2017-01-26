@@ -11,9 +11,10 @@ typedef struct {
   char startfile[MAXFILENAME];
 
   // Smearing parameters -- 100 alphas is probably overkill
+#define MAX_ALPHA 100
   int num_alpha;
   Real alpha_hyp1, alpha_hyp2;
-  Real alpha_mcrg[100];
+  Real alpha_mcrg[MAX_ALPHA];
 } params;
 #endif
 // -----------------------------------------------------------------

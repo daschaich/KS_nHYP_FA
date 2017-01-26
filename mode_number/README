@@ -32,7 +32,7 @@ We calculate |h(X)^2 psi|^2 to get a more accurate result for the mode number
 The coefficients c_i in P(X) are computed offline and copied into coeffs.c
 The serial (GSL-based) code is in the polynomial directory
   https://www.gnu.org/software/gsl/
-It finds the smallest order that satisfies the input epsilon and delta
+It finds the smallest Norder that satisfies the input epsilon and delta
 It is based on code kindly shared by Agostino Patella
   http://inspirehep.net/author/profile/A.Patella.1
 

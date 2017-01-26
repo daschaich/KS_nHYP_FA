@@ -13,7 +13,6 @@ void coefficients32() {
   delta = 0.000435;
   star = 0.92801041;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.3527157920184645e+00;
   coeffs[1]  = -2.1871510934428566e+00;
   coeffs[2]  =  1.4066374223699289e+00;
@@ -59,7 +58,6 @@ void coefficients36() {
   delta = 0.000225;
   star = 0.93139704;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.3527158127939387e+00;
   coeffs[1]  = -2.1871511356779809e+00;
   coeffs[2]  =  1.4066374673462714e+00;
@@ -109,7 +107,6 @@ void coefficients39() {
   delta = 0.0001125;
   star = 0.93364544;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.3527158157508596e+00;
   coeffs[1]  = -2.1871511418603209e+00;
   coeffs[2]  =  1.4066374739460681e+00;
@@ -162,7 +159,6 @@ void coefficients46() {
   delta = 0.000435;
   star = 0.94868758;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.5714711569361342e+00;
   coeffs[1]  = -2.6126986917631858e+00;
   coeffs[2]  =  1.8042951883234575e+00;
@@ -222,7 +218,6 @@ void coefficients50() {
   delta = 0.000225;
   star = 0.9504348;
 
-  coeffs = malloc((Norder + 1) * sizeof(double)); 
   coeffs[0]  =  2.5714711722648995e+00;
   coeffs[1]  = -2.6126987228433518e+00;
   coeffs[2]  =  1.8042952201892231e+00;
@@ -286,7 +281,6 @@ void coefficients65(){
   delta = 0.00045;
   star = 0.96332273;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.7910322455938661e+00;
   coeffs[1]  = -3.0447857940481207e+00;
   coeffs[2]  =  2.2193756732092811e+00;
@@ -365,7 +359,6 @@ void coefficients71() {
   delta = 0.000225;
   star = 0.96465871;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]  =  2.7910322616016843e+00;
   coeffs[1]  = -3.0447858262631895e+00;
   coeffs[2]  =  2.2193757063030897e+00;
@@ -450,7 +443,6 @@ void coefficients101() {
   delta = 0.000520;
   star = 0.97641279;
 
-  coeffs = malloc((Norder + 1) * sizeof(double));
   coeffs[0]   =  3.0819606827975017e+00;
   coeffs[1]   = -3.6217000236525627e+00;
   coeffs[2]   =  2.7839604432372682e+00;

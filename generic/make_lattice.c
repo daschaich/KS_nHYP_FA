@@ -11,7 +11,7 @@ void make_lattice() {
   int x, y, z, t;
 
   // Allocate space for lattice
-  node0_printf("Mallocing %.1f MBytes per node for lattice\n",
+  node0_printf("Mallocing %.1f MBytes per core for lattice\n",
                (double)sites_on_node * sizeof(site) / 1e6);
   lattice = malloc(sites_on_node * sizeof(*lattice));
   if (lattice == NULL) {
