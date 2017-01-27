@@ -33,18 +33,18 @@ void X(field_offset src, field_offset dest) {
 void Z(field_offset src, field_offset dest) {
   register int i;
   register site *s;
-  double toAdd = -1.0 - epsilon;
-  double norm = 1.0 / (1.0 - epsilon);
+  Real scale = 2.0 / (1.0 - epsilon);
+  Real toAdd = (-1.0 - epsilon) / (1.0 - epsilon);
 
-  X(src, F_OFFSET(R1));
-  X(F_OFFSET(R1), F_OFFSET(Xsrc));
+  X(src, F_OFFSET(Xsrc));
+  X(F_OFFSET(Xsrc), dest);
 
   FOREVENSITES(i, s) {
-    scalar_mult_su3_vector(&(s->Xsrc), 2.0, &(s->Xsrc));
-    scalar_mult_add_su3_vector(&(s->Xsrc), (su3_vector *)F_PT(s, src),
-                               toAdd, (su3_vector *)F_PT(s, dest));
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), norm,
+    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), scale,
                            (su3_vector *)F_PT(s, dest));
+    // !!! Note unusual order of arguments
+    scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+                               (su3_vector *)F_PT(s, src), toAdd);
   }
 }
 // -----------------------------------------------------------------
@@ -99,7 +99,7 @@ void clenshaw(field_offset src, field_offset dest) {
 
 
 // -----------------------------------------------------------------
-// Step function approximated by h(x) = [1 - xp(x)^2] / 2
+// Step function approximated by h(X) = [1 - X p(X)^2] / 2
 // Hard-code EVEN parity
 void step(field_offset src, field_offset dest) {
   register int i;
