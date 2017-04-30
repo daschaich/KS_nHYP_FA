@@ -6,12 +6,12 @@
 
 
 // -----------------------------------------------------------------
-// dest = src - 8M^2 (DD^dag + 4M^2)^{-1} src
+// dest = src - 8M^2 (DD^dag + 4M^2)^(-1) src
 // Hard-code EVEN parity in inverse
 void X(field_offset src, field_offset dest) {
   register int i;
   register site *s;
-  Real MSq_x2 = -8 * M * M / starSq;
+  Real MSq_x2 = -8.0 * M * M / starSq;
 
   // psi = (DD^dag + 4M^2)^{-1} src
   clear_latvec(F_OFFSET(psi), EVENANDODD);    // Zero initial guess
@@ -36,6 +36,10 @@ void Z(field_offset src, field_offset dest) {
   Real scale = 2.0 / (1.0 - epsilon);
   Real toAdd = (-1.0 - epsilon) / (1.0 - epsilon);
 
+  // This is more compact, but the subtraction in X(src)
+  // seems to leave it relatively poorly conditioned,
+  // increasing CG iterations by almost 10% even for a small 4nt4 test
+  // (compared to inverting twice on src itself)
   X(src, F_OFFSET(Xsrc));
   X(F_OFFSET(Xsrc), dest);
 
@@ -53,9 +57,8 @@ void Z(field_offset src, field_offset dest) {
 
 // -----------------------------------------------------------------
 // Clenshaw algorithm:
-// P(x)R(0) = \sum_i^n c[i]T[i]R(0) = (b[0] - xb[1])R(0),
+// P(X) src = sum_i^n c[i] T[i] src = (b[0] - X b[1]) src,
 // where b[i] = c[i] + 2zb[i + 1] - b[i + 2], b[n] = b[n + 1] = 0
-// So want to compute b[0] - xb[1];
 // Hard-code EVEN parity
 void clenshaw(field_offset src, field_offset dest) {
   register int i;

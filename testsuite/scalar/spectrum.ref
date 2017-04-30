@@ -1,0 +1,126 @@
+SU(3) with Kogut--Susskind fermions
+S4b phase order parameter measurement
+Machine = QMP (portable), with 1 nodes
+nHYP links, reading alpha_smear parameters from infile
+  IR_STAB = 1e-06
+  EPS_SQ = 1e-05
+NHYP_DEBUG turned on
+start: Sun Apr 30 09:05:54 2017
+
+type 0 for no prompts or 1 for prompts
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+LAYOUT = Hypercubes, options = hyper_prime,
+QMP with automatic hyper_prime layout
+ON EACH NODE 4 x 4 x 4 x 4
+Mallocing 0.5 MBytes per core for lattice
+Mallocing 2.2 MBytes per node for fields
+
+
+mass 0.01
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+source_start 0
+source_inc 2
+n_sources 2
+max_cg_iterations 500
+max_cg_restarts 1
+error_per_site 1e-05
+reload_serial config.4444
+Restored binary gauge configuration serially from file config.4444
+Time stamp Wed Dec 31 14:07:26 1997
+Checksums 38abcb08 70225d93 OK
+Time to reload gauge configuration = 0.0147 seconds
+CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
+Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
+Time to check unitarity = 0.001182 seconds
+GFIX: Ended at step 21. Av gf action 9.15459776e-01, delta 1.309e-06
+
+ANTIPERIODIC BC in time direction
+fpi_2: t_src = 0, num_sourcevecs = 3
+fpi_2: t_src = 2, num_sourcevecs = 3
+STARTPROP
+MASSES:  1.00000e-02   1.00000e-02
+SOURCE: RANDOM_WALL
+SINKS: POINT_KAON_5 WALL_KAON_5
+0 5.364232e-03 0.000000e+00 2.158498e-03 0.000000e+00
+1 3.143469e-03 0.000000e+00 1.298173e-02 0.000000e+00
+2 2.510643e-04 0.000000e+00 6.451034e-04 0.000000e+00
+3 3.254067e-03 0.000000e+00 1.320035e-02 0.000000e+00
+ENDPROP
+STARTPROP
+MASSES:  1.00000e-02   1.00000e-02
+SOURCE: FULL_WALL
+SINKS: POINT_KAON_5 WALL_KAON_5
+0 1.362584e-03 0.000000e+00 2.039200e-02 0.000000e+00
+1 1.620998e-02 0.000000e+00 9.676139e-01 0.000000e+00
+2 1.240085e-03 0.000000e+00 1.630225e-02 0.000000e+00
+3 1.630716e-02 0.000000e+00 9.718347e-01 0.000000e+00
+ENDPROP
+spectrum(): source time = 0
+spectrum(): source time = 2
+STARTPROP
+MASSES:  1.000000e-02   1.000000e-02
+SOURCE: CORNER
+SINKS: PION_PS PION_SC RHO_VT RHO_PV
+0 4.687865e-01 0.0 -4.626525e-01 0.0 4.468938e-01 0.0 -4.292361e-01 0.0
+1 6.150537e+00 0.0 6.150157e+00 0.0 1.769450e+01 0.0 1.769415e+01 0.0
+2 4.817212e-01 0.0 -4.815849e-01 0.0 4.473854e-01 0.0 -4.470795e-01 0.0
+3 6.208896e+00 0.0 6.208599e+00 0.0 1.787680e+01 0.0 1.787653e+01 0.0
+ENDPROP
+STARTPROP
+MASSES:  1.000000e-02   1.000000e-02  1.000000e-02
+SOURCE: CORNER
+SINKS: NUCLEON
+0 1.099848e-05 0.0
+1 9.894152e-01 0.0
+2 5.719718e-10 0.0
+3 1.002239e+00 0.0
+ENDPROP
+nl_spectrum(): source time = 0
+nl_spectrum(): source time = 2
+STARTPROP
+MASSES:   1.000000e-02  1.000000e-02
+SOURCE: EVEN_WALL
+SINKS: PION_PS PION_SC
+0 1.188433e-01 0.0 -1.172529e-01 0.0
+1 1.574354e+00 0.0 1.574261e+00 0.0
+2 1.174033e-01 0.0 -1.173550e-01 0.0
+3 1.565473e+00 0.0 1.565379e+00 0.0
+ENDPROP
+STARTPROP
+MASSES:  1.000000e-02   1.000000e-02  1.000000e-02
+SOURCE: EVEN_WALL
+SINKS: NUCLEON
+0 1.813146e-07 0.0
+1 1.802003e-02 0.0
+2 -1.891993e-10 0.0
+3 1.621166e-02 0.0
+ENDPROP
+STARTPROP
+MASSES:   1.000000e-02  1.000000e-02
+SOURCE: EVENANDODD_WALL
+SINKS: PION_PS PION_SC PION_i5 PION_ij
+0 5.236814e-01 0.0 -2.586702e-01 0.0 2.863973e-01 0.0 -2.802239e-01 0.0
+1 6.222545e+00 0.0 3.111083e+00 0.0 5.951721e+00 0.0 5.951504e+00 0.0
+2 4.761441e-01 0.0 -2.379821e-01 0.0 2.497087e-01 0.0 -2.496204e-01 0.0
+3 6.263638e+00 0.0 3.131647e+00 0.0 5.976592e+00 0.0 5.976423e+00 0.0
+ENDPROP
+STARTPROP
+MASSES:  1.000000e-02   1.000000e-02  1.000000e-02
+SOURCE: EVENANDODD_WALL
+SINKS: NUCLEON DELTA
+0 3.402504e-05 0.0 5.250209e-04 0.0
+1 1.803120e-02 0.0 7.109950e-01 0.0
+2 9.140854e-06 0.0 -3.996060e-06 0.0
+3 1.620776e-02 0.0 7.135078e-01 0.0
+ENDPROP
+RUNNING COMPLETED
+Time = 0.1082 seconds
+total_iters = 1095
+

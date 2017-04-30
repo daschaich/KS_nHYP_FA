@@ -3,7 +3,7 @@
 // Go to eighth order in the exponential of the momentum matrices,
 // since higher order integrators use large steps
 // Evaluation is done as:
-//   exp(H) * U = ( 1 + H + H^2/2 + H^3/6 ...) * U
+//   exp(H) * U = (1 + H + H^2/2 + H^3/6 ...) * U
 //              = U + H*(U + (H/2)*(U + (H/3)*( ... )))
 #include "ks_dyn_includes.h"
 // -----------------------------------------------------------------
@@ -27,7 +27,7 @@ void update_u(Real eps) {
   t8 = eps / 8.0;
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       uncompress_anti_hermitian(&(s->mom[dir]), &htemp);
       link = &(s->link[dir]);
 

@@ -119,7 +119,6 @@ EXTERN su3_matrix *Staple1[4][4];
 EXTERN su3_matrix *Staple2[4][4];
 EXTERN su3_matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
-EXTERN su3_matrix *tempmat2;    // Used in Polyakov loop calculation
-#endif // _LATTICE_H
+EXTERN su3_matrix *tempmat, *tempmat2;
+#endif
 // -----------------------------------------------------------------

@@ -160,7 +160,7 @@ double fermion_force(int level, Real eps) {
     tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
                              XUP, EVENANDODD, gen_pt[0]);
 
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       // For all sites, gather psi[j][level]
       tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(su3_vector),
                                dir, EVENANDODD, gen_pt[1]);
@@ -193,7 +193,7 @@ double fermion_force(int level, Real eps) {
     tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
                              XUP, EVEN, gen_pt[0]);
 
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       // For odd sites, gather psi[j][level]
       tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(su3_vector),
                                dir, ODD, gen_pt[1]);
@@ -223,7 +223,7 @@ double fermion_force(int level, Real eps) {
   leanlinks();  // Restore the thin links
 
   // Multiply a HYP field dagger from the left on the force
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     FORALLSITES(i, st) {
       mult_su3_an(gauge_field[dir] + i, Sigma[dir] + i, &tmat);
       su3mat_copy(&tmat, Sigma[dir] + i);
@@ -237,14 +237,14 @@ double fermion_force(int level, Real eps) {
     // Save j-1-smeared links in gauge_field_temp
     block_N_fatten(j - 1);
     leanlinks();
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       FORALLSITES(i, st)
         su3mat_copy(gauge_field[dir] + i, gauge_field_temp[dir] + i);
     }
 
     block_N_fatten(j);   // gauge_field holds j-smeared links
     // gauge_field_thin receives j-1-smeared links from gauge_field_temp
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       FORALLSITES(i, st)
         su3mat_copy(gauge_field_temp[dir] + i, gauge_field_thin[dir] + i);
     }
@@ -252,7 +252,7 @@ double fermion_force(int level, Real eps) {
     nhyp_force1();
 
     // Restore unsmeared links to gauge_field_thin
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       FORALLSITES(i, st)
         su3mat_copy(gauge_field_save[dir] + i, gauge_field_thin[dir] + i);
     }
@@ -269,7 +269,7 @@ double fermion_force(int level, Real eps) {
   }
 
   // Finally we can update the momenta
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     FORALLSITES(i, st) {
       uncompress_anti_hermitian(&(st->mom[dir]), &tmat2);
       mult_su3_nn(gauge_field_thin[dir] + i, Sigma[dir] + i, &tmat);

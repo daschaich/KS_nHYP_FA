@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
       step(F_OFFSET(g_rand), F_OFFSET(chi));
       step(F_OFFSET(chi), F_OFFSET(R2));
 
-      // Take the norm to produce nu(omega)
+      // Take the norm to obtain nu(omega)
       nu = 0;
       FOREVENSITES(i, s)
         nu += (double)magsq_su3vec(&(s->R2));

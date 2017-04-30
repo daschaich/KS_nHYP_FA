@@ -1,27 +1,27 @@
 # ------------------------------------------------------------------
-MAKEFILE = Make_cluster_gcc
+MAKEFILE = Make_mpi
 
 MPP            = true
 PRECISION      = 2
 CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
-OPT            = -O3 -Wall -fno-strict-aliasing
+OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
 CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                # Large files gcc only
-MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o io_romio.o)
+MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
 
 WANTQOP        =
 WANTQDP        =
-WANTQIO        =
-WANTQMP        =
+WANTQIO        = true
+WANTQMP        = true
 
-SCIDAC         =
-QIOSNG         = # $(SCIDAC)/qio-single
-QIOPAR         = # $(SCIDAC)/qio
-QMPSNG         = # ${SCIDAC}/qmp-single
-QMPPAR         = # ${SCIDAC}/qmp
+SCIDAC         = /nfs/beowulf03/schaich/lqcd/install
+QIOSNG         =
+QIOPAR         = $(SCIDAC)/qio
+QMPSNG         =
+QMPPAR         = ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
+QOP            = # ${SCIDAC}/qopqdp
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
@@ -29,7 +29,7 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = #-DINLINE # -DSSE_GLOBAL_INLINE
+INLINEOPT      = # -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =
@@ -43,8 +43,9 @@ CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
                  ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
                  ${KSFFMULTI} ${KSRHMCINT}
 
-MAKELIBRARIES  = Make_vanilla
-# Also check include/config.h.
+MAKELIBRARIES  = Make_mpi
+
+# Also check include/config.h
 # ------------------------------------------------------------------
 
 
@@ -70,19 +71,18 @@ else
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 
 # Complete set of compiler flags - do not change
-CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} \
-	${PREC} ${CLFS} ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} \
-	${IMPI}
+CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
+         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} ${IMPI}
 
 ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
 
