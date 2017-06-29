@@ -53,6 +53,10 @@ int main(int argc, char **argv) {
   iters += spectrum2(mass, F_OFFSET(chi), F_OFFSET(psi));
   iters += nl_spectrum(mass, F_OFFSET(chi), F_OFFSET(psi),
                        F_OFFSET(tempmat1), F_OFFSET(tempmat2));
+
+  // More pseudoscalar tastes...
+  iters += spectrum_nlpi2(mass, mass);
+
   leanlinks();
   fflush(stdout);
 

@@ -42,16 +42,17 @@ typedef struct {
   su3_vector p;                 // CG change vector
   su3_vector mp;                // CG temporary vector
   su3_vector r;                 // CG residual vector
-  su3_vector ttt1[1];           // For ../generic_ks/mat_invert.c
+  su3_vector ttt;               // For ../generic_ks/mat_invert.c
+                                // and ../generic_ks/flavor_ops.c
   su3_vector M_inv;
 
   // Spectrum stuff
-  su3_vector quark_source;      // For ../generic_ks/fpi_2.c
+  su3_vector prop, aprop;       // For ../generic_ks/spectrum_nlpi2.c
   su3_vector propmat[3];        // For three source colors
-  su3_vector propmat2[3];       // For three source colors
+  su3_vector propmat2[3];       // For three source colors in nl_spectrum.c
 
   // Temporary vectors and matrices -- for gauge fixing, spectrum
-  su3_vector tempvec[4];  // One for each direction
+  su3_vector tempvec[4];        // One for each direction
   su3_matrix tempmat1, tempmat2, staple;
 } site;
 // -----------------------------------------------------------------

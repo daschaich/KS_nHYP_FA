@@ -64,7 +64,10 @@ endif
 G_KS_OBJECTS = fpi_2.o       \
                nl_spectrum.o \
                rephase.o     \
-               spectrum2.o
+               spectrum2.o   \
+               mat_invert.o  \
+               flavor_ops.o  \
+               spectrum_nlpi2.o
 
 # Basic set from generic_nhyp directory
 G_NHYP_OBJECTS = nhyp.o       \

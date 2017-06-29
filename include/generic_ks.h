@@ -451,7 +451,6 @@ void sym_shift(int dir, field_offset src,field_offset dest);
 void zeta_shift(int n, int *d, field_offset src, field_offset dest);
 void eta_shift(int n, int *d, field_offset src, field_offset dest);
 
-
 void mult_flavor_vector(int mu, field_offset src, field_offset dest);
 void mult_flavor_tensor(int mu, int nu, field_offset src, field_offset dest);
 void mult_flavor_pseudovector(int mu, field_offset src, field_offset dest);
@@ -584,11 +583,8 @@ int spectrum_multimom(Real dyn_mass, Real low_mass, Real mass_inc,
 int spectrum_nd(Real mass1, Real mass2, Real tol,
      ferm_links_t *fn);
 
-/* spectrum_nlpi2.c */
-int spectrum_nlpi2(Real qmass, Real amass, field_offset temp, Real tol,
-        ferm_links_t *fn);
-void mult_rho0(int fdir, field_offset src, field_offset dest);
-void mult_rhos(int fdir, field_offset src, field_offset dest);
+// spectrum_nlpi2.c -- stripped ferm_links_t
+int spectrum_nlpi2(Real fmass, Real amass);
 
 /* spectrum_singlets */
 int spectrum_singlets(Real mass, Real tol, field_offset temp_offset,

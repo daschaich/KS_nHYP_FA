@@ -319,6 +319,7 @@ void sum_su3_matrix(su3_matrix *b, su3_matrix *c);
 void add_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 
 // In file addvec.c
+void sum_su3_vector(su3_vector *b, su3_vector *c);
 void add_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
 
 Real magsq_su3vec(su3_vector *a);
@@ -362,10 +363,11 @@ void scalar_mult_sum_su3_matrix(su3_matrix *b, Real s, su3_matrix *c);
 
 // c <-- a + s * b, in "s_m_a_mat.c"
 void scalar_mult_add_su3_matrix(su3_matrix *src1, su3_matrix *src2,
-  Real scalar, su3_matrix *dest);
+                                Real scalar, su3_matrix *dest);
 
+void scalar_mult_sum_su3_vector(su3_vector *dest, su3_vector *src, Real s);
 void scalar_mult_add_su3_vector(su3_vector *src1, su3_vector *src2,
-  Real scalar, su3_vector *dest);
+                                Real s, su3_vector *dest);
 
 #ifndef su3_projector
 void su3_projector(su3_vector *a, su3_vector *b, su3_matrix *c);

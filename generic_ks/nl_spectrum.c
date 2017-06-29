@@ -3,10 +3,11 @@
 // For measuring propagation IN THE T DIRECTION
 // With correct t offset in E_MES_PRO.  Now reported as E_PI_PRO
 
-// Spectrum for Kogut-Susskind nonlocal hadrons, including delta
+// Spectrum for Kogut--Susskind nonlocal hadrons, including delta
 // pion, and a few local ones for checking.  Uses E and O wall sources
 // This version does arbitrary number of wall sources
-// This version DOES NOT FIX THE GAUGE.  MUST BE DONE BEFORE CALLING!!
+
+// Coulomb gauge should be fixed before calling this routine
 
 // Stuck CG wrappers in this directory
 #include "../ks_spectrum/spectrum_includes.h"
@@ -16,10 +17,13 @@
 #define NL_PI_DIR ZUP  /* Defines direction for non-local pi propagator */
                        /* This direction depends on the choice of KS */
                        /* phase! */
+// -----------------------------------------------------------------
 
 
-/* Returns the lattice coordinate at site i in the direction dir */
-short get_coord(int i,int dir) {
+
+// -----------------------------------------------------------------
+// Return the lattice coordinate at site i in the direction dir
+short get_coord(int i, int dir) {
   switch (dir) {
     case XUP:   return(lattice[i].x);
     case YUP:   return(lattice[i].y);
@@ -30,45 +34,45 @@ short get_coord(int i,int dir) {
     case ZDOWN: return(lattice[i].z);
     case TDOWN: return(lattice[i].t);
   }
-  return -1;  /* Error */
+  return -1;    // Error
 }
+// -----------------------------------------------------------------
 
-void accum_delta_prop(int i,int c[3], field_offset tempmat1)
-     /* Load a determinant for the calculation of the delta propagator */
-     /* Each column of the determinant is the symmetrically shifted   */
-     /* "q" propagator.  Each column has a differenct shift direction */
-     /* Each column also corresponds to a different source wall color */
-     /* as specified by the color vector c                            */
-     /* Result is put in tempmat1 */
-{
-  int j=-1,dir;
-  su3_matrix *af, *ab;
+
+
+// -----------------------------------------------------------------
+/* Load a determinant for the calculation of the delta propagator */
+/* Each column of the determinant is the symmetrically shifted   */
+/* "q" propagator.  Each column has a differenct shift direction */
+/* Each column also corresponds to a different source wall color */
+/* as specified by the color vector c                            */
+/* Result is put in tempmat1 */
+void accum_delta_prop(int i,int c[3], field_offset tempmat1) {
   register su3_matrix *tmp1;
+  int j = -1, dir;
+  su3_matrix *af, *ab;
 
-
-  FORALLUPDIRBUT(TUP,dir)
-    {
-      /* For timeward propagation, this step is pedantic */
-      /* since we could simply take j = dir */
-      /* but for spacelike propagation, it is necessary */
-      switch (dir)
-  {
-  case XUP: j = 0; break;
-  case YUP: j = 1; break;
-  case ZUP: j = 2;
-  }
-
-      /* gen_pt points to the "q" propagator on the next neighbor    */
-      af = (su3_matrix *)gen_pt[dir][i];
-      ab = (su3_matrix *)gen_pt[dir+4][i];
-      tmp1 = (su3_matrix *)F_PT(&lattice[i],tempmat1);
-      su3vec_copy( (su3_vector *)(af->e[c[j]]),
-       (su3_vector *)(tmp1->e[j]) );
-      add_su3_vector( (su3_vector *)(ab->e[c[j]]),
-         (su3_vector *)(tmp1->e[j]),
-         (su3_vector *)(tmp1->e[j]) );
-
+  FORALLUPDIRBUT(TUP, dir) {
+    /* For timeward propagation, this step is pedantic */
+    /* since we could simply take j = dir */
+    /* but for spacelike propagation, it is necessary */
+    switch (dir) {
+      case XUP: j = 0; break;
+      case YUP: j = 1; break;
+      case ZUP: j = 2;
     }
+
+    /* gen_pt points to the "q" propagator on the next neighbor    */
+    af = (su3_matrix *)gen_pt[dir][i];
+    ab = (su3_matrix *)gen_pt[dir+4][i];
+    tmp1 = (su3_matrix *)F_PT(&lattice[i], tempmat1);
+    su3vec_copy((su3_vector *)(af->e[c[j]]),
+        (su3_vector *)(tmp1->e[j]));
+    add_su3_vector((su3_vector *)(ab->e[c[j]]),
+        (su3_vector *)(tmp1->e[j]),
+        (su3_vector *)(tmp1->e[j]));
+
+  }
 }
 
 void delta_prop(int c0,int c1,int c2,int perm,int t,double *delprop,
@@ -78,7 +82,7 @@ void delta_prop(int c0,int c1,int c2,int perm,int t,double *delprop,
      /* perm specifies the sign of the contribution to be calculated */
 {
   register int i;
-  register complex cc;
+  register complex tc;
   int x,y,z;
   int c[3];
 
@@ -87,19 +91,20 @@ void delta_prop(int c0,int c1,int c2,int perm,int t,double *delprop,
   c[2] = c2;
 
   for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
-      if ( node_number(x,y,z,t) != mynode() )continue;
-      i=node_index(x,y,z,t);
+    if (node_number(x, y, z, t) != mynode())
+      continue;
+    i = node_index(x, y, z, t);
 
-      /*  Calculate for the cube origin only */
+    /*  Calculate for the cube origin only */
+    accum_delta_prop(i, c, tempmat1);
 
-      accum_delta_prop(i,c,tempmat1);
+    tc = det_su3((su3_matrix *)F_PT(&lattice[i], tempmat1));
 
-      cc = det_su3( (su3_matrix *)F_PT(&lattice[i],tempmat1) );
-
-      if (perm>0)*delprop += cc.real;
-      else      *delprop -= cc.real;
-
-    }
+    if (perm > 0)
+      *delprop += tc.real;
+    else
+      *delprop -= tc.real;
+  }
 }
 
 void accum_nl_meson_prop(int i,int dir,
@@ -118,93 +123,96 @@ void accum_nl_meson_prop(int i,int dir,
   af = (su3_matrix *)gen_pt[dir][i];
   ab = (su3_matrix *)gen_pt[dir+4][i];
   dstq = (su3_matrix *)F_PT(&lattice[i],destq);
-  su3mat_copy( af, dstq );
-  add_su3_matrix( ab, dstq, dstq);
+  su3mat_copy(af, dstq);
+  add_su3_matrix(ab, dstq, dstq);
 
   /* gen_pt[8+dir] points to the "o" propagator      */
   /* desto <- D_dir o                       */
   af = (su3_matrix *)gen_pt[8+dir][i];
   ab = (su3_matrix *)gen_pt[8+dir+4][i];
   dsto = (su3_matrix *)F_PT(&lattice[i],desto);
-  su3mat_copy( af, dsto);
-  add_su3_matrix( ab, dsto, dsto);
+  su3mat_copy(af, dsto);
+  add_su3_matrix(ab, dsto, dsto);
 
 }
 
-void nl_meson_prop (int t,double *nlpiprop,double *nlpi2prop,
-        double *ckpiprop,double *ckpi2prop,
-        field_offset tempmat1, field_offset tempmat2)
-     /* Calculates non-local pion propagator pi_3 and pi_3 tilde */
-     /* and local pion propagators for a check */
-     /* tempmat1 and tempmat2 are scratch space of size su3_matrix each */
-{
-  int x,y,z,i,icol;
-  int coord;
+/* Calculate non-local pion propagator pi_3 and pi_3 tilde */
+/* and local pion propagators for a check */
+/* tempmat1 and tempmat2 are scratch space of size su3_matrix each */
+void nl_meson_prop (int t, double *nlpiprop, double *nlpi2prop,
+                    double *ckpiprop, double *ckpi2prop,
+                    field_offset tempmat1, field_offset tempmat2) {
   register su3_matrix *tmp1, *tmp2;
+  int x, y, z, i, icol, coord;
+  complex tc;
 
-  complex cc;
-  /* Sum over all x,y z              */
+  // Sum over all x, y, z
   for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++) {
-    if ( node_number(x,y,z,t) != mynode() )continue;
-    i=node_index(x,y,z,t);
+    if (node_number(x,y,z, t) != mynode())continue;
+    i=node_index(x,y,z, t);
 
-    coord = get_coord(i,NL_PI_DIR);
-    if (coord%2 == 0)accum_nl_meson_prop(i,NL_PI_DIR,tempmat1,tempmat2);
+    coord = get_coord(i, NL_PI_DIR);
+    if (coord % 2 == 0)
+      accum_nl_meson_prop(i,NL_PI_DIR, tempmat1, tempmat2);
 
     for (icol=0;icol<3;icol++) {
 
       /* Calculate non-local propagator only on even coordinate */
 
       if (coord%2 ==0) {
-  /* propmat contains "q" and tempmat1 contains "Dq" */
-  /* q^adj D q  */
-  tmp1 = (su3_matrix *)F_PT(&lattice[i],tempmat1);
-  cc = su3_dot( &lattice[i].propmat[icol],
-          (su3_vector *)(tmp1->e[icol]) );
-  *nlpiprop += cc.real;
+        /* propmat contains "q" and tempmat1 contains "Dq" */
+        /* q^adj D q  */
+        tmp1 = (su3_matrix *)F_PT(&lattice[i], tempmat1);
+        tc = su3_dot(&lattice[i].propmat[icol],
+                     (su3_vector *)(tmp1->e[icol]));
+        *nlpiprop += tc.real;
 
-  /* propmat2 contains "o" and tempmat2 contains "Do" */
-  /* q^adj D q - o^adj D o  */
-  tmp2 = (su3_matrix *)F_PT(&lattice[i],tempmat2);
-  cc = su3_dot( &(lattice[i].propmat2[icol]),
-          (su3_vector *)(tmp2->e[icol]) );
-  *nlpiprop -= cc.real;
+        /* propmat2 contains "o" and tempmat2 contains "Do" */
+        /* q^adj D q - o^adj D o  */
+        tmp2 = (su3_matrix *)F_PT(&lattice[i], tempmat2);
+        tc = su3_dot(&(lattice[i].propmat2[icol]),
+                     (su3_vector *)(tmp2->e[icol]));
+        *nlpiprop -= tc.real;
 
-  /* o^adj D q          */
-  cc = su3_dot( &lattice[i].propmat2[icol],
-          (su3_vector *)(tmp1->e[icol]) );
+        /* o^adj D q          */
+        tc = su3_dot(&lattice[i].propmat2[icol],
+                     (su3_vector *)(tmp1->e[icol]));
 
-  if ((x+y+z)%2 == 0)*nlpi2prop += cc.real;
-  else              *nlpi2prop -= cc.real;
+        if ((x + y + z) % 2 == 0)
+          *nlpi2prop += tc.real;
+        else
+          *nlpi2prop -= tc.real;
 
-  /* o^adj D q - q^adj D o          */
-  cc = su3_dot( &(lattice[i].propmat[icol]),
-          (su3_vector *)(tmp2 ->e[icol]) );
+        /* o^adj D q - q^adj D o          */
+        tc = su3_dot(&(lattice[i].propmat[icol]),
+                     (su3_vector *)(tmp2 ->e[icol]));
 
-  if ((x+y+z)%2 == 0)*nlpi2prop -= cc.real;
-  else              *nlpi2prop += cc.real;
+        if ((x + y + z) % 2 == 0)
+          *nlpi2prop -= tc.real;
+        else
+          *nlpi2prop += tc.real;
 
       }
 
       /* Calculate local check for all z */
       /* q^adj q  */
-      cc = su3_dot( &lattice[i].propmat[icol],
-        &lattice[i].propmat[icol] );
-      *ckpiprop += cc.real;
+      tc = su3_dot(&lattice[i].propmat[icol],
+                   &lattice[i].propmat[icol]);
+      *ckpiprop += tc.real;
 
       /* q^adj q + o^adj o          */
-      cc = su3_dot( &lattice[i].propmat2[icol],
-        &lattice[i].propmat2[icol] );
-      *ckpiprop += cc.real;
-
+      tc = su3_dot(&lattice[i].propmat2[icol],
+                   &lattice[i].propmat2[icol]);
+      *ckpiprop += tc.real;
 
       /* q^adj o  */
-      cc = su3_dot( &lattice[i].propmat[icol],
-        &lattice[i].propmat2[icol] );
+      tc = su3_dot(&lattice[i].propmat[icol],
+                   &lattice[i].propmat2[icol]);
 
-      if ( (x+y+z)%2==0)*ckpi2prop += cc.real;
-      else             *ckpi2prop -= cc.real;
-
+      if ((x + y + z) % 2 == 0)
+        *ckpi2prop += tc.real;
+      else
+        *ckpi2prop -= tc.real;
     }
   }
 }
@@ -214,41 +222,36 @@ void nl_meson_prop (int t,double *nlpiprop,double *nlpi2prop,
 
 // -----------------------------------------------------------------
 // Stripped ferm_links_t
+// n_src, src_start and src_inc need to be set by each application's setup.c
 // Return the number of CG iterations
 int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
                 field_offset tempmat1, field_offset tempmat2) {
 
-  register int i, x, y, z, t, icol, cgn = 0, t_source, t_off;
-  register complex cc;
+  register int i, x, y, z, t, icol, cgn = 0, t_src, t_off;
+  register site *s;
+  register complex tc;
   register su3_matrix *tmp1;
   int dir, isrc;
-  Real vmass_x2 = 2 * vmass;
-  double *piprop, *pi2prop, *rhoprop, *rho2prop, *barprop;
-  double *nlpiprop, *nlpi2prop, *ckpiprop, *ckpi2prop;
-  double *delprop, *ckbarprop, proptmp;
-  site* s;
+  Real vmass_x2 = 2 * vmass, one_ov_N = 1.0 / (Real)n_src;
+  double proptmp;
+  double *piprop = malloc(nt * sizeof(*piprop));
+  double *pi2prop = malloc(nt * sizeof(*pi2prop));
+  double *nlpiprop = malloc(nt * sizeof(*nlpiprop));
+  double *nlpi2prop = malloc(nt * sizeof(*nlpi2prop));
+  double *ckpiprop = malloc(nt * sizeof(*ckpiprop));
+  double *ckpi2prop = malloc(nt * sizeof(*ckpi2prop));
+  double *barprop = malloc(nt * sizeof(*barprop));
+  double *delprop = malloc(nt * sizeof(*delprop));
+  double *ckbarprop = malloc(nt * sizeof(*ckbarprop));
   msg_tag *mtag[16];
 
-  // Required 16 gen_pts
+  // Require 16 gen_pts
   assert(N_POINTERS >= 16);
 
-  piprop = (double *)malloc(nt * sizeof(double));
-  pi2prop = (double *)malloc(nt * sizeof(double));
-  rhoprop = (double *)malloc(nt * sizeof(double));
-  rho2prop = (double *)malloc(nt * sizeof(double));
-  barprop = (double *)malloc(nt * sizeof(double));
-  nlpiprop = (double *)malloc(nt * sizeof(double));
-  nlpi2prop = (double *)malloc(nt * sizeof(double));
-  ckpiprop = (double *)malloc(nt * sizeof(double));
-  ckpi2prop = (double *)malloc(nt * sizeof(double));
-  delprop = (double *)malloc(nt * sizeof(double));
-  ckbarprop = (double *)malloc(nt * sizeof(double));
-
+  // Clear propagators
   for (t = 0; t < nt; t++) {
     piprop[t] = 0;
     pi2prop[t] = 0;
-    rhoprop[t] = 0;
-    rho2prop[t] = 0;
     nlpiprop[t] = 0;
     nlpi2prop[t] = 0;
     ckpiprop[t] = 0;
@@ -259,14 +262,14 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
   }
 
   // Unlike spectrum.c, here we calculate only with wall sources
-  for (t_source = src_start, isrc = 0;
-       t_source < 2 * nt && isrc < n_src;
-       ++isrc, t_source += src_inc) {
+  for (t_src = src_start, isrc = 0;
+      t_src < 2 * nt && isrc < n_src;
+      ++isrc, t_src += src_inc) {
 
-    node0_printf("nl_spectrum(): source time = %d\n", t_source);
+    node0_printf("nl_spectrum(): source time = %d\n", t_src);
 
     // Only work for even source slices
-    if (t_source % 2 != 0) {
+    if (t_src % 2 != 0) {
       node0_printf("DUMMY:  Use even time slices for nl_spectrum()\n");
       terminate(0);
     }
@@ -277,276 +280,261 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
     /* Put result in propmat */
     for (icol=0; icol<3; icol++) {
 
-    /* initialize tempvec1 and tempvec2 */
-    clear_latvec(tempvec1, EVEN);
-    clear_latvec(tempvec2, EVEN);
+      /* initialize tempvec1 and tempvec2 */
+      clear_latvec(tempvec1, EVEN);
+      clear_latvec(tempvec2, EVEN);
 
-    for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++) {
-        if ((x+y+z) % 2 == 0) {
-      if (node_number(x, y, z, t_source) != mynode())
-        continue;
-      i = node_index(x,y,z,t_source);
-      ((su3_vector *)(F_PT(&lattice[i],tempvec1)))->c[icol].real =
-        -0.25;
-    }
-      }
-
-    /* do a C.G.: source tempvec1, result tempvec2 */
-    cgn += ks_congrad(tempvec1, tempvec2, vmass, EVEN);
-    dslash(tempvec2, tempvec2, ODD);  // Multiply by -M^dag
-    scalar_mult_latvec(tempvec2, -vmass_x2, tempvec2, EVEN);
-
-    /* fill the hadron matrix */
-    copy_latvec( tempvec2, F_OFFSET(propmat[icol]), EVENANDODD);
-  } /* end loop on icol */
-
-
-      /* Compute propagator from odd wall sites */
-      /* Put result in propmat2 */
-
-      for (icol=0; icol<3; icol++) {
-
-    /* initialize tempvec1 and tempvec2 */
-    clear_latvec(tempvec1, ODD);
-    clear_latvec(tempvec2, ODD);
-    for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++) {
-        if ((x+y+z) % 2 == 1) {
-      if ( node_number(x,y,z,t_source) != mynode() )continue;
-      i=node_index(x,y,z,t_source);
-      ((su3_vector *)(F_PT(&lattice[i],tempvec1)))->c[icol].real =
-        -0.25;
-    }
-      }
-
-    /* do a C.G.: source tempvec1, result tempvec2 */
-    cgn += ks_congrad(tempvec1, tempvec2, vmass, ODD);
-    dslash(tempvec2, tempvec2, EVEN);     // Multiply by -M^dag
-    scalar_mult_latvec(tempvec2, -vmass_x2, tempvec2, ODD);
-
-    /* fill the hadron matrix */
-    copy_latvec(tempvec2, F_OFFSET(propmat2[icol]), EVENANDODD);
-  } /* end loop on icol */
-
-      /* cgn now gives the sum for both inversions */
-
-
-      /* measure the meson propagator for the E wall source */
-      for (t=0; t<nt; t++) {
-    /* define the time value offset t from t_source */
-    t_off = (t+t_source)%nt;
-
-    for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++)
-      for (icol=0;icol<3;icol++) {
-    if (node_number(x,y,z,t_off) != mynode() )continue;
-    i=node_index(x,y,z,t_off);
-    cc = su3_dot( &lattice[i].propmat[icol],
-           &lattice[i].propmat[icol] );
-
-    piprop[t] += cc.real;
-                /* (rhoprop and rho2prop are not generated by this source) */
-
-    if ((x + y + z) % 2 == 0)
-      pi2prop[t] += cc.real;
-    else
-      pi2prop[t] -= cc.real;
+      for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++) {
+        if ((x + y + z) % 2 == 0) {
+          if (node_number(x, y, z, t_src) != mynode())
+            continue;
+          i = node_index(x, y, z, t_src);
+          ((su3_vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
         }
+      }
 
-  } /* nt-loop */
+      /* do a C.G.: source tempvec1, result tempvec2 */
+      cgn += ks_congrad(tempvec1, tempvec2, vmass, EVEN);
+      dslash(tempvec2, tempvec2, ODD);  // Multiply by -M^dag
+      scalar_mult_latvec(tempvec2, -vmass_x2, tempvec2, EVEN);
 
-      /* measure the baryon propagator for the E wall source */
-      for (t=0; t<nt; t++) {
-    /* define the time value offset t from t_source */
-    t_off = (t+t_source)%nt;
+      /* fill the hadron matrix */
+      copy_latvec(tempvec2, F_OFFSET(propmat[icol]), EVENANDODD);
+    } /* end loop on icol */
 
-    proptmp = 0;
-    for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
-        if ( node_number(x,y,z,t_off) != mynode() )continue;
-        i=node_index(x,y,z,t_off);
-        cc = det_su3( (su3_matrix *)(lattice[i].propmat) );
-        proptmp += cc.real;
+
+    /* Compute propagator from odd wall sites */
+    /* Put result in propmat2 */
+    for (icol = 0; icol < 3; icol++) {
+      /* initialize tempvec1 and tempvec2 */
+      clear_latvec(tempvec1, ODD);
+      clear_latvec(tempvec2, ODD);
+      for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++) {
+        if ((x + y + z) % 2 == 1) {
+          if (node_number(x, y, z, t_src) != mynode())
+            continue;
+          i = node_index(x,y,z, t_src);
+          ((su3_vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
+        }
+      }
+
+      // Invert with source in tempvec1 and result in tempvec2
+      cgn += ks_congrad(tempvec1, tempvec2, vmass, ODD);
+      dslash(tempvec2, tempvec2, EVEN);     // Multiply by -M^dag
+      scalar_mult_latvec(tempvec2, -vmass_x2, tempvec2, ODD);
+
+      /* fill the hadron matrix */
+      copy_latvec(tempvec2, F_OFFSET(propmat2[icol]), EVENANDODD);
     }
 
-    /* must get sign right.  This looks to see if we have
-       wrapped around the lattice.  "t" is the distance
-       from the source to the measurement, so we are
-       trying to find out if t_source+t is greater than
-       or equal to nt. */
-    /*if ( (((t+t_source)/nt-t_source/nt)%2) == 1 )barprop[t] *= -1.0;*/
-    /* change sign because antiperiodic b.c.  sink point
-       should really be in a copy of the lattice */
+    /* measure the meson propagator for the even wall source */
+    for (t = 0; t < nt; t++) {
+      /* define the time value offset t from t_src */
+      t_off = (t+t_src)%nt;
 
-    if ( (((t+t_source)/nt-t_source/nt)%2) == 0 )
-      barprop[t] += proptmp;
-    else
-      barprop[t] -= proptmp;
+      for (x=0;x<nx;x++)for (y=0;y<ny;y++)for (z=0;z<nz;z++)
+        for (icol=0;icol<3;icol++) {
+          if (node_number(x,y,z, t_off) != mynode())continue;
+          i = node_index(x,y,z, t_off);
+          tc = su3_dot(&lattice[i].propmat[icol],
+                       &lattice[i].propmat[icol]);
 
-  } /* nt-loop */
+          piprop[t] += tc.real;
 
+          if ((x + y + z) % 2 == 0)
+            pi2prop[t] += tc.real;
+          else
+            pi2prop[t] -= tc.real;
+        }
+    }
 
-      /* Measure nonlocal (and some local for checking) propagators    */
-      /* These propagators include the delta and some nonlocal mesons  */
-      /* The method for the delta is described in M.F.L. Golterman and */
-      /* J. Smit, Nucl. Phys. B 255, 328 (1985)                        */
-      /* Equation (6.3) defines the sink operator for the delta        */
-      /* The method for the mesons is described in M.F.L. Golterman    */
-      /* Nucl. Phys. B 273, 663 (1986)                                 */
-      /* The treatment of the source wall is described in Gupta,       */
-      /* Guralnik, Kilcup, and Sharpe, (GGKS) NSF-ITP-90-172 (1990)    */
-      /* Phys.Rev.D43:2003-2026,1991  */
-      /* To get the delta propagator, we take the "q" propagator       */
-      /* matrices for each of the wall colors and antisymmetrize over  */
-      /* wall color as well as s                    */
+    /* measure the baryon propagator for the E wall source */
+    for (t = 0; t < nt; t++) {
+      /* define the time value offset t from t_src */
+      t_off = (t + t_src) % nt;
 
-      /* First construct the "q" and "o" propagators                   */
-      /* Put q = E + O in propmat and o = E - O in propmat2 */
-
-      FORALLSITES(i,s) {
-  tmp1 = (su3_matrix *)F_PT(s,tempmat1);
-  for (icol=0; icol<3; icol++) {
-    add_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
-        (su3_vector *)(tmp1->e[icol]) );
-    sub_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
-        &(s->propmat2[icol]) );
-    su3vec_copy( (su3_vector *)(tmp1->e[icol]),
-           &(s->propmat[icol]) );
-  }
+      proptmp = 0;
+      for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
+        if (node_number(x, y, z, t_off) != mynode())continue;
+        i=node_index(x, y, z, t_off);
+        tc = det_su3((su3_matrix *)(lattice[i].propmat));
+        proptmp += tc.real;
       }
 
+      /* must get sign right.  This looks to see if we have
+         wrapped around the lattice.  "t" is the distance
+         from the source to the measurement, so we are
+         trying to find out if t_src+t is greater than
+         or equal to nt. */
+      /*if ((((t+t_src)/nt-t_src/nt)%2) == 1)barprop[t] *= -1.0;*/
+      /* change sign because antiperiodic b.c.  sink point
+         should really be in a copy of the lattice */
+      if ((((t + t_src) / nt - t_src / nt) % 2) == 0)
+        barprop[t] += proptmp;
+      else
+        barprop[t] -= proptmp;
+    }
 
+    /* Measure nonlocal (and some local for checking) propagators    */
+    /* These propagators include the delta and some nonlocal mesons  */
+    /* The method for the delta is described in M.F.L. Golterman and */
+    /* J. Smit, Nucl. Phys. B 255, 328 (1985)                        */
+    /* Equation (6.3) defines the sink operator for the delta        */
+    /* The method for the mesons is described in M.F.L. Golterman    */
+    /* Nucl. Phys. B 273, 663 (1986)                                 */
+    /* The treatment of the source wall is described in Gupta,       */
+    /* Guralnik, Kilcup, and Sharpe, (GGKS) NSF-ITP-90-172 (1990)    */
+    /* Phys.Rev.D43:2003-2026,1991  */
+    /* To get the delta propagator, we take the "q" propagator       */
+    /* matrices for each of the wall colors and antisymmetrize over  */
+    /* wall color as well as s                    */
 
-      /* Next gather the propagators in preparation for calculating   */
-      /* shifted propagators Dq and Do                                */
+    /* First construct the "q" and "o" propagators                   */
+    /* Put q = E + O in propmat and o = E - O in propmat2 */
 
-      FORALLUPDIRBUT(TUP,dir) {
-    /* Start bringing "q" = propmat from forward sites    */
+    FORALLSITES(i,s) {
+      tmp1 = (su3_matrix *)F_PT(s, tempmat1);
+      for (icol = 0; icol < 3; icol++) {
+        add_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
+            (su3_vector *)(tmp1->e[icol]));
+        sub_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
+            &(s->propmat2[icol]));
+        su3vec_copy((su3_vector *)(tmp1->e[icol]),
+            &(s->propmat[icol]));
+      }
+    }
 
-    mtag[dir] = start_gather_site(F_OFFSET(propmat[0]),
-       sizeof(su3_matrix), dir, EVENANDODD, gen_pt[dir]);
+    /* Next gather the propagators in preparation for calculating   */
+    /* shifted propagators Dq and Do                                */
+    FORALLUPDIRBUT(TUP, dir) {
+      /* Start bringing "q" = propmat from forward sites    */
 
-    /* Start bringing "q" from backward neighbors       */
+      mtag[dir] = start_gather_site(F_OFFSET(propmat[0]),
+          sizeof(su3_matrix), dir, EVENANDODD, gen_pt[dir]);
 
-    mtag[dir+4] = start_gather_site(F_OFFSET(propmat[0]),
-       sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
-       gen_pt[dir+4]);
-    wait_gather(mtag[dir]);
-    wait_gather(mtag[dir+4]);
+      /* Start bringing "q" from backward neighbors       */
 
-    /* Start bringing "o" = propmat2 from forward sites   */
+      mtag[dir+4] = start_gather_site(F_OFFSET(propmat[0]),
+          sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
+          gen_pt[dir+4]);
+      wait_gather(mtag[dir]);
+      wait_gather(mtag[dir+4]);
 
-    mtag[8+dir] = start_gather_site(F_OFFSET(propmat2[0]),
-       sizeof(su3_matrix), dir, EVENANDODD, gen_pt[8+dir]);
+      /* Start bringing "o" = propmat2 from forward sites   */
 
-        /* Start bringing "o" from backward neighbors       */
+      mtag[8+dir] = start_gather_site(F_OFFSET(propmat2[0]),
+          sizeof(su3_matrix), dir, EVENANDODD, gen_pt[8+dir]);
 
-    mtag[8+dir+4] = start_gather_site(F_OFFSET(propmat2[0]),
-        sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
-        gen_pt[8+dir+4]);
-    wait_gather(mtag[8+dir]);
-    wait_gather(mtag[8+dir+4]);
+      /* Start bringing "o" from backward neighbors       */
 
-  }
+      mtag[8+dir+4] = start_gather_site(F_OFFSET(propmat2[0]),
+          sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
+          gen_pt[8+dir+4]);
+      wait_gather(mtag[8+dir]);
+      wait_gather(mtag[8+dir+4]);
 
-      /* Calculate and dump delta propagator */
-      for (t=0; t<nt; t++) {
-    /* define the time value offset t from t_source */
-    t_off = (t+t_source)%nt;
+    }
 
-    /* Calculate contribution for each permutation of source color */
-    proptmp = 0;
-    delta_prop (0,1,2, 1, t_off, &proptmp, tempmat1);
-    delta_prop (1,2,0, 1, t_off, &proptmp, tempmat1);
-    delta_prop (2,0,1, 1, t_off, &proptmp, tempmat1);
-    delta_prop (1,0,2,-1, t_off, &proptmp, tempmat1);
-    delta_prop (0,2,1,-1, t_off, &proptmp, tempmat1);
-    delta_prop (2,1,0,-1, t_off, &proptmp, tempmat1);
+    /* Calculate and dump delta propagator */
+    for (t = 0; t < nt; t++) {
+      /* define the time value offset t from t_src */
+      t_off = (t + t_src) % nt;
 
-    if ( (((t+t_source)/nt-t_source/nt)%2) == 0 )
-      delprop[t] += proptmp;
-    else
-      delprop[t] -= proptmp;
+      /* Calculate contribution for each permutation of source color */
+      proptmp = 0;
+      delta_prop(0, 1, 2, 1, t_off, &proptmp, tempmat1);
+      delta_prop(1, 2, 0, 1, t_off, &proptmp, tempmat1);
+      delta_prop(2, 0, 1, 1, t_off, &proptmp, tempmat1);
+      delta_prop(1, 0, 2, -1, t_off, &proptmp, tempmat1);
+      delta_prop(0, 2, 1, -1, t_off, &proptmp, tempmat1);
+      delta_prop(2, 1, 0, -1, t_off, &proptmp, tempmat1);
 
-    /*if ( (((t+t_source)/nt-t_source/nt)%2) == 1 ) delprop[t] *= -1;*/
-  } /* nt-loop */
+      if ((((t + t_src)/nt-t_src/nt)%2) == 0)
+        delprop[t] += proptmp;
+      else
+        delprop[t] -= proptmp;
+    }
 
-      /* Calculate the "q" source nucleon as a check */
+    /* Calculate the "q" source nucleon as a check */
 
-      /* Calculate and dump nucleon check propagator */
-      for (t=0; t<nt; t++) {
-    /* define the time value offset t from t_source */
-    t_off = (t+t_source)%nt;
+    /* Calculate and dump nucleon check propagator */
+    for (t = 0; t < nt; t++) {
+      /* define the time value offset t from t_src */
+      t_off = (t+t_src)%nt;
 
-    proptmp = 0;
-    for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
-        if ( node_number(x,y,z,t_off) != mynode() )continue;
-        i=node_index(x,y,z,t_off);
+      proptmp = 0;
+      for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
+        if (node_number(x,y,z, t_off) != mynode())continue;
+        i=node_index(x,y,z, t_off);
         /* The q propagator is in propmat */
-        cc = det_su3( (su3_matrix *)(lattice[i].propmat) );
-        proptmp += cc.real;
+        tc = det_su3((su3_matrix *)(lattice[i].propmat));
+        proptmp += tc.real;
       }
 
-    if ( (((t+t_source)/nt-t_source/nt)%2) == 0 )
-      ckbarprop[t] += proptmp;
-    else
-      ckbarprop[t] -= proptmp;
+      if ((((t + t_src) / nt - t_src / nt) % 2) == 0)
+        ckbarprop[t] += proptmp;
+      else
+        ckbarprop[t] -= proptmp;
+    }
 
-    /*if ( (((t+t_source)/nt-t_source/nt)%2) == 1 )ckbarprop[t]*= -1.0;*/
-    /* change sign because antiperiodic b.c.  sink point
-       should really be in a copy of the lattice */
-  } /* nt-loop */
+    /* Calculate nonlocal meson propagators and local check */
+    for (t = 0; t < nt; t++) {
+      /* Calculate two nonlocal pion propagators */
+      /* These are pi_1 and pi_1 tilde of Gupta et al */
+      /* Also calculate two local propagators as a check */
 
-      /* Calculate nonlocal meson propagators and local check */
-      for (t=0; t<nt; t++) {
-    /* Calculate two nonlocal pion propagators */
-    /* These are pi_1 and pi_1 tilde of Gupta et al */
-    /* Also calculate two local propagators as a check */
+      /* define the time value offset t from t_src */
+      t_off = (t + t_src) % nt;
 
-    /* define the time value offset t from t_source */
-    t_off = (t+t_source)%nt;
+      nl_meson_prop(t_off, &nlpiprop[t], &nlpi2prop[t], &ckpiprop[t],
+                    &ckpi2prop[t], tempmat1, tempmat2);
+    }
 
-    nl_meson_prop(t_off,&nlpiprop[t],&nlpi2prop[t],&ckpiprop[t],
-       &ckpi2prop[t],tempmat1,tempmat2);
-
-  } /* nt-loop */
-
-      /* Clean up gathers */
-      FORALLUPDIRBUT(TUP,dir) {
-    cleanup_gather(mtag[dir]);
-    cleanup_gather(mtag[dir+4]);
-    cleanup_gather(mtag[8+dir]);
-    cleanup_gather(mtag[8+dir+4]);
+    /* Clean up gathers */
+    FORALLUPDIRBUT(TUP, dir) {
+      cleanup_gather(mtag[dir]);
+      cleanup_gather(mtag[dir + 4]);
+      cleanup_gather(mtag[8 + dir]);
+      cleanup_gather(mtag[8 + dir + 4]);
+    }
   }
 
-    } /* end loop on t_source */
+  // Dump the propagators, including vanishing imaginary components
   g_vecdoublesum(piprop, nt);
   g_vecdoublesum(pi2prop, nt);
-  g_vecdoublesum(rhoprop, nt);
-  g_vecdoublesum(rho2prop, nt);
-  g_vecdoublesum(barprop, nt);
   g_vecdoublesum(nlpiprop, nt);
   g_vecdoublesum(nlpi2prop, nt);
   g_vecdoublesum(ckpiprop, nt);
   g_vecdoublesum(ckpi2prop, nt);
+  g_vecdoublesum(barprop, nt);
   g_vecdoublesum(delprop, nt);
   g_vecdoublesum(ckbarprop, nt);
-
-  /* dump propagators */
+  for (t = 0; t < nt; t++) {
+    piprop[t] *= one_ov_N;
+    pi2prop[t] *= one_ov_N;
+    nlpiprop[t] *= one_ov_N;
+    nlpi2prop[t] *= one_ov_N;
+    ckpiprop[t] *= one_ov_N;
+    ckpi2prop[t] *= one_ov_N;
+    barprop[t] *= one_ov_N;
+    delprop[t] *= one_ov_N;
+    ckbarprop[t] *= one_ov_N;
+  }
   if (this_node == 0) {
     printf("STARTPROP\n");
     printf("MASSES:   %e  %e\n", vmass, vmass);
     printf("SOURCE: EVEN_WALL\n");
     printf("SINKS: PION_PS PION_SC\n");
-    for (t = 0; t < nt; t++) {
-      printf("%d %e 0.0 %e 0.0\n", t, piprop[t] / n_src,
-                                      pi2prop[t] / n_src);
-    }
+    for (t = 0; t < nt; t++)
+      printf("%d %e 0.0 %e 0.0\n", t, piprop[t], pi2prop[t]);
     printf("ENDPROP\n");
 
     printf("STARTPROP\n");
-    printf("MASSES:  %e   %e  %e\n",vmass,vmass,vmass);
+    printf("MASSES:  %e   %e  %e\n", vmass, vmass, vmass);
     printf("SOURCE: EVEN_WALL\n");
     printf("SINKS: NUCLEON\n");
     for (t = 0; t < nt; t++)
-      printf("%d %e 0.0\n",t, barprop[t] / n_src);
+      printf("%d %e 0.0\n", t, barprop[t]);
     printf("ENDPROP\n");
 
     printf("STARTPROP\n");
@@ -555,8 +543,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
     printf("SINKS: PION_PS PION_SC PION_i5 PION_ij\n");
     for (t = 0; t < nt; t++) {
       printf("%d %e 0.0 %e 0.0 %e 0.0 %e 0.0\n", t,
-             ckpiprop[t] / n_src, ckpi2prop[t] / n_src,
-             nlpiprop[t] / n_src, nlpi2prop[t] / n_src);
+             ckpiprop[t], ckpi2prop[t], nlpiprop[t], nlpi2prop[t]);
     }
     printf("ENDPROP\n");
 
@@ -564,17 +551,15 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
     printf("MASSES:  %e   %e  %e\n", vmass, vmass, vmass);
     printf("SOURCE: EVENANDODD_WALL\n");
     printf("SINKS: NUCLEON DELTA\n");
-    for (t = 0; t < nt; t++) {
-      printf("%d %e 0.0 %e 0.0\n",t, ckbarprop[t] / n_src,
-                                     delprop[t] / n_src);
-    }
+    for (t = 0; t < nt; t++)
+      printf("%d %e 0.0 %e 0.0\n", t, ckbarprop[t], delprop[t]);
     printf("ENDPROP\n");
+
+    fflush(stdout);
   }
 
   free(piprop);
   free(pi2prop);
-  free(rhoprop);
-  free(rho2prop);
   free(nlpiprop);
   free(nlpi2prop);
   free(ckpiprop);
