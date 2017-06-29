@@ -41,7 +41,7 @@ typedef struct {
   su3_vector p;           // CG change vector
   su3_vector mp;          // CG temporary vector
   su3_vector r;           // CG residual vector
-  su3_vector ttt1[1];     // For ../generic_ks/mat_invert.c
+  su3_vector ttt;         // For ../generic_ks/mat_invert.c
   su3_vector M_inv;
 
   // Vacuum polarization stuff

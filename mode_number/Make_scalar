@@ -40,7 +40,7 @@ KSFFMULTI      = # -DKS_MULTIFF=FNMAT
 KSRHMCINT      =
 
 CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
-                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
+                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI} \
                  ${KSFFMULTI} ${KSRHMCINT}
 
 MAKELIBRARIES  = Make_vanilla
@@ -71,11 +71,11 @@ else
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}

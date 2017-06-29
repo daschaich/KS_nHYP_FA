@@ -1,24 +1,17 @@
 # ------------------------------------------------------------------
-#  MIMD version 7
-#  Standard application makefile.
-MAKEFILE = Make_cluster_gcc
-# ------------------------------------------------------------------
+MAKEFILE = Make_mpi
 
-
-
-# ------------------------------------------------------------------
-# User choices
 MPP            = true
 PRECISION      = 2
 CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
-OPT            = -O3 -Wall -fno-strict-aliasing
+OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
 CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                # Large files gcc only
-MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o io_romio.o)
+MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
 
 WANTQOP        =
 WANTQDP        =
-WANTQIO        =
+WANTQIO        = # true
 WANTQMP        =
 
 SCIDAC         =
@@ -36,10 +29,10 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = #-DINLINE # -DSSE_GLOBAL_INLINE
+INLINEOPT      = # -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
-CDEBUG         = 
+CDEBUG         =
 KSCGSTORE      = # -DDBLSTORE_FN -DD_FN_GATHER13
 CPREFETCH      =
 KSCGMULTI      = # -DKS_MULTICG=HYBRID
@@ -50,9 +43,9 @@ CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
                  ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
                  ${KSFFMULTI} ${KSRHMCINT}
 
-MAKELIBRARIES  = Make_cluster_gcc
+MAKELIBRARIES  = Make_mpi
 
-# Also check include/config.h.
+# Also check include/config.h
 # ------------------------------------------------------------------
 
 
@@ -78,19 +71,18 @@ else
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 
 # Complete set of compiler flags - do not change
-CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} \
-	${PREC} ${CLFS} ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} \
-	${IMPI}
+CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
+         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} ${IMPI}
 
 LIBRARY_FLAGS = -lgsl -lgslcblas -lm
 

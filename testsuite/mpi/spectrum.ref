@@ -1,11 +1,11 @@
 SU(3) with Kogut--Susskind fermions
 S4b phase order parameter measurement
-Machine = QMP (portable), with 1 nodes
+Machine = QMP (portable), with 2 nodes
 nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Thu Jun 29 17:37:06 2017
+start: Thu Jun 29 09:41:43 2017
 
 type 0 for no prompts or 1 for prompts
 nx 4
@@ -15,9 +15,9 @@ nt 4
 iseed 41
 LAYOUT = Hypercubes, options = hyper_prime,
 QMP with automatic hyper_prime layout
-ON EACH NODE 4 x 4 x 4 x 4
-Mallocing 0.5 MBytes per core for lattice
-Mallocing 2.2 MBytes per node for fields
+ON EACH NODE 2 x 4 x 4 x 4
+Mallocing 0.3 MBytes per core for lattice
+Mallocing 1.1 MBytes per node for fields
 
 
 mass 0.01
@@ -34,11 +34,11 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.0001409 seconds
-CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+Time to reload gauge configuration = 0.002647 seconds
+CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.000447 seconds
+Time to check unitarity = 0.0001891 seconds
 GFIX: Ended at step 21. Av gf action 9.15459776e-01, delta 1.309e-06
 
 ANTIPERIODIC BC in time direction
@@ -141,6 +141,6 @@ SINKS: PION_05 PION_ij PION_i0 PION_0 RHO_i0 RHO_0
 3 -7.884392e-01 4.588340e-04 -7.440736e-01 5.907180e-04 -6.806124e-01 -3.245109e-03 6.659571e-01 3.148187e-03 7.560955e-01 1.240450e-04 7.383114e-01 1.083177e-04
 ENDPROP
 RUNNING COMPLETED
-Time = 0.1524 seconds
+Time = 0.05802 seconds
 total_iters = 1750
 

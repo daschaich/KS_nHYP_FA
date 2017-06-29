@@ -5,7 +5,7 @@ nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Thu Jan 12 03:48:25 2017
+start: Thu Jun 29 09:44:15 2017
 
 type 0 for no prompts or 1 for prompts
 nx 4
@@ -16,7 +16,7 @@ iseed 41
 LAYOUT = Hypercubes, options = hyper_prime,
 QMP with automatic hyper_prime layout
 ON EACH NODE 2 x 4 x 4 x 4
-Mallocing 0.3 MBytes per node for lattice
+Mallocing 0.3 MBytes per core for lattice
 Mallocing 1.1 MBytes per node for fields
 
 
@@ -36,33 +36,33 @@ outpat .TEST
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.002596 seconds
+Time to reload gauge configuration = 0.002161 seconds
 CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.0001829 seconds
+Time to check unitarity = 0.0001371 seconds
 
 ANTIPERIODIC BC in time direction
 Plaquettes after smearing: 2.8036023 2.8025315
-color 0 at (0 0 0 0): iters = 39 secs = 0.001087
-color 1 at (0 0 0 0): iters = 39 secs = 0.000941
-color 2 at (0 0 0 0): iters = 39 secs = 0.0009279
-color 0 at (1 0 0 0): iters = 54 secs = 0.001257
-color 1 at (1 0 0 0): iters = 54 secs = 0.001258
-color 2 at (1 0 0 0): iters = 54 secs = 0.001259
-color 0 at (0 1 0 0): iters = 54 secs = 0.001262
-color 1 at (0 1 0 0): iters = 54 secs = 0.001271
-color 2 at (0 1 0 0): iters = 54 secs = 0.001266
-color 0 at (0 0 1 0): iters = 54 secs = 0.001275
-color 1 at (0 0 1 0): iters = 54 secs = 0.001262
-color 2 at (0 0 1 0): iters = 54 secs = 0.001259
-color 0 at (0 0 0 1): iters = 54 secs = 0.001259
-color 1 at (0 0 0 1): iters = 54 secs = 0.00126
-color 2 at (0 0 0 1): iters = 54 secs = 0.001257
+color 0 at (0 0 0 0): iters = 39 secs = 0.001093
+color 1 at (0 0 0 0): iters = 39 secs = 0.0009692
+color 2 at (0 0 0 0): iters = 39 secs = 0.000968
+color 0 at (1 0 0 0): iters = 54 secs = 0.001331
+color 1 at (1 0 0 0): iters = 54 secs = 0.001299
+color 2 at (1 0 0 0): iters = 54 secs = 0.001292
+color 0 at (0 1 0 0): iters = 54 secs = 0.001291
+color 1 at (0 1 0 0): iters = 54 secs = 0.00132
+color 2 at (0 1 0 0): iters = 54 secs = 0.001313
+color 0 at (0 0 1 0): iters = 54 secs = 0.001328
+color 1 at (0 0 1 0): iters = 54 secs = 0.001306
+color 2 at (0 0 1 0): iters = 54 secs = 0.001317
+color 0 at (0 0 0 1): iters = 54 secs = 0.001339
+color 1 at (0 0 0 1): iters = 54 secs = 0.0013
+color 2 at (0 0 0 1): iters = 54 secs = 0.001322
 ndim = 4
 numsites = 128
 len = 4 4 4 4
 nsquares = 2 1 1 1
 RUNNING COMPLETED
-Time = 0.08673 seconds
+Time = 0.0596 seconds
 total_iters = 765
