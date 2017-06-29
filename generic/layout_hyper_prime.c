@@ -363,7 +363,7 @@ void setup_layout() {
 
   if (geom != NULL) {
     /* Set the sublattice dimensions according to the specified geometry */
-    node0_printf("with fixed node_geometry (geom = %d)\n", geom);
+    node0_printf("with fixed node_geometry\n");
     setup_fixed_geom(geom, nd);
   }
   else {

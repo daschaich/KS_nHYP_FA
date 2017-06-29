@@ -446,8 +446,8 @@ int spectrum_nlpi2(Real fmass, Real amass) {
   }
 
   // Sum propagator arrays over nodes and normalize
-  g_veccomplexsum(props[0], nprops * nt);
   for (i = 0; i < nprops; i++) {
+    g_veccomplexsum(props[i], nt);
     for (j = 0; j < nt; j++)
       CMULREAL(props[i][j], norm, props[i][j]);
   }

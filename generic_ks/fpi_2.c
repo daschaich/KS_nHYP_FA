@@ -170,8 +170,7 @@ int fpi_2(Real *masses) {
     }
   }
 
-  /* Sum propagator arrays over nodes */
-  /* print out propagators */
+  // Sum propagator arrays over nodes and normalize
   for (i = 0; i < NPROP * nmasses * nmasses; i += NPROP) {
     g_veccomplexsum(props[i + PP], nt);
     g_veccomplexsum(props[i + WP], nt);
@@ -185,6 +184,9 @@ int fpi_2(Real *masses) {
       CMULREAL(props[offset + WW][j], wall_norm, props[offset + WW][j]);
     }
   }
+
+  // Dump the propagators
+  // Seem to be purely real, possibly due to single mass being used
   if (this_node == 0) {
     for (m1 = 0; m1 < nmasses; m1++) {
       for (m2 = m1; m2 < nmasses; m2++) {
@@ -194,7 +196,7 @@ int fpi_2(Real *masses) {
         printf("SOURCE: RANDOM_WALL\n");
         printf("SINKS: POINT_KAON_5 WALL_KAON_5\n");
         for (j = 0; j < nt; j++) {
-          printf("%d %e %e %e %e\n",j,
+          printf("%d %e %g %e %g\n",j,
               props[offset + PP][j].real, props[offset + PP][j].imag,
               props[offset + PW][j].real, props[offset + PW][j].imag);
         }
@@ -205,7 +207,7 @@ int fpi_2(Real *masses) {
         printf("SOURCE: FULL_WALL\n");
         printf("SINKS: POINT_KAON_5 WALL_KAON_5\n");
         for (j=0;j<nt;j++) {
-          printf("%d %e %e %e %e\n",j,
+          printf("%d %e %g %e %g\n",j,
               props[offset + WP][j].real, props[offset + WP][j].imag,
               props[offset + WW][j].real, props[offset + WW][j].imag);
         }
