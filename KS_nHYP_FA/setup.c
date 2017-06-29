@@ -125,7 +125,7 @@ void make_fields() {
   FIELD_ALLOC_VEC(SigmaH, su3_matrix, 4);
   FIELD_ALLOC_VEC(Sigma, su3_matrix, 4);
 
-  node0_printf("Mallocing %.1f MBytes per node for fields\n",
+  node0_printf("Mallocing %.1f MBytes per core for fields\n",
                (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
 }
 // -----------------------------------------------------------------

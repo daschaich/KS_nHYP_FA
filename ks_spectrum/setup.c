@@ -190,7 +190,7 @@ void make_fields() {
   FIELD_ALLOC(tempmat, su3_matrix);
   FIELD_ALLOC(tempmat2, su3_matrix);
 
-  node0_printf("Mallocing %.1f MBytes per node for fields\n",
+  node0_printf("Mallocing %.1f MBytes per core for fields\n",
                (double)sites_on_node * 61 * sizeof(su3_matrix) / 1e6);
 }
 // -----------------------------------------------------------------

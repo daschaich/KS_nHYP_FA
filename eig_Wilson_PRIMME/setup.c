@@ -77,7 +77,7 @@ void make_fields() {
   FIELD_ALLOC(tempmat1, su3_matrix);
 
   // Check the total number of su3_matrices; this may not be accurate
-  node0_printf("Mallocing %.1f MBytes per node for fields\n",
+  node0_printf("Mallocing %.1f MBytes per core for fields\n",
                (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
 }
 // -----------------------------------------------------------------
