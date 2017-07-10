@@ -1,5 +1,6 @@
 // -----------------------------------------------------------------
 // Matrix inversion for general even plus odd quark actions
+// Uses all s->tempvec components through ks_congrad
 // dslash and ks_congrad made more v6-like
 // ferm_links_t, relresid and unused functions stripped out
 

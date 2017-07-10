@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) S4b order parameters
+// Main procedure for SU(3) Kogut--Susskind spectrum
 #define CONTROL
 #include "spectrum_includes.h"
 // -----------------------------------------------------------------

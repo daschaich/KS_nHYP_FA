@@ -1,5 +1,6 @@
 // -----------------------------------------------------------------
 // Conjugate gradient for staggered fermions
+// Uses all s->tempvec components for temporary storage
 // Traditional algorithm based on v6/generic_ks/d_congrad5.c
 // Solves (M^dag.M) psi = chi
 // Like v6 code, includes only dslash!
