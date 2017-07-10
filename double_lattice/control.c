@@ -15,14 +15,13 @@ int main(int argc, char *argv[])  {
   double ssplaq, stplaq, dtime;
   su3_matrix **bak;
 
-  // Setup
+  // Set up
   setlinebuf(stdout); // DEBUG
-  // Remap standard I/O
+  initialize_machine(&argc, &argv);
+  g_sync();
   if (remap_stdio_from_args(argc, argv) == 1)
     terminate(1);
 
-  initialize_machine(&argc, &argv);
-  g_sync();
   prompt = setup();
 
   // Load input and run (loop removed)

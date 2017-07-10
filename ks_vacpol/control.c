@@ -13,14 +13,13 @@ int main(int argc, char **argv) {
   char vecName[80], axiName[80], md[80];
   site *s;
 
-  // Setup
+  // Set up
   setlinebuf(stdout); // DEBUG
-  // Remap standard I/O
+  initialize_machine(&argc, &argv);
+  g_sync();
   if (remap_stdio_from_args(argc, argv) == 1)
     terminate(1);
 
-  initialize_machine(&argc, &argv);
-  g_sync();
   prompt = setup();
 
   // Load input and run (loop removed)

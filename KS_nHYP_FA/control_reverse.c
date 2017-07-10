@@ -109,14 +109,13 @@ int main(int argc, char *argv[]){
   double ssplaq, stplaq, startAct, endAct, dtime;
   complex plp = cmplx(99, 99), xplp = cmplx(99, 99);
 
-  // Setup
+  // Set up
   setlinebuf(stdout); // DEBUG
-  // Remap standard I/O
+  initialize_machine(&argc, &argv);
+  g_sync();
   if(remap_stdio_from_args(argc, argv) == 1)
     terminate(1);
 
-  initialize_machine(&argc, &argv);
-  g_sync();
   prompt = setup();
 
   // Always accept
