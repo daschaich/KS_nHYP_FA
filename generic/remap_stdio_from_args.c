@@ -14,7 +14,7 @@ int remap_stdio_from_args(int argc, char *argv[]) {
   if (argc > 1 && mynode() == 0) {
     fp = freopen(argv[1], "r", stdin);
     if (fp == NULL) {
-      node0_printf("Can't open stdin file %s for reading.\n", argv[1]);
+      node0_printf("Can't open stdin file %s for reading\n", argv[1]);
       return 1;
     }
   }

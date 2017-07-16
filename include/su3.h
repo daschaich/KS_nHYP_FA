@@ -210,6 +210,7 @@ typedef struct { complex e[2][2]; } su2_matrix;
 *
 */
 
+Real realtrace_su3_nn(su3_matrix *a, su3_matrix *b);
 Real realtrace_su3(su3_matrix *a, su3_matrix *b);
 complex trace_su3(su3_matrix *a);
 complex complextrace_su3(su3_matrix *a, su3_matrix *b);

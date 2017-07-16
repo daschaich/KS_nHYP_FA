@@ -85,21 +85,19 @@ void mcrg_block(Real t, int blmax) {
 int main(int argc, char *argv[])  {
   register int i, dir;
   register site *s;
-  int j, prompt, istep, block_count = 0, blmax = 0;
+  int j, prompt, istep, block_count = 0, blmax = 0, eps_scale = 1;
   double dtime, t = 0.0, E, old_value, new_value = 0.0, der_value;
   double ssplaq, stplaq, plaq, check, topo;
-  complex tc;
-  su3_matrix t_mat, *S[4];
+  su3_matrix *S[4];
   anti_hermitmat *A[4];
 
-  // Setup
+  // Set up
   setlinebuf(stdout); // DEBUG
-  // Remap standard I/O
+  initialize_machine(&argc, &argv);
+  g_sync();
   if (remap_stdio_from_args(argc, argv) == 1)
     terminate(1);
 
-  initialize_machine(&argc, &argv);
-  g_sync();
   prompt = setup();
   if (readin(prompt) != 0) {
     node0_printf("ERROR in readin, aborting\n");
@@ -131,6 +129,7 @@ int main(int argc, char *argv[])  {
   }
 
   // Wilson flow!
+  epsilon = start_eps;
   for (istep = 0; tmax == 0 || fabs(t) <  fabs(tmax) - fabs(epsilon) / 2;
        istep++) {
 
@@ -145,11 +144,8 @@ int main(int argc, char *argv[])  {
     old_value = new_value;
     E = 0;
     FORALLSITES(i, s) {
-      for (dir = 0; dir < 6; dir++) {
-        mult_su3_nn(&(s->FS[dir]), &(s->FS[dir]), &t_mat);
-        tc = trace_su3(&t_mat);
-        E -= (double)tc.real;
-      }
+      for (dir = 0; dir < 6; dir++)
+        E -= (double)realtrace_su3_nn(&(s->FS[dir]), &(s->FS[dir]));
     }
     g_doublesum(&E);
     E /= (volume * 64.0); // Normalization factor of 1/8 for each F_munu
@@ -161,17 +157,9 @@ int main(int argc, char *argv[])  {
     // Normalization is 1/4pi^2 again with 1/8 for each F_munu
     topo = 0.0;
     FORALLSITES(i, s) {
-      mult_su3_nn(&(s->FS[0]), &(s->FS[5]), &t_mat); // XYZT
-      tc = trace_su3(&t_mat);
-      topo -= (double)tc.real;
-
-      mult_su3_nn(&(s->FS[3]), &(s->FS[2]), &t_mat); // XTYZ
-      tc = trace_su3(&t_mat);
-      topo -= (double)tc.real;
-
-      mult_su3_na(&(s->FS[1]), &(s->FS[4]), &t_mat); // XZTY;  TY=(YT)^dag
-      tc = trace_su3(&t_mat);
-      topo -= (double)tc.real;
+      topo -= (double)realtrace_su3_nn(&(s->FS[0]), &(s->FS[5])); // XYZT
+      topo -= (double)realtrace_su3_nn(&(s->FS[3]), &(s->FS[2])); // XTYZ
+      topo -= (double)realtrace_su3(&(s->FS[1]), &(s->FS[4]));    // XZ(YT)^dag
     }
     g_doublesum(&topo);
     topo *= 0.000395785873603;
@@ -180,6 +168,12 @@ int main(int argc, char *argv[])  {
     plaquette(&ssplaq, &stplaq);
     plaq = 0.5 * (ssplaq + stplaq);
     check = 12.0 * t * t * (3.0 - plaq);
+
+    // If necessary, interpolate from previous t-eps to current t
+    if (eps_scale > 1) {
+      //TODO
+    }
+
     node0_printf("WFLOW %g %g %g %g %g %g %g\n",
                  t, plaq, E, new_value, der_value, check, topo);
 
@@ -198,6 +192,10 @@ int main(int argc, char *argv[])  {
       if (new_value > 0.45 && der_value > 0.35)
         break;
     }
+
+    // Choose epsilon for the next step
+    // Make sure to land on next tblock if it is approaching
+      //TODO
   }
 
   node0_printf("RUNNING COMPLETED\n");
@@ -205,7 +203,7 @@ int main(int argc, char *argv[])  {
   node0_printf("Time = %.4g seconds\n", dtime);
   fflush(stdout);
 
-  for (dir = 0; dir < 4; dir++) {
+  FORALLUPDIR(dir) {
     free(S[dir]);
     free(A[dir]);
   }

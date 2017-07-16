@@ -13,7 +13,7 @@
 void exp_mult(int dir, double eps, anti_hermitmat *A) {
   register int i;
   register site *s;
-  su3_matrix *link, temp1, temp2, htemp;
+  su3_matrix *link, tmat, tmat2, htemp;
   register Real t2, t3, t4, t5, t6, t7, t8;
 
   // Take divisions out of site loop (can't be done by compiler)
@@ -29,31 +29,31 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
     uncompress_anti_hermitian(&(A[i]), &htemp);
     link = &(s->link[dir]);
 
-    mult_su3_nn(&htemp, link, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t8, &temp2);
+    mult_su3_nn(&htemp, link, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t8, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t7, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t7, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t6, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t6, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t5, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t5, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t4, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t4, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t3, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t3, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t2, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, t2, &tmat2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, eps, &temp2);
+    mult_su3_nn(&htemp, &tmat2, &tmat);
+    scalar_mult_add_su3_matrix(link, &tmat, eps, &tmat2);
 
-    su3mat_copy(&temp2, link);    // This step updates the link U[dir]
+    su3mat_copy(&tmat2, link);    // This step updates the link U[dir]
   }
 }
 // -----------------------------------------------------------------
@@ -127,19 +127,19 @@ void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]) {
 
   // Clear A, just in case
   FORALLSITES(i, s) {
-    for (dir = 0; dir < 4; dir++)
+    FORALLUPDIR(dir)
       clear_antiH(&A[dir][i]);
   }
 
   // Copied from Szabolcs Borsanyi's wilson_flow.c
   staple(S);
-  for (dir = 0; dir < 4; dir++)
-    update_flow(dir, A[dir], S[dir], 17 * epsilon / 36.0, -9 / 17.0);
+  FORALLUPDIR(dir)
+    update_flow(dir, A[dir], S[dir], 17.0 * epsilon / 36.0, -9.0 / 17.0);
   staple(S);
-  for (dir = 0; dir < 4; dir++)
-    update_flow(dir, A[dir], S[dir], -8 * epsilon / 9.0, 1);
+  FORALLUPDIR(dir)
+    update_flow(dir, A[dir], S[dir], -8.0 * epsilon / 9.0, 1.0);
   staple(S);
-  for (dir = 0; dir < 4; dir++)
-    update_flow(dir, A[dir], S[dir], 3 * epsilon / 4.0, -1);
+  FORALLUPDIR(dir)
+    update_flow(dir, A[dir], S[dir], 3.0 * epsilon / 4.0, -1.0);
 }
 // -----------------------------------------------------------------

@@ -14,7 +14,8 @@ typedef struct {
 
   // Wilson flow and MCRG blocking paramaters
   int num_block;
-  Real epsilon, tmax, alpha_hyp0, alpha_hyp1, alpha_hyp2, tblock[100];
+  Real start_eps, max_eps;
+  Real tmax, alpha_hyp0, alpha_hyp1, alpha_hyp2, tblock[100];
 } params;
 #endif
 // -----------------------------------------------------------------
