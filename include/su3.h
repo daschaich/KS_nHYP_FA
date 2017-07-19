@@ -40,17 +40,6 @@ typedef struct {
 /* For KS spectroscopy */
 typedef su3_vector **ks_prop_field;
 
-/* Used in HISQ codes */
-/* Rank 4 tensor for storing derivatives */
-typedef struct { fcomplex t4[3][3][3][3]; } fsu3_tensor4;
-typedef struct { dcomplex t4[3][3][3][3]; } dsu3_tensor4;
-
-#if PRECISION == 1
-#define su3_tensor4 fsu3_tensor4
-#else
-#define su3_tensor4 dsu3_tensor4
-#endif
-
 /* SU(2) */
 typedef struct { complex e[2][2]; } su2_matrix;
 
@@ -72,11 +61,6 @@ typedef struct { complex e[2][2]; } su2_matrix;
 * void mult_su3_an(su3_matrix *a, su3_matrix *b, su3_matrix *c)
 * matrix multiply, first matrix is adjoint
 * files "m_mat_an.c"
-* Real realtrace_su3(su3_matrix *a, su3_matrix *b)
-* (Re(Tr(A_adjoint*B)))
-* file "realtr.c"
-* complex trace_su3(su3_matrix *a)
-* file "trace_su3.c"
 * complex complextrace_su3(su3_matrix *a, su3_matrix *b)
 * (Tr(A_adjoint*B))
 * file "complextr.c"
@@ -159,8 +143,6 @@ typedef struct { complex e[2][2]; } su2_matrix;
 *
 * void add_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c)
 * file "addvec.c"
-* void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c)
-* file "subvec.c"
 * void sub_four_su3_vecs(su3_vector *a, su3_vector *b1, su3_vector *b2,
 *   su3_vector *b3, su3_vector *b4)
 * file "sub4vecs.c"
@@ -207,68 +189,13 @@ typedef struct { complex e[2][2]; } su2_matrix;
 * file "z2rand.c"
 * void byterevn(int32type w[], int n)
 * void byterevn64(int32type w[], int n)
-*
 */
-
-Real realtrace_su3_nn(su3_matrix *a, su3_matrix *b);
-Real realtrace_su3(su3_matrix *a, su3_matrix *b);
-complex trace_su3(su3_matrix *a);
-complex complextrace_su3(su3_matrix *a, su3_matrix *b);
-complex det_su3(su3_matrix *a);
-void sub_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
-void scalar_mult_su3_matrix(su3_matrix *b, Real s, su3_matrix *c);
-void scalar_mult_sub_su3_matrix(su3_matrix *a, su3_matrix *b, Real s,
-                                su3_matrix *c);
-void c_scalar_mult_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
-void scalar_add_diag_su3(su3_matrix *a, Real s);
-void c_scalar_add_diag_su3(su3_matrix *a, complex *s);
-
-// In file cs_m_a_mat.c
-void c_scalar_mult_add_su3mat(su3_matrix *a, su3_matrix *b, complex *s,
-                              su3_matrix *c);
-
-void su3_adjoint(su3_matrix *a, su3_matrix *b);
-void make_anti_hermitian(su3_matrix *m3, anti_hermitmat *ah3);
-void random_anti_hermitian(anti_hermitmat *mat_antihermit, double_prn *prn_pt);
-void uncompress_anti_hermitian(anti_hermitmat *mat_anti, su3_matrix *mat);
-void compress_anti_hermitian(su3_matrix *mat, anti_hermitmat *mat_anti);
-void clear_su3mat(su3_matrix *dest);
-void su3mat_copy(su3_matrix *a, su3_matrix *b);
-void dumpmat(su3_matrix *m);
-
-complex su3_dot(su3_vector *a, su3_vector *b);
-void su3vec_copy(su3_vector *a, su3_vector *b);
-void dumpvec(su3_vector *v);
-void clearvec(su3_vector *v);
-
-void mult_su3_mat_vec_sum(su3_matrix *a, su3_vector *b, su3_vector *c);
-
-void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
-void scalar_mult_su3_vector(su3_vector *b, Real s, su3_vector *c);
-void scalar_mult_sub_su3_vector(su3_vector *a, su3_vector *b, Real s,
-                                su3_vector *c);
-void c_scalar_mult_su3vec(su3_vector *b, complex *s, su3_vector *c);
-void c_scalar_mult_sum_su3vec(su3_vector *b, complex *s, su3_vector *c);
-void c_scalar_mult_dif_su3vec(su3_vector *b, complex *s, su3_vector *c);
-
-void left_su2_hit_n(su2_matrix *u, int p, int q, su3_matrix *link);
-void right_su2_hit_a(su2_matrix *u, int p, int q, su3_matrix *link);
-void dumpsu2(su2_matrix *u);
-void mult_su2_mat_vec_elem_n(su2_matrix *u, complex *x0, complex *x1);
-void mult_su2_mat_vec_elem_a(su2_matrix *u, complex *x0, complex *x1);
-
-Real gaussian_rand_no(double_prn *prn_pt);
-
-Real z2_rand_no(double_prn *prn_pt);
-
-#include "../include/int32type.h"
-void byterevn(int32type w[], int n);
-void byterevn64(int32type w[], int n);
+// -----------------------------------------------------------------
 
 
-/********************************************************************/
-/* Inline macros                                                    */
-/********************************************************************/
+
+// -----------------------------------------------------------------
+// Inline macros
 
 /* We have optional SSE and C inline macros for selected library
    routines */
@@ -311,17 +238,91 @@ void byterevn64(int32type w[], int n);
 
 /********************************************************************/
 #endif
+// -----------------------------------------------------------------
 
-/********************************************************************/
-/* Use standard prototypes if macros are not defined */
+
+
+// -----------------------------------------------------------------
+// Matrix operations
+// In file realtr.c
+Real realtrace_su3_nn(su3_matrix *a, su3_matrix *b);
+Real realtrace_su3(su3_matrix *a, su3_matrix *b);
+
+// In file trace_su3.c
+complex trace_su3(su3_matrix *a);
+
+complex complextrace_su3(su3_matrix *a, su3_matrix *b);
+complex det_su3(su3_matrix *a);
 
 // In file addmat.c
 void sum_su3_matrix(su3_matrix *b, su3_matrix *c);
 void add_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
 
+// In file submat.c
+void sub_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c);
+
+void scalar_mult_su3_matrix(su3_matrix *b, Real s, su3_matrix *c);
+void scalar_mult_sub_su3_matrix(su3_matrix *a, su3_matrix *b, Real s,
+                                su3_matrix *c);
+void c_scalar_mult_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
+void scalar_add_diag_su3(su3_matrix *a, Real s);
+void c_scalar_add_diag_su3(su3_matrix *a, complex *s);
+
+// In file cs_m_a_mat.c
+void c_scalar_mult_add_su3mat(su3_matrix *a, su3_matrix *b, complex *s,
+                              su3_matrix *c);
+
+void su3_adjoint(su3_matrix *a, su3_matrix *b);
+
+void make_anti_hermitian(su3_matrix *m3, anti_hermitmat *ah3);
+void random_anti_hermitian(anti_hermitmat *mat_antihermit, double_prn *prn_pt);
+void uncompress_anti_hermitian(anti_hermitmat *mat_anti, su3_matrix *mat);
+void compress_anti_hermitian(su3_matrix *mat, anti_hermitmat *mat_anti);
+
+void clear_su3mat(su3_matrix *dest);
+void su3mat_copy(su3_matrix *a, su3_matrix *b);
+void dumpmat(su3_matrix *m);
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Vector operations
+complex su3_dot(su3_vector *a, su3_vector *b);
+void su3vec_copy(su3_vector *a, su3_vector *b);
+void dumpvec(su3_vector *v);
+void clearvec(su3_vector *v);
+
+void mult_su3_mat_vec_sum(su3_matrix *a, su3_vector *b, su3_vector *c);
+
 // In file addvec.c
 void sum_su3_vector(su3_vector *b, su3_vector *c);
 void add_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
+
+// In file subvec.c
+void dif_su3_vector(su3_vector *b, su3_vector *c);
+void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c);
+
+void scalar_mult_su3_vector(su3_vector *b, Real s, su3_vector *c);
+void scalar_mult_sub_su3_vector(su3_vector *a, su3_vector *b, Real s,
+                                su3_vector *c);
+void c_scalar_mult_su3vec(su3_vector *b, complex *s, su3_vector *c);
+void c_scalar_mult_sum_su3vec(su3_vector *b, complex *s, su3_vector *c);
+void c_scalar_mult_dif_su3vec(su3_vector *b, complex *s, su3_vector *c);
+
+void left_su2_hit_n(su2_matrix *u, int p, int q, su3_matrix *link);
+void right_su2_hit_a(su2_matrix *u, int p, int q, su3_matrix *link);
+void dumpsu2(su2_matrix *u);
+void mult_su2_mat_vec_elem_n(su2_matrix *u, complex *x0, complex *x1);
+void mult_su2_mat_vec_elem_a(su2_matrix *u, complex *x0, complex *x1);
+
+Real gaussian_rand_no(double_prn *prn_pt);
+
+Real z2_rand_no(double_prn *prn_pt);
+
+#include "../include/int32type.h"
+void byterevn(int32type w[], int n);
+void byterevn64(int32type w[], int n);
 
 Real magsq_su3vec(su3_vector *a);
 

@@ -21,3 +21,4 @@ void add_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c) {
     c->c[i].imag = a->c[i].imag + b->c[i].imag;
   }
 }
+// -----------------------------------------------------------------

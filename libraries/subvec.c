@@ -1,16 +1,24 @@
-/*********************  subvec.c  (in su3.a) ****************************
-*									*
-* void sub_su3_vector(a,b,c) su3_vector *a,*b,*c;			*
-* subtract su3 vectors:  C <-  A - B 					*
-*/
+// -----------------------------------------------------------------
+// Subtract two vectors -- unlike CDIF, output is always last
+// c <-- c - b
+// c <-- a - b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-/* subtract su3 vectors */
-void sub_su3_vector( su3_vector *a, su3_vector *b, su3_vector *c ){
-register int i;
-    for(i=0;i<3;i++){
-	CSUB( a->c[i], b->c[i], c->c[i] );
-    }
+void dif_su3_vector(su3_vector *b, su3_vector *c) {
+  register int i;
+  for (i = 0; i < 3; i++) {
+    c->c[i].real -= b->c[i].real;
+    c->c[i].imag -= b->c[i].imag;
+  }
 }
+
+void sub_su3_vector(su3_vector *a, su3_vector *b, su3_vector *c) {
+  register int i;
+  for (i = 0; i < 3; i++) {
+    c->c[i].real = a->c[i].real - b->c[i].real;
+    c->c[i].imag = a->c[i].imag - b->c[i].imag;
+  }
+}
+// -----------------------------------------------------------------

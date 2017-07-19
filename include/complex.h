@@ -36,6 +36,7 @@
 //    CMUL_J(a, b, c)     c = a * bdag
 //    CMULJ_(a, b, c)     c = adag * b
 //    CMULJJ(a, b, c)     c = (a * b)dag
+//    CMULJ_SUM(a, b, c)  c += adag * b
 //    CNEGATE(a, b)       b = -a
 //    CMUL_I(a, b)        b = ia
 //    CMUL_MINUS_I(a, b)  b = -ia
@@ -141,6 +142,11 @@ double_complex dce_itheta(double theta);
 #define CMULJJ(a, b, c) { \
   (c).real =  (a).real * (b).real - (a).imag * (b).imag; \
   (c).imag = -(a).real * (b).imag - (a).imag * (b).real; }
+
+// c += adag * b
+#define CMULJ_SUM(a, b, c) { \
+  (c).real += (a).real * (b).real + (a).imag * (b).imag; \
+  (c).imag += (a).real * (b).imag - (a).imag * (b).real; }
 
 // b = -a
 #define CNEGATE(a, b) { (b).real = -(a).real; (b).imag = -(a).imag; }

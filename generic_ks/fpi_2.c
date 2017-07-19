@@ -95,8 +95,7 @@ int fpi_2(Real *masses) {
       FORALLSITES(i, s) {
         scalar_mult_su3_vector(&(fprops[0][i]), 2 * masses[0],
                                &(fprops[0][i]));
-        scalar_mult_add_su3_vector(&(fprops[0][i]), &(temp_prop[i]),
-                                   -1.0, &(fprops[0][i]));
+        dif_su3_vector(&(temp_prop[i]), &(fprops[0][i]));
       }
 
       /* 0-+ (kaon) propagators */
@@ -140,8 +139,7 @@ int fpi_2(Real *masses) {
         FORALLSITES(i,s) {
           scalar_mult_su3_vector(&(fprops[j][i]), 2.0 * masses[j],
                                  &(fprops[j][i]));
-          scalar_mult_add_su3_vector(&(fprops[j][i]), &(temp_prop[i]), -1.0,
-                                     &(fprops[j][i]));
+          dif_su3_vector(&(temp_prop[i]), &(fprops[j][i]));
         }
       }
 
@@ -197,8 +195,8 @@ int fpi_2(Real *masses) {
         printf("SINKS: POINT_KAON_5 WALL_KAON_5\n");
         for (j = 0; j < nt; j++) {
           printf("%d %e %g %e %g\n",j,
-              props[offset + PP][j].real, props[offset + PP][j].imag,
-              props[offset + PW][j].real, props[offset + PW][j].imag);
+                 props[offset + PP][j].real, props[offset + PP][j].imag,
+                 props[offset + PW][j].real, props[offset + PW][j].imag);
         }
         printf("ENDPROP\n");
 
@@ -206,10 +204,10 @@ int fpi_2(Real *masses) {
         printf("MASSES:  %.5e   %.5e\n", masses[m1], masses[m2]);
         printf("SOURCE: FULL_WALL\n");
         printf("SINKS: POINT_KAON_5 WALL_KAON_5\n");
-        for (j=0;j<nt;j++) {
+        for (j = 0; j < nt; j++) {
           printf("%d %e %g %e %g\n",j,
-              props[offset + WP][j].real, props[offset + WP][j].imag,
-              props[offset + WW][j].real, props[offset + WW][j].imag);
+                 props[offset + WP][j].real, props[offset + WP][j].imag,
+                 props[offset + WW][j].real, props[offset + WW][j].imag);
         }
         printf("ENDPROP\n");
       }
