@@ -24,10 +24,12 @@
 // Prototypes for functions in high level code
 int setup();
 int readin(int prompt);
+void wflow(su3_matrix *S[4], anti_hermitmat *A[4]);
 void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]);
 void staple(su3_matrix *stp[4]);
 
 // nHYP stuff specific to for MCRG-blocked measurements
+void mcrg_block(Real t, int blmax);
 void clear_disp(int *disp);
 void diag_su3(su3_matrix* Q, complex *f);
 void block_nhyp_mcrg(int num, int block);

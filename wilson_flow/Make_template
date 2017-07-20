@@ -35,11 +35,13 @@ HEADERS = ${GLOBAL_HEADERS} ${MY_HEADERS}
 # All required object files
 # Basic set from current directory
 MY_OBJECTS = control.o         \
+             wflow.o           \
              setup.o           \
              gauge_info.o      \
              staple.o          \
              loop_table.o      \
              path.o            \
+             mcrg_block.o      \
              block_mcrg.o      \
              block_nhyp_mcrg.o \
              blocked_path.o    \
