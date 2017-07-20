@@ -1,15 +1,15 @@
 Measure Wilson flow using Runge--Kutta integration
-At specified points in the flow, measure MCRG-blocked observables
+Can specify points in the flow at which to measure MCRG-blocked observables
+Can allow code to increase step size up to max_eps for large t > 5
 Option to save the Wilson-flowed lattice at the end of the calculation
 
 Parameters:
-  epsilon
+  epsilon (initialized to start_eps)
     Runge--Kutta step size, 0.02 should be safe
+    For t>5 code can choose larger safe values based on Delta_plaq
 
   tmax
     How far to integrate
-    If tmax=0, the program will try to decide when to stop,
-    but this has not been carefully tested
 
   alpha_hyp{0,1,2}
     HYP smearing parameters for the twice-HYP smeared blocking transformation
@@ -33,7 +33,8 @@ ny 4
 nz 4
 nt 4
 
-epsilon 0.01
+start_eps 0.01
+max_eps 0.1
 tmax 0.3
 
 alpha_hyp0 0.6

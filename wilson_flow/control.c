@@ -85,9 +85,14 @@ void mcrg_block(Real t, int blmax) {
 int main(int argc, char *argv[])  {
   register int i, dir;
   register site *s;
-  int j, prompt, istep, block_count = 0, blmax = 0, eps_scale = 1;
-  double dtime, t = 0.0, E, old_value, new_value = 0.0, der_value;
-  double ssplaq, stplaq, plaq, check, topo;
+  int j, prompt, istep, block_count = 0, blmax = 0;
+  int max_scale, eps_scale = 1, N_base = 0;     // All three always positive
+  double dtime, t = 0.0, E = 0.0, tSqE = 0.0, old_tSqE, der_tSqE;
+  double ssplaq, stplaq, plaq = 0, old_plaq, baseline = 0.0;
+  double check, old_check, topo, old_topo;
+  double slope_tSqE, slope_check, slope_topo, prev_tSqE;
+  double interp_t, interp_plaq, interp_E, interp_tSqE;
+  double interp_check, interp_topo, interp_der;
   su3_matrix *S[4];
   anti_hermitmat *A[4];
 
@@ -130,31 +135,36 @@ int main(int argc, char *argv[])  {
 
   // Wilson flow!
   epsilon = start_eps;
-  for (istep = 0; tmax == 0 || fabs(t) <  fabs(tmax) - fabs(epsilon) / 2;
-       istep++) {
-
+  max_scale = (int)floor(max_eps / start_eps);     // Maximum scaling factor
+  for (istep = 0; fabs(t) <  fabs(tmax) - 0.5 * fabs(epsilon); istep++) {
     stout_step_rk(S, A);
     t += epsilon;
 
-    // Finds 8F_munu = sum_{clover} (U - Udag)
-    // Subtracts the (lattice artifact?) trace at each lattice site
+    // Find 8F_munu = sum_{clover} (U - Udag)
+    // Subtract the (lattice artifact?) trace at each lattice site
     make_field_strength(F_OFFSET(link), F_OFFSET(FS));
 
-    // The variables necessary for scale setting: used if tmax==0 only
-    old_value = new_value;
-    E = 0;
+    // Save previous data for slope and interpolation
+    // old_plaq is only used for adjusting step size below
+    old_tSqE = tSqE;
+    old_check = check;
+    old_topo = topo;
+    old_plaq = plaq;
+
+    // Compute t^2 E and its slope
+    E = 0.0;
     FORALLSITES(i, s) {
       for (dir = 0; dir < 6; dir++)
         E -= (double)realtrace_su3_nn(&(s->FS[dir]), &(s->FS[dir]));
     }
     g_doublesum(&E);
     E /= (volume * 64.0); // Normalization factor of 1/8 for each F_munu
-    new_value = t * t * E;
-    der_value = fabs(t) * (new_value - old_value) / fabs(epsilon);
+    tSqE = t * t * E;
+    der_tSqE = fabs(t) * (tSqE - old_tSqE) / fabs(epsilon);
     // Any negative signs in t and epsilon should cancel out anyway...
 
     // Might as well extract topology
-    // Normalization is 1/4pi^2 again with 1/8 for each F_munu
+    // Normalization is 1/(64*4pi^2) again with 1/8 for each F_munu
     topo = 0.0;
     FORALLSITES(i, s) {
       topo -= (double)realtrace_su3_nn(&(s->FS[0]), &(s->FS[5])); // XYZT
@@ -170,32 +180,85 @@ int main(int argc, char *argv[])  {
     check = 12.0 * t * t * (3.0 - plaq);
 
     // If necessary, interpolate from previous t-eps to current t
+    // before printing out results computed above
     if (eps_scale > 1) {
-      //TODO
-    }
+      slope_tSqE = (tSqE - old_tSqE) / epsilon;
+      slope_check = (check - old_check) / epsilon;
+      slope_topo = (topo - old_topo) / epsilon;
+      prev_tSqE = old_tSqE;
+      interp_t = t - epsilon;
+      for (j = 0; j < eps_scale - 1; j++) {
+        interp_t += start_eps;
+        interp_tSqE = old_tSqE + j * slope_tSqE;
+        interp_E = interp_tSqE / (interp_t * interp_t);
+        interp_der = interp_t * (interp_tSqE - prev_tSqE) / start_eps;
+        prev_tSqE = interp_tSqE;
 
+        interp_check = old_check + j * slope_check;
+        interp_plaq = 3.0 - check / (12.0 * interp_t * interp_t);
+
+        interp_topo = old_topo + j * slope_topo;
+        node0_printf("WFLOW %g %g %g %g %g %g %g (interp)\n",
+                     interp_t, interp_plaq, interp_E, interp_tSqE,
+                     interp_der, interp_check, interp_topo);
+      }
+    }
     node0_printf("WFLOW %g %g %g %g %g %g %g\n",
-                 t, plaq, E, new_value, der_value, check, topo);
+                 t, plaq, E, tSqE, der_tSqE, check, topo);
 
     // Do MCRG blocking at specified t
+    // Use start_eps rather than epsilon to get more accurate targeting
     if (block_count < num_block
-        && fabs(t + epsilon / 2.0) >= fabs(tblock[block_count])) {
+        && fabs(t + 0.5 * start_eps) >= fabs(tblock[block_count])) {
       mcrg_block(tblock[block_count], blmax);
       block_count++;
     }
 
-    // For the tmax == 0 case, figure out if we can stop
-    // Never stop before t = 1
-    // stepi%20 == 0 suppresses fluctuations in the flow length
-    // between different configurations in the same ensemble
-    if (tmax == 0 && fabs(t) > 1 && istep % 20 == 0) {
-      if (new_value > 0.45 && der_value > 0.35)
-        break;
+    // Choose epsilon for the next step
+    // For t < 5 keep epsilon = start_eps fixed
+    // and set up a baseline Delta_plaq * epsilon
+    // This avoids problems interpolating during the initial rise
+    // The t < 5 choice may be conservative (t < 2 might suffice)
+    if (fabs(t) < 5.0) {
+      baseline += (plaq - old_plaq) * epsilon;
+      N_base++;
     }
 
-    // Choose epsilon for the next step
-    // Make sure to land on next tblock if it is approaching
-      //TODO
+    // For t > 5, set epsilon = eps_scale * start_eps
+    // where eps_scale = floor(baseline / Delta_plaq)
+    // Any signs should cancel in the Delta_plaq factors
+    // Round down if eps_scale exceeds max_scale
+    // Also reduce to land on next tblock or final tmax
+    else {
+      // Finish setting up the baseline if this is the first t > 5
+      if (N_base > 0) {
+        baseline /= N_base;
+        N_base = -99;
+      }
+
+      // Basic scaling to keep Delta_plaq * epsilon fixed
+      eps_scale = (int)floor(baseline / ((plaq - old_plaq) * start_eps));
+      if (fabs(eps_scale) > fabs(max_scale))
+        eps_scale = max_scale;
+      epsilon = eps_scale * start_eps;
+
+      // Make sure we don't overshoot tmax or next tblock
+      // This can probably be made more elegant
+      // Need to make sure epsilon never becomes zero
+      if (fabs(t + epsilon) > fabs(tmax)) {
+        eps_scale = (int)floor((tmax - t) / start_eps);
+        if (eps_scale < 1)
+          eps_scale = 1;
+        epsilon = eps_scale * start_eps;
+      }
+      else if (block_count < num_block
+               && fabs(t + epsilon) > fabs(tblock[block_count])) {
+        eps_scale = (int)floor((tblock[block_count] - t) / start_eps);
+        if (eps_scale < 1)
+          eps_scale = 1;
+        epsilon = eps_scale * start_eps;
+      }
+    }
   }
 
   node0_printf("RUNNING COMPLETED\n");

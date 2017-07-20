@@ -96,15 +96,15 @@ int readin(int prompt) {
       status++;
     }
     if (fabs(par_buf.start_eps) > fabs(par_buf.max_eps)) {
-      node0_printf("WARNING: Resetting the starting epsilon (%.4g)",
-                   par_buf.start_eps);
-      node0_printf(" to the maximum epsilon (%.4g)\n", par_buf.max_eps);
+      node0_printf("WARNING: Resetting start_eps to max_eps\n");
       par_buf.start_eps = par_buf.max_eps;
     }
+    if (par_buf.start_eps * par_buf.max_eps < 0)
+      node0_printf("WARNING: start_eps and max_eps have different signs\n");
 
     IF_OK status += get_f(stdin, prompt, "tmax", &par_buf.tmax);
     if (par_buf.start_eps * par_buf.tmax < 0)
-      node0_printf("WARNING: epsilon and tmax have different signs\n");
+      node0_printf("WARNING: start_eps and tmax have different signs\n");
 
     // Smearing parameters
     IF_OK status += get_f(stdin, prompt, "alpha_hyp0", &par_buf.alpha_hyp0);
