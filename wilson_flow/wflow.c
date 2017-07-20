@@ -115,20 +115,12 @@ void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
 
     // Choose epsilon for the next step
     // For t < 5 keep epsilon = start_eps fixed
+    // and set up a baseline Delta_plaq * epsilon
     // This avoids problems interpolating during the initial rise
     // The t < 5 choice may be conservative (t < 2 might suffice)
     if (fabs(t) < 5.0) {
-      // Use first ten steps to set a baseline Delta_plaq * epsilon
-      if (N_base < 10) {
-        baseline += (plaq - old_plaq) * epsilon;
-        N_base++;
-      }
-      else if (N_base == 10) {
-        baseline /= N_base;
-        N_base = 99;
-      }
-      else
-        continue;
+      baseline += (plaq - old_plaq) * epsilon;
+      N_base++;
     }
 
     // For t > 5, set epsilon = eps_scale * start_eps
@@ -137,6 +129,12 @@ void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
     // Round down if eps_scale exceeds max_scale
     // Also reduce to land on next tblock or final tmax
     else {
+      // Finish setting up the baseline if this is the first t > 5
+      if (N_base > 0) {
+        baseline /= N_base;
+        N_base = -99;
+      }
+
       // Basic scaling to keep Delta_plaq * epsilon fixed
       eps_scale = (int)floor(baseline / ((plaq - old_plaq) * start_eps));
       if (fabs(eps_scale) > fabs(max_scale))
