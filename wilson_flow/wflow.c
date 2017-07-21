@@ -12,7 +12,7 @@ void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
   double ssplaq, stplaq, plaq = 0, old_plaq, baseline = 0.0;
   double check, old_check, topo, old_topo;
   double slope_tSqE, slope_check, slope_topo, prev_tSqE;
-  double interp_t, interp_plaq, interp_E, interp_tSqE;
+  double Delta_t, interp_t, interp_plaq, interp_E, interp_tSqE;
   double interp_check, interp_topo, interp_der;
 
   // Determine maximum number of blockings from smallest dimension
@@ -88,15 +88,16 @@ void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
       interp_t = t - epsilon;
       for (j = 0; j < eps_scale - 1; j++) {
         interp_t += start_eps;
-        interp_tSqE = old_tSqE + j * slope_tSqE;
+        Delta_t = (j + 1) * start_eps;
+        interp_tSqE = old_tSqE + Delta_t * slope_tSqE;
         interp_E = interp_tSqE / (interp_t * interp_t);
         interp_der = interp_t * (interp_tSqE - prev_tSqE) / start_eps;
         prev_tSqE = interp_tSqE;
 
-        interp_check = old_check + j * slope_check;
+        interp_check = old_check + Delta_t * slope_check;
         interp_plaq = 3.0 - check / (12.0 * interp_t * interp_t);
 
-        interp_topo = old_topo + j * slope_topo;
+        interp_topo = old_topo + Delta_t * slope_topo;
         node0_printf("WFLOW %g %g %g %g %g %g %g (interp)\n",
                      interp_t, interp_plaq, interp_E, interp_tSqE,
                      interp_der, interp_check, interp_topo);
