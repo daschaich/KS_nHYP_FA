@@ -93,7 +93,7 @@ void copy_latvec(field_offset src, field_offset dest, int parity) {
 
 
 // -----------------------------------------------------------------
-// Scalar multiply an SU3 vector in the lattice
+// Scalar multiply a vector in the lattice
 void scalar_mult_latvec(field_offset src, Real scalar,
                         field_offset dest, int parity) {
 
@@ -130,25 +130,25 @@ void scalar_mult_latvec(field_offset src, Real scalar,
 
 
 // -----------------------------------------------------------------
-// Scalar multiply and add an SU3 vector in the lattice
-// dest = src1 + scalar * src2
-void scalar_mult_add_latvec(field_offset src1, field_offset src2,
-                            Real scalar, field_offset dest, int parity) {
+// Scalar multiply and add vectors in the lattice
+// c <-- a + scalar * b
+void scalar_mult_add_latvec(field_offset a, field_offset b,
+                            Real scalar, field_offset c, int parity) {
 
   register int i;
   register site *s;
-  register vector *spt1, *spt2, *dpt;
+  register vector *apt, *bpt, *cpt;
 
   FORSOMEPARITY(i, s, parity) {
-    spt1 = (vector *)F_PT(s, src1);
-    spt2 = (vector *)F_PT(s, src2);
-    dpt = (vector *)F_PT(s, dest);
+    apt = (vector *)F_PT(s, a);
+    bpt = (vector *)F_PT(s, b);
+    cpt = (vector *)F_PT(s, c);
     if (i < loopend - FETCH_UP)
-      prefetch_VVV((vector *)F_PT((s+FETCH_UP), src1),
-                   (vector *)F_PT((s+FETCH_UP), src2),
-                   (vector *)F_PT((s+FETCH_UP), dest));
+      prefetch_VVV((vector *)F_PT((s + FETCH_UP), a),
+                   (vector *)F_PT((s + FETCH_UP), b),
+                   (vector *)F_PT((s + FETCH_UP), c));
 
-    scalar_mult_add_vector(spt1, spt2, scalar, dpt);
+    scalar_mult_add_vector(apt, bpt, scalar, cpt);
   } END_LOOP
 }
 // -----------------------------------------------------------------
@@ -159,7 +159,7 @@ void scalar_mult_add_latvec(field_offset src1, field_offset src2,
 // Convenience functions to clean up all gathers
 static void cleanup_one_gather_set(msg_tag *tags[]) {
   int i;
-  for(i = XUP; i <= TUP; i++) {
+  FORALLUPDIR(i) {
     cleanup_gather(tags[i]);
     cleanup_gather(tags[OPP_DIR(i)]);
   }

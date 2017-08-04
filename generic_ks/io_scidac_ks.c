@@ -170,7 +170,7 @@ void save_ks_vector_scidac_from_site(char *filename, char *fileinfo,
 
   FORALLSITES(i,s){
     for(j = 0; j < count; j++)
-      su3vec_copy((vector *)F_PT(s,src+j*sizeof(vector)),tmp+count*i+j);
+      vec_copy((vector *)F_PT(s,src+j*sizeof(vector)),tmp+count*i+j);
   }
 
   save_ks_vector_scidac_from_field(filename, fileinfo, recinfo, 
@@ -301,7 +301,7 @@ void restore_ks_vector_scidac_to_site(char *filename, int serpar,
 
   FORALLSITES(i,s){
     for(j = 0; j < count; j++)
-      su3vec_copy(tmp+count*i+j,(vector *)F_PT(s,dest+j*sizeof(vector)));
+      vec_copy(tmp+count*i+j,(vector *)F_PT(s,dest+j*sizeof(vector)));
   }
 
   free(tmp);

@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void su3vec_copy(vector *src, vector *dest) {
+void vec_copy(vector *src, vector *dest) {
   *dest = *src;
 }
 // -----------------------------------------------------------------

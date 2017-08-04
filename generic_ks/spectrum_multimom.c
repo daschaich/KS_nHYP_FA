@@ -373,7 +373,7 @@ void mult_pion_mom_temp( int fb, int px, int py, int pz,
 	    (double)(py*s->y)/(double)(ny) +
 	    (double)(pz*s->z)/(double)(nz))*2.0*PI );
 	if( fb==BACKWARDS )phase.imag = -phase.imag;
-	c_scalar_mult_su3vec( &(src[i]), &phase,
+	c_scalar_mult_vec( &(src[i]), &phase,
 		(vector *)F_PT(s,dest) );
     }
 }
@@ -394,7 +394,7 @@ void mult_rho_mom_temp( int fb, int pdir, int px, int py, int pz,
 	if( ((((short *)&(s->x))[pdir]) & 0x1) != 0 ){
 	     CMULREAL( phase, -1.0, phase );
 	}
-	c_scalar_mult_su3vec( &(src[i]), &phase,
+	c_scalar_mult_vec( &(src[i]), &phase,
 		(vector *)F_PT(s,dest) );
     }
 }

@@ -105,15 +105,14 @@ start:
 
   // mp  <- mp - msq_x4 * psi
   FORSOMEPARITY(i, s, l_parity) {
-    scalar_mult_add_vector(&(s->mp), (vector *)F_PT(s, psi),
-                               -msq_x4, &(s->mp));
+    scalar_mult_sum_vector((vector *)F_PT(s, psi), -msq_x4, &(s->mp));
 
     // mp contains -(M^dag M) psi
     add_vector((vector *)F_PT(s, chi), &(s->mp), &(s->r));
 
     s->p = s->r;
-    rsq += (double)magsq_su3vec(&(s->r));
-    source_norm += (double)magsq_su3vec((vector *)F_PT(s, chi));
+    rsq += (double)magsq_vec(&(s->r));
+    source_norm += (double)magsq_vec((vector *)F_PT(s, chi));
   } END_LOOP
   g_doublesum(&source_norm);
   g_doublesum(&rsq);
@@ -184,7 +183,7 @@ start:
       if (i < loopend - FETCH_UP)
         prefetch_VV(&((s + FETCH_UP)->mp), &((s + FETCH_UP)->p));
 
-      scalar_mult_add_vector(&(s->mp), &(s->p), -msq_x4, &(s->mp));
+      scalar_mult_sum_vector(&(s->p), -msq_x4, &(s->mp));
       pkp += (double)su3_rdot(&(s->p), &(s->mp));
     } END_LOOP
     g_doublesum(&pkp);
@@ -203,10 +202,9 @@ start:
                       &((s + FETCH_UP)->p), &((s+FETCH_UP)->r),
                       &((s + FETCH_UP)->mp));
 
-      scalar_mult_add_vector((vector *)F_PT(s, psi),
-                                 &(s->p), a, (vector *)F_PT(s, psi));
-      scalar_mult_add_vector(&(s->r), &(s->mp), a, &(s->r));
-      rsq += (double)magsq_su3vec(&(s->r));
+      scalar_mult_sum_vector(&(s->p), a, (vector *)F_PT(s, psi));
+      scalar_mult_sum_vector(&(s->mp), a, &(s->r));
+      rsq += (double)magsq_vec(&(s->r));
     } END_LOOP
     g_doublesum(&rsq);
 
@@ -242,7 +240,7 @@ start:
     }
 
     b = (Real)rsq / oldrsq;
-    // p <- r + b * p
+    // p <-- r + b * p
     scalar_mult_add_latvec(F_OFFSET(r), F_OFFSET(p), b,
                            F_OFFSET(p), l_parity);
   } while (iteration % niter != 0);
@@ -315,8 +313,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
                      (vector *)F_PT((s + FETCH_UP), chi),
                      (s + FETCH_UP)->tempvec);
 
-    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi),
-                              s->tempvec);
+    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
   } END_LOOP
 
   // Start gathers from negative directions
@@ -341,10 +338,10 @@ void dslash(field_offset chi, field_offset psi, int parity) {
                       (vector *)gen_pt[TUP][i + FETCH_UP]);
     }
     mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
-                              (vector *)gen_pt[YUP][i],
-                              (vector *)gen_pt[ZUP][i],
-                              (vector *)gen_pt[TUP][i],
-                              (vector *)F_PT(s, psi));
+                          (vector *)gen_pt[YUP][i],
+                          (vector *)gen_pt[ZUP][i],
+                          (vector *)gen_pt[TUP][i],
+                          (vector *)F_PT(s, psi));
   } END_LOOP
 
   // Wait gathers from negative directions
@@ -435,8 +432,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
                      (vector *)F_PT((s + FETCH_UP), chi),
                      (s + FETCH_UP)->tempvec);
 
-    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi),
-                              s->tempvec);
+    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
   } END_LOOP
 
   // Start gathers from negative directions
@@ -464,10 +460,10 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
                     (vector *)gen_pt[TUP][i + FETCH_UP]);
 
     mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
-                              (vector *)gen_pt[YUP][i],
-                              (vector *)gen_pt[ZUP][i],
-                              (vector *)gen_pt[TUP][i],
-                              (vector *)F_PT(s, psi));
+                          (vector *)gen_pt[YUP][i],
+                          (vector *)gen_pt[ZUP][i],
+                          (vector *)gen_pt[TUP][i],
+                          (vector *)F_PT(s, psi));
   } END_LOOP
 
   // Wait gathers from negative directions

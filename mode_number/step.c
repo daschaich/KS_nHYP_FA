@@ -45,10 +45,9 @@ void Z(field_offset src, field_offset dest) {
 
   FOREVENSITES(i, s) {
     scalar_mult_vector((vector *)F_PT(s, dest), scale,
+                       (vector *)F_PT(s, dest));
+    scalar_mult_sum_vector((vector *)F_PT(s, src), toAdd,
                            (vector *)F_PT(s, dest));
-    // !!! Note unusual order of arguments
-    scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                               (vector *)F_PT(s, src), toAdd);
   }
 }
 // -----------------------------------------------------------------

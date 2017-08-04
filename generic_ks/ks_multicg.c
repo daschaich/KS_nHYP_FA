@@ -332,13 +332,13 @@ int ks_multicg_reverse(	/* Return value is number of iterations taken */
 	num_offsets_now = num_offsets;
 	source_norm = 0.0;
 	FORSOMEPARITY(i,s,l_parity){
-	    source_norm += (double) magsq_su3vec( (vector *)F_PT(s,src) );
-	    su3vec_copy((vector *)F_PT(s,src), &(resid[i]));
-	    su3vec_copy(&(resid[i]), &(cg_p[i]));
+	    source_norm += (double) magsq_vec( (vector *)F_PT(s,src) );
+	    vec_copy((vector *)F_PT(s,src), &(resid[i]));
+	    vec_copy(&(resid[i]), &(cg_p[i]));
 	    clearvec(&(psim_rev[i][j_low]));
 	    for(j=0;j<num_offsets;j++) if(j!=j_low){
 		clearvec(&(psim_rev[i][j]));
-		su3vec_copy(&(resid[i]), &(pm_rev[i][j]));
+		vec_copy(&(resid[i]), &(pm_rev[i][j]));
 	    }
 	} END_LOOP;
 	g_doublesum( &source_norm );
@@ -430,7 +430,7 @@ int ks_multicg_reverse(	/* Return value is number of iterations taken */
 	FORSOMEPARITY(i,s,l_parity){
 	    scalar_mult_add_vector( &(resid[i]), &(ttt[i]),
 		(Real)beta_i[j_low], &(resid[i]));
-	    rsq += (double)magsq_su3vec( &(resid[i]) );
+	    rsq += (double)magsq_vec( &(resid[i]) );
 	} END_LOOP;
 	g_doublesum(&rsq);
 

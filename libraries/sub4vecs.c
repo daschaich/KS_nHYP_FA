@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void sub_four_su3_vecs(vector *a, vector *b1, vector *b2,
+void sub_four_vecs(vector *a, vector *b1, vector *b2,
                        vector *b3, vector *b4) {
 #ifndef FAST
   register int i;

@@ -57,7 +57,7 @@ void norm(vector *vec, double *norm) {
   register site *s;
 
   FOREVENSITES(i, s)
-    n += magsq_su3vec(&(vec[i]));
+    n += magsq_vec(&(vec[i]));
 
   *norm = n;
   g_doublesum(norm);
@@ -117,7 +117,7 @@ void complex_vec_mult_sub(double_complex *cc, vector *vec1,
   sc.real = (Real)(cc->real);
   sc.imag = (Real)(cc->imag);
   FOREVENSITES(i, s)
-    c_scalar_mult_dif_su3vec(&(vec1[i]), &sc, &(vec2[i]));
+    c_scalar_mult_dif_vec(&(vec1[i]), &sc, &(vec2[i]));
 }
 // -----------------------------------------------------------------
 
@@ -205,7 +205,7 @@ void complex_vec_mult_add(double_complex *cc, vector *vec1,
   sc.real = (Real)(cc->real);
   sc.imag = (Real)(cc->imag);
   FOREVENSITES(i, s)
-    c_scalar_mult_sum_su3vec(&(vec1[i]), &sc, &(vec2[i]));
+    c_scalar_mult_sum_vec(&(vec1[i]), &sc, &(vec2[i]));
 }
 // -----------------------------------------------------------------
 
@@ -447,7 +447,7 @@ int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
     grad[j] = 1e10;
     grsource_imp();
     FOREVENSITES(i, s)
-      su3vec_copy(&(s->g_rand), &(eigVec[j][i]));
+      vec_copy(&(s->g_rand), &(eigVec[j][i]));
   }
 
   while (max_error > Tolerance && iter < kiters) {
@@ -533,7 +533,7 @@ void measure_chirality(vector *src, double *chirality) {
   complex tmp;
 
   FORALLSITES(i, s)
-    su3vec_copy(&src[i], &(s->tempvec[3]));
+    vec_copy(&src[i], &(s->tempvec[3]));
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(temp));
 
@@ -558,7 +558,7 @@ void print_densities(vector *src, char *tag, int y, int z, int t) {
   complex tmp1, tmp2;
 
   FOREVENSITES(i, s)
-    su3vec_copy(&src[i], &(s->tempvec[3]));
+    vec_copy(&src[i], &(s->tempvec[3]));
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(temp));
 

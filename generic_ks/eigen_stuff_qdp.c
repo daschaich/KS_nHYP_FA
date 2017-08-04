@@ -652,7 +652,7 @@ void measure_chirality(vector *src, double *chirality, int parity)
   complex tmp ;
  
   FORSOMEPARITY(i,s,parity){
-    su3vec_copy(&src[i],&(s->tempvec[3])) ;
+    vec_copy(&src[i],&(s->tempvec[3])) ;
   }
  
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]),F_OFFSET(ttt)) ;

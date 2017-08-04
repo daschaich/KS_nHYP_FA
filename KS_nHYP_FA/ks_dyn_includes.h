@@ -44,8 +44,8 @@ void clear_latvec(field_offset v, int parity);
 void copy_latvec(field_offset src, field_offset dest, int parity);
 void scalar_mult_latvec(field_offset src, Real scalar,
                         field_offset dest, int parity);
-void scalar_mult_add_latvec(field_offset src1, field_offset src2,
-                            Real scalar, field_offset dest, int parity);
+void scalar_mult_add_latvec(field_offset a, field_offset b,
+                            Real scalar, field_offset c, int parity);
 
 // Evolution stuff
 void grsource_imp(field_offset dest, Real mass, int parity);

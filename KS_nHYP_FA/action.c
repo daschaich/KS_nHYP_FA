@@ -123,8 +123,7 @@ void gauge_field_copy(field_offset src, field_offset dest) {
     src2 = src;
     dest2 = dest;
     FORALLUPDIR(dir) {
-      mat_copy((matrix *)F_PT(s, src2),
-                  (matrix *)F_PT(s, dest2));
+      mat_copy((matrix *)F_PT(s, src2), (matrix *)F_PT(s, dest2));
       src2 += sizeof(matrix);
       dest2 += sizeof(matrix);
     }

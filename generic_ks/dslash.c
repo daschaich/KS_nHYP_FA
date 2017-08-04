@@ -150,7 +150,7 @@ void dslash_site_special( field_offset src, field_offset dest,
         (vector *)gen_pt[TDOWN][i+FETCH_UP] );
     }
 
-    sub_four_su3_vecs( (vector *)F_PT(s,dest),
+    sub_four_vecs( (vector *)F_PT(s,dest),
            (vector *)(gen_pt[XDOWN][i]),
            (vector *)(gen_pt[YDOWN][i]),
            (vector *)(gen_pt[ZDOWN][i]),
@@ -276,7 +276,7 @@ void dslash_field_special( vector *src, vector *dest,
         (vector *)gen_pt[TDOWN][i+FETCH_UP] );
     }
     
-    sub_four_su3_vecs( &(dest[i]),
+    sub_four_vecs( &(dest[i]),
            (vector *)(gen_pt[XDOWN][i]),
            (vector *)(gen_pt[YDOWN][i]),
            (vector *)(gen_pt[ZDOWN][i]),

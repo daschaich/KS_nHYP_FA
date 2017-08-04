@@ -136,7 +136,7 @@ int make_evs(double *start, int Nvecs, vector **eigVecs, double *eigVals) {
     eigVals[ivec] = 1e16;
     grsource_imp();
     FOREVENSITES(i, s)
-      su3vec_copy(&(s->g_rand), &(eigVecs[ivec][i]));
+      vec_copy(&(s->g_rand), &(eigVecs[ivec][i]));
   }
 
   // Copy initial guesses into double-precision temporary fields
@@ -210,7 +210,7 @@ void measure_chirality(vector *src, double *chirality) {
   complex tmp;
 
   FORALLSITES(i, s)
-    su3vec_copy(&src[i], &(s->tempvec[3]));
+    vec_copy(&src[i], &(s->tempvec[3]));
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(temp));
 
@@ -235,7 +235,7 @@ void print_densities(vector *src, char *tag, int y, int z, int t) {
   complex tmp1, tmp2;
 
   FOREVENSITES(i, s)
-    su3vec_copy(&src[i], &(s->tempvec[3]));
+    vec_copy(&src[i], &(s->tempvec[3]));
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(temp));
 

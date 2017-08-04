@@ -341,8 +341,7 @@ void block_nhyp1_mcrg(int num, int block) {
 
         FORALLSITES(i, s) {
           // Make Omega
-          scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]),
-                                     ftmp1, &Q);
+          scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
           scalar_mult_matrix(&Q, ftmp2, &Omega);
           mult_su3_an(&Omega, &Omega, &Q);
           scalar_add_diag_su3(&Q, IR_STAB);
@@ -393,8 +392,7 @@ void block_nhyp2_mcrg(int num, int block) {
 
       FORALLSITES(i, s) {
         // Make Omega
-        scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]),
-                                   ftmp1, &Q);
+        scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
         scalar_mult_matrix(&Q, ftmp2, &Omega);
         mult_su3_an(&Omega,&Omega,&Q);
         scalar_add_diag_su3(&Q, IR_STAB);
@@ -440,8 +438,7 @@ void block_nhyp3_mcrg(int num, int block) {
 
     FORALLSITES(i, s) {
       // Make Omega
-      scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]),
-                                 ftmp1, &Q);
+      scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
       scalar_mult_matrix(&Q, ftmp2, &Omega);
       mult_su3_an(&Omega, &Omega, &Q);
       scalar_add_diag_su3(&Q, IR_STAB);

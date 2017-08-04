@@ -82,7 +82,7 @@ int fpi_2(Real *masses) {
             s->chi.c[icol].imag = gaussian_rand_no(&(s->site_prn));
           }
           // Factor of 2 because we invert 2m + 2 Dslash
-          tr = 2.0 / sqrt(magsq_su3vec(&(s->chi)));
+          tr = 2.0 / sqrt(magsq_vec(&(s->chi)));
           scalar_mult_vector(&(s->chi), tr, &(s->chi));
         }
       }

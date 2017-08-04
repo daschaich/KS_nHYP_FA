@@ -44,7 +44,7 @@ int CG_wrapper(field_offset chi, vector **props, Real m, int parity) {
 
   it = ks_congrad(chi, F_OFFSET(psi), m, parity);
   FORALLSITES(i, s)
-    su3vec_copy(&(s->psi), &(props[0][i]));
+    vec_copy(&(s->psi), &(props[0][i]));
   return it;
 }
 // -----------------------------------------------------------------
@@ -126,8 +126,8 @@ start:
     add_vector((vector *)F_PT(s, chi), &(s->mp), &(s->r));
 
     s->p = s->r;
-    rsq += (double)magsq_su3vec(&(s->r));
-    source_norm += (double)magsq_su3vec((vector *)F_PT(s, chi));
+    rsq += (double)magsq_vec(&(s->r));
+    source_norm += (double)magsq_vec((vector *)F_PT(s, chi));
   } END_LOOP
   g_doublesum(&source_norm);
   g_doublesum(&rsq);
@@ -220,7 +220,7 @@ start:
       scalar_mult_add_vector((vector *)F_PT(s, psi),
                                  &(s->p), a, (vector *)F_PT(s, psi));
       scalar_mult_add_vector(&(s->r), &(s->mp), a, &(s->r));
-      rsq += (double)magsq_su3vec(&(s->r));
+      rsq += (double)magsq_vec(&(s->r));
     } END_LOOP
     g_doublesum(&rsq);
 
@@ -302,10 +302,10 @@ void dslash_wrapper(vector *src, vector *dest, int parity) {
   register site* s;
 
   FORALLSITES(i, s)
-    su3vec_copy(&(src[i]), &(s->chi));
+    vec_copy(&(src[i]), &(s->chi));
   dslash(F_OFFSET(chi), F_OFFSET(psi), parity);
   FORALLSITES(i, s)
-    su3vec_copy(&(s->psi), &(dest[i]));
+    vec_copy(&(s->psi), &(dest[i]));
 }
 // -----------------------------------------------------------------
 
@@ -392,7 +392,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
 
 #ifndef INLINE
     // Non-inline version
-    sub_four_su3_vecs((vector *)F_PT(s,psi),
+    sub_four_vecs((vector *)F_PT(s,psi),
                       (vector *)(gen_pt[XDOWN][i]),
                       (vector *)(gen_pt[YDOWN][i]),
                       (vector *)(gen_pt[ZDOWN][i]),
@@ -528,7 +528,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
 
 #ifndef INLINE
     // Non-inline version
-    sub_four_su3_vecs((vector *)F_PT(s, psi),
+    sub_four_vecs((vector *)F_PT(s, psi),
                       (vector *)(gen_pt[XDOWN][i]),
                       (vector *)(gen_pt[YDOWN][i]),
                       (vector *)(gen_pt[ZDOWN][i]),

@@ -120,7 +120,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
 
 #ifndef INLINE
     // Non-inline version
-    sub_four_su3_vecs((vector *)F_PT(s,psi),
+    sub_four_vecs((vector *)F_PT(s,psi),
                       (vector *)(gen_pt[XDOWN][i]),
                       (vector *)(gen_pt[YDOWN][i]),
                       (vector *)(gen_pt[ZDOWN][i]),

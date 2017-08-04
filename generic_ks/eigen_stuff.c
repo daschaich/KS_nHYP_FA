@@ -240,7 +240,7 @@ void norm2(vector *vec, double *norm, int parity) {
 
   n=0;
   FORSOMEPARITY(i, s, parity) {
-    n += magsq_su3vec(&(vec[i]));
+    n += magsq_vec(&(vec[i]));
   }
   *norm = n;
   g_doublesum(norm);
@@ -279,7 +279,7 @@ void complex_vec_mult_sub(double_complex *cc, vector *vec1,
   sc.real= (Real)(cc->real);
   sc.imag= (Real)(cc->imag);
   FORSOMEPARITY(i, s, parity)
-    c_scalar_mult_dif_su3vec(&(vec1[i]), (&sc), &(vec2[i]));
+    c_scalar_mult_dif_vec(&(vec1[i]), (&sc), &(vec2[i]));
 }
 
 /*****************************************************************************/
@@ -294,7 +294,7 @@ void complex_vec_mult_add(double_complex *cc, vector *vec1,
   sc.real= (Real)(cc->real);
   sc.imag= (Real)(cc->imag);
   FORSOMEPARITY(i, s, parity) {
-    c_scalar_mult_sum_su3vec(&(vec1[i]), &sc, &(vec2[i]));
+    c_scalar_mult_sum_vec(&(vec1[i]), &sc, &(vec2[i]));
   }
 }
 
@@ -585,7 +585,7 @@ void RotateBasis(vector **eigVec, Matrix *V, int parity) {
     /* Copy only wanted parity (UMH) */
     /** copy_Vector(Tmp[j], eigVec[j]); **/
     FORSOMEPARITY(i, s, parity) {
-      su3vec_copy( &(Tmp[j][i]), &(eigVec[j][i]));
+      vec_copy( &(Tmp[j][i]), &(eigVec[j][i]));
     }
     free(Tmp[j]);
   }
@@ -635,7 +635,7 @@ int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
     grad[j] = 1.0e+10;
     grsource_plain(F_OFFSET(g_rand), parity);
     FORSOMEPARITY(i, s, parity) {
-      su3vec_copy(&(s->g_rand),&(eigVec[j][i]));
+      vec_copy(&(s->g_rand),&(eigVec[j][i]));
     }
     eigVal[j] = 1.0e+16;
   }
@@ -660,7 +660,7 @@ int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
   /* Copy only wanted parity (UMH) */
   /** copy_Vector(vec, eigVec[j]); **/
   FORSOMEPARITY(i, s, parity) {
-    su3vec_copy( &(vec[i]), &(eigVec[j][i]));
+    vec_copy( &(vec[i]), &(eigVec[j][i]));
   }
       }else{
   converged[j] = 1;
@@ -761,7 +761,7 @@ void measure_chirality(vector *src, double *chirality, int parity) {
   complex tmp;
 
   FORSOMEPARITY(i, s, parity) {
-    su3vec_copy(&src[i],&(s->tempvec[3]));
+    vec_copy(&src[i],&(s->tempvec[3]));
   }
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(ttt));
@@ -786,7 +786,7 @@ void print_densities(vector *src, char *tag, int y, int z, int t,
   complex tmp1, tmp2;
 
   FORSOMEPARITY(i, s, parity)
-    su3vec_copy(&src[i], &(s->tempvec[3]));
+    vec_copy(&src[i], &(s->tempvec[3]));
 
   mult_spin_pseudoscalar(F_OFFSET(tempvec[3]), F_OFFSET(ttt));
 

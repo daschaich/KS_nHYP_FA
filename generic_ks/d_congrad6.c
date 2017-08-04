@@ -10,7 +10,7 @@
 /* The dslash code in this version waits for gathers from both
    positive and negative directions before computing, thereby combining
    two lattice loops in an attempt to gain prefetching time for
-   sub_four_su3_vecs */
+   sub_four_vecs */
 
 /* This version looks at the initial vector every "niter" passes */
 /* The source vector is in "src", and the initial guess and answer
@@ -119,8 +119,8 @@ start:
 			    &(s->ttt), &(s->resid) );
 		/* remember ttt contains -M_adjoint*M*src */
 	    s->cg_p = s->resid;
-	    source_norm += (double)magsq_su3vec( (vector *)F_PT(s,src) );
-            rsq += (double)magsq_su3vec( &(s->resid) );
+	    source_norm += (double)magsq_vec( (vector *)F_PT(s,src) );
+            rsq += (double)magsq_vec( &(s->resid) );
 	} END_LOOP
 	g_doublesum( &source_norm );
         g_doublesum( &rsq );
@@ -220,7 +220,7 @@ fflush(stdout);}
 					&(s->cg_p), a, 
 					(vector *)F_PT(s,dest) );
 	    scalar_mult_add_vector( &(s->resid), &(s->ttt), a, &(s->resid));
-	    rsq += (double)magsq_su3vec( &(s->resid) );
+	    rsq += (double)magsq_vec( &(s->resid) );
 	} END_LOOP
 	g_doublesum(&rsq);
 	/**if(mynode()==0)printf("iter=%d, rsq= %e, pkp=%e\n",
@@ -397,7 +397,7 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
 			(vector *)gen_pt[TDOWN][i+FETCH_UP] );
 	}
 #ifndef INLINE
-      sub_four_su3_vecs( (vector *)F_PT(s,dest),
+      sub_four_vecs( (vector *)F_PT(s,dest),
 	    (vector *)(gen_pt[XDOWN][i]),
 	    (vector *)(gen_pt[YDOWN][i]),
 	    (vector *)(gen_pt[ZDOWN][i]),
@@ -575,7 +575,7 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
 
 #ifndef INLINE
 
-      sub_four_su3_vecs( (vector *)F_PT(s,dest),
+      sub_four_vecs( (vector *)F_PT(s,dest),
 	    (vector *)(gen_pt[XDOWN][i]),
 	    (vector *)(gen_pt[YDOWN][i]),
 	    (vector *)(gen_pt[ZDOWN][i]),

@@ -110,8 +110,8 @@ start:
     add_vector((vector *)F_PT(s, chi), &(s->mp), &(s->r));
 
     s->p = s->r;
-    rsq += (double)magsq_su3vec(&(s->r));
-    source_norm += (double)magsq_su3vec((vector *)F_PT(s, chi));
+    rsq += (double)magsq_vec(&(s->r));
+    source_norm += (double)magsq_vec((vector *)F_PT(s, chi));
   } END_LOOP
   g_doublesum(&source_norm);
   g_doublesum(&rsq);
@@ -204,7 +204,7 @@ start:
       scalar_mult_add_vector((vector *)F_PT(s, psi),
                                  &(s->p), a, (vector *)F_PT(s, psi));
       scalar_mult_add_vector(&(s->r), &(s->mp), a, &(s->r));
-      rsq += (double)magsq_su3vec(&(s->r));
+      rsq += (double)magsq_vec(&(s->r));
     } END_LOOP
     g_doublesum(&rsq);
 
@@ -359,7 +359,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
 
 #ifndef INLINE
     // Non-inline version
-    sub_four_su3_vecs((vector *)F_PT(s,psi),
+    sub_four_vecs((vector *)F_PT(s,psi),
                       (vector *)(gen_pt[XDOWN][i]),
                       (vector *)(gen_pt[YDOWN][i]),
                       (vector *)(gen_pt[ZDOWN][i]),
@@ -495,7 +495,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
 
 #ifndef INLINE
     // Non-inline version
-    sub_four_su3_vecs((vector *)F_PT(s, psi),
+    sub_four_vecs((vector *)F_PT(s, psi),
                       (vector *)(gen_pt[XDOWN][i]),
                       (vector *)(gen_pt[YDOWN][i]),
                       (vector *)(gen_pt[ZDOWN][i]),

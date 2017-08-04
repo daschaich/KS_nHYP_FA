@@ -74,7 +74,7 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
 #ifdef NPBP_REPS
     pbp_pbp = 0;
     FORALLSITES(i, s)
-      su3vec_copy((vector *)F_PT(s, psi_off), &(s->M_inv));
+      vec_copy((vector *)F_PT(s, psi_off), &(s->M_inv));
 
     clear_latvec(psi_off, EVENANDODD);
     mat_invert_uml(F_OFFSET(M_inv), psi_off, chi_off, mass);

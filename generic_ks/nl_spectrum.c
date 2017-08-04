@@ -66,7 +66,7 @@ void accum_delta_prop(int i,int c[3], field_offset tempmat1) {
     af = (matrix *)gen_pt[dir][i];
     ab = (matrix *)gen_pt[dir+4][i];
     tmp1 = (matrix *)F_PT(&lattice[i], tempmat1);
-    su3vec_copy((vector *)(af->e[c[j]]),
+    vec_copy((vector *)(af->e[c[j]]),
         (vector *)(tmp1->e[j]));
     add_vector((vector *)(ab->e[c[j]]),
         (vector *)(tmp1->e[j]),
@@ -399,7 +399,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
             (vector *)(tmp1->e[icol]));
         sub_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
             &(s->propmat2[icol]));
-        su3vec_copy((vector *)(tmp1->e[icol]),
+        vec_copy((vector *)(tmp1->e[icol]),
             &(s->propmat[icol]));
       }
     }

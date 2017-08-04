@@ -186,10 +186,8 @@ void mult_flavor_tensor(int mu, int nu, field_offset src, field_offset dest) {
   zeta_shift(2, d, src, F_OFFSET(tempvec[1]));
 
   FORALLSITES(i, s) {
-    scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                               &(s->tempvec[1]), -1.0);
-    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
-                           (vector *)F_PT(s, dest));
+    dif_vector(&(s->tempvec[1]), (vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5, (vector *)F_PT(s, dest));
   }
 }
 
@@ -214,8 +212,8 @@ void mult_flavor_pseudovector(int mu, field_offset src, field_offset dest) {
       /* Multiply the extra 1/6 needed by the definition    *
        * of the operator (number of permutations)           */
       FORALLSITES(i, s) {
-        scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                   &(s->tempvec[1]), eps[p].sign / 6.0);
+        scalar_mult_sum_vector(&(s->tempvec[1]), eps[p].sign / 6.0,
+                               (vector *)F_PT(s, dest));
       }
     }
   }
@@ -241,8 +239,8 @@ void mult_flavor_pseudoscalar(field_offset src, field_offset dest) {
     /*  Multiply the the extra 1/24 needed by the            *
      * definition of the operator (number of permutations)   */
     FORALLSITES(i, s) {
-      scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                 &(s->tempvec[1]), eps[p].sign / 24.0);
+      scalar_mult_sum_vector(&(s->tempvec[1]), eps[p].sign / 24.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -276,8 +274,7 @@ void mult_spin_tensor(int mu, int nu, field_offset src, field_offset dest) {
   eta_shift(2, d, src, F_OFFSET(tempvec[2]));
 
   FORALLSITES(i, s) {
-    scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                               &(s->tempvec[2]), -1.0);
+    dif_vector(&(s->tempvec[2]), (vector *)F_PT(s, dest));
     scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
                            (vector *)F_PT(s, dest));
   }
@@ -304,8 +301,8 @@ void mult_spin_pseudovector(int mu, field_offset src, field_offset dest) {
       /* Multiply the extra 1/6 needed by the definition    *
          of the operator (number of permutations)           */
       FORALLSITES(i, s) {
-        scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                   &(s->tempvec[2]), eps[p].sign / 6.0);
+        scalar_mult_sum_vector(&(s->tempvec[2]), eps[p].sign / 6.0,
+                               (vector *)F_PT(s, dest));
       }
     }
   }
@@ -331,8 +328,8 @@ void mult_spin_pseudoscalar(field_offset src, field_offset dest) {
     /*  Multiply the the extra 1/24 needed by the            *
      * definition of the operator (number of permutations)   */
     FORALLSITES(i, s) {
-      scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                 &(s->tempvec[2]), eps[p].sign / 24.0);
+      scalar_mult_sum_vector(&(s->tempvec[2]), eps[p].sign / 24.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }

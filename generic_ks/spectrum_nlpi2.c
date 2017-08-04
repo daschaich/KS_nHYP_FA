@@ -162,8 +162,7 @@ void mult_pioni(int fdir, field_offset src, field_offset dest) {
       if (((((short *)&(s->x))[d1]) & 0x1) == 1)
         sign = -1.0;
       sign *= epsilon_sign;
-      scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                 &(s->tempvec[1]), sign);
+      scalar_mult_sum_vector(&(s->tempvec[1]), sign, (vector *)F_PT(s, dest));
     }
     epsilon_sign = -epsilon_sign;
   }
@@ -179,7 +178,7 @@ void mult_pioni0(int fdir, field_offset src, field_offset dest) {
   FORALLSITES(i, s) {
     if ((s->x + s->y + s->z) % 2 == 1) {
       scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }
@@ -204,16 +203,14 @@ void mult_pions(field_offset src, field_offset dest) {
   for (c = 0; c < 6; c++) {
     zeta_shift(3, p[c].d, src, F_OFFSET(tempvec[1]));
     FORALLSITES(i, s) {
-      scalar_mult_sum_vector((vector *)F_PT(s, dest),
-                                 &(s->tempvec[1]), p[c].sign);
+      scalar_mult_sum_vector(&(s->tempvec[1]), p[c].sign,
+                             (vector *)F_PT(s, dest));
     }
   }
 
   // Multiply by epsilon for the anti-quark
-  FORODDSITES(i, s) {
-    scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
-                           (vector *)F_PT(s, dest));
-  }
+  FORODDSITES(i, s)
+    scalar_mult_vector((vector *)F_PT(s, dest), -1.0, (vector *)F_PT(s, dest));
 }
 
 // The three-link gamma_0 pion operator
@@ -226,7 +223,7 @@ void mult_pion0(field_offset src, field_offset dest) {
   FORALLSITES(i, s) {
     if ((s->x + s->y + s->z) % 2 == 1) {
       scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }
@@ -241,7 +238,7 @@ void mult_rhoi(int pdir, field_offset src, field_offset dest) {
       *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
     else {
       scalar_mult_vector((vector *)F_PT(s, src), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }
@@ -256,7 +253,7 @@ void mult_rhoi0(int pdir, field_offset src, field_offset dest) {
       *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
     else {
       scalar_mult_vector((vector *)F_PT(s, src), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }
@@ -272,7 +269,7 @@ void mult_rhos(int fdir, field_offset src, field_offset dest) {
   FORALLSITES(i, s) {
     if (s->parity == ODD) {   // The extra gamma_5
       scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }
@@ -289,7 +286,7 @@ void mult_rho0(int fdir, field_offset src, field_offset dest) {
   FORALLSITES(i, s) {
     if ((s->t) % 2 == 1) {
       scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
-                             (vector *)F_PT(s, dest));
+                         (vector *)F_PT(s, dest));
     }
   }
 }

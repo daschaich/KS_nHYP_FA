@@ -28,12 +28,12 @@ typedef struct {
 } danti_hermitmat;
 
 #if PRECISION == 1
-#define matrix      fmatrix
-#define vector      fvector
+#define matrix          fmatrix
+#define vector          fvector
 #define anti_hermitmat  fanti_hermitmat
 #else
-#define matrix      dmatrix
-#define vector      dvector
+#define matrix          dmatrix
+#define vector          dvector
 #define anti_hermitmat  danti_hermitmat
 #endif
 
@@ -114,11 +114,11 @@ typedef struct { complex e[2][2]; } su2_matrix;
 * Real su3_rdot(vector *a, vector *b)
 * file "su3_rdot.c"
   *
-* Real magsq_su3vec(vector *a)
-* file "msq_su3vec.c"
+* Real magsq_vec(vector *a)
+* file "msq_vec.c"
   *
-* void su3vec_copy(vector *a, vector *b)
-* file "su3vec_copy.c"
+* void vec_copy(vector *a, vector *b)
+* file "vec_copy.c"
 *
 * void mult_mat_vec(matrix *a, vector *b, vector *c)
 *  C  <-  A*B
@@ -143,7 +143,7 @@ typedef struct { complex e[2][2]; } su2_matrix;
 *
 * void add_vector(vector *a, vector *b, vector *c)
 * file "addvec.c"
-* void sub_four_su3_vecs(vector *a, vector *b1, vector *b2,
+* void sub_four_vecs(vector *a, vector *b1, vector *b2,
 *   vector *b3, vector *b4)
 * file "sub4vecs.c"
 *
@@ -157,11 +157,11 @@ typedef struct { complex e[2][2]; } su2_matrix;
 * void scalar_mult_sub_vector(vector *a, vector *b, Real s,
 * vector *c)
 * file "s_m_s_vec.c"
-* void c_scalar_mult_su3vec(vector *src, complex *phase, vector *dest)
+* void c_scalar_mult_vec(vector *src, complex *phase, vector *dest)
 * file "cs_m_vec.c"
-* void c_scalar_mult_add_su3vec(vector *v1, complex *phase, vector *v2)
+* void c_scalar_mult_add_vec(vector *v1, complex *phase, vector *v2)
 * file "cs_m_a_vec.c"
-* void c_scalar_mult_sub_su3vec(vector *v1, complex *phase, vector *v2)
+* void c_scalar_mult_sub_vec(vector *v1, complex *phase, vector *v2)
 * file "cs_m_s_vec.c"
 * void dumpvec(vector *v)
 *       file "dumpvec.c"
@@ -262,16 +262,19 @@ void add_matrix(matrix *a, matrix *b, matrix *c);
 void sub_matrix(matrix *a, matrix *b, matrix *c);
 
 void scalar_mult_matrix(matrix *b, Real s, matrix *c);
-void scalar_mult_sub_matrix(matrix *a, matrix *b, Real s,
-                                matrix *c);
+void scalar_mult_sub_matrix(matrix *a, matrix *b, Real s, matrix *c);
+
 void c_scalar_mult_mat(matrix *b, complex *s, matrix *c);
 void scalar_add_diag_su3(matrix *a, Real s);
 void c_scalar_add_diag_su3(matrix *a, complex *s);
 
+// In file s_m_a_mat.c
+void scalar_mult_sum_matrix(matrix *b, Real s, matrix *c);
+void scalar_mult_add_matrix(matrix *a, matrix *b, Real scalar, matrix *c);
+
 // In file cs_m_a_mat.c
 void c_scalar_mult_sum_mat(matrix *b, complex *s, matrix *c);
-void c_scalar_mult_add_mat(matrix *a, matrix *b, complex *s,
-                              matrix *c);
+void c_scalar_mult_add_mat(matrix *a, matrix *b, complex *s, matrix *c);
 
 void su3_adjoint(matrix *a, matrix *b);
 
@@ -290,7 +293,7 @@ void dumpmat(matrix *m);
 // -----------------------------------------------------------------
 // Vector operations
 complex su3_dot(vector *a, vector *b);
-void su3vec_copy(vector *a, vector *b);
+void vec_copy(vector *a, vector *b);
 void dumpvec(vector *v);
 void clearvec(vector *v);
 
@@ -305,11 +308,10 @@ void dif_vector(vector *b, vector *c);
 void sub_vector(vector *a, vector *b, vector *c);
 
 void scalar_mult_vector(vector *b, Real s, vector *c);
-void scalar_mult_sub_vector(vector *a, vector *b, Real s,
-                                vector *c);
-void c_scalar_mult_su3vec(vector *b, complex *s, vector *c);
-void c_scalar_mult_sum_su3vec(vector *b, complex *s, vector *c);
-void c_scalar_mult_dif_su3vec(vector *b, complex *s, vector *c);
+void scalar_mult_sub_vector(vector *a, vector *b, Real s, vector *c);
+void c_scalar_mult_vec(vector *b, complex *s, vector *c);
+void c_scalar_mult_sum_vec(vector *b, complex *s, vector *c);
+void c_scalar_mult_dif_vec(vector *b, complex *s, vector *c);
 
 void left_su2_hit_n(su2_matrix *u, int p, int q, matrix *link);
 void right_su2_hit_a(su2_matrix *u, int p, int q, matrix *link);
@@ -325,7 +327,7 @@ Real z2_rand_no(double_prn *prn_pt);
 void byterevn(int32type w[], int n);
 void byterevn64(int32type w[], int n);
 
-Real magsq_su3vec(vector *a);
+Real magsq_vec(vector *a);
 
 // In file m_mat_nn.c
 #ifndef mult_su3_nn
@@ -361,16 +363,9 @@ void mult_mat_vec_sum_4dir(matrix *a, vector *b0,
   vector *b1, vector *b2, vector *b3, vector *c);
 #endif
 
-// c <-- c + s * b, in "s_m_a_mat.c"
-void scalar_mult_sum_matrix(matrix *b, Real s, matrix *c);
-
-// c <-- a + s * b, in "s_m_a_mat.c"
-void scalar_mult_add_matrix(matrix *src1, matrix *src2,
-                                Real scalar, matrix *dest);
-
-void scalar_mult_sum_vector(vector *dest, vector *src, Real s);
-void scalar_mult_add_vector(vector *src1, vector *src2,
-                                Real s, vector *dest);
+// In file s_m_a_vec.c
+void scalar_mult_sum_vector(vector *b, Real s, vector *c);
+void scalar_mult_add_vector(vector *a, vector *b, Real s, vector *c);
 
 #ifndef su3_projector
 void su3_projector(vector *a, vector *b, matrix *c);
@@ -378,8 +373,7 @@ void su3_projector(vector *a, vector *b, matrix *c);
 
 Real su3_rdot(vector *a, vector *b);
 
-void sub_four_su3_vecs(vector *a, vector *b1, vector *b2,
-                       vector *b3, vector *b4);
+void sub_four_vecs(vector *a, vector *b1, vector *b2, vector *b3, vector *b4);
 
 #endif
 // -----------------------------------------------------------------

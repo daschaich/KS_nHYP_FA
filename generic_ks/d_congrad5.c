@@ -45,8 +45,8 @@ relative_residue(vector *p, vector *q, int parity)
   
   residue = 0;
   FORSOMEPARITY(i,s,parity){
-    num = (double)magsq_su3vec( &(p[i]) );
-    den = (double)magsq_su3vec( &(q[i]) );
+    num = (double)magsq_vec( &(p[i]) );
+    den = (double)magsq_vec( &(q[i]) );
     residue += (den==0) ? 1.0 : (num/den);
   } END_LOOP
 
@@ -111,7 +111,7 @@ ks_congrad_parity( vector *t_src, vector *t_dest,
   /* Source norm */
   source_norm = 0.0;
   FORSOMEPARITY(i,s,parity){
-    source_norm += (double)magsq_su3vec( &t_src[i] );
+    source_norm += (double)magsq_vec( &t_src[i] );
   } END_LOOP
   g_doublesum( &source_norm );
 #ifdef CG_DEBUG
@@ -160,7 +160,7 @@ ks_congrad_parity( vector *t_src, vector *t_dest,
 	  add_vector( &t_src[i], &ttt[i], &resid[i] );
 	  /* remember ttt contains -M_adjoint*M*src */
 	  cg_p[i] = resid[i];
-	  rsq += (double)magsq_su3vec( &resid[i] );
+	  rsq += (double)magsq_vec( &resid[i] );
 	} END_LOOP
 #ifdef FEWSUMS
 	actual_rsq = rsq; /* not yet summed over nodes */
@@ -273,9 +273,9 @@ ks_congrad_parity( vector *t_src, vector *t_dest,
       scalar_mult_add_vector( &t_dest[i], &cg_p[i], a, &t_dest[i] );
       scalar_mult_add_vector( &resid[i], &ttt[i], a, &resid[i]);
 #ifdef FEWSUMS
-      actual_rsq += (double)magsq_su3vec( &resid[i] );
+      actual_rsq += (double)magsq_vec( &resid[i] );
 #else
-      rsq += (double)magsq_su3vec( &resid[i] );
+      rsq += (double)magsq_vec( &resid[i] );
 #endif
     } END_LOOP
 #ifdef FEWSUMS

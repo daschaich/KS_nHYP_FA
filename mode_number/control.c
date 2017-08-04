@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   for (ipbp = 0; ipbp < npbp; ipbp++) {
     grsource_plain();
     FORALLSITES(i, s)
-      su3vec_copy(&(s->g_rand), &(source[ipbp][i]));
+      vec_copy(&(s->g_rand), &(source[ipbp][i]));
   }
 
   // NB: The Dirac operator normalization means that
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     for (ipbp = 0; ipbp < npbp; ipbp++) {
       // Hit gaussian random vector twice with step function
       FORALLSITES(i, s)
-        su3vec_copy(&(source[ipbp][i]), &(s->g_rand));
+        vec_copy(&(source[ipbp][i]), &(s->g_rand));
 
       step(F_OFFSET(g_rand), F_OFFSET(chi));
       step(F_OFFSET(chi), F_OFFSET(R2));
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
       // Take the norm to obtain nu(omega)
       nu = 0;
       FOREVENSITES(i, s)
-        nu += (double)magsq_su3vec(&(s->R2));
+        nu += (double)magsq_vec(&(s->R2));
       g_doublesum(&nu);
       ave += nu;
       err += nu * nu;

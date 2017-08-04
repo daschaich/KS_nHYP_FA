@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
       for (ivec = 0; ivec < block + 1; ivec++) {
         eigVal[ivec] = 0;
         FORALLSITES(j, s)
-          su3vec_copy(&eigVec[block - ivec][j], &(eigVec[ivec][j]));
+          vec_copy(&eigVec[block - ivec][j], &(eigVec[ivec][j]));
       }
       total_iters += make_evs(&start, block + 1, eigVec, eigVal);
 
