@@ -10,15 +10,9 @@ void blocked_gauge_loops(int block, double *result) {
   register int i, k;
   register site *s;
   int rep, dirs[10], sign[10], length;
+  int ln, iloop;      // For loop_table
   double g_action = 0, action, act2, total_action;
   complex trace;
-
-  // For loop_table
-  int ln, iloop;
-  su3_matrix *tmat;
-  tmat = (su3_matrix *)malloc(sites_on_node * sizeof(su3_matrix));
-  if (tmat == NULL)
-    exit(1);
 
   // Gauge action
   for (iloop = 0; iloop < nloop; iloop++) {
@@ -43,13 +37,15 @@ void blocked_gauge_loops(int block, double *result) {
       }
 
       // Unfortunately, I don't seem able to combine these
+      // Both put the result in tempmat2
+      // and use tempmat for temporary storage
       if (block > 0)
-        blocked_path(block, dirs, sign, length, tmat);
+        blocked_path(block, dirs, sign, length);
       else
-        path(dirs, sign, length, tmat);
+        path(dirs, sign, length);
 
       FORALLSITES(i, s) {
-        trace = trace_su3(&tmat[i]);
+        trace = trace_su3(&(tempmat2[i]));
         // Avoid excessively large numbers
         // Measure relative to some reasonable value of the loops
         action = (double)trace.real;
@@ -74,6 +70,5 @@ void blocked_gauge_loops(int block, double *result) {
 //                   result[iloop] / volume / loop_num[iloop]);
     }
   }
-  free(tmat);
 }
 // -----------------------------------------------------------------

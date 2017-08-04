@@ -1,9 +1,8 @@
 // -----------------------------------------------------------------
 // SU(3) MCRG-blocked measurements setup
-#include "mcrg_includes.h"
 #include <string.h>
+#include "mcrg_includes.h"
 
-int initial_set();
 #define IF_OK if (status == 0)
 
 // Each node has a params structure for passing simulation parameters
@@ -14,28 +13,9 @@ params par_buf;
 
 
 // -----------------------------------------------------------------
-int setup() {
-  int prompt;
-
-  // Print banner, get volume
-  prompt = initial_set();
-  // Initialize the layout functions, which decide where sites live
-  setup_layout();
-  // Allocate space for lattice, set up coordinate fields
-  make_lattice();
-  // Set up neighbor pointers and comlink structures
-  make_nn_gathers();
-
-  return prompt;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// On node zero, read lattice size, seed, and send to others
+// On node zero, read lattice size and send to others
 int initial_set() {
-  int prompt, status;
+  int prompt = 0, status = 0;
   if (mynode() == 0) {
     // Print banner
     printf("SU(3) MCRG-blocked measurements\n");
@@ -57,7 +37,7 @@ int initial_set() {
     IF_OK status += get_i(stdin, prompt, "nz", &par_buf.nz);
     IF_OK status += get_i(stdin, prompt, "nt", &par_buf.nt);
 
-    if(status > 0)
+    if (status > 0)
       par_buf.stopflag = 1;
     else
       par_buf.stopflag = 0;
@@ -65,7 +45,7 @@ int initial_set() {
 
   // Broadcast parameter buffer from node 0 to all other nodes
   broadcast_bytes((char *)&par_buf, sizeof(par_buf));
-  if (par_buf.stopflag != 0 )
+  if (par_buf.stopflag != 0)
     normal_exit(0);
 
   nx = par_buf.nx;
@@ -76,6 +56,28 @@ int initial_set() {
   this_node = mynode();
   number_of_nodes = numnodes();
   volume = nx * ny * nz * nt;
+  return prompt;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+int setup() {
+  int prompt;
+
+  // Print banner, get volume
+  prompt = initial_set();
+  // Initialize the layout functions, which decide where sites live
+  setup_layout();
+  // Allocate space for lattice, set up coordinate fields
+  make_lattice();
+  // Set up neighbor pointers and comlink structures
+  make_nn_gathers();
+  // Allocate temporary fields
+  FIELD_ALLOC(tempmat, su3_matrix);
+  FIELD_ALLOC(tempmat2, su3_matrix);
+
   return prompt;
 }
 // -----------------------------------------------------------------
@@ -132,10 +134,10 @@ int readin(int prompt) {
   alpha_smear[2] = par_buf.alpha_hyp2;
 
   startflag = par_buf.startflag;
-  strcpy(startfile,par_buf.startfile);
+  strcpy(startfile, par_buf.startfile);
 
   // Do whatever is needed to get lattice
-  startlat_p = reload_lattice( startflag, startfile);
+  startlat_p = reload_lattice(startflag, startfile);
   return 0;
 }
 // -----------------------------------------------------------------

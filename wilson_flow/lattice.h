@@ -6,6 +6,7 @@
 #include "defines.h"
 #include "../include/macros.h"    // For MAXFILENAME
 #include "../include/io_lat.h"    // For gauge_file
+#include "../include/dirs.h"      // For NDIMS
 #include "../include/su3.h"
 // -----------------------------------------------------------------
 
@@ -20,8 +21,9 @@ typedef struct {
 
   // No random numbers
   // HYP stuff needed for MCRG measurements
+  // Tripled gauge field provides workspace and backup storage
   su3_matrix link[12];
-  su3_matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
+  su3_matrix hyplink1[12], hyplink2[12];
   su3_matrix FS[6];       // Field strength for F^2 and topological charge
 } site;
 
@@ -91,10 +93,13 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
+// Temporary fields
+EXTERN su3_matrix *tempmat, *tempmat2;
+
 // Wilson flow stuff
 EXTERN Real tmax, start_eps, max_eps, epsilon;
-EXTERN su3_matrix *tempmat, *tempmat2, *S[4];
-EXTERN anti_hermitmat *A[4];
+EXTERN su3_matrix *S[NDIMS];
+EXTERN anti_hermitmat *A[NDIMS];
 
 // MCRG blocking stuff
 EXTERN Real alpha_smear[3];

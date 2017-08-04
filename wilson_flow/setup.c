@@ -21,8 +21,8 @@ int initial_set() {
     printf("Wilson flow with optional MCRG blocking\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     time_stamp("start");
-    status = get_prompt(stdin, &prompt);
 
+    status = get_prompt(stdin, &prompt);
     IF_OK status += get_i(stdin, prompt, "nx", &par_buf.nx);
     IF_OK status += get_i(stdin, prompt, "ny", &par_buf.ny);
     IF_OK status += get_i(stdin, prompt, "nz", &par_buf.nz);
@@ -53,7 +53,6 @@ int initial_set() {
 
 
 
-
 // -----------------------------------------------------------------
 int setup() {
   int prompt;
@@ -66,7 +65,7 @@ int setup() {
   make_lattice();
   // Set up neighbor pointers and comlink structures
   make_nn_gathers();
-  // Allocate temporary fields
+  // Allocate temporary fields and Wilson flow stuff
   FIELD_ALLOC(tempmat, su3_matrix);
   FIELD_ALLOC(tempmat2, su3_matrix);
   FIELD_ALLOC_VEC(S, su3_matrix, NDIMS);

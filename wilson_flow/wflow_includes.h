@@ -38,9 +38,8 @@ void block_mcrg(int num, int block);
 // Wilson loop stuff
 void make_loop_table2();
 void blocked_gauge_loops(int block, double *result);
-void path(int *dir, int *sign, int length, su3_matrix *resmat);
-void blocked_path(int block, int *dir, int *sign,
-                  int length, su3_matrix *resmat);
+void path(int *dir, int *sign, int length);
+void blocked_path(int block, int *dir, int *sign, int length);
 
 // Polyakov loop stuff
 complex blocked_ploop(int block, int dir);

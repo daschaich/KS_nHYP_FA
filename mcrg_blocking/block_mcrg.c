@@ -1,18 +1,20 @@
 // -----------------------------------------------------------------
 // Blocking function for MCRG-blocked measurements
 // Handles "neighboring" sites separated by 2^block links
+// Use tempmat and tempmat2 for temporary storage
 #include "mcrg_includes.h"
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
-void staple_mcrg(int dir1, int block) {
+// Put result into tempmat2
+void staple_mcrg(int dir, int block) {
   register int i, dir2;
   register site *s;
   int j, bl, start, disp[4];    // Displacement vector for general gather
   msg_tag *tag0, *tag1, *tag2, *tag3, *tag4, *tag5, *tag6;
-  su3_matrix tmat1, tmat2;
+  su3_matrix tmat, tmat2;
 
   bl = 1;
   for (j = 1; j < block; j++)
@@ -20,103 +22,104 @@ void staple_mcrg(int dir1, int block) {
 
   start = 1;                    // Indicates staple sum not initialized
   // Loop over other directions
-  for (dir2 = XUP; dir2 <= TUP; dir2++) {
-    if (dir2 != dir1) {
-      // Get link[dir2] from direction 2 * dir1
-      clear_disp(disp);
-      disp[dir1] = 2 * bl;
-      tag0 = start_general_gather_site(F_OFFSET(link[dir2]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[0]);
-      wait_general_gather(tag0);
+  FORALLUPDIR(dir2) {
+    if (dir2 == dir)
+      continue;
 
-      // Get link[dir1] from direction dir2
-      clear_disp(disp);
-      disp[dir2] = bl;
-      tag1 = start_general_gather_site(F_OFFSET(link[dir1]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[1]);
-      wait_general_gather(tag1);
+    // Get link[dir2] from direction 2 * dir
+    clear_disp(disp);
+    disp[dir] = 2 * bl;
+    tag0 = start_general_gather_site(F_OFFSET(link[dir2]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[0]);
+    wait_general_gather(tag0);
 
-      // Get link[dir1] from direction dir1 + dir2
-      clear_disp(disp);
-      disp[dir1] = bl;
-      disp[dir2] = bl;
-      tag2 = start_general_gather_site(F_OFFSET(link[dir1]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[2]);
-      wait_general_gather(tag2);
+    // Get link[dir] from direction dir2
+    clear_disp(disp);
+    disp[dir2] = bl;
+    tag1 = start_general_gather_site(F_OFFSET(link[dir]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[1]);
+    wait_general_gather(tag1);
 
-      // Get link[dir2] from direction -dir2
-      clear_disp(disp);
-      disp[dir2] = -bl;
-      tag3 = start_general_gather_site(F_OFFSET(link[dir2]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[3]);
-      wait_general_gather(tag3);
+    // Get link[dir] from direction dir + dir2
+    clear_disp(disp);
+    disp[dir] = bl;
+    disp[dir2] = bl;
+    tag2 = start_general_gather_site(F_OFFSET(link[dir]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[2]);
+    wait_general_gather(tag2);
 
-      // Get link[dir1] from direction -dir2
-      clear_disp(disp);
-      disp[dir2] = -bl;
-      tag4 = start_general_gather_site(F_OFFSET(link[dir1]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[4]);
-      wait_general_gather(tag4);
+    // Get link[dir2] from direction -dir2
+    clear_disp(disp);
+    disp[dir2] = -bl;
+    tag3 = start_general_gather_site(F_OFFSET(link[dir2]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[3]);
+    wait_general_gather(tag3);
 
-      // Get link[dir1] from direction dir1 - dir2
-      clear_disp(disp);
-      disp[dir1] = bl;
-      disp[dir2]= -bl;
-      tag5 = start_general_gather_site(F_OFFSET(link[dir1]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[5]);
-      wait_general_gather(tag5);
+    // Get link[dir] from direction -dir2
+    clear_disp(disp);
+    disp[dir2] = -bl;
+    tag4 = start_general_gather_site(F_OFFSET(link[dir]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[4]);
+    wait_general_gather(tag4);
 
-      // Get link[dir2] from direction 2 * dir1 - dir2
-      clear_disp(disp);
-      disp[dir1] = 2 * bl;
-      disp[dir2] = -bl;
+    // Get link[dir] from direction dir - dir2
+    clear_disp(disp);
+    disp[dir] = bl;
+    disp[dir2]= -bl;
+    tag5 = start_general_gather_site(F_OFFSET(link[dir]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[5]);
+    wait_general_gather(tag5);
 
-      tag6 = start_general_gather_site(F_OFFSET(link[dir2]),
-                                       sizeof(su3_matrix), disp,
-                                       EVENANDODD, gen_pt[6]);
-      wait_general_gather(tag6);
+    // Get link[dir2] from direction 2 * dir - dir2
+    clear_disp(disp);
+    disp[dir] = 2 * bl;
+    disp[dir2] = -bl;
 
-      // Upper staple
-      if (start) {          // The first contribution to the staple
-        FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[2][i]), &tmat2);
-          mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &(s->tempmat2));
-        }
-        start = 0;
-      }
-      else {
-        FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[2][i]), &tmat2);
-          mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &tmat1);
-          add_su3_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
-        }
-      }
-      cleanup_general_gather(tag0);
-      cleanup_general_gather(tag1);
-      cleanup_general_gather(tag2);
+    tag6 = start_general_gather_site(F_OFFSET(link[dir2]),
+                                     sizeof(su3_matrix), disp,
+                                     EVENANDODD, gen_pt[6]);
+    wait_general_gather(tag6);
 
-      // Lower staple
+    // Upper staple
+    if (start) {          // The first contribution to the staple
       FORALLSITES(i, s) {
-        mult_su3_an((su3_matrix *)(gen_pt[3][i]),
-                    (su3_matrix *)(gen_pt[4][i]), &tmat1);
-        mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[5][i]), &tmat2);
-        mult_su3_nn(&tmat2, (su3_matrix *)(gen_pt[6][i]), &tmat1);
-        add_su3_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
+        mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat);
+        mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[2][i]), &tmat2);
+        mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &(tempmat2[i]));
       }
-      cleanup_general_gather(tag3);
-      cleanup_general_gather(tag4);
-      cleanup_general_gather(tag5);
-      cleanup_general_gather(tag6);
+      start = 0;
     }
-  } // End loop over dir2 != dir1
+    else {
+      FORALLSITES(i, s) {
+        mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat);
+        mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[2][i]), &tmat2);
+        mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &tmat);
+        sum_su3_matrix(&tmat, &(tempmat2[i]));
+      }
+    }
+    cleanup_general_gather(tag0);
+    cleanup_general_gather(tag1);
+    cleanup_general_gather(tag2);
+
+    // Lower staple
+    FORALLSITES(i, s) {
+      mult_su3_an((su3_matrix *)(gen_pt[3][i]),
+                  (su3_matrix *)(gen_pt[4][i]), &tmat);
+      mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[5][i]), &tmat2);
+      mult_su3_nn(&tmat2, (su3_matrix *)(gen_pt[6][i]), &tmat);
+      sum_su3_matrix(&tmat, &(tempmat2[i]));
+    }
+    cleanup_general_gather(tag3);
+    cleanup_general_gather(tag4);
+    cleanup_general_gather(tag5);
+    cleanup_general_gather(tag6);
+  }
 }
 // -----------------------------------------------------------------
 
@@ -134,7 +137,7 @@ void block_mcrg(int num, int block) {
   msg_tag *tag0;
   su3_matrix tmat, Omega, eQ, Id, Q, Q2;
 
-  for (dir = XUP; dir <= TUP; dir++) {
+  FORALLUPDIR(dir) {
     // First the central spine of the blocking
     clear_disp(disp);
     disp[dir] = 1;
@@ -146,21 +149,22 @@ void block_mcrg(int num, int block) {
                                      EVENANDODD, gen_pt[0]);
     wait_general_gather(tag0);
 
-    FORALLSITES(i, s)
+    FORALLSITES(i, s) {
       mult_su3_nn(&(s->link[dir]), (su3_matrix *)(gen_pt[0][i]),
-                  &(s->staple));
+                  &(tempmat[i]));
+    }
 
     if (num == 0) {               // Do only center link
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->link[dir + 4]));
+        su3mat_copy(&(tempmat[i]), &(s->link[dir + 4]));
     }
-    else {                         // Do the full staple
-      staple_mcrg(dir, block);
+    else {                        // Do the full staple
+      staple_mcrg(dir, block);    // Puts result into tempmat2
 
       FORALLSITES(i, s) {
         // Make Omega
-        scalar_mult_su3_matrix(&(s->staple), 1 - alpha_mcrg[num], &Q);
-        scalar_mult_add_su3_matrix(&Q, &(s->tempmat2),
+        scalar_mult_su3_matrix(&(tempmat[i]), 1.0 - alpha_mcrg[num], &Q);
+        scalar_mult_add_su3_matrix(&Q, &(tempmat2[i]),
                                    alpha_mcrg[num] / 6.0, &Omega);
         mult_su3_an(&Omega, &Omega, &Q);
 
@@ -185,11 +189,11 @@ void block_mcrg(int num, int block) {
         mult_su3_nn(&Omega, &eQ, &tmat);
         su3mat_copy(&tmat, &(s->link[dir + 4]));
       }
-    } // End of staple
-  } // End loop over dir
+    }
+  }
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++)
+    FORALLUPDIR(dir)
       su3mat_copy(&(s->link[dir + 4]), &(s->link[dir]));
   }
 }

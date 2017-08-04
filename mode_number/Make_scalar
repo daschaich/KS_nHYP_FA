@@ -62,11 +62,11 @@ ifeq ($(strip ${MPP}),true)
   endif
 else
   ifeq ($(strip ${HAVEQMP}),true)
-     COMMTYPE = SINGLE
-     COMMPKG = com_qmp.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_qmp.o
   else
-     COMMTYPE = SINGLE
-     COMMPKG = com_vanilla.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_vanilla.o
   endif
 endif
 

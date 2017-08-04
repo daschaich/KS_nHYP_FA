@@ -25,16 +25,15 @@ int readin(int prompt);
 
 // nHYP stuff specific to for MCRG-blocked measurements
 void clear_disp(int *disp);
-void diag_su3(su3_matrix* Q, complex *f);
+void diag_su3(su3_matrix *Q, complex *f);
 void block_nhyp_mcrg(int num, int block);
 void block_mcrg(int num, int block);
 
 // Wilson loop stuff
 void make_loop_table2();
 void blocked_gauge_loops(int block, double *result);
-void path(int *dir, int *sign, int length, su3_matrix *resmat);
-void blocked_path(int block, int *dir, int *sign,
-                  int length, su3_matrix *resmat);
+void path(int *dir, int *sign, int length);
+void blocked_path(int block, int *dir, int *sign, int length);
 
 // Polyakov loop stuff
 complex blocked_ploop(int block, int dir);

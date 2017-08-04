@@ -29,7 +29,7 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = # -DINLINE # -DSSE_GLOBAL_INLINE
+INLINEOPT      = # -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =
@@ -40,7 +40,7 @@ KSFFMULTI      = # -DKS_MULTIFF=FNMAT
 KSRHMCINT      =
 
 CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
-                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
+                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI} \
                  ${KSFFMULTI} ${KSRHMCINT}
 
 MAKELIBRARIES  = Make_vanilla
@@ -62,20 +62,20 @@ ifeq ($(strip ${MPP}),true)
   endif
 else
   ifeq ($(strip ${HAVEQMP}),true)
-     COMMTYPE = SINGLE
-     COMMPKG = com_qmp.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_qmp.o
   else
-     COMMTYPE = SINGLE
-     COMMPKG = com_vanilla.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_vanilla.o
   endif
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}

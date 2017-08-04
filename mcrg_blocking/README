@@ -1,6 +1,6 @@
-Measure Wilson and Polyakov loops after repeated two-nHYP blocking steps.
+Measure Wilson and Polyakov loops after repeated two-HYP blocking steps.
 The total number of blocking steps is determined by the smallest side of the lattice.
-The input file must specify the number of outer nHYP smearing parameters to use ("num_alpha"), as well as their values ("alpha_mcrg").
+The input file must specify the number of outer HYP smearing parameters to use ("num_alpha"), as well as their values ("alpha_mcrg").
 The specialized block_nhyp_mcrg(num, block) routine handles "neighboring" sites separated by 2^block links.
 
 Sample input file:

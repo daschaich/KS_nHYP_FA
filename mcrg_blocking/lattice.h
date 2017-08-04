@@ -4,8 +4,8 @@
 #define _LATTICE_H
 
 #include "defines.h"
-#include "../include/macros.h"  // For MAXFILENAME
-#include "../include/io_lat.h"  // For gauge_file
+#include "../include/macros.h"    // For MAXFILENAME
+#include "../include/io_lat.h"    // For gauge_file
 #include "../include/su3.h"
 // -----------------------------------------------------------------
 
@@ -19,12 +19,10 @@ typedef struct {
   int index;          // Index in the array
 
   // No random numbers
+  // HYP stuff needed for MCRG measurements
   // Tripled gauge field provides workspace and backup storage
   su3_matrix link[12];
-
-  // Program-dependent fields
-  // Accumulators for Wilson and Polyakov loops
-  su3_matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
+  su3_matrix hyplink1[12], hyplink2[12];
 } site;
 // -----------------------------------------------------------------
 
@@ -41,7 +39,7 @@ typedef struct {
 EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
 
-EXTERN double g_ssplaq, g_stplaq;
+EXTERN double g_ssplaq, g_stplaq;   // Global plaqs for I/O
 EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME];
@@ -83,9 +81,13 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-// nHYP stuff
+// Temporary fields
+EXTERN su3_matrix *tempmat, *tempmat2;
+
+// MCRG blocking stuff
 EXTERN int num_alpha;
 EXTERN Real alpha_smear[3];
 EXTERN Real alpha_mcrg[100];    // Probably overkill
-#endif // _LATTICE_H
+
+#endif
 // -----------------------------------------------------------------
