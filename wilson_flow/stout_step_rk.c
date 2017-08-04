@@ -63,65 +63,65 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
 // -----------------------------------------------------------------
 // Clear A
 void clear_antiH(anti_hermitmat *a) {
-  a->m01.real = 0;
-  a->m01.imag = 0;
-  a->m02.real = 0;
-  a->m02.imag = 0;
-  a->m12.real = 0;
-  a->m12.imag = 0;
-  a->m00im = 0;
-  a->m11im = 0;
-  a->m22im = 0;
+  a->m01.real = 0.0;
+  a->m01.imag = 0.0;
+  a->m02.real = 0.0;
+  a->m02.imag = 0.0;
+  a->m12.real = 0.0;
+  a->m12.imag = 0.0;
+  a->m00im = 0.0;
+  a->m11im = 0.0;
+  a->m22im = 0.0;
 }
 
-// C <- A + s * B
-void scalar_mult_add_antiH(anti_hermitmat *a, anti_hermitmat *b,
-                           Real s, anti_hermitmat *c) {
-
-  c->m01.real = a->m01.real + s * b->m01.real;
-  c->m01.imag = a->m01.imag + s * b->m01.imag;
-  c->m02.real = a->m02.real + s * b->m02.real;
-  c->m02.imag = a->m02.imag + s * b->m02.imag;
-  c->m12.real = a->m12.real + s * b->m12.real;
-  c->m12.imag = a->m12.imag + s * b->m12.imag;
-  c->m00im = a->m00im + s * b->m00im;
-  c->m11im = a->m11im + s * b->m11im;
-  c->m22im = a->m22im + s * b->m22im;
+// c <-- c + s * b (output is always last)
+void scalar_mult_sum_antiH(anti_hermitmat *b, Real s, anti_hermitmat *c) {
+  c->m01.real += s * b->m01.real;
+  c->m01.imag += s * b->m01.imag;
+  c->m02.real += s * b->m02.real;
+  c->m02.imag += s * b->m02.imag;
+  c->m12.real += s * b->m12.real;
+  c->m12.imag += s * b->m12.imag;
+  c->m00im += s * b->m00im;
+  c->m11im += s * b->m11im;
+  c->m22im += s * b->m22im;
 }
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
-// Calculate A = A + f1 * Project_antihermitian_traceless(U.S)
+// Calculate A = A + f1 * Project_antihermitian_traceless(U.Sdag)
 //           U = exp(f2 * A).U
-void update_flow(int dir, anti_hermitmat *A, su3_matrix *S,
-                 double f1, double f2) {
-
-  register int i;
+// S is the Lie derivative of the action being used to flow
+void update_flow(double f1, double f2) {
+  register int i, dir;
   register site *s;
-//  double td = 0;
-//  complex tc;
   su3_matrix tmat;
   anti_hermitmat tantiH;
 
-  FORALLSITES(i, s) {
-    mult_su3_na(&(S[i]), &(s->link[dir]), &tmat); // S.Udag
-//    tc = trace_su3(&tmat);
-//    td += (double)tc.real;
-    make_anti_hermitian(&tmat, &tantiH);          // Projection
-    scalar_mult_add_antiH(&(A[i]), &tantiH,
-                          (Real)f1, &(A[i]));     // A += f1 * U.S
+  // Lie derivative of (Wilson) action
+  // Need to compute all four before we start updating U
+  // Uses tempmat for temporary storage
+  staple(S);
+
+  FORALLUPDIR(dir) {
+    FORALLSITES(i, s) {
+      // Project_antihermitian_traceless(U.Sdag)
+      mult_su3_na(&(s->link[dir]), &(S[dir][i]), &tmat);
+      make_anti_hermitian(&tmat, &tantiH);
+      // A += f1 * U.S
+      scalar_mult_sum_antiH(&tantiH, (Real)f1, &(A[dir][i]));
+    }
+    exp_mult(dir, f2, A[dir]);                  // U = exp(f2 * A).U
   }
-  exp_mult(dir, -f2, A);                           // U = exp(f2 * A).U
-//  node0_printf("Tr(Udag.S)[dir=%d] = %g\n", dir, td / volume);
 }
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
-void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]) {
+void stout_step_rk() {
   register int i, dir;
   register site *s;
 
@@ -131,15 +131,9 @@ void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]) {
       clear_antiH(&A[dir][i]);
   }
 
-  // Copied from Szabolcs Borsanyi's wilson_flow.c
-  staple(S);
-  FORALLUPDIR(dir)
-    update_flow(dir, A[dir], S[dir], 17.0 * epsilon / 36.0, -9.0 / 17.0);
-  staple(S);
-  FORALLUPDIR(dir)
-    update_flow(dir, A[dir], S[dir], -8.0 * epsilon / 9.0, 1.0);
-  staple(S);
-  FORALLUPDIR(dir)
-    update_flow(dir, A[dir], S[dir], 3.0 * epsilon / 4.0, -1.0);
+  // Runge--Kutta coefficients computed from Eq. 2.4 of arXiv:1203.4469
+  update_flow(17.0 * epsilon / 36.0, -9.0 / 17.0);
+  update_flow(-8.0 * epsilon / 9.0, 1.0);
+  update_flow(3.0 * epsilon / 4.0, -1.0);
 }
 // -----------------------------------------------------------------

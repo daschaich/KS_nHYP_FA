@@ -19,9 +19,10 @@ typedef struct {
   int index;          // Index in the array
 
   // No random numbers
+  // HYP stuff needed for MCRG measurements
   su3_matrix link[12];
-  su3_matrix FS[6];
   su3_matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
+  su3_matrix FS[6];       // Field strength for F^2 and topological charge
 } site;
 
 // Defines for index on field_strength
@@ -92,7 +93,8 @@ EXTERN char **gen_pt[N_POINTERS];
 
 // Wilson flow stuff
 EXTERN Real tmax, start_eps, max_eps, epsilon;
-EXTERN su3_matrix *tempmat, *tempmat2;
+EXTERN su3_matrix *tempmat, *tempmat2, *S[4];
+EXTERN anti_hermitmat *A[4];
 
 // MCRG blocking stuff
 EXTERN Real alpha_smear[3];

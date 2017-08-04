@@ -3,7 +3,7 @@
 // Just need to pass through fields used by integrator
 #include "wflow_includes.h"
 
-void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
+void wflow() {
   register int i, dir;
   register site *s;
   int j, istep, block_count = 0, blmax = 0;
@@ -36,7 +36,7 @@ void wflow(su3_matrix *S[4], anti_hermitmat *A[4]) {
   epsilon = start_eps;
   max_scale = (int)floor(max_eps / start_eps);     // Maximum scaling factor
   for (istep = 0; fabs(t) <  fabs(tmax) - 0.5 * fabs(epsilon); istep++) {
-    stout_step_rk(S, A);
+    stout_step_rk();
     t += epsilon;
 
     // Find 8F_munu = sum_{clover} (U - Udag)

@@ -12,7 +12,7 @@ void staple_mcrg(int dir1, int block) {
   register site *s;
   int j, bl, start, disp[4];    // Displacement vector for general gather
   msg_tag *tag0, *tag1, *tag2, *tag3, *tag4, *tag5, *tag6;
-  su3_matrix tmat1, tmat2;
+  su3_matrix tmat, tmat2;
 
   bl = 1;
   for (j = 1; j < block; j++)
@@ -20,7 +20,7 @@ void staple_mcrg(int dir1, int block) {
 
   start = 1;                    // Indicates staple sum not initialized
   // Loop over other directions
-  for (dir2 = XUP; dir2 <= TUP; dir2++) {
+  FORALLUPDIR(dir2) {
     if (dir2 != dir1) {
       // Get link[dir2] from direction 2 * dir1
       clear_disp(disp);
@@ -85,18 +85,18 @@ void staple_mcrg(int dir1, int block) {
       // Upper staple
       if (start) {          // The first contribution to the staple
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[2][i]), &tmat2);
+          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat);
+          mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[2][i]), &tmat2);
           mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &(s->tempmat2));
         }
         start = 0;
       }
       else {
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[2][i]), &tmat2);
-          mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &tmat1);
-          add_su3_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
+          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat);
+          mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[2][i]), &tmat2);
+          mult_su3_na(&tmat2, (su3_matrix *)(gen_pt[0][i]), &tmat);
+          sum_su3_matrix(&tmat, &(s->tempmat2));
         }
       }
       cleanup_general_gather(tag0);
@@ -106,10 +106,10 @@ void staple_mcrg(int dir1, int block) {
       // Lower staple
       FORALLSITES(i, s) {
         mult_su3_an((su3_matrix *)(gen_pt[3][i]),
-                    (su3_matrix *)(gen_pt[4][i]), &tmat1);
-        mult_su3_nn(&tmat1, (su3_matrix *)(gen_pt[5][i]), &tmat2);
-        mult_su3_nn(&tmat2, (su3_matrix *)(gen_pt[6][i]), &tmat1);
-        add_su3_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
+                    (su3_matrix *)(gen_pt[4][i]), &tmat);
+        mult_su3_nn(&tmat, (su3_matrix *)(gen_pt[5][i]), &tmat2);
+        mult_su3_nn(&tmat2, (su3_matrix *)(gen_pt[6][i]), &tmat);
+        sum_su3_matrix(&tmat, &(s->tempmat2));
       }
       cleanup_general_gather(tag3);
       cleanup_general_gather(tag4);
@@ -146,9 +146,10 @@ void block_mcrg(int num, int block) {
                                      EVENANDODD, gen_pt[0]);
     wait_general_gather(tag0);
 
-    FORALLSITES(i, s)
+    FORALLSITES(i, s) {
       mult_su3_nn(&(s->link[dir]), (su3_matrix *)(gen_pt[0][i]),
                   &(s->staple));
+    }
 
     if (num == 0) {               // Do only center link
       FORALLSITES(i, s)
@@ -159,7 +160,7 @@ void block_mcrg(int num, int block) {
 
       FORALLSITES(i, s) {
         // Make Omega
-        scalar_mult_su3_matrix(&(s->staple), 1 - alpha_smear[num], &Q);
+        scalar_mult_su3_matrix(&(s->staple), 1.0 - alpha_smear[num], &Q);
         scalar_mult_add_su3_matrix(&Q, &(s->tempmat2),
                                    alpha_smear[num] / 6.0, &Omega);
         mult_su3_an(&Omega, &Omega, &Q);
@@ -189,7 +190,7 @@ void block_mcrg(int num, int block) {
   } // End loop over dir
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++)
+    FORALLUPDIR(dir)
       su3mat_copy(&(s->link[dir + 4]), &(s->link[dir]));
   }
 }
