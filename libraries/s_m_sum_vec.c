@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Accumulate scalar multiplication on vector
-// a <- a + s * b
+// a <-- a + s * b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"

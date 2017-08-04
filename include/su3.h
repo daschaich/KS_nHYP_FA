@@ -269,6 +269,7 @@ void scalar_add_diag_su3(su3_matrix *a, Real s);
 void c_scalar_add_diag_su3(su3_matrix *a, complex *s);
 
 // In file cs_m_a_mat.c
+void c_scalar_mult_sum_su3mat(su3_matrix *b, complex *s, su3_matrix *c);
 void c_scalar_mult_add_su3mat(su3_matrix *a, su3_matrix *b, complex *s,
                               su3_matrix *c);
 

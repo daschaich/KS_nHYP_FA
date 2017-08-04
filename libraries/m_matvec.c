@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Matrix--vector multiplication
-// c <- a.b
+// c <-- a.b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"

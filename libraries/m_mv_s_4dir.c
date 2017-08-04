@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Sum four matrix--vector multiplications, with matrices in single array
-// c <- sum_i a[i].bi
+// c <-- sum_i a[i].bi
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"

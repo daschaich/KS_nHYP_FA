@@ -57,7 +57,6 @@ typedef struct {
 
   // Temporary vectors and matrices
   su3_vector tempvec[4];  // One for each direction
-  su3_matrix tempmat1, tempmat2, staple;
 } site;
 // -----------------------------------------------------------------
 

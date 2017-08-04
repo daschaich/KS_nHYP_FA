@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Adjoint-matrix--vector multiplication
-// c <- adag.b
+// c <-- adag.b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"

@@ -476,11 +476,8 @@ void block_nhyp_mcrg(int num, int block) {
 
   // First step is to fill the index arrays
   for (i = 0; i < 4; i++) {
-    for (j = 0; j < 4; j++)
-      hyp2ind[i][j] = 999;
-  }
-  for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
+      hyp2ind[i][j] = 999;
       if (i != j)
         hyp2ind[i][j] = count++;
     }
@@ -489,14 +486,9 @@ void block_nhyp_mcrg(int num, int block) {
   count = 0;
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) {
-      for (k = 0; k < 4; k++)
-        hyp1ind[i][j][k] = 999;
-    }
-  }
-  for (i = 0; i < 4; i++) {
-    for (j = 0; j < 4; j++) {
-      for (k = 0; k < j; k++) {
-        if (j != i && k != i) {
+      for (k = 0; k < 4; k++) {
+        hyp1ind[k][j][i] = 999;
+        if (k < j && j != i && k != i) {
           hyp1ind[j][k][i] = count;
           hyp1ind[k][j][i] = count++;
         }
@@ -507,24 +499,14 @@ void block_nhyp_mcrg(int num, int block) {
   FORALLSITES(i, s) {
     FORALLUPDIR(dir) {
       FORALLUPDIR(dir2) {
-        if (dir2 != dir) {
-          for (dir3 = dir2 + 1; dir3 <= TUP; dir3++) {
-            if (dir != dir3) {
-              su3mat_copy(&(s->link[dir]),
-                          &(s->hyplink1[hyp1ind[dir2][dir3][dir]]));
-            }
-          }
-        }
-      }
-    }
-  }
-
-  FORALLSITES(i, s) {
-    FORALLUPDIR(dir) {
-      FORALLUPDIR(dir2) {
-        if (dir2 != dir) {
+        if (dir2 == dir)
+          continue;
+        su3mat_copy(&(s->link[dir]), &(s->hyplink2[hyp2ind[dir2][dir]]));
+        for (dir3 = dir2 + 1; dir3 <= TUP; dir3++) {
+          if (dir == dir3)
+            continue;
           su3mat_copy(&(s->link[dir]),
-                      &(s->hyplink2[hyp2ind[dir2][dir]]));
+                      &(s->hyplink1[hyp1ind[dir2][dir3][dir]]));
         }
       }
     }

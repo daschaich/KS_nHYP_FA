@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Scalar multiplication on irrep matrix
-// b <- s * a
+// b <-- s * a
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"

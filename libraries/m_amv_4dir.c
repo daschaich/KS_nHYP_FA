@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------
 // Four adjoint-matrix--vector multiplications, with a single vector
 // and four matrices in single array
-// c[i] <- adag[i].b
+// c[i] <-- adag[i].b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"
