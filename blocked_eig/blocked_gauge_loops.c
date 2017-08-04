@@ -15,8 +15,8 @@ void blocked_gauge_loops(int block, double *result) {
 
   // For loop_table
   int ln, iloop;
-  su3_matrix *tmat;
-  tmat = (su3_matrix *)malloc(sites_on_node * sizeof(su3_matrix));
+  matrix *tmat;
+  tmat = (matrix *)malloc(sites_on_node * sizeof(matrix));
   if (tmat == NULL)
     exit(1);
 

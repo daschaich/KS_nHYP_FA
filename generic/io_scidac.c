@@ -478,7 +478,7 @@ void restore_color_matrix_scidac_to_site(char *filename,
 // -----------------------------------------------------------------
 // Read color matrices in SciDAC format to a field
 void restore_color_matrix_scidac_to_field(char *filename,
-        su3_matrix *dest, int count) {
+        matrix *dest, int count) {
   QIO_Layout layout;
   QIO_Filesystem fs;
   QIO_Reader *infile;
@@ -574,7 +574,7 @@ void save_color_matrix_scidac_from_site(char *filename, char *fileinfo,
 // Save a set of color matrices
 void save_color_matrix_scidac_from_field(char *filename, char *fileinfo,
                                          char *recinfo, int volfmt,
-                                         su3_matrix *src, int count) {
+                                         matrix *src, int count) {
 
   QIO_Layout layout;
   QIO_Writer *outfile;

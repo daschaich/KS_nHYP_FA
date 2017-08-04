@@ -28,7 +28,7 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Program-dependent fields
   // Staggered phases, which have been absorbed into the matrices
@@ -36,18 +36,18 @@ typedef struct {
   Real phase[4];
 
   // Staggered complex vectors
-  su3_vector g_rand;            // Gaussian random vector
-  su3_vector chi;               // Gaussian random source vector
-  su3_vector psi;               // Solution vector = Kinverse * chi
-  su3_vector p;                 // CG change vector
-  su3_vector mp;                // CG temporary vector
-  su3_vector r;                 // CG residual vector
-  su3_vector ttt1[1];           // For ../generic_ks/mat_invert.c
-  su3_vector M_inv;
+  vector g_rand;            // Gaussian random vector
+  vector chi;               // Gaussian random source vector
+  vector psi;               // Solution vector = Kinverse * chi
+  vector p;                 // CG change vector
+  vector mp;                // CG temporary vector
+  vector r;                 // CG residual vector
+  vector ttt1[1];           // For ../generic_ks/mat_invert.c
+  vector M_inv;
 
   // Temporary vectors and matrices
-  su3_vector tempvec[4];  // One for each direction
-  su3_matrix tempmat1, tempmat2, staple;
+  vector tempvec[4];  // One for each direction
+  matrix tempmat1, tempmat2, staple;
 } site;
 // -----------------------------------------------------------------
 
@@ -99,19 +99,19 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
 
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
-EXTERN su3_matrix *tempmat2;    // Used in Polyakov loop calculation
+EXTERN matrix *tempmat1;
+EXTERN matrix *tempmat2;    // Used in Polyakov loop calculation
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

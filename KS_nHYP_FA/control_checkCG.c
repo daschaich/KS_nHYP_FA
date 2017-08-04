@@ -15,11 +15,11 @@ double check_latvec(field_offset end, field_offset start) {
   register site *s;
   int j;
   double maxDiff = 0, diff;
-  su3_vector *eptr, *sptr;
+  vector *eptr, *sptr;
 
   FORALLSITES(i, s) {
-    eptr = (su3_vector *)F_PT(s, end);
-    sptr = (su3_vector *)F_PT(s, start);
+    eptr = (vector *)F_PT(s, end);
+    sptr = (vector *)F_PT(s, start);
     for (j = 0; j < 3; j++) {
       diff = fabs(eptr->c[j].real - sptr->c[j].real);
       if (diff > maxDiff)

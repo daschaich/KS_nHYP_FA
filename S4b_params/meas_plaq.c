@@ -9,12 +9,12 @@
 void meas_plaq() {
   register int i, dir1, dir2;
   register site *s;
-  register su3_matrix *m1, *m4;
+  register matrix *m1, *m4;
   double plaq_ss = 0, plaq_e[5], plaq_o[5];    // st, x, y, z, a
-  su3_matrix mtmp, *tmat;         // Scratch space
+  matrix mtmp, *tmat;         // Scratch space
   msg_tag *mtag0,*mtag1;
 
-  tmat = (su3_matrix *)malloc(sizeof(su3_matrix) * sites_on_node);
+  tmat = (matrix *)malloc(sizeof(matrix) * sites_on_node);
   if (tmat == NULL) {
     node0_printf("ERROR: can't malloc tmat in plaq_diff()\n");
     fflush(stdout);
@@ -28,9 +28,9 @@ void meas_plaq() {
 
   for (dir1 = YUP; dir1 <= TUP; dir1++) {
     for (dir2 = XUP; dir2 < dir1; dir2++) {
-      mtag0 = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+      mtag0 = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                 dir1, EVENANDODD, gen_pt[0]);
-      mtag1 = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+      mtag1 = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                                 dir2, EVENANDODD, gen_pt[1]);
 
       FORALLSITES(i, s) {
@@ -41,55 +41,55 @@ void meas_plaq() {
       wait_gather(mtag0);
       wait_gather(mtag1);
       FORALLSITES(i, s) {
-        mult_su3_nn(&tmat[i], (su3_matrix *)(gen_pt[0][i]), &mtmp);
+        mult_su3_nn(&tmat[i], (matrix *)(gen_pt[0][i]), &mtmp);
 
         if (dir1 == TUP) {
           if ((s->t) % 2 == 0)
-            plaq_e[0] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_e[0] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[0] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_o[0] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
         else    // Check
-          plaq_ss += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+          plaq_ss += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                            &mtmp);
 
         if (dir1 == XUP || dir2 == XUP) {
           if ((s->x) % 2 == 0)
-            plaq_e[1] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_e[1] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[1] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_o[1] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         if (dir1 == YUP || dir2 == YUP) {
           if ((s->y) % 2 == 0)
-            plaq_e[2] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_e[2] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[2] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_o[2] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         if (dir1 == ZUP || dir2 == ZUP) {
           if ((s->z) % 2 == 0)
-            plaq_e[3] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_e[3] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[3] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+            plaq_o[3] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         // "a" is not really even/odd, but leave the labels for consistency
         if ((s->t) % 2 == 1 && (s->x) % 2 == 1
                             && (s->y) % 2 == 1 && (s->z) % 2 == 1)
-          plaq_e[4] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+          plaq_e[4] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                              &mtmp);
         if ((s->t) % 2 == 0 && (s->x) % 2 == 0
                             && (s->y) % 2 == 0 && (s->z) % 2 == 0)
-          plaq_o[4] += (double)realtrace_su3((su3_matrix *)(gen_pt[1][i]),
+          plaq_o[4] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
                                              &mtmp);
       }
       cleanup_gather(mtag0);

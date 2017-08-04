@@ -26,12 +26,12 @@ int setup();
 int readin(int prompt);
 void wflow();
 void stout_step_rk();
-void staple(su3_matrix *stp[NDIMS]);
+void staple(matrix *stp[NDIMS]);
 
 // nHYP stuff specific to for MCRG-blocked measurements
 void mcrg_block(Real t, int blmax);
 void clear_disp(int *disp);
-void diag_su3(su3_matrix *Q, complex *f);
+void diag_su3(matrix *Q, complex *f);
 void block_nhyp_mcrg(int num, int block);
 void block_mcrg(int num, int block);
 

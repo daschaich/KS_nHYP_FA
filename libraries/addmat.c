@@ -6,7 +6,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void sum_su3_matrix(su3_matrix *b, su3_matrix *c) {
+void sum_matrix(matrix *b, matrix *c) {
   register int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
@@ -16,7 +16,7 @@ void sum_su3_matrix(su3_matrix *b, su3_matrix *c) {
   }
 }
 
-void add_su3_matrix(su3_matrix *a, su3_matrix *b, su3_matrix *c) {
+void add_matrix(matrix *a, matrix *b, matrix *c) {
   register int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {

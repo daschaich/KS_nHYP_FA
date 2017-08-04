@@ -29,7 +29,7 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Staggered phases, which have been absorbed into the matrices
   // Also the antiperiodic boundary conditions
@@ -37,22 +37,22 @@ typedef struct {
 
   // Program-dependent fields
   // Staggered complex vectors
-  su3_vector g_rand;      // Gaussian random vector
-  //su3_vector *rand;  // Gaussian random vectors
-  su3_vector chi;         // Source vector
-  su3_vector psi;         // Solution vector
-  su3_vector p;           // CG change vector
-  su3_vector mp;          // CG temporary vector
-  su3_vector r;           // CG residual vector
+  vector g_rand;      // Gaussian random vector
+  //vector *rand;  // Gaussian random vectors
+  vector chi;         // Source vector
+  vector psi;         // Solution vector
+  vector p;           // CG change vector
+  vector mp;          // CG temporary vector
+  vector r;           // CG residual vector
 
-  su3_vector R1;          // Passed as destination for intermediate X
-  su3_vector R2;          // Passed as destination for step
-  su3_vector Xsrc;        // X.src in step.c
-  su3_vector bj, bjp1, bjp2;  // b[j], b[j + 1], b[j + 2] for Clenshaw
-  su3_vector Zbjp1;           // Z.b[j + 1] in step.c
+  vector R1;          // Passed as destination for intermediate X
+  vector R2;          // Passed as destination for step
+  vector Xsrc;        // X.src in step.c
+  vector bj, bjp1, bjp2;  // b[j], b[j + 1], b[j + 2] for Clenshaw
+  vector Zbjp1;           // Z.b[j + 1] in step.c
 
   // Temporary vectors and matrices
-  su3_vector tempvec[4];  // One for each direction
+  vector tempvec[4];  // One for each direction
 } site;
 // -----------------------------------------------------------------
 
@@ -103,25 +103,25 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff
 EXTERN int Nsmear;
 EXTERN Real alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
 // Temporary matrices
-EXTERN su3_matrix *tempmat;
+EXTERN matrix *tempmat;
 
 // Mode number stuff
 EXTERN int Npts;
 EXTERN Real M, spacing;
-EXTERN su3_vector **source;
+EXTERN vector **source;
 
 // Step function stuff
 // For now Norder selects between options hard-coded in coeffs.c

@@ -4,7 +4,7 @@
 
 /* These routines set up and perform Fourier transforms on fields in
    the lattice.  The field consists of "size" consecutive complex
-   numbers.  For example, an su3_vector is three consecutive
+   numbers.  For example, an vector is three consecutive
    complex numbers, and a wilson_vector is 12.
 
    The setup_restrict_fourier() routine makes all the tables needed for the
@@ -271,7 +271,7 @@ void restrict_fourier(
                          /* space2 is needed only for non power of 2 */
      int size,		 /* Size of field in bytes.  The field must
 			    consist of size/sizeof(complex) consecutive
-			    complex numbers.  For example, an su3_vector
+			    complex numbers.  For example, an vector
 			    is 3 complex numbers. */
      int isign)		 /* 1 for x -> k, -1 for k -> x */
 {

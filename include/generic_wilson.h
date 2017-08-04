@@ -130,9 +130,9 @@ int gamma_index(char *label);
 char *gamma_label(int index);
 
 /* gauss_smear_w.c */
-void gauss_smear_field(wilson_vector *src, su3_matrix *t_links,
+void gauss_smear_field(wilson_vector *src, matrix *t_links,
 		       Real width, int iters, int t0);
-void gauss_smear_site(field_offset src, su3_matrix *t_links,
+void gauss_smear_site(field_offset src, matrix *t_links,
 		      Real width, int iters, int t0);
 
 /* meson_cont.c */
@@ -145,10 +145,10 @@ void meson_cont_field(spin_wilson_vector *src1, spin_wilson_vector *src2,
 
 /* staggered2naive.c */
 
-void convert_ksprop_to_wprop(wilson_propagator *wp, su3_matrix *ksp,
+void convert_ksprop_to_wprop(wilson_propagator *wp, matrix *ksp,
 			     int ks_source_r[]);
 void convert_ksprop_to_wprop_swv(spin_wilson_vector *swv, 
-				 su3_vector *ksp, int r[]);
+				 vector *ksp, int r[]);
 
 /* w_source.c */
 void alloc_wqs_wv_src(wilson_quark_source *wqs);

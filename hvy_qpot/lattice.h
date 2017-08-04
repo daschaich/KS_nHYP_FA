@@ -20,10 +20,10 @@ typedef struct {
 
   // No random numbers
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Program-dependent fields -- accumulators for Wilson loops
-  su3_matrix s_link, s_link_f, t_link_f, diag, staple;
+  matrix s_link, s_link_f, t_link_f, diag, staple;
 } site;
 // -----------------------------------------------------------------
 
@@ -69,18 +69,18 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
 
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
+EXTERN matrix *tempmat1;
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

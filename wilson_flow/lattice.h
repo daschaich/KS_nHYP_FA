@@ -22,9 +22,9 @@ typedef struct {
   // No random numbers
   // HYP stuff needed for MCRG measurements
   // Tripled gauge field provides workspace and backup storage
-  su3_matrix link[12];
-  su3_matrix hyplink1[12], hyplink2[12];
-  su3_matrix FS[6];       // Field strength for F^2 and topological charge
+  matrix link[12];
+  matrix hyplink1[12], hyplink2[12];
+  matrix FS[6];       // Field strength for F^2 and topological charge
 } site;
 
 // Defines for index on field_strength
@@ -94,11 +94,11 @@ EXTERN site *lattice;
 EXTERN char **gen_pt[N_POINTERS];
 
 // Temporary fields
-EXTERN su3_matrix *tempmat, *tempmat2;
+EXTERN matrix *tempmat, *tempmat2;
 
 // Wilson flow stuff
 EXTERN Real tmax, start_eps, max_eps, epsilon;
-EXTERN su3_matrix *S[NDIMS];
+EXTERN matrix *S[NDIMS];
 EXTERN anti_hermitmat *A[NDIMS];
 
 // MCRG blocking stuff

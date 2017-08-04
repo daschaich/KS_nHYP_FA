@@ -24,7 +24,7 @@
 
    -------------------------------------------------------------------
    EXAMPLE:  Fixing only the link matrices to Coulomb gauge with scratch
-     space in mp (su3_matrix) and chi (su3_vector):
+     space in mp (matrix) and chi (vector):
 
    gaugefix(TUP,(Real)1.5,500,(Real)1.0e-7,
          F_OFFSET(mp),F_OFFSET(chi),0,NULL,NULL,0,NULL,NULL);
@@ -75,8 +75,8 @@
 
 /* Scratch space */
 
-static su3_matrix *diffmatp;               /* malloced diffmat pointer */
-static su3_vector *sumvecp;                /* malloced sumvec pointer */
+static matrix *diffmatp;               /* malloced diffmat pointer */
+static vector *sumvecp;                /* malloced sumvec pointer */
 field_offset diffmat_offset,sumvec_offset;  /* field offsets */
 
 void accum_gauge_hit(int gauge_dir,int parity) {
@@ -86,7 +86,7 @@ void accum_gauge_hit(int gauge_dir,int parity) {
 /* in sumvec  */
 
   register int j;
-  register su3_matrix *m1,*m2;
+  register matrix *m1,*m2;
   register int dir,i;
   register site *s;
 
@@ -95,11 +95,11 @@ void accum_gauge_hit(int gauge_dir,int parity) {
   FORSOMEPARITY(i,s,parity)
     {
       if(diffmat_offset >= 0)
-  clear_su3mat((su3_matrix *)F_PT(s,diffmat_offset));
+  clear_mat((matrix *)F_PT(s,diffmat_offset));
       else
-  clear_su3mat(&diffmatp[i]);
+  clear_mat(&diffmatp[i]);
       if(sumvec_offset >= 0)
-  clearvec((su3_vector *)F_PT(s,sumvec_offset));
+  clearvec((vector *)F_PT(s,sumvec_offset));
       else
   clearvec(&sumvecp[i]);
     }
@@ -113,14 +113,14 @@ void accum_gauge_hit(int gauge_dir,int parity) {
     /* Upward link matrix */
     m1 = &(s->link[dir]);
     if(diffmat_offset >= 0)
-      sub_su3_matrix((su3_matrix *)F_PT(s,diffmat_offset),
-         m1, (su3_matrix *)F_PT(s,diffmat_offset));
+      sub_matrix((matrix *)F_PT(s,diffmat_offset),
+         m1, (matrix *)F_PT(s,diffmat_offset));
     else
-      sub_su3_matrix( &diffmatp[i], m1, &diffmatp[i]);
+      sub_matrix( &diffmatp[i], m1, &diffmatp[i]);
 
     if(sumvec_offset >= 0)
       {
-        for(j=0;j<3;j++)CSUM( ((su3_vector *)F_PT(s,sumvec_offset))->c[j],
+        for(j=0;j<3;j++)CSUM( ((vector *)F_PT(s,sumvec_offset))->c[j],
             m1->e[j][j]);
       }
     else
@@ -137,17 +137,17 @@ void accum_gauge_hit(int gauge_dir,int parity) {
       FORALLUPDIRBUT(gauge_dir,dir)
   {
     /* Downward link matrix */
-    m2 = (su3_matrix *)gen_pt[dir][i];
+    m2 = (matrix *)gen_pt[dir][i];
 
     if(diffmat_offset >= 0)
-      add_su3_matrix((su3_matrix *)F_PT(s,diffmat_offset), m2,
-                     (su3_matrix *)F_PT(s,diffmat_offset));
+      add_matrix((matrix *)F_PT(s,diffmat_offset), m2,
+                     (matrix *)F_PT(s,diffmat_offset));
     else
-      add_su3_matrix( &diffmatp[i], m2, &diffmatp[i]);
+      add_matrix( &diffmatp[i], m2, &diffmatp[i]);
 
     if(sumvec_offset >= 0)
       {
-        for(j=0;j<3;j++)CSUM( ((su3_vector *)F_PT(s,sumvec_offset))->c[j],
+        for(j=0;j<3;j++)CSUM( ((vector *)F_PT(s,sumvec_offset))->c[j],
             m2->e[j][j]);
       }
     else
@@ -172,7 +172,7 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost,
   register int dir,i,j;
   register site *s;
   su2_matrix u;
-  su3_matrix htemp;
+  matrix htemp;
 
   /* Accumulate sums for determining optimum gauge hit */
 
@@ -195,19 +195,19 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost,
       a3 =  s->diffmat.e[p][p].imag - s->diffmat.e[q][q].imag;
 */
       if(sumvec_offset >= 0)
-  a0 =     ((su3_vector *)F_PT(s,sumvec_offset))->c[p].real +
-    ((su3_vector *)F_PT(s,sumvec_offset))->c[q].real;
+  a0 =     ((vector *)F_PT(s,sumvec_offset))->c[p].real +
+    ((vector *)F_PT(s,sumvec_offset))->c[q].real;
       else
   a0 =     sumvecp[i].c[p].real +  sumvecp[i].c[q].real;
 
       if(diffmat_offset >= 0)
   {
-    a1 =     ((su3_matrix *)F_PT(s,diffmat_offset))->e[q][p].imag +
-      ((su3_matrix *)F_PT(s,diffmat_offset))->e[p][q].imag;
-    a2 =    -((su3_matrix *)F_PT(s,diffmat_offset))->e[q][p].real +
-      ((su3_matrix *)F_PT(s,diffmat_offset))->e[p][q].real;
-    a3 =     ((su3_matrix *)F_PT(s,diffmat_offset))->e[p][p].imag -
-      ((su3_matrix *)F_PT(s,diffmat_offset))->e[q][q].imag;
+    a1 =     ((matrix *)F_PT(s,diffmat_offset))->e[q][p].imag +
+      ((matrix *)F_PT(s,diffmat_offset))->e[p][q].imag;
+    a2 =    -((matrix *)F_PT(s,diffmat_offset))->e[q][p].real +
+      ((matrix *)F_PT(s,diffmat_offset))->e[p][q].real;
+    a3 =     ((matrix *)F_PT(s,diffmat_offset))->e[p][p].imag -
+      ((matrix *)F_PT(s,diffmat_offset))->e[q][q].imag;
   }
       else
   {
@@ -246,7 +246,7 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost,
       /* Do SU(2) hit on all downward links */
 
       FORALLUPDIR(dir)
-  right_su2_hit_a(&u,p,q,(su3_matrix *)gen_pt[dir][i]);
+  right_su2_hit_a(&u,p,q,(matrix *)gen_pt[dir][i]);
 
       /* Transform vectors and gauge momentum if requested */
 
@@ -257,8 +257,8 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost,
   /* vector <- u * vector */
   if(vector_parity[j] == EVENANDODD || vector_parity[j] == parity)
     mult_su2_mat_vec_elem_n(&u,
-     &((su3_vector *)F_PT(s,vector_offset[j]))->c[p],
-     &((su3_vector *)F_PT(s,vector_offset[j]))->c[q]);
+     &((vector *)F_PT(s,vector_offset[j]))->c[p],
+     &((vector *)F_PT(s,vector_offset[j]))->c[q]);
 
       /* Transform antihermitian matrices if requested */
 
@@ -289,7 +289,7 @@ double get_gauge_fix_action(int gauge_dir,int parity)
 
   register int dir,i,ndir;
   register site *s;
-  register su3_matrix *m1, *m2;
+  register matrix *m1, *m2;
   double gauge_fix_action;
   complex trace;
 
@@ -300,7 +300,7 @@ double get_gauge_fix_action(int gauge_dir,int parity)
       FORALLUPDIRBUT(gauge_dir,dir)
   {
     m1 = &(s->link[dir]);
-    m2 = (su3_matrix *)gen_pt[dir][i];
+    m2 = (matrix *)gen_pt[dir][i];
 
     trace = trace_su3(m1);
     gauge_fix_action += (double)trace.real;
@@ -344,7 +344,7 @@ void gaugefixstep(int gauge_dir,double *av_gauge_fix_action,Real relax_boost,
 
       FORALLUPDIR(dir)
   {
-    mtag[dir] = start_gather_site( F_OFFSET(link[dir]), sizeof(su3_matrix),
+    mtag[dir] = start_gather_site( F_OFFSET(link[dir]), sizeof(matrix),
          OPP_DIR(dir), parity, gen_pt[dir] );
   }
 
@@ -391,9 +391,9 @@ void gaugefixstep(int gauge_dir,double *av_gauge_fix_action,Real relax_boost,
     FORSOMEPARITY(i,s,parity)
       {
         if(diffmat_offset >= 0)
-    su3mat_copy((su3_matrix *)(gen_pt[dir][i]),(su3_matrix *)F_PT(s,diffmat_offset));
+    mat_copy((matrix *)(gen_pt[dir][i]),(matrix *)F_PT(s,diffmat_offset));
         else
-    su3mat_copy((su3_matrix *)(gen_pt[dir][i]), &diffmatp[i]);
+    mat_copy((matrix *)(gen_pt[dir][i]), &diffmatp[i]);
       }
 
     /* Now we are finished with gen_pt[dir] */
@@ -405,10 +405,10 @@ void gaugefixstep(int gauge_dir,double *av_gauge_fix_action,Real relax_boost,
 
     /* Gather diffmat onto sites of opposite parity */
     if(diffmat_offset >= 0)
-      mtag[dir] = start_gather_site( diffmat_offset, sizeof(su3_matrix),
+      mtag[dir] = start_gather_site( diffmat_offset, sizeof(matrix),
               dir, OPP_PAR(parity), gen_pt[dir] );
     else
-      mtag[dir] = start_gather_field( diffmatp, sizeof(su3_matrix),
+      mtag[dir] = start_gather_field( diffmatp, sizeof(matrix),
               dir, OPP_PAR(parity), gen_pt[dir] );
 
     wait_gather(mtag[dir]);
@@ -416,7 +416,7 @@ void gaugefixstep(int gauge_dir,double *av_gauge_fix_action,Real relax_boost,
          /* Copy modified matrices into proper location */
 
          FORSOMEPARITY(i,s,OPP_PAR(parity))
-        su3mat_copy((su3_matrix *)(gen_pt[dir][i]),&(s->link[dir]));
+        mat_copy((matrix *)(gen_pt[dir][i]),&(s->link[dir]));
 
     cleanup_gather(mtag[dir]);
   }
@@ -430,7 +430,7 @@ void gaugefixscratch(field_offset diffmat, field_offset sumvec)
   diffmatp = NULL;
   if(diffmat_offset < 0)
     {
-      diffmatp = (su3_matrix *)malloc(sizeof(su3_matrix)*sites_on_node);
+      diffmatp = (matrix *)malloc(sizeof(matrix)*sites_on_node);
       if(diffmatp == NULL)
   {
     node0_printf("gaugefix: Can't malloc diffmat\n");
@@ -442,7 +442,7 @@ void gaugefixscratch(field_offset diffmat, field_offset sumvec)
   sumvecp = NULL;
   if(sumvec_offset < 0)
     {
-      sumvecp = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+      sumvecp = (vector *)malloc(sizeof(vector)*sites_on_node);
       if(sumvecp == NULL)
   {
     node0_printf("gaugefix: Can't malloc sumvec\n");

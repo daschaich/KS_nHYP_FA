@@ -85,7 +85,7 @@ void predict_next_psi(Real *oldtime, Real *newtime, Real *nexttime,
   register site *s;
   register Real x;
   int j;
-  su3_vector tvec;
+  vector tvec;
 
   if (newtime[level] != oldtime[level]) {
     x = (nexttime[level] - newtime[level])
@@ -101,9 +101,9 @@ void predict_next_psi(Real *oldtime, Real *newtime, Real *nexttime,
     }
     else {
       FORALLSITES(i, s) {
-        sub_su3_vector(&(s->psi[j][level]), &(s->old_psi[j][level]), &tvec);
+        sub_vector(&(s->psi[j][level]), &(s->old_psi[j][level]), &tvec);
         s->old_psi[j][level] = s->psi[j][level];
-        scalar_mult_add_su3_vector(&(s->psi[j][level]), &tvec, x,
+        scalar_mult_add_vector(&(s->psi[j][level]), &tvec, x,
                                    &(s->psi[j][level]));
       }
     }
@@ -116,9 +116,9 @@ void predict_next_psi(Real *oldtime, Real *newtime, Real *nexttime,
     }
     else {
       FOREVENSITES(i, s) {
-        sub_su3_vector(&(s->psi[j][level]), &(s->old_psi[j][level]), &tvec);
+        sub_vector(&(s->psi[j][level]), &(s->old_psi[j][level]), &tvec);
         s->old_psi[j][level] = s->psi[j][level];
-        scalar_mult_add_su3_vector(&(s->psi[j][level]), &tvec, x,
+        scalar_mult_add_vector(&(s->psi[j][level]), &tvec, x,
                                    &(s->psi[j][level]));
       }
     }

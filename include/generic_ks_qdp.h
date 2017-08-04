@@ -36,11 +36,11 @@ void fn_fermion_force_qdp( QDP_ColorMatrix *force[], QDP_ColorMatrix *gf[],
 			   Real eps[], int nsrc,
 			   ferm_links_t *fn, ks_action_paths *ap );
 
-int ks_congrad_milcfield2qdp_F(su3_vector *f_src, su3_vector *f_dest, 
+int ks_congrad_milcfield2qdp_F(vector *f_src, vector *f_dest, 
 			       quark_invert_control *qic, Real mass,
 			       ferm_links_t *fn );
 
-int ks_congrad_milcfield2qdp_D(su3_vector *f_src, su3_vector *f_dest, 
+int ks_congrad_milcfield2qdp_D(vector *f_src, vector *f_dest, 
 			       quark_invert_control *qic, Real mass,
 			       ferm_links_t *fn );
 
@@ -74,10 +74,10 @@ void eo_fermion_force_twoterms_D( Real eps, Real weight1, Real weight2,
 				  field_offset x1_off, field_offset x2_off,
 				  ferm_links_t *fn, ks_action_paths *ap );
 void fermion_force_asqtad_multi_D( Real eps, Real *residues,
-				   su3_vector *xxx[], int nsrc,
+				   vector *xxx[], int nsrc,
 				   ferm_links_t *fn, ks_action_paths *ap);
 void fermion_force_asqtad_block_D( Real eps, Real *residues, 
-				   su3_vector **xxx, int nterms, 
+				   vector **xxx, int nterms, 
 				   int veclength,
 				   ferm_links_t *fn, ks_action_paths *ap );
 
@@ -96,18 +96,18 @@ void eo_fermion_force_twoterms_F( Real eps, Real weight1, Real weight2,
 				  field_offset x1_off, field_offset x2_off,
 				  ferm_links_t *fn, ks_action_paths *ap );
 void fermion_force_asqtad_multi_F( Real eps, Real *residues,
-				   su3_vector *xxx[], int nsrc,
+				   vector *xxx[], int nsrc,
 				  ferm_links_t *fn, ks_action_paths *ap);
 void fermion_force_asqtad_block_F( Real eps, Real *residues, 
-				   su3_vector **xxx, int nterms, int veclength,
+				   vector **xxx, int nterms, int veclength,
 				   ferm_links_t *fn, ks_action_paths *ap );
 
 
 /* ks_multicg_offset_qdp.c */
 
 int ks_multicg_offset_F( /* Return value is number of iterations taken */
-    field_offset src,	 /* source vector (type su3_vector) */
-    su3_vector **psim,	 /* solution vectors */
+    field_offset src,	 /* source vector (type vector) */
+    vector **psim,	 /* solution vectors */
     Real *offsets,	 /* the offsets */
     int num_offsets,	 /* number of offsets */
     int niter,		 /* maximal number of CG interations */
@@ -118,8 +118,8 @@ int ks_multicg_offset_F( /* Return value is number of iterations taken */
 			);
 
 int ks_multicg_offset_D( /* Return value is number of iterations taken */
-    field_offset src,	 /* source vector (type su3_vector) */
-    su3_vector **psim,	 /* solution vectors */
+    field_offset src,	 /* source vector (type vector) */
+    vector **psim,	 /* solution vectors */
     Real *offsets,	 /* the offsets */
     int num_offsets,	 /* number of offsets */
     int niter,		 /* maximal number of CG interations */
@@ -130,8 +130,8 @@ int ks_multicg_offset_D( /* Return value is number of iterations taken */
 			 );
 
 int ks_multicg_mass_F(	 /* Return value is number of iterations taken */
-    field_offset src,	 /* source vector (type su3_vector) */
-    su3_vector **psim,	 /* solution vectors (preallocated) */
+    field_offset src,	 /* source vector (type vector) */
+    vector **psim,	 /* solution vectors (preallocated) */
     Real *masses,	 /* the masses */
     int num_masses,	 /* number of masses */
     int niter,		 /* maximal number of CG interations */
@@ -142,8 +142,8 @@ int ks_multicg_mass_F(	 /* Return value is number of iterations taken */
 			);
 
 int ks_multicg_mass_D(	 /* Return value is number of iterations taken */
-    field_offset src,	 /* source vector (type su3_vector) */
-    su3_vector **psim,	 /* solution vectors (preallocated) */
+    field_offset src,	 /* source vector (type vector) */
+    vector **psim,	 /* solution vectors (preallocated) */
     Real *masses,	 /* the masses */
     int num_masses,	 /* number of masses */
     int niter,		 /* maximal number of CG interations */

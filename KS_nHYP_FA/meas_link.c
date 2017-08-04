@@ -48,27 +48,27 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
     // Fermion action = chi.psi
     // pbp on even sites = g_rand.psi
     FOREVENSITES(i, s) {
-      cc = su3_dot((su3_vector *)F_PT(s, chi_off),
-                   (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot((vector *)F_PT(s, chi_off),
+                   (vector *)F_PT(s, psi_off));
       faction += cc.real;
-      cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
       CSUM(pbp_e[0], cc);
     }
 
     // pbp on odd sites
     FORODDSITES(i, s) {
-      cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
       CSUM(pbp_o[0], cc);
     }
 
     // Now calculate the link differences
-    tag0 = start_gather_site(psi_off, sizeof(su3_vector), TUP,
+    tag0 = start_gather_site(psi_off, sizeof(vector), TUP,
                              EVENANDODD, gen_pt[0]);
-    tag1 = start_gather_site(psi_off, sizeof(su3_vector), XUP,
+    tag1 = start_gather_site(psi_off, sizeof(vector), XUP,
                              EVENANDODD, gen_pt[1]);
-    tag2 = start_gather_site(psi_off, sizeof(su3_vector), YUP,
+    tag2 = start_gather_site(psi_off, sizeof(vector), YUP,
                              EVENANDODD, gen_pt[2]);
-    tag3 = start_gather_site(psi_off, sizeof(su3_vector), ZUP,
+    tag3 = start_gather_site(psi_off, sizeof(vector), ZUP,
                              EVENANDODD, gen_pt[3]);
 
     wait_gather(tag0);
@@ -77,14 +77,14 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
     wait_gather(tag3);
 
     FORALLSITES(i, s) {
-      mult_su3_mat_vec(&(s->link[TUP]),
-                       (su3_vector *)gen_pt[0][i], &(s->tempvec[0]));
-      mult_su3_mat_vec(&(s->link[XUP]),
-                       (su3_vector *)gen_pt[1][i], &(s->tempvec[1]));
-      mult_su3_mat_vec(&(s->link[YUP]),
-                       (su3_vector *)gen_pt[2][i], &(s->tempvec[2]));
-      mult_su3_mat_vec(&(s->link[ZUP]),
-                       (su3_vector *)gen_pt[3][i], &(s->tempvec[3]));
+      mult_mat_vec(&(s->link[TUP]),
+                       (vector *)gen_pt[0][i], &(s->tempvec[0]));
+      mult_mat_vec(&(s->link[XUP]),
+                       (vector *)gen_pt[1][i], &(s->tempvec[1]));
+      mult_mat_vec(&(s->link[YUP]),
+                       (vector *)gen_pt[2][i], &(s->tempvec[2]));
+      mult_mat_vec(&(s->link[ZUP]),
+                       (vector *)gen_pt[3][i], &(s->tempvec[3]));
     }
 
     FORALLSITES(i, s) {
@@ -148,7 +148,7 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
     if (npbp > 1) {
       pbp_pbp = 0;
       FORALLSITES(i, s)
-        su3vec_copy((su3_vector *)F_PT(s, psi_off), &(s->M_inv));
+        su3vec_copy((vector *)F_PT(s, psi_off), &(s->M_inv));
 
       clear_latvec(psi_off, EVENANDODD);
 //      mat_invert_uml(F_OFFSET(M_inv), psi_off, chi_off, mass);
@@ -159,7 +159,7 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
       scalar_mult_latvec(chi_off, -1.0, chi_off, EVENANDODD);
       ks_congrad(chi_off, psi_off, mass, EVENANDODD);
       FORALLSITES(i, s) {
-        cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+        cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
         pbp_pbp += cc.real;
       }
       g_doublesum(&pbp_pbp);

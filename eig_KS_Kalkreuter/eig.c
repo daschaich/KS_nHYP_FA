@@ -17,12 +17,12 @@
 void scalar_mult_latvec(field_offset src, Real scalar, field_offset dest) {
   register int i;
   register site *s;
-  register su3_vector *spt, *dpt;
+  register vector *spt, *dpt;
 
   FOREVENSITES(i, s) {
-    spt = (su3_vector *)F_PT(s, src);
-    dpt = (su3_vector *)F_PT(s, dest);
-    scalar_mult_su3_vector(spt, scalar, dpt);
+    spt = (vector *)F_PT(s, src);
+    dpt = (vector *)F_PT(s, dest);
+    scalar_mult_vector(spt, scalar, dpt);
   }
 }
 // -----------------------------------------------------------------
@@ -32,7 +32,7 @@ void scalar_mult_latvec(field_offset src, Real scalar, field_offset dest) {
 // -----------------------------------------------------------------
 // Apply the matrix whose eigenvalues we are computing
 // Specifically, staggered D^dag D = -D^2, with EVEN parity hard-coded
-void Matrix_Vec_mult(su3_vector *src, su3_vector *res) {
+void Matrix_Vec_mult(vector *src, vector *res) {
   register site *s;
   register int i;
 
@@ -51,7 +51,7 @@ void Matrix_Vec_mult(su3_vector *src, su3_vector *res) {
 
 // -----------------------------------------------------------------
 // Compute the norm of the given vector, with EVEN parity hard-coded
-void norm(su3_vector *vec, double *norm) {
+void norm(vector *vec, double *norm) {
   register int i;
   register double n = 0;
   register site *s;
@@ -69,7 +69,7 @@ void norm(su3_vector *vec, double *norm) {
 
 // -----------------------------------------------------------------
 // Normalize the given vector, with EVEN parity hard-coded
-void normalize(su3_vector *vec) {
+void normalize(vector *vec) {
   register int i;
   register site *s;
   double N;
@@ -77,7 +77,7 @@ void normalize(su3_vector *vec) {
   norm(vec, &N);
   N = 1.0 / N;
   FOREVENSITES(i, s)
-    scalar_mult_su3_vector(&(vec[i]), (Real)N, &(vec[i]));
+    scalar_mult_vector(&(vec[i]), (Real)N, &(vec[i]));
 }
 // -----------------------------------------------------------------
 
@@ -86,7 +86,7 @@ void normalize(su3_vector *vec) {
 // -----------------------------------------------------------------
 // Compute the dot product of the two given vectors
 // Hard-code EVEN parity
-void dot_product(su3_vector *vec1, su3_vector *vec2, double_complex *dot) {
+void dot_product(vector *vec1, vector *vec2, double_complex *dot) {
   register int i;
   register double re = 0, im = 0;
   register site *s;
@@ -107,8 +107,8 @@ void dot_product(su3_vector *vec1, su3_vector *vec2, double_complex *dot) {
 
 // -----------------------------------------------------------------
 // Compute vec2 = vec2 - cc * vec1, with EVEN parity hard-coded
-void complex_vec_mult_sub(double_complex *cc, su3_vector *vec1,
-                          su3_vector *vec2) {
+void complex_vec_mult_sub(double_complex *cc, vector *vec1,
+                          vector *vec2) {
 
   register int i;
   register site *s;
@@ -126,7 +126,7 @@ void complex_vec_mult_sub(double_complex *cc, su3_vector *vec1,
 // -----------------------------------------------------------------
 // Project out the N given **vectors from the given *vec
 // The vectors are assumed to be orthonormal, EVEN parity is hard-coded
-void project_out(su3_vector *vec, su3_vector **vector, int N) {
+void project_out(vector *vec, vector **vector, int N) {
   register int i;
   double_complex cc;
 
@@ -141,8 +141,8 @@ void project_out(su3_vector *vec, su3_vector **vector, int N) {
 
 // -----------------------------------------------------------------
 // Copy src to res
-void copy_Vector(su3_vector *src, su3_vector *res) {
-  memcpy((void *)res, (void *)src, sites_on_node*sizeof(su3_vector));
+void copy_Vector(vector *src, vector *res) {
+  memcpy((void *)res, (void *)src, sites_on_node*sizeof(vector));
 }
 // -----------------------------------------------------------------
 
@@ -150,12 +150,12 @@ void copy_Vector(su3_vector *src, su3_vector *res) {
 
 // -----------------------------------------------------------------
 // Compute vec = vec - rr * vec1, with EVEN parity hard-coded
-void double_vec_mult_sub(double *rr, su3_vector *vec1, su3_vector *vec) {
+void double_vec_mult_sub(double *rr, vector *vec1, vector *vec) {
   register  int i;
   register site *s;
 
   FOREVENSITES(i, s)
-    scalar_mult_sub_su3_vector(&(vec[i]), &(vec1[i]), (Real)*rr, &(vec[i]));
+    scalar_mult_sub_vector(&(vec[i]), &(vec1[i]), (Real)*rr, &(vec[i]));
 }
 // -----------------------------------------------------------------
 
@@ -163,13 +163,13 @@ void double_vec_mult_sub(double *rr, su3_vector *vec1, su3_vector *vec) {
 
 // -----------------------------------------------------------------
 // Compute vec = a * vec + b * vec2, with EVEN parity hard-coded
-void dax_p_by(double *a, su3_vector *vec, double *b, su3_vector *vec2) {
+void dax_p_by(double *a, vector *vec, double *b, vector *vec2) {
   register int i;
   register site *s;
 
   FOREVENSITES(i, s) {
-    scalar_mult_su3_vector(&(vec[i]), (Real)(*a), &(vec[i]));
-    scalar_mult_add_su3_vector(&(vec[i]), &(vec2[i]), (Real)(*b), &(vec[i]));
+    scalar_mult_vector(&(vec[i]), (Real)(*a), &(vec[i]));
+    scalar_mult_add_vector(&(vec[i]), &(vec2[i]), (Real)(*b), &(vec[i]));
   }
 }
 // -----------------------------------------------------------------
@@ -178,15 +178,15 @@ void dax_p_by(double *a, su3_vector *vec, double *b, su3_vector *vec2) {
 
 // -----------------------------------------------------------------
 // Compute vec2 = vec1 + a * vec2, with EVEN parity hard-coded
-void vec_plus_double_vec_mult(su3_vector *vec1, double *a,
-                              su3_vector *vec2) {
+void vec_plus_double_vec_mult(vector *vec1, double *a,
+                              vector *vec2) {
 
   register int i;
   register site *s;
 
   FOREVENSITES(i, s) {
-    scalar_mult_su3_vector(&(vec2[i]), *a, &(vec2[i]));
-    add_su3_vector(&(vec1[i]), &(vec2[i]), &(vec2[i]));
+    scalar_mult_vector(&(vec2[i]), *a, &(vec2[i]));
+    add_vector(&(vec1[i]), &(vec2[i]), &(vec2[i]));
   }
 }
 // -----------------------------------------------------------------
@@ -195,8 +195,8 @@ void vec_plus_double_vec_mult(su3_vector *vec1, double *a,
 
 // -----------------------------------------------------------------
 // Compute vec2 = vec2 + cc * vec1, with EVEN parity hard-coded
-void complex_vec_mult_add(double_complex *cc, su3_vector *vec1,
-                          su3_vector *vec2) {
+void complex_vec_mult_add(double_complex *cc, vector *vec1,
+                          vector *vec2) {
 
   register int i;
   register site *s;
@@ -213,7 +213,7 @@ void complex_vec_mult_add(double_complex *cc, su3_vector *vec1,
 
 // -----------------------------------------------------------------
 // Hard-code EVEN parity
-int Rayleigh_min(su3_vector *vec, su3_vector **eigVec, Real Tolerance,
+int Rayleigh_min(vector *vec, vector **eigVec, Real Tolerance,
                  Real RelTol, int Nvecs, int maxIter, int restart) {
 
   int iter;
@@ -224,12 +224,12 @@ int Rayleigh_min(su3_vector *vec, su3_vector **eigVec, Real Tolerance,
   double vec_norm;
 #endif
   double_complex cc;
-  su3_vector *Mvec, *grad, *P, *MP;
+  vector *Mvec, *grad, *P, *MP;
 
-  Mvec = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
-  grad = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
-  P = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
-  MP = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+  Mvec = (vector *)malloc(sites_on_node * sizeof(vector));
+  grad = (vector *)malloc(sites_on_node * sizeof(vector));
+  P = (vector *)malloc(sites_on_node * sizeof(vector));
+  MP = (vector *)malloc(sites_on_node * sizeof(vector));
 
   project_out(vec, eigVec, Nvecs);
   normalize(vec);
@@ -352,14 +352,14 @@ int Rayleigh_min(su3_vector *vec, su3_vector **eigVec, Real Tolerance,
 // -----------------------------------------------------------------
 // Construct the projected matrix A and the error of each eigenvector
 // Hard-code EVEN parity
-void constructArray(su3_vector **eigVec, Matrix *A, double *err) {
+void constructArray(vector **eigVec, Matrix *A, double *err) {
   int i, j, Nvecs;
-  su3_vector *res, *grad;
+  vector *res, *grad;
   double_complex cc, Aij, Aji;
 
   Nvecs = A->N;
-  res = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
-  grad = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+  res = (vector *)malloc(sites_on_node * sizeof(vector));
+  grad = (vector *)malloc(sites_on_node * sizeof(vector));
   for (i = 0; i < Nvecs; i++) {
     Matrix_Vec_mult(eigVec[i], res);
     dot_product(res, eigVec[i], &cc);
@@ -389,16 +389,16 @@ void constructArray(su3_vector **eigVec, Matrix *A, double *err) {
 
 // -----------------------------------------------------------------
 // Hard-code EVEN parity
-void RotateBasis(su3_vector **eigVec, Matrix *V) {
+void RotateBasis(vector **eigVec, Matrix *V) {
   register int i, j, k, N;
   register site *s;
-  su3_vector **Tmp;
+  vector **Tmp;
 
   N = V->N;
   // Allocate the temporary vectors needed
-  Tmp = (su3_vector **)malloc(N * sizeof(su3_vector *));
+  Tmp = (vector **)malloc(N * sizeof(vector *));
   for (j = 0; j < N; j++)
-    Tmp[j] = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+    Tmp[j] = (vector *)malloc(sites_on_node*sizeof(vector));
 
   for (j = 0; j < N; j++) {
     FOREVENSITES(i, s)
@@ -421,7 +421,7 @@ void RotateBasis(su3_vector **eigVec, Matrix *V) {
 
 // -----------------------------------------------------------------
 // Hard-code EVEN parity
-int Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
+int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
                Real RelTol, int Nvecs, int maxIter,
                int restart, int kiters) {
 
@@ -431,13 +431,13 @@ int Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
   double max_error = 1e10;
   double *grad, *err;
   Matrix Array, V;
-  su3_vector *vec;
+  vector *vec;
 
   // Allocate the array and eigenvector matrix
   Array = AllocateMatrix(Nvecs);
   V = AllocateMatrix(Nvecs);
 
-  vec = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+  vec = (vector *)malloc(sites_on_node * sizeof(vector));
   grad = (double *)malloc(Nvecs * sizeof(double));
   err = (double *)malloc(Nvecs * sizeof(double));
 
@@ -526,7 +526,7 @@ int Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
 // Measure the chirality of a unit-normalized fermion state
 // Chirality is real since gamma_5 is hermitian
 // Hard-code EVENANDODD parity
-void measure_chirality(su3_vector *src, double *chirality) {
+void measure_chirality(vector *src, double *chirality) {
   register int i;
   register site *s;
   register double cc = 0;
@@ -551,7 +551,7 @@ void measure_chirality(su3_vector *src, double *chirality) {
 // -----------------------------------------------------------------
 // Print the density and chiral density of a normalized fermion state
 // Hard-code EVEN parity
-void print_densities(su3_vector *src, char *tag, int y, int z, int t) {
+void print_densities(vector *src, char *tag, int y, int z, int t) {
 
   register int i;
   register site *s;

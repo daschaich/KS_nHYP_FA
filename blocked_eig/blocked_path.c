@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------
 // Result is reported in resmat
 void blocked_path(int block, int *dir, int *sign,
-                  int length, su3_matrix *resmat) {
+                  int length, matrix *resmat) {
 
   register int i;
   register site *s;
@@ -21,22 +21,22 @@ void blocked_path(int block, int *dir, int *sign,
 
   if (sign[0] > 0) {
     FORALLSITES(i, s)
-      su3mat_copy(&(s->link[dir[0]]), &(s->tempmat2));
+      mat_copy(&(s->link[dir[0]]), &(s->tempmat2));
 
     // Shift block times
     for (k = 0; k < bl; k++) {
-      mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(su3_matrix),
+      mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(matrix),
                                OPP_DIR(dir[0]), EVENANDODD, gen_pt[0]);
       wait_gather(mtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat1));
+        mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat1));
 
       cleanup_gather(mtag);
-      mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(su3_matrix),
+      mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(matrix),
                                OPP_DIR(dir[0]), EVENANDODD, gen_pt[0]);
       wait_gather(mtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat2));
+        mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat2));
 
       cleanup_gather(mtag);
     }
@@ -54,45 +54,45 @@ void blocked_path(int block, int *dir, int *sign,
 
       // Shift block times
       for (k = 0; k < bl; k++) {
-        mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(su3_matrix),
+        mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(matrix),
                                  OPP_DIR(dir[j]), EVENANDODD, gen_pt[0]);
         wait_gather(mtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat2));
+          mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat2));
 
         cleanup_gather(mtag);
-        mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(su3_matrix),
+        mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(matrix),
                                  OPP_DIR(dir[j]), EVENANDODD, gen_pt[0]);
         wait_gather(mtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat1));
+          mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat1));
 
         cleanup_gather(mtag);
       }
       FORALLSITES(i, s)
-        su3mat_copy(&(s->tempmat1), &(s->tempmat2));
+        mat_copy(&(s->tempmat1), &(s->tempmat2));
     }
 
     if (sign[j] < 0) {
       // Shift block times
       for (k = 0; k < bl; k++) {
-        mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(su3_matrix),
+        mtag = start_gather_site(F_OFFSET(tempmat2), sizeof(matrix),
                                  dir[j], EVENANDODD, gen_pt[0]);
         wait_gather(mtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat1));
+          mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat1));
 
         cleanup_gather(mtag);
-        mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(su3_matrix),
+        mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(matrix),
                                  dir[j], EVENANDODD, gen_pt[0]);
         wait_gather(mtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->tempmat2));
+          mat_copy((matrix *)(gen_pt[0][i]), &(s->tempmat2));
 
         cleanup_gather(mtag);
       }
       FORALLSITES(i, s)
-        su3mat_copy(&(s->tempmat2), &(s->tempmat1));
+        mat_copy(&(s->tempmat2), &(s->tempmat1));
 
       FORALLSITES(i, s)
         mult_su3_na(&(s->tempmat1), &(s->link[dir[j]]), &(s->tempmat2));
@@ -101,6 +101,6 @@ void blocked_path(int block, int *dir, int *sign,
 
   // Copy result into matrix to be returned
   FORALLSITES(i, s)
-    su3mat_copy(&(s->tempmat2), &resmat[i]);
+    mat_copy(&(s->tempmat2), &resmat[i]);
 }
 // -----------------------------------------------------------------

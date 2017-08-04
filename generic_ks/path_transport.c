@@ -21,20 +21,20 @@
 /* NOT OPTIMIZED at the moment - do lots of extra copying.  Use temp.
    vectors rather than stuff in lattice.h */
 /********************************************************************/
-void path_transport_field( su3_vector *src, su3_vector *dest, int parity,
+void path_transport_field( vector *src, vector *dest, int parity,
     int *dir, int length ){
     register int i;
     register site *s;
     msg_tag *mtag0;
     int j;
-    su3_vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
-    su3_vector *tmp_pt; /* scratch */
+    vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
+    vector *tmp_pt; /* scratch */
     int tmp_parity=0, tmp_otherparity=0; /* parity for this step */
 
   if( length > 0 ){
-    tmp_src = (su3_vector *)malloc( sites_on_node*sizeof(su3_vector) );
-    tmp_dest = (su3_vector *)malloc( sites_on_node*sizeof(su3_vector) );
-    tmp_work = (su3_vector *)malloc( sites_on_node*sizeof(su3_vector) );
+    tmp_src = (vector *)malloc( sites_on_node*sizeof(vector) );
+    tmp_dest = (vector *)malloc( sites_on_node*sizeof(vector) );
+    tmp_work = (vector *)malloc( sites_on_node*sizeof(vector) );
 
     for( j=length-1; j>=0; j-- ){
 	/* figure out parities for this step */
@@ -62,12 +62,12 @@ void path_transport_field( su3_vector *src, su3_vector *dest, int parity,
 	}
 
 	if( GOES_FORWARDS(dir[j]) ) {
-	    mtag0 = start_gather_field( tmp_src, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_src, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		mult_su3_mat_vec( &(s->link[dir[j]]),
-		    (su3_vector *)(gen_pt[0][i]),
+		mult_mat_vec( &(s->link[dir[j]]),
+		    (vector *)(gen_pt[0][i]),
 		    &(tmp_dest[i]) );
 	    }
 	    cleanup_gather(mtag0);
@@ -75,14 +75,14 @@ void path_transport_field( su3_vector *src, su3_vector *dest, int parity,
 
 	else{ /* GOES_BACKWARDS(dir[j]) */
 	    FORSOMEPARITY(i,s,tmp_otherparity){
-		mult_adj_su3_mat_vec( &(s->link[OPP_DIR(dir[j])]),
+		mult_adj_mat_vec( &(s->link[OPP_DIR(dir[j])]),
 		    &(tmp_src[i]), &(tmp_work[i]) );
 	    }
-	    mtag0 = start_gather_field( tmp_work, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_work, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		 tmp_dest[i] = *(su3_vector *)gen_pt[0][i];
+		 tmp_dest[i] = *(vector *)gen_pt[0][i];
 	    }
 	    cleanup_gather(mtag0);
 	}
@@ -117,20 +117,20 @@ void path_transport_field( su3_vector *src, su3_vector *dest, int parity,
 /* NOT OPTIMIZED at the moment - do lots of extra copying.  Use temp.
    matrix rather than stuff in lattice.h */
 /********************************************************************/
-void path_transport_connection( su3_matrix *src, su3_matrix *dest, int parity,
+void path_transport_connection( matrix *src, matrix *dest, int parity,
     int *dir, int length ){
     register int i;
     register site *s;
     msg_tag *mtag0;
     int j;
-    su3_matrix *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
-    su3_matrix *tmp_pt; /* scratch */
+    matrix *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
+    matrix *tmp_pt; /* scratch */
     int tmp_parity=0, tmp_otherparity=0; /* parity for this step */
 
   if( length > 0 ){
-    tmp_src = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
-    tmp_dest = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
-    tmp_work = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
+    tmp_src = (matrix *)malloc( sites_on_node*sizeof(matrix) );
+    tmp_dest = (matrix *)malloc( sites_on_node*sizeof(matrix) );
+    tmp_work = (matrix *)malloc( sites_on_node*sizeof(matrix) );
 
     for( j=length-1; j>=0; j-- ){
 	/* figure out parities for this step */
@@ -158,12 +158,12 @@ void path_transport_connection( su3_matrix *src, su3_matrix *dest, int parity,
 	}
 
 	if( GOES_FORWARDS(dir[j]) ) {
-	    mtag0 = start_gather_field( tmp_src, sizeof(su3_matrix),
+	    mtag0 = start_gather_field( tmp_src, sizeof(matrix),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
 		mult_su3_nn( &(s->link[dir[j]]),
-		    (su3_matrix *)(gen_pt[0][i]),
+		    (matrix *)(gen_pt[0][i]),
 		    &(tmp_dest[i]) );
 	    }
 	    cleanup_gather(mtag0);
@@ -174,11 +174,11 @@ void path_transport_connection( su3_matrix *src, su3_matrix *dest, int parity,
 		mult_su3_an( &(s->link[OPP_DIR(dir[j])]),
 		    &(tmp_src[i]), &(tmp_work[i]) );
 	    }
-	    mtag0 = start_gather_field( tmp_work, sizeof(su3_matrix),
+	    mtag0 = start_gather_field( tmp_work, sizeof(matrix),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		 tmp_dest[i] = *(su3_matrix *)gen_pt[0][i];
+		 tmp_dest[i] = *(matrix *)gen_pt[0][i];
 	    }
 	    cleanup_gather(mtag0);
 	}
@@ -200,21 +200,21 @@ void path_transport_connection( su3_matrix *src, su3_matrix *dest, int parity,
 } /* path_transport_connection */
 
 
-void path_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_matrix *dest,
+void path_transport_connection_hisq( matrix *src, matrix **links, matrix *dest,
     int parity, int *dir, int length ){
 //TEST ME
     register int i;
     register site *s;
     msg_tag *mtag0;
     int j;
-    su3_matrix *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
-    su3_matrix *tmp_pt; /* scratch */
+    matrix *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
+    matrix *tmp_pt; /* scratch */
     int tmp_parity=0, tmp_otherparity=0; /* parity for this step */
 
   if( length > 0 ){
-    tmp_src = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
-    tmp_dest = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
-    tmp_work = (su3_matrix *)malloc( sites_on_node*sizeof(su3_matrix) );
+    tmp_src = (matrix *)malloc( sites_on_node*sizeof(matrix) );
+    tmp_dest = (matrix *)malloc( sites_on_node*sizeof(matrix) );
+    tmp_work = (matrix *)malloc( sites_on_node*sizeof(matrix) );
 
     for( j=length-1; j>=0; j-- ){
 	/* figure out parities for this step */
@@ -242,11 +242,11 @@ void path_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_ma
 	}
 
 	if( GOES_FORWARDS(dir[j]) ) {
-	    mtag0 = start_gather_field( tmp_src, sizeof(su3_matrix),
+	    mtag0 = start_gather_field( tmp_src, sizeof(matrix),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		mult_su3_nn( &(links[dir[j]][i]), (su3_matrix *)(gen_pt[0][i]),
+		mult_su3_nn( &(links[dir[j]][i]), (matrix *)(gen_pt[0][i]),
 		    &(tmp_dest[i]) );
 	    }
 	    cleanup_gather(mtag0);
@@ -256,11 +256,11 @@ void path_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_ma
 	    FORSOMEPARITY(i,s,tmp_otherparity){
 		mult_su3_an( &(links[OPP_DIR(dir[j])][i]), &(tmp_src[i]), &(tmp_work[i]) );
 	    }
-	    mtag0 = start_gather_field( tmp_work, sizeof(su3_matrix),
+	    mtag0 = start_gather_field( tmp_work, sizeof(matrix),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		 tmp_dest[i] = *(su3_matrix *)gen_pt[0][i];
+		 tmp_dest[i] = *(matrix *)gen_pt[0][i];
 	    }
 	    cleanup_gather(mtag0);
 	}
@@ -282,18 +282,18 @@ void path_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_ma
 } /* path_transport_connection_hisq */
 
 // special case to transport a "connection" by one link, does both parities
-void link_transport_connection( su3_matrix *src, su3_matrix *dest,
-  su3_matrix *work, int dir ){
+void link_transport_connection( matrix *src, matrix *dest,
+  matrix *work, int dir ){
     register int i;
     register site *s;
     msg_tag *mtag0;
 
     if( GOES_FORWARDS(dir) ) {
-	mtag0 = start_gather_field( src, sizeof(su3_matrix),
+	mtag0 = start_gather_field( src, sizeof(matrix),
 	    dir, EVENANDODD, gen_pt[0] );
 	wait_gather(mtag0);
 	FORALLSITES(i,s){
-	    mult_su3_nn( &(s->link[dir]), (su3_matrix *)(gen_pt[0][i]),
+	    mult_su3_nn( &(s->link[dir]), (matrix *)(gen_pt[0][i]),
 		&(dest[i]) );
 	}
 	cleanup_gather(mtag0);
@@ -304,29 +304,29 @@ void link_transport_connection( su3_matrix *src, su3_matrix *dest,
 	    mult_su3_an( &(s->link[OPP_DIR(dir)]),
 		&(src[i]), &(work[i]) );
 	}
-	mtag0 = start_gather_field( work, sizeof(su3_matrix),
+	mtag0 = start_gather_field( work, sizeof(matrix),
 	    dir, EVENANDODD, gen_pt[0] );
 	wait_gather(mtag0);
 	FORALLSITES(i,s){
-	    dest[i] = *(su3_matrix *)gen_pt[0][i];
+	    dest[i] = *(matrix *)gen_pt[0][i];
 	}
 	cleanup_gather(mtag0);
     }
 } /* link_transport_connection */
 // special case to transport a "connection" by one link, does both parities
-void link_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_matrix *dest,
-  su3_matrix *work, int dir ){
+void link_transport_connection_hisq( matrix *src, matrix **links, matrix *dest,
+  matrix *work, int dir ){
 //TEST ME
     register int i;
     register site *s;
     msg_tag *mtag0;
 
     if( GOES_FORWARDS(dir) ) {
-	mtag0 = start_gather_field( src, sizeof(su3_matrix),
+	mtag0 = start_gather_field( src, sizeof(matrix),
 	    dir, EVENANDODD, gen_pt[0] );
 	wait_gather(mtag0);
 	FORALLSITES(i,s){
-	    mult_su3_nn( &(links[dir][i]), (su3_matrix *)(gen_pt[0][i]), &(dest[i]) );
+	    mult_su3_nn( &(links[dir][i]), (matrix *)(gen_pt[0][i]), &(dest[i]) );
 	}
 	cleanup_gather(mtag0);
     }
@@ -335,11 +335,11 @@ void link_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_ma
 	FORALLSITES(i,s){
 	    mult_su3_an( &(links[OPP_DIR(dir)][i]), &(src[i]), &(work[i]) );
 	}
-	mtag0 = start_gather_field( work, sizeof(su3_matrix),
+	mtag0 = start_gather_field( work, sizeof(matrix),
 	    dir, EVENANDODD, gen_pt[0] );
 	wait_gather(mtag0);
 	FORALLSITES(i,s){
-	    dest[i] = *(su3_matrix *)gen_pt[0][i];
+	    dest[i] = *(matrix *)gen_pt[0][i];
 	}
 	cleanup_gather(mtag0);
     }
@@ -347,17 +347,17 @@ void link_transport_connection_hisq( su3_matrix *src, su3_matrix **links, su3_ma
 // like link_transport, except doesn't multiply by link matrices.  use this, for example,
 // when storing the intermediate HISQ force (a connection) at the lattice site
 // associated with a link
-void link_gather_connection_hisq( su3_matrix *src, su3_matrix *dest,
-  su3_matrix *work, int dir ){
+void link_gather_connection_hisq( matrix *src, matrix *dest,
+  matrix *work, int dir ){
 //TEST ME
     register int i;
     register site *s;
     msg_tag *mtag0;
 
-    mtag0 = start_gather_field( src, sizeof(su3_matrix),
+    mtag0 = start_gather_field( src, sizeof(matrix),
 	dir, EVENANDODD, gen_pt[0] );
     wait_gather(mtag0);
-    FORALLSITES(i,s){ dest[i] = *(su3_matrix *)(gen_pt[0][i]); }
+    FORALLSITES(i,s){ dest[i] = *(matrix *)(gen_pt[0][i]); }
     cleanup_gather(mtag0);
 } /* link_gather_connection_hisq */
 
@@ -377,14 +377,14 @@ void path_transport( field_offset src, field_offset dest, int parity,
     register site *s;
     msg_tag *mtag0;
     int j;
-    su3_vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
-    su3_vector *tmp_pt; /* scratch */
+    vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
+    vector *tmp_pt; /* scratch */
     int tmp_parity=0, tmp_otherparity=0; /* parity for this step */
 
   if( length > 0 ){
-    tmp_src = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
-    tmp_dest = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
-    tmp_work = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
+    tmp_src = (vector *)special_alloc( sites_on_node*sizeof(vector) );
+    tmp_dest = (vector *)special_alloc( sites_on_node*sizeof(vector) );
+    tmp_work = (vector *)special_alloc( sites_on_node*sizeof(vector) );
 
     for( j=length-1; j>=0; j-- ){
 	/* figure out parities for this step */
@@ -407,17 +407,17 @@ void path_transport( field_offset src, field_offset dest, int parity,
 
 	if( j==length-1 ){
 	    FORSOMEPARITY(i,s,tmp_otherparity){
-	        tmp_src[i] = *(su3_vector *)F_PT(s,src);
+	        tmp_src[i] = *(vector *)F_PT(s,src);
 	    }
 	}
 
 	if( GOES_FORWARDS(dir[j]) ) {
-	    mtag0 = start_gather_field( tmp_src, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_src, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		mult_su3_mat_vec( &(s->link[dir[j]]),
-		    (su3_vector *)(gen_pt[0][i]),
+		mult_mat_vec( &(s->link[dir[j]]),
+		    (vector *)(gen_pt[0][i]),
 		    &(tmp_dest[i]) );
 	    }
 	    cleanup_gather(mtag0);
@@ -425,14 +425,14 @@ void path_transport( field_offset src, field_offset dest, int parity,
 
 	else{ /* GOES_BACKWARDS(dir[j]) */
 	    FORSOMEPARITY(i,s,tmp_otherparity){
-		mult_adj_su3_mat_vec( &(s->link[OPP_DIR(dir[j])]),
+		mult_adj_mat_vec( &(s->link[OPP_DIR(dir[j])]),
 		    &(tmp_src[i]), &(tmp_work[i]) );
 	    }
-	    mtag0 = start_gather_field( tmp_work, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_work, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		 tmp_dest[i] = *(su3_vector *)gen_pt[0][i];
+		 tmp_dest[i] = *(vector *)gen_pt[0][i];
 	    }
 	    cleanup_gather(mtag0);
 	}
@@ -442,13 +442,13 @@ void path_transport( field_offset src, field_offset dest, int parity,
     }  /* j=link in path */
     /* done, copy result into real dest. (tmp_src now points to result) */
     FORSOMEPARITY(i,s,parity){
-        *(su3_vector *)F_PT(s,dest) = tmp_src[i];
+        *(vector *)F_PT(s,dest) = tmp_src[i];
     }
     free(tmp_src); free(tmp_dest); free(tmp_work);
   } /* end if(length>0) */
   else if( src != dest ){ /* for length=0 */
     FORSOMEPARITY(i,s,parity){
-        *(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+        *(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
     }
   }
 } /* path_transport */
@@ -468,14 +468,14 @@ void path_transport_site( field_offset src, field_offset dest, int parity,
     register site *s;
     msg_tag *mtag0;
     int j;
-    su3_vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
-    su3_vector *tmp_pt; /* scratch */
+    vector *tmp_src,*tmp_dest,*tmp_work; /*source, dest and workspace*/
+    vector *tmp_pt; /* scratch */
     int tmp_parity=0, tmp_otherparity=0; /* parity for this step */
 
   if( length > 0 ){
-    tmp_src = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
-    tmp_dest = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
-    tmp_work = (su3_vector *)special_alloc( sites_on_node*sizeof(su3_vector) );
+    tmp_src = (vector *)special_alloc( sites_on_node*sizeof(vector) );
+    tmp_dest = (vector *)special_alloc( sites_on_node*sizeof(vector) );
+    tmp_work = (vector *)special_alloc( sites_on_node*sizeof(vector) );
 
     for( j=length-1; j>=0; j-- ){
 	/* figure out parities for this step */
@@ -498,17 +498,17 @@ void path_transport_site( field_offset src, field_offset dest, int parity,
 
 	if( j==length-1 ){
 	    FORSOMEPARITY(i,s,tmp_otherparity){
-	        tmp_src[i] = *(su3_vector *)F_PT(s,src);
+	        tmp_src[i] = *(vector *)F_PT(s,src);
 	    }
 	}
 
 	if( GOES_FORWARDS(dir[j]) ) {
-	    mtag0 = start_gather_field( tmp_src, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_src, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		mult_su3_mat_vec( &(s->link[dir[j]]),
-		    (su3_vector *)(gen_pt[0][i]),
+		mult_mat_vec( &(s->link[dir[j]]),
+		    (vector *)(gen_pt[0][i]),
 		    &(tmp_dest[i]) );
 	    }
 	    cleanup_gather(mtag0);
@@ -516,14 +516,14 @@ void path_transport_site( field_offset src, field_offset dest, int parity,
 
 	else{ /* GOES_BACKWARDS(dir[j]) */
 	    FORSOMEPARITY(i,s,tmp_otherparity){
-		mult_adj_su3_mat_vec( &(s->link[OPP_DIR(dir[j])]),
+		mult_adj_mat_vec( &(s->link[OPP_DIR(dir[j])]),
 		    &(tmp_src[i]), &(tmp_work[i]) );
 	    }
-	    mtag0 = start_gather_field( tmp_work, sizeof(su3_vector),
+	    mtag0 = start_gather_field( tmp_work, sizeof(vector),
 	        dir[j], tmp_parity, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORSOMEPARITY(i,s,tmp_parity){
-		 tmp_dest[i] = *(su3_vector *)gen_pt[0][i];
+		 tmp_dest[i] = *(vector *)gen_pt[0][i];
 	    }
 	    cleanup_gather(mtag0);
 	}
@@ -533,13 +533,13 @@ void path_transport_site( field_offset src, field_offset dest, int parity,
     }  /* j=link in path */
     /* done, copy result into real dest. (tmp_src now points to result) */
     FORSOMEPARITY(i,s,parity){
-        *(su3_vector *)F_PT(s,dest) = tmp_src[i];
+        *(vector *)F_PT(s,dest) = tmp_src[i];
     }
     free(tmp_src); free(tmp_dest); free(tmp_work);
   } /* end if(length>0) */
   else if( src != dest ){ /* for length=0 */
     FORSOMEPARITY(i,s,parity){
-        *(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+        *(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
     }
   }
 }

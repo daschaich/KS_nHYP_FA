@@ -75,8 +75,8 @@ int setup() {
   // Set up neighbor pointers and comlink structures
   make_nn_gathers();
   // Allocate temporary fields
-  FIELD_ALLOC(tempmat, su3_matrix);
-  FIELD_ALLOC(tempmat2, su3_matrix);
+  FIELD_ALLOC(tempmat, matrix);
+  FIELD_ALLOC(tempmat2, matrix);
 
   return prompt;
 }

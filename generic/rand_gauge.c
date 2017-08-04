@@ -27,10 +27,10 @@ void randomize(field_offset G, Real radius)
 
   FORALLSITES(i,s) {
     for(a=0; a<3; a++) for(b=0; b<3; b++)
-      (*(su3_matrix *)F_PT(s,G)).e[a][b] 
+      (*(matrix *)F_PT(s,G)).e[a][b] 
              = cmplx(radius*((Real)drand48()-0.5),
                      radius*((Real)drand48()-0.5));
-    reunit_su3((su3_matrix *)F_PT(s,G));
+    reunit_su3((matrix *)F_PT(s,G));
   }
 }
 
@@ -38,19 +38,19 @@ void gauge_trans(field_offset G)
 {
   register int i,mu;
   site *s;
-  su3_matrix tmp;
+  matrix tmp;
   msg_tag *tag[4];
 
   FORALLUPDIR(mu) 
-    tag[mu] = start_gather_site(G,sizeof(su3_matrix),mu,EVENANDODD,
+    tag[mu] = start_gather_site(G,sizeof(matrix),mu,EVENANDODD,
 		       gen_pt[mu]);
 
   FORALLUPDIR(mu) {
     wait_gather(tag[mu]);
     FORALLSITES(i,s) {
 
-       mult_su3_an((su3_matrix *)F_PT(s,G), &(s->link[mu]), &tmp);
-       mult_su3_nn(&tmp, (su3_matrix *)gen_pt[mu][i],
+       mult_su3_an((matrix *)F_PT(s,G), &(s->link[mu]), &tmp);
+       mult_su3_nn(&tmp, (matrix *)gen_pt[mu][i],
 		       &(s->link[mu]));
 
     }

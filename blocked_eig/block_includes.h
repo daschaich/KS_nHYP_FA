@@ -27,8 +27,8 @@ int setup();
 void make_fields();
 void free_fields();
 int readin(int prompt);
-void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]);
-void staple(su3_matrix *stp[4]);
+void stout_step_rk(matrix *S[4], anti_hermitmat *A[4]);
+void staple(matrix *stp[4]);
 
 void grsource_imp();
 void grsource_eig();
@@ -56,7 +56,7 @@ void scalar_mult_add_latvec(field_offset src1, field_offset src2,
 // -----------------------------------------------------------------
 // nHYP stuff specific to for MCRG-blocked measurements
 void clear_disp(int *disp);
-void diag_su3(su3_matrix* Q, complex *f);
+void diag_su3(matrix* Q, complex *f);
 void block_nhyp_mcrg(int num, int block);
 void block_mcrg(int num, int block);
 // -----------------------------------------------------------------
@@ -67,9 +67,9 @@ void block_mcrg(int num, int block);
 // Wilson and Polyakov loop stuff
 void make_loop_table2();
 void blocked_gauge_loops(int block, double *result);
-void path(int *dir, int *sign, int length, su3_matrix *resmat);
+void path(int *dir, int *sign, int length, matrix *resmat);
 void blocked_path(int block, int *dir, int *sign,
-                  int length, su3_matrix *resmat);
+                  int length, matrix *resmat);
 
 complex blocked_ploop(int block, int dir);
 // -----------------------------------------------------------------
@@ -78,9 +78,9 @@ complex blocked_ploop(int block, int dir);
 
 // -----------------------------------------------------------------
 // Eigenvalue routines
-int Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
+int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
                Real RelTol, int Nvecs, int maxIter, int restart, int kiters);
 
-void measure_chirality(su3_vector *src, double *chirality);
-void print_densities(su3_vector *src, char *tag, int y, int z, int t);
+void measure_chirality(vector *src, double *chirality);
+void print_densities(vector *src, char *tag, int y, int z, int t);
 // -----------------------------------------------------------------

@@ -13,7 +13,7 @@
 void exp_mult(int dir, double eps, anti_hermitmat *A) {
   register int i;
   register site *s;
-  su3_matrix *link, temp1, temp2, htemp;
+  matrix *link, temp1, temp2, htemp;
   register Real t2, t3, t4, t5, t6, t7, t8;
 
   // Take divisions out of site loop (can't be done by compiler)
@@ -30,30 +30,30 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
     link = &(s->link[dir]);
 
     mult_su3_nn(&htemp, link, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t8, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t8, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t7, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t7, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t6, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t6, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t5, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t5, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t4, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t4, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t3, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t3, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, t2, &temp2);
+    scalar_mult_add_matrix(link, &temp1, t2, &temp2);
 
     mult_su3_nn(&htemp, &temp2, &temp1);
-    scalar_mult_add_su3_matrix(link, &temp1, eps, &temp2);
+    scalar_mult_add_matrix(link, &temp1, eps, &temp2);
 
-    su3mat_copy(&temp2, link);    // This step updates the link U[dir]
+    mat_copy(&temp2, link);    // This step updates the link U[dir]
   }
 }
 // -----------------------------------------------------------------
@@ -61,14 +61,14 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
 
 
 // -----------------------------------------------------------------
-// Project su3_matrix to traceless anti-hermitian matrix
-void proj_traceless_antiH(su3_matrix *in, anti_hermitmat *out) {
+// Project matrix to traceless anti-hermitian matrix
+void proj_traceless_antiH(matrix *in, anti_hermitmat *out) {
   int i;
   complex tc;
-  su3_matrix tmat;
+  matrix tmat;
 
   su3_adjoint(in, &tmat);
-  sub_su3_matrix(in, &tmat, in);
+  sub_matrix(in, &tmat, in);
   tc = trace_su3(in);
   CMULREAL(tc, 1 / 3.0, tc);
   for (i = 0; i < 3; i++)
@@ -115,14 +115,14 @@ void scalar_mult_add_antiH(anti_hermitmat *a, anti_hermitmat *b,
 // -----------------------------------------------------------------
 // Calculate A = A + f1 * Project_antihermitian_traceless(U.S)
 //           U = exp(f2 * A).U
-void update_flow(int dir, anti_hermitmat *A, su3_matrix *S,
+void update_flow(int dir, anti_hermitmat *A, matrix *S,
                  double f1, double f2) {
 
   register int i;
   register site *s;
 //  double td = 0;
 //  complex tc;
-  su3_matrix tmat;
+  matrix tmat;
   anti_hermitmat tantiH;
 
   FORALLSITES(i, s) {
@@ -142,7 +142,7 @@ void update_flow(int dir, anti_hermitmat *A, su3_matrix *S,
 
 
 // -----------------------------------------------------------------
-void stout_step_rk(su3_matrix *S[4], anti_hermitmat *A[4]) {
+void stout_step_rk(matrix *S[4], anti_hermitmat *A[4]) {
   register int i, dir;
   register site *s;
 

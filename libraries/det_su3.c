@@ -1,6 +1,6 @@
 /******************  det_su3.c  (in su3.a) ******************************
 *									*
-* complex det_su3( su3_matrix *a )					*
+* complex det_su3( matrix *a )					*
 * Complex determinant of an SU3 matrix 					*
 */
 #include "../include/config.h"
@@ -9,7 +9,7 @@
 
 /* FIX THIS - more efficient to take cross product of first two
    rows, dot with third. */
-complex det_su3( su3_matrix *a ) {
+complex det_su3( matrix *a ) {
 register complex cc,dd,sum;
     CMUL(a->e[0][0],a->e[1][1],cc);
     CMUL(cc,a->e[2][2],sum);

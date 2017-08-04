@@ -19,7 +19,7 @@ typedef struct {
   int index;          // Index in the array
 
   // No random numbers
-  su3_matrix link[4];
+  matrix link[4];
 } site;
 // -----------------------------------------------------------------
 
@@ -69,15 +69,15 @@ EXTERN char **gen_pt[N_POINTERS];
 // Smearing stuff
 EXTERN int nsmear;
 EXTERN Real alpha_smear[3];
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // hyplinks, Staples, tempmat used by generic_nhyp/block_nhyp.c
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
-EXTERN su3_matrix *tempmat1;
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
+EXTERN matrix *tempmat1;
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

@@ -14,7 +14,7 @@ double gauge_force(Real eps) {
   register Real eb3 = eps * beta / 3.0;
   msg_tag *tag0, *tag1, *tag2;
   int start;
-  su3_matrix tmat, tmat2;
+  matrix tmat, tmat2;
   complex tc;
   double norm = 0;
 
@@ -30,12 +30,12 @@ double gauge_force(Real eps) {
 
       // Get link[dir2] from direction dir
       tag0 = start_gather_site(F_OFFSET(link[dir2]),
-                               sizeof(su3_matrix),
+                               sizeof(matrix),
                                dir, EVENANDODD, gen_pt[0]);
 
       // Start gather for the "upper staple"
      tag2 = start_gather_site(F_OFFSET(link[dir]),
-                              sizeof(su3_matrix),
+                              sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[2]);
 
       // Begin the computation "at the dir2DOWN point"
@@ -43,12 +43,12 @@ double gauge_force(Real eps) {
       wait_gather(tag0);
       FORALLSITES(i, s) {
         mult_su3_an(&(s->link[dir2]), &(s->link[dir]), &tmat);
-        mult_su3_nn(&tmat, (su3_matrix *)gen_pt[0][i],
-                    (su3_matrix *)&(tempmat[i]));
+        mult_su3_nn(&tmat, (matrix *)gen_pt[0][i],
+                    (matrix *)&(tempmat[i]));
       }
 
       // Gather lower staple "up to home site"
-      tag1 = start_gather_field(tempmat, sizeof(su3_matrix),
+      tag1 = start_gather_field(tempmat, sizeof(matrix),
                                 OPP_DIR(dir2), EVENANDODD, gen_pt[1]);
 
       // The "upper" staple
@@ -58,39 +58,39 @@ double gauge_force(Real eps) {
       wait_gather(tag2);
       if (start) {  // Initialize staple sum in tempmat2
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat);
-          mult_su3_na(&tmat, (su3_matrix *)gen_pt[0][i], &(tempmat2[i]));
+          mult_su3_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
+          mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
           mult_su3_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
           tc = trace_su3(&tmat);
           tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
           tc.imag = -2.0 * beta_a / 3.0 * tc.imag;
 
-          c_scalar_mult_su3mat(&(tempmat2[i]), &tc, &tmat);
-          su3mat_copy(&tmat, &(tempmat2[i]));
+          c_scalar_mult_mat(&(tempmat2[i]), &tc, &tmat);
+          mat_copy(&tmat, &(tempmat2[i]));
         }
         start = 0;
       }
       else {
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)gen_pt[2][i], &tmat);
-          mult_su3_na(&tmat, (su3_matrix *)gen_pt[0][i], &tmat2);
+          mult_su3_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
+          mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
           mult_su3_na(&(s->link[dir]), &tmat2, &tmat);
           tc = trace_su3(&tmat);
           tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
           tc.imag *= -2.0 * beta_a / 3.0;
 
-          c_scalar_mult_sum_su3mat(&tmat2, &tc, &(tempmat2[i]));
+          c_scalar_mult_sum_mat(&tmat2, &tc, &(tempmat2[i]));
         }
       }
 
       wait_gather(tag1);
       FORALLSITES(i, s) {
-        mult_su3_na(&(s->link[dir]), (su3_matrix *)gen_pt[1][i], &tmat);
+        mult_su3_na(&(s->link[dir]), (matrix *)gen_pt[1][i], &tmat);
         tc = trace_su3(&tmat);
         tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
         tc.imag *= -2.0 * beta_a / 3.0;
 
-        c_scalar_mult_sum_su3mat((su3_matrix *)gen_pt[1][i], &tc,
+        c_scalar_mult_sum_mat((matrix *)gen_pt[1][i], &tc,
                                  &(tempmat2[i]));
       }
       cleanup_gather(tag0);
@@ -102,7 +102,7 @@ double gauge_force(Real eps) {
     FORALLSITES(i, s) {
       mult_su3_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
       uncompress_anti_hermitian(&(s->mom[dir]), &tmat2);
-      scalar_mult_add_su3_matrix(&tmat2, &tmat, eb3, &(tempmat2[i]));
+      scalar_mult_add_matrix(&tmat2, &tmat, eb3, &(tempmat2[i]));
       make_anti_hermitian(&(tempmat2[i]), &(s->mom[dir]));
       norm += (double)realtrace_su3(&tmat, &tmat);
     }
@@ -127,13 +127,13 @@ double fermion_force(int level, Real eps) {
   double norm = 0;
   msg_tag *tag0, *tag1;
   anti_hermitmat ahtmp;
-  su3_matrix tmat, tmat2;
-  su3_vector tvec;
+  matrix tmat, tmat2;
+  vector tvec;
 
   // Zero the force collectors
   FORALLUPDIR(dir) {
     FORALLSITES(i, s)
-      clear_su3mat(&(Sigma[dir][i]));
+      clear_mat(&(Sigma[dir][i]));
   }
 
   // Rescale outer level to account for Hasenbusch preconditioning
@@ -153,32 +153,32 @@ double fermion_force(int level, Real eps) {
   // su3_projector overwrites its target, so add via temporary tmat2
   for (j = 0; j < full_fields; j++) {
     // For all sites, gather first ttt[j][level] before entering loop
-    tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
+    tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(vector),
                              XUP, EVENANDODD, gen_pt[0]);
 
     FORALLUPDIR(dir) {
       // For all sites, gather psi[j][level]
-      tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(su3_vector),
+      tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(vector),
                                dir, EVENANDODD, gen_pt[1]);
 
       wait_gather(tag0);
       FORALLSITES(i, s) {
-        mult_su3_mat_vec(&(s->link[dir]), (su3_vector *)gen_pt[0][i], &tvec);
+        mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[0][i], &tvec);
         su3_projector(&tvec, &(s->psi[j][level]), &tmat2);
-        sum_su3_matrix(&tmat2, &(Sigma[dir][i]));
+        sum_matrix(&tmat2, &(Sigma[dir][i]));
       }
       cleanup_gather(tag0);
 
       // For all sites, gather next ttt[j][level]
       if (dir < TUP)
-        tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
+        tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(vector),
                                  dir + 1, EVENANDODD, gen_pt[0]);
 
       wait_gather(tag1);
       FORALLSITES(i, s) {
-        mult_su3_mat_vec(&(s->link[dir]), (su3_vector *)gen_pt[1][i], &tvec);
+        mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[1][i], &tvec);
         su3_projector(&(s->ttt[j][level]), &tvec, &tmat2);
-        sum_su3_matrix(&tmat2, &(Sigma[dir][i]));
+        sum_matrix(&tmat2, &(Sigma[dir][i]));
       }
       cleanup_gather(tag1);
     }
@@ -186,32 +186,32 @@ double fermion_force(int level, Real eps) {
   if (half_fields == 1) {
     j = full_fields;
     // For even sites, gather first ttt[j][level] before entering loop
-    tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
+    tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(vector),
                              XUP, EVEN, gen_pt[0]);
 
     FORALLUPDIR(dir) {
       // For odd sites, gather psi[j][level]
-      tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(su3_vector),
+      tag1 = start_gather_site(F_OFFSET(psi[j][level]), sizeof(vector),
                                dir, ODD, gen_pt[1]);
 
       wait_gather(tag0);
       FOREVENSITES(i, s) {
-        mult_su3_mat_vec(&(s->link[dir]), (su3_vector *)gen_pt[0][i], &tvec);
+        mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[0][i], &tvec);
         su3_projector(&tvec, &(s->psi[j][level]), &tmat2);
-        sum_su3_matrix(&tmat2, &(Sigma[dir][i]));
+        sum_matrix(&tmat2, &(Sigma[dir][i]));
       }
       cleanup_gather(tag0);
 
       // For even sites, gather next ttt[j][level]
       if (dir < TUP)
-        tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(su3_vector),
+        tag0 = start_gather_site(F_OFFSET(ttt[j][level]), sizeof(vector),
                                  dir + 1, EVEN, gen_pt[0]);
 
       wait_gather(tag1);
       FORODDSITES(i, s) {
-        mult_su3_mat_vec(&(s->link[dir]), (su3_vector *)gen_pt[1][i], &tvec);
+        mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[1][i], &tvec);
         su3_projector(&(s->ttt[j][level]), &tvec, &tmat2);
-        sum_su3_matrix(&tmat2, &(Sigma[dir][i]));
+        sum_matrix(&tmat2, &(Sigma[dir][i]));
       }
       cleanup_gather(tag1);
     }
@@ -222,7 +222,7 @@ double fermion_force(int level, Real eps) {
   FORALLUPDIR(dir) {
     FORALLSITES(i, s) {
       mult_su3_an(&(gauge_field[dir][i]), &(Sigma[dir][i]), &tmat);
-      su3mat_copy(&tmat, &(Sigma[dir][i]));
+      mat_copy(&tmat, &(Sigma[dir][i]));
     }
   }
 
@@ -235,14 +235,14 @@ double fermion_force(int level, Real eps) {
     leanlinks();
     FORALLUPDIR(dir) {
       FORALLSITES(i, s)
-        su3mat_copy(&(gauge_field[dir][i]), &(gauge_field_temp[dir][i]));
+        mat_copy(&(gauge_field[dir][i]), &(gauge_field_temp[dir][i]));
     }
 
     block_N_fatten(j);   // gauge_field holds j-smeared links
     // gauge_field_thin receives j-1-smeared links from gauge_field_temp
     FORALLUPDIR(dir) {
       FORALLSITES(i, s)
-        su3mat_copy(&(gauge_field_temp[dir][i]), &(gauge_field_thin[dir][i]));
+        mat_copy(&(gauge_field_temp[dir][i]), &(gauge_field_thin[dir][i]));
     }
     leanlinks();          // s->link points to j-1-smeared links
     nhyp_force1();
@@ -250,7 +250,7 @@ double fermion_force(int level, Real eps) {
     // Restore unsmeared links to gauge_field_thin
     FORALLUPDIR(dir) {
       FORALLSITES(i, s)
-        su3mat_copy(&(gauge_field_save[dir][i]), &(gauge_field_thin[dir][i]));
+        mat_copy(&(gauge_field_save[dir][i]), &(gauge_field_thin[dir][i]));
     }
     leanlinks();            // s->link points to unsmeared links
   }
@@ -273,7 +273,7 @@ double fermion_force(int level, Real eps) {
 
       uncompress_anti_hermitian(&ahtmp, &tmat);
       // tmat2 += ferm_epsilon * tmat
-      scalar_mult_sum_su3_matrix(&tmat, ferm_epsilon, &tmat2);
+      scalar_mult_sum_matrix(&tmat, ferm_epsilon, &tmat2);
       make_anti_hermitian(&tmat2, &(s->mom[dir]));
       norm += (double)realtrace_su3(&tmat, &tmat);
     }

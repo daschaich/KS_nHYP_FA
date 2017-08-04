@@ -51,33 +51,33 @@ void sym_shift(int dir, field_offset src, field_offset dest) {
     terminate(101);
   }
 
-  tag[0] = start_gather_site(src, sizeof(su3_vector), dir,
+  tag[0] = start_gather_site(src, sizeof(vector), dir,
                              EVENANDODD, gen_pt[0]);
 
   FORALLSITES(i, s) {
-    mult_adj_su3_mat_vec(&(s->link[dir]), (su3_vector *)F_PT(s, src),
+    mult_adj_mat_vec(&(s->link[dir]), (vector *)F_PT(s, src),
                          &(s->ttt));
   }
 
-  tag[1] = start_gather_site(F_OFFSET(ttt), sizeof(su3_vector), OPP_DIR(dir),
+  tag[1] = start_gather_site(F_OFFSET(ttt), sizeof(vector), OPP_DIR(dir),
                              EVENANDODD, gen_pt[1]);
 
   wait_gather(tag[0]);
   FORALLSITES(i, s) {
-    mult_su3_mat_vec(&(s->link[dir]), (su3_vector *)gen_pt[0][i],
-                     (su3_vector *)F_PT(s, dest));
+    mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[0][i],
+                     (vector *)F_PT(s, dest));
   }
   cleanup_gather(tag[0]);
 
   wait_gather(tag[1]);
   FORALLSITES(i, s)
-    sum_su3_vector((su3_vector *)gen_pt[1][i], (su3_vector *)F_PT(s, dest));
+    sum_vector((vector *)gen_pt[1][i], (vector *)F_PT(s, dest));
   cleanup_gather(tag[1]);
 
   /* Now divide by 2 eq. (4.2b) of Golderman's Meson paper*/
   FORALLSITES(i, s) {
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), 0.5,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -114,8 +114,8 @@ void zeta_shift(int n, int *d, field_offset src, field_offset dest) {
       /* And the (-1)^coord[d[c]] */
       if (((((short *)&(s->x))[d[c]]) & 0x1) == 1)
         sign = -sign;
-      scalar_mult_su3_vector(&(s->tempvec[0]), sign,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector(&(s->tempvec[0]), sign,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -186,10 +186,10 @@ void mult_flavor_tensor(int mu, int nu, field_offset src, field_offset dest) {
   zeta_shift(2, d, src, F_OFFSET(tempvec[1]));
 
   FORALLSITES(i, s) {
-    scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+    scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                &(s->tempvec[1]), -1.0);
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), 0.5,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -206,7 +206,7 @@ void mult_flavor_pseudovector(int mu, field_offset src, field_offset dest) {
   }
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (p = 0; p < 24; p++) {
     if (eps[p].d[0] == mu) {
@@ -214,7 +214,7 @@ void mult_flavor_pseudovector(int mu, field_offset src, field_offset dest) {
       /* Multiply the extra 1/6 needed by the definition    *
        * of the operator (number of permutations)           */
       FORALLSITES(i, s) {
-        scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+        scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                    &(s->tempvec[1]), eps[p].sign / 6.0);
       }
     }
@@ -234,14 +234,14 @@ void mult_flavor_pseudoscalar(field_offset src, field_offset dest) {
   }
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (p = 0; p < 24; p++) {
     zeta_shift(4, eps[p].d, src, F_OFFSET(tempvec[1]));
     /*  Multiply the the extra 1/24 needed by the            *
      * definition of the operator (number of permutations)   */
     FORALLSITES(i, s) {
-      scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+      scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                  &(s->tempvec[1]), eps[p].sign / 24.0);
     }
   }
@@ -276,10 +276,10 @@ void mult_spin_tensor(int mu, int nu, field_offset src, field_offset dest) {
   eta_shift(2, d, src, F_OFFSET(tempvec[2]));
 
   FORALLSITES(i, s) {
-    scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+    scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                &(s->tempvec[2]), -1.0);
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), 0.5,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -296,7 +296,7 @@ void mult_spin_pseudovector(int mu, field_offset src, field_offset dest) {
   }
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (p = 0; p < 24; p++) {
     if (eps[p].d[0] == mu) {
@@ -304,7 +304,7 @@ void mult_spin_pseudovector(int mu, field_offset src, field_offset dest) {
       /* Multiply the extra 1/6 needed by the definition    *
          of the operator (number of permutations)           */
       FORALLSITES(i, s) {
-        scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+        scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                    &(s->tempvec[2]), eps[p].sign / 6.0);
       }
     }
@@ -324,14 +324,14 @@ void mult_spin_pseudoscalar(field_offset src, field_offset dest) {
   }
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (p = 0; p < 24; p++) {
     eta_shift(4, eps[p].d, src, F_OFFSET(tempvec[2]));
     /*  Multiply the the extra 1/24 needed by the            *
      * definition of the operator (number of permutations)   */
     FORALLSITES(i, s) {
-      scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+      scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                  &(s->tempvec[2]), eps[p].sign / 24.0);
     }
   }

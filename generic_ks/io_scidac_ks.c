@@ -85,7 +85,7 @@ QIO_Writer *w_open_ks_vector_scidac_file(char *filename, char *fileinfo,
 }
 
 int save_ks_vector_scidac(QIO_Writer *outfile, char *filename, char *recinfo,
-			  int volfmt, su3_vector *src, int count)
+			  int volfmt, vector *src, int count)
 {
   QIO_String *recxml;
   int status;
@@ -130,7 +130,7 @@ void w_close_ks_vector_scidac_file(QIO_Writer *outfile)
 void save_ks_vector_scidac_from_field(char *filename, char *fileinfo,
 				      char *recinfo, 
 				      int volfmt, int serpar, 
-				      su3_vector *src, int count)
+				      vector *src, int count)
 {
   QIO_Writer *outfile;
   int status;
@@ -158,10 +158,10 @@ void save_ks_vector_scidac_from_site(char *filename, char *fileinfo,
 				     field_offset src, int count)
 {
 
-  su3_vector *tmp;
+  vector *tmp;
   int i,j; site *s;
 
-  tmp = (su3_vector *)malloc(sites_on_node * count * sizeof(su3_vector));
+  tmp = (vector *)malloc(sites_on_node * count * sizeof(vector));
   if(tmp == NULL){
     printf("save_ks_vector_scidac_from_site(%d): No room for tmp\n",
 	   this_node);
@@ -170,7 +170,7 @@ void save_ks_vector_scidac_from_site(char *filename, char *fileinfo,
 
   FORALLSITES(i,s){
     for(j = 0; j < count; j++)
-      su3vec_copy((su3_vector *)F_PT(s,src+j*sizeof(su3_vector)),tmp+count*i+j);
+      su3vec_copy((vector *)F_PT(s,src+j*sizeof(vector)),tmp+count*i+j);
   }
 
   save_ks_vector_scidac_from_field(filename, fileinfo, recinfo, 
@@ -219,7 +219,7 @@ QIO_Reader *r_open_ks_vector_scidac_file(char *filename, int serpar)
   return infile;
 }
 
-int read_ks_vector_scidac_xml(QIO_Reader *infile, su3_vector *dest, int count,
+int read_ks_vector_scidac_xml(QIO_Reader *infile, vector *dest, int count,
 			      QIO_String *recxml)
 {
   int status, typesize;
@@ -240,7 +240,7 @@ int read_ks_vector_scidac_xml(QIO_Reader *infile, su3_vector *dest, int count,
 
 }
 
-int read_ks_vector_scidac(QIO_Reader *infile, su3_vector *dest, int count)
+int read_ks_vector_scidac(QIO_Reader *infile, vector *dest, int count)
 {
   QIO_String *recxml;
   int status;
@@ -265,7 +265,7 @@ void r_close_ks_vector_scidac_file(QIO_Reader *infile)
 /* reads "count" vectors per site                                   */
 
 void restore_ks_vector_scidac_to_field(char *filename, int serpar, 
-				       su3_vector *dest, int count){
+				       vector *dest, int count){
   QIO_Reader *infile;
   int status;
 
@@ -286,11 +286,11 @@ void restore_ks_vector_scidac_to_field(char *filename, int serpar,
 
 void restore_ks_vector_scidac_to_site(char *filename, int serpar,
 				      field_offset dest, int count){
-  su3_vector *tmp;
+  vector *tmp;
   int i,j;
   site *s;
 
-  tmp = (su3_vector *)malloc(sites_on_node * count * sizeof(su3_vector));
+  tmp = (vector *)malloc(sites_on_node * count * sizeof(vector));
   if(tmp == NULL){
     printf("restore_ks_vector_scidac_to_site(%d): No room for tmp\n",
 	   this_node);
@@ -301,7 +301,7 @@ void restore_ks_vector_scidac_to_site(char *filename, int serpar,
 
   FORALLSITES(i,s){
     for(j = 0; j < count; j++)
-      su3vec_copy(tmp+count*i+j,(su3_vector *)F_PT(s,dest+j*sizeof(su3_vector)));
+      su3vec_copy(tmp+count*i+j,(vector *)F_PT(s,dest+j*sizeof(vector)));
   }
 
   free(tmp);
@@ -380,7 +380,7 @@ int read_kspropsource_C_usqcd(QIO_Reader *infile, char *srcinfo, int n,
    extract the info string */
 
 int read_kspropsource_V_usqcd(QIO_Reader *infile, char *srcinfo, int n,
-			      su3_vector *dest)
+			      vector *dest)
 {
   QIO_USQCDKSPropSourceInfo propsource_info;
   QIO_String *recxml;
@@ -447,7 +447,7 @@ int write_kspropsource_C_usqcd(QIO_Writer *outfile, char *srcinfo,
 /* Write a KS vector source field */
 
 int write_kspropsource_V_usqcd_xml(QIO_Writer *outfile, QIO_String *recxml,
-				   su3_vector *src, int t0){
+				   vector *src, int t0){
   int status;
   status = write_F3_V_timeslice_from_field(outfile, recxml, src, 1, t0);
   return status;
@@ -457,7 +457,7 @@ int write_kspropsource_V_usqcd_xml(QIO_Writer *outfile, QIO_String *recxml,
 /* Write a KS vector source field */
 
 int write_kspropsource_V_usqcd(QIO_Writer *outfile, char *srcinfo, 
-			       su3_vector *src, int t0){
+			       vector *src, int t0){
   QIO_USQCDKSPropSourceInfo *propsource_info;
   QIO_String *recxml;
   int status;
@@ -475,7 +475,7 @@ int write_kspropsource_V_usqcd(QIO_Writer *outfile, char *srcinfo,
 /********************************************************************/
 /* Write a KS vector solution field for a given source color */
 
-int write_ksprop_usqcd_c(QIO_Writer *outfile, su3_vector *src, 
+int write_ksprop_usqcd_c(QIO_Writer *outfile, vector *src, 
 			 int color, char *recinfo)
 {
   QIO_USQCDKSPropRecordInfo *proprecord_info;
@@ -568,7 +568,7 @@ QIO_Reader *open_usqcd_ksprop_read(char *filename, int serpar){
 /* Read the next color vector record from an open file and return its
    color */
 
-int read_ksproprecord_usqcd(QIO_Reader *infile, int *color, su3_vector *dest)
+int read_ksproprecord_usqcd(QIO_Reader *infile, int *color, vector *dest)
 {
   QIO_USQCDKSPropRecordInfo proprecord_info;
   QIO_String *recxml;

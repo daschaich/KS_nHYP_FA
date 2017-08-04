@@ -5,20 +5,20 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void mult_su3_mat_vec_sum_4dir(su3_matrix *a, su3_vector *b0, su3_vector *b1,
-                               su3_vector *b2, su3_vector *b3, su3_vector *c) {
+void mult_mat_vec_sum_4dir(matrix *a, vector *b0, vector *b1,
+                               vector *b2, vector *b3, vector *c) {
 #ifndef FAST
-  mult_su3_mat_vec(a, b0, c);
-  mult_su3_mat_vec_sum(a + 1, b1, c);
-  mult_su3_mat_vec_sum(a + 2, b2, c);
-  mult_su3_mat_vec_sum(a + 3, b3, c);
+  mult_mat_vec(a, b0, c);
+  mult_mat_vec_sum(a + 1, b1, c);
+  mult_mat_vec_sum(a + 2, b2, c);
+  mult_mat_vec_sum(a + 3, b3, c);
 
 #else
   register int n;
   register Real c0r = 0.0, c0i = 0.0, c1r = 0.0, c1i = 0.0;
   register Real c2r = 0.0, c2i = 0.0, br, bi, a0, a1, a2;
-  register su3_matrix *mat;
-  register su3_vector *b;
+  register matrix *mat;
+  register vector *b;
 
   mat = a;
   for (n = 0; n < 4; n++) {

@@ -79,8 +79,8 @@ static char* cvsHeader = "$Header: /u/aquila/cvsroot/milc_qcd/generic_ks/ks_mult
 
 /* Offsets are 4 * mass * mass and must be positive */
 int KS_MULTICG_OFFSET(	      /* Return value is number of iterations taken */
-    field_offset src,	      /* source vector (type su3_vector) */
-    su3_vector **psim,	      /* solution vectors */
+    field_offset src,	      /* source vector (type vector) */
+    vector **psim,	      /* solution vectors */
     Real *offsets,	      /* the offsets */
     int num_offsets,	      /* number of offsets */
     quark_invert_control *qic,/* inversion parameters */
@@ -96,7 +96,7 @@ int KS_MULTICG_OFFSET(	      /* Return value is number of iterations taken */
   int nmass[1], nsrc;
   int parity = qic->parity;     /* MILC parity */
   field_offset milc_srcs[1];
-  su3_vector **milc_sols[1];
+  vector **milc_sols[1];
   char myname[] = "ks_multicg_offset";
   
   /* Generate mass table */
@@ -143,8 +143,8 @@ int KS_MULTICG_OFFSET(	      /* Return value is number of iterations taken */
    single source, multiple masses.  Uses the prevailing precision */
 
 int KS_MULTICG_MASS(	      /* Return value is number of iterations taken */
-    field_offset src,	      /* source vector (type su3_vector) */
-    su3_vector **psim,	      /* solution vectors (preallocated) */
+    field_offset src,	      /* source vector (type vector) */
+    vector **psim,	      /* solution vectors (preallocated) */
     Real *masses,	      /* the masses */
     int num_masses,	      /* number of masses */
     quark_invert_control *qic, /* inversion parameters */
@@ -157,7 +157,7 @@ int KS_MULTICG_MASS(	      /* Return value is number of iterations taken */
   int nmass[1], nsrc;
   int i;
   field_offset milc_srcs[1];
-  su3_vector **milc_sols[1];
+  vector **milc_sols[1];
 
   /* Set up general source and solution pointers for one mass, one source */
   nsrc = 1;

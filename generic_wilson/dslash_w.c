@@ -24,7 +24,7 @@ static half_wilson_vector *htmp[8] ;
 static int temp_not_allocated=1 ;
 
 /* Temporary work space for gauge links */ 
-static su3_matrix *t_links;
+static matrix *t_links;
 
 /* Flag indicating if temp is allocated               */
 static int tmp_links_not_set = 1;
@@ -57,7 +57,7 @@ static void setup_tmp_links(){
   register site *s;
 
   if(!tmp_links_not_set)return;
-  t_links =(su3_matrix *)malloc(sites_on_node*4*sizeof(su3_matrix));
+  t_links =(matrix *)malloc(sites_on_node*4*sizeof(matrix));
   if(t_links == NULL){
       printf("node %d can't malloc t_links\n",this_node);
       terminate(1);
@@ -113,10 +113,10 @@ msg_tag *tag[8];
     FORSOMEPARITY(i,s,otherparity){
         wp_shrink_4dir( (wilson_vector *)F_PT(s,src),
 	    &hwvx, &hwvy, &hwvz, &hwvt, -isign);
-	mult_adj_su3_mat_hwvec( &(s->link[XUP]), &hwvx, htmp[XDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[YUP]), &hwvy, htmp[YDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[ZUP]), &hwvz, htmp[ZDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[TUP]), &hwvt, htmp[TDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[XUP]), &hwvx, htmp[XDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[YUP]), &hwvy, htmp[YDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[ZUP]), &hwvz, htmp[ZDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[TUP]), &hwvt, htmp[TDOWN]+i);
     }
 
     for( dir=XUP; dir <= TUP; dir++) {
@@ -134,13 +134,13 @@ msg_tag *tag[8];
 	wait_gather(tag[dir]);
     }
     FORSOMEPARITY(i,s,parity){
-	mult_su3_mat_hwvec( &(s->link[XUP]), 
+	mult_mat_hwvec( &(s->link[XUP]), 
 		(half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-	mult_su3_mat_hwvec( &(s->link[YUP]), 
+	mult_mat_hwvec( &(s->link[YUP]), 
 		(half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-	mult_su3_mat_hwvec( &(s->link[ZUP]), 
+	mult_mat_hwvec( &(s->link[ZUP]), 
 		(half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-	mult_su3_mat_hwvec( &(s->link[TUP]), 
+	mult_mat_hwvec( &(s->link[TUP]), 
 		(half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
 	grow_add_four_wvecs( (wilson_vector *)F_PT(s,dest),
 	    &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */
@@ -222,10 +222,10 @@ register int dir,otherparity=0;
     FORSOMEPARITY(i,s,otherparity){
         wp_shrink_4dir( (wilson_vector *)F_PT(s,src),
 	    &hwvx, &hwvy, &hwvz, &hwvt, -isign);
-	mult_adj_su3_mat_hwvec( &(s->link[XUP]), &hwvx, htmp[XDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[YUP]), &hwvy, htmp[YDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[ZUP]), &hwvz, htmp[ZDOWN]+i);
-	mult_adj_su3_mat_hwvec( &(s->link[TUP]), &hwvt, htmp[TDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[XUP]), &hwvx, htmp[XDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[YUP]), &hwvy, htmp[YDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[ZUP]), &hwvz, htmp[ZDOWN]+i);
+	mult_adj_mat_hwvec( &(s->link[TUP]), &hwvt, htmp[TDOWN]+i);
     }
 
     for( dir=XUP; dir <= TUP; dir++) {
@@ -247,13 +247,13 @@ register int dir,otherparity=0;
 	wait_gather(tag[dir]);
     }
     FORSOMEPARITY(i,s,parity){
-	mult_su3_mat_hwvec( &(s->link[XUP]), 
+	mult_mat_hwvec( &(s->link[XUP]), 
 		(half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-	mult_su3_mat_hwvec( &(s->link[YUP]), 
+	mult_mat_hwvec( &(s->link[YUP]), 
 		(half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-	mult_su3_mat_hwvec( &(s->link[ZUP]), 
+	mult_mat_hwvec( &(s->link[ZUP]), 
 		(half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-	mult_su3_mat_hwvec( &(s->link[TUP]), 
+	mult_mat_hwvec( &(s->link[TUP]), 
 		(half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
 	grow_add_four_wvecs( (wilson_vector *)F_PT(s,dest),
 	    &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */
@@ -283,7 +283,7 @@ void dslash_w_field( wilson_vector *src, wilson_vector *dest, int isign, int par
   register site *s;
   register int dir,otherparity=0;
   msg_tag *tag[8];
-  su3_matrix *linkx,*linky,*linkz,*linkt;
+  matrix *linkx,*linky,*linkz,*linkt;
   
   /* The calling program must clean up the temps! */
   malloc_dslash_temps();
@@ -320,10 +320,10 @@ void dslash_w_field( wilson_vector *src, wilson_vector *dest, int isign, int par
     linky = &t_links[4*i+YUP];
     linkz = &t_links[4*i+ZUP];
     linkt = &t_links[4*i+TUP];
-    mult_adj_su3_mat_hwvec( linkx, &hwvx, &(htmp[XDOWN][i]));
-    mult_adj_su3_mat_hwvec( linky, &hwvy, &(htmp[YDOWN][i]));
-    mult_adj_su3_mat_hwvec( linkz, &hwvz, &(htmp[ZDOWN][i]));
-    mult_adj_su3_mat_hwvec( linkt, &hwvt, &(htmp[TDOWN][i]));
+    mult_adj_mat_hwvec( linkx, &hwvx, &(htmp[XDOWN][i]));
+    mult_adj_mat_hwvec( linky, &hwvy, &(htmp[YDOWN][i]));
+    mult_adj_mat_hwvec( linkz, &hwvz, &(htmp[ZDOWN][i]));
+    mult_adj_mat_hwvec( linkt, &hwvt, &(htmp[TDOWN][i]));
   }
   
   for( dir=XUP; dir <= TUP; dir++) {
@@ -345,13 +345,13 @@ void dslash_w_field( wilson_vector *src, wilson_vector *dest, int isign, int par
     linky = &t_links[4*i+YUP];
     linkz = &t_links[4*i+ZUP];
     linkt = &t_links[4*i+TUP];
-    mult_su3_mat_hwvec( linkx, 
+    mult_mat_hwvec( linkx, 
 			(half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-    mult_su3_mat_hwvec( linky, 
+    mult_mat_hwvec( linky, 
 			(half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-    mult_su3_mat_hwvec( linkz, 
+    mult_mat_hwvec( linkz, 
 			(half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-    mult_su3_mat_hwvec( linkt, 
+    mult_mat_hwvec( linkt, 
 			(half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
     grow_add_four_wvecs( &(dest[i]),
 			 &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */
@@ -397,7 +397,7 @@ half_wilson_vector hwvx,hwvy,hwvz,hwvt;
 register int i;
 register site *s;
 register int dir,otherparity=0;
-su3_matrix *linkx,*linky,*linkz,*linkt;
+matrix *linkx,*linky,*linkz,*linkt;
   /* allocate temporary work space only if not already allocated */
   /* The calling program must clean up this space */
   malloc_dslash_temps();
@@ -438,10 +438,10 @@ su3_matrix *linkx,*linky,*linkz,*linkt;
       linkz = &t_links[4*i+ZUP];
       linkt = &t_links[4*i+TUP];
       wp_shrink_4dir( &(src[i]), &hwvx, &hwvy, &hwvz, &hwvt, -isign);
-      mult_adj_su3_mat_hwvec( linkx, &hwvx, &(htmp[XDOWN][i]));
-      mult_adj_su3_mat_hwvec( linky, &hwvy, &(htmp[YDOWN][i]));
-      mult_adj_su3_mat_hwvec( linkz, &hwvz, &(htmp[ZDOWN][i]));
-      mult_adj_su3_mat_hwvec( linkt, &hwvt, &(htmp[TDOWN][i]));
+      mult_adj_mat_hwvec( linkx, &hwvx, &(htmp[XDOWN][i]));
+      mult_adj_mat_hwvec( linky, &hwvy, &(htmp[YDOWN][i]));
+      mult_adj_mat_hwvec( linkz, &hwvz, &(htmp[ZDOWN][i]));
+      mult_adj_mat_hwvec( linkt, &hwvt, &(htmp[TDOWN][i]));
     }
 
     for( dir=XUP; dir <= TUP; dir++) {
@@ -466,13 +466,13 @@ su3_matrix *linkx,*linky,*linkz,*linkt;
       linky = &t_links[4*i+YUP];
       linkz = &t_links[4*i+ZUP];
       linkt = &t_links[4*i+TUP];
-      mult_su3_mat_hwvec( linkx, 
+      mult_mat_hwvec( linkx, 
 			   (half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-      mult_su3_mat_hwvec( linky, 
+      mult_mat_hwvec( linky, 
 			   (half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-      mult_su3_mat_hwvec( linkz, 
+      mult_mat_hwvec( linkz, 
 			   (half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-      mult_su3_mat_hwvec( linkt, 
+      mult_mat_hwvec( linkt, 
 			   (half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
       grow_add_four_wvecs( &(dest[i]),
 	    &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */
@@ -541,7 +541,7 @@ void hop_w_field( wilson_vector *src, wilson_vector *dest,
      multiply it by adjoint link matrix, gather it "up" */
   FORSOMEPARITY(i,s,otherparity){
     wp_shrink( &src[i], &hwv, dir, -isign );
-    mult_adj_su3_mat_hwvec( &(s->link[dir]), &hwv, &(htmp[1][i]) );
+    mult_adj_mat_hwvec( &(s->link[dir]), &hwv, &(htmp[1][i]) );
   }
   
   tag[1]=start_gather_field( htmp[1],
@@ -555,7 +555,7 @@ void hop_w_field( wilson_vector *src, wilson_vector *dest,
   wait_gather(tag[0]);
 
   FORSOMEPARITYDOMAIN(i,s,parity){
-    mult_su3_mat_hwvec( &(s->link[dir]), 
+    mult_mat_hwvec( &(s->link[dir]), 
 			(half_wilson_vector * )(gen_pt[0][i]), &hwv ); 
     wp_grow( &hwv, &dest[i], dir, isign);
   }

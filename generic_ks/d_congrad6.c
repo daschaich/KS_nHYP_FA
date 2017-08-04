@@ -113,13 +113,13 @@ start:
 	dslash_site(F_OFFSET(ttt),F_OFFSET(ttt),l_parity);
 	/* ttt  <- ttt - msq_x4*src	(msq = mass squared) */
 	FORSOMEPARITYDOMAIN(i,s,l_parity){
-	    scalar_mult_add_su3_vector( &(s->ttt), (su3_vector *)F_PT(s,dest),
+	    scalar_mult_add_vector( &(s->ttt), (vector *)F_PT(s,dest),
 					-msq_x4, &(s->ttt) );
-	    add_su3_vector( (su3_vector *)F_PT(s,src), 
+	    add_vector( (vector *)F_PT(s,src), 
 			    &(s->ttt), &(s->resid) );
 		/* remember ttt contains -M_adjoint*M*src */
 	    s->cg_p = s->resid;
-	    source_norm += (double)magsq_su3vec( (su3_vector *)F_PT(s,src) );
+	    source_norm += (double)magsq_su3vec( (vector *)F_PT(s,src) );
             rsq += (double)magsq_su3vec( &(s->resid) );
 	} END_LOOP
 	g_doublesum( &source_norm );
@@ -196,7 +196,7 @@ fflush(stdout);}
 	    prefetch_VV( &((s+FETCH_UP)->ttt),
 			 &((s+FETCH_UP)->cg_p) );
 	  }
-	    scalar_mult_add_su3_vector( &(s->ttt), &(s->cg_p), -msq_x4,
+	    scalar_mult_add_vector( &(s->ttt), &(s->cg_p), -msq_x4,
 		&(s->ttt) );
 	    pkp += (double)su3_rdot( &(s->cg_p), &(s->ttt) );
 	} END_LOOP
@@ -211,15 +211,15 @@ fflush(stdout);}
 	rsq=0.0;
 	FORSOMEPARITYDOMAIN(i,s,l_parity){
 	  if(i < loopend-FETCH_UP){
-	    prefetch_VVVV( (su3_vector *)F_PT(s+FETCH_UP,dest),
+	    prefetch_VVVV( (vector *)F_PT(s+FETCH_UP,dest),
 			   &((s+FETCH_UP)->cg_p),
 			   &((s+FETCH_UP)->resid), 
 			   &((s+FETCH_UP)->ttt) );
 	  }
-	    scalar_mult_add_su3_vector( (su3_vector *)F_PT(s,dest), 
+	    scalar_mult_add_vector( (vector *)F_PT(s,dest), 
 					&(s->cg_p), a, 
-					(su3_vector *)F_PT(s,dest) );
-	    scalar_mult_add_su3_vector( &(s->resid), &(s->ttt), a, &(s->resid));
+					(vector *)F_PT(s,dest) );
+	    scalar_mult_add_vector( &(s->resid), &(s->ttt), a, &(s->resid));
 	    rsq += (double)magsq_su3vec( &(s->resid) );
 	} END_LOOP
 	g_doublesum(&rsq);
@@ -303,7 +303,7 @@ register int i;
 register site *s;
 register int dir,otherparity;
 msg_tag *tag[8];
-register su3_vector *a,*b1,*b2,*b3,*b4;
+register vector *a,*b1,*b2,*b3,*b4;
 
     switch(parity){
 	case EVEN:	otherparity=ODD; break;
@@ -313,7 +313,7 @@ register su3_vector *a,*b1,*b2,*b3,*b4;
 
     /* Start gathers from positive directions */
     for(dir=XUP; dir<=TUP; dir++){
-	tag[dir] = start_gather_site( src, sizeof(su3_vector), dir, parity,
+	tag[dir] = start_gather_site( src, sizeof(vector), dir, parity,
 	    gen_pt[dir] );
     }
 
@@ -324,11 +324,11 @@ dtimem -= dclock();
     FORSOMEPARITYDOMAIN(i,s,otherparity){
       if(i < loopend-FETCH_UP){
         prefetch_4MV4V( &((s+FETCH_UP)->link[XUP]),
-			(su3_vector *)F_PT((s+FETCH_UP),src),
+			(vector *)F_PT((s+FETCH_UP),src),
 			&((s+FETCH_UP)->tempvec));
       }
-	mult_adj_su3_mat_vec_4dir( s->link,
-	    (su3_vector *)F_PT(s,src), s->tempvec );
+	mult_adj_mat_vec_4dir( s->link,
+	    (vector *)F_PT(s,src), s->tempvec );
     } END_LOOP
 #ifdef M4TIME
 dtimem += dclock();
@@ -338,7 +338,7 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
     /* Start gathers from negative directions */
     for( dir=XUP; dir <= TUP; dir++){
 	tag[OPP_DIR(dir)] = start_gather_site( F_OFFSET(tempvec[dir]),
-	    sizeof(su3_vector), OPP_DIR( dir), parity,
+	    sizeof(vector), OPP_DIR( dir), parity,
 	    gen_pt[OPP_DIR(dir)] );
     }
 
@@ -356,61 +356,61 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
 #ifdef SCHROED_FUN
     FORSOMEPARITY(i,s,parity) if(s->t > 0){
       if( i < loopend-FETCH_UP ){
-	prefetch_V((su3_vector *)F_PT(s+FETCH_UP,dest));
+	prefetch_V((vector *)F_PT(s+FETCH_UP,dest));
 	prefetch_4MVVVV(&((s+FETCH_UP)->link[XUP]),
-			(su3_vector *)gen_pt[XUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[YUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[ZUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[TUP][i+FETCH_UP] );
+			(vector *)gen_pt[XUP][i+FETCH_UP],
+			(vector *)gen_pt[YUP][i+FETCH_UP],
+			(vector *)gen_pt[ZUP][i+FETCH_UP],
+			(vector *)gen_pt[TUP][i+FETCH_UP] );
       }
       /* Don't include last time-link in computation */
       if(s->t == (nt-1)){
-	    mult_su3_mat_vec( &(s->link[XUP]),
-		(su3_vector *)(gen_pt[XUP][i]), (su3_vector *)F_PT(s,dest));
+	    mult_mat_vec( &(s->link[XUP]),
+		(vector *)(gen_pt[XUP][i]), (vector *)F_PT(s,dest));
 	    for(dir=YUP; dir<TUP; dir++){
-		mult_su3_mat_vec_sum( &(s->link[dir]),
-		    (su3_vector *)(gen_pt[dir][i]), (su3_vector *)F_PT(s,dest));
+		mult_mat_vec_sum( &(s->link[dir]),
+		    (vector *)(gen_pt[dir][i]), (vector *)F_PT(s,dest));
 	    }
 	}
 	else{
 #else
     FORSOMEPARITY(i,s,parity){
       if( i < loopend-FETCH_UP ){
-	prefetch_V((su3_vector *)F_PT(s+FETCH_UP,dest));
+	prefetch_V((vector *)F_PT(s+FETCH_UP,dest));
 	prefetch_4MVVVV(&((s+FETCH_UP)->link[XUP]),
-			(su3_vector *)gen_pt[XUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[YUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[ZUP][i+FETCH_UP],
-			(su3_vector *)gen_pt[TUP][i+FETCH_UP] );
+			(vector *)gen_pt[XUP][i+FETCH_UP],
+			(vector *)gen_pt[YUP][i+FETCH_UP],
+			(vector *)gen_pt[ZUP][i+FETCH_UP],
+			(vector *)gen_pt[TUP][i+FETCH_UP] );
       }
 #endif
-      mult_su3_mat_vec_sum_4dir( s->link,
-          (su3_vector *)gen_pt[XUP][i], (su3_vector *)gen_pt[YUP][i],
-          (su3_vector *)gen_pt[ZUP][i], (su3_vector *)gen_pt[TUP][i],
-          (su3_vector *)F_PT(s,dest));
+      mult_mat_vec_sum_4dir( s->link,
+          (vector *)gen_pt[XUP][i], (vector *)gen_pt[YUP][i],
+          (vector *)gen_pt[ZUP][i], (vector *)gen_pt[TUP][i],
+          (vector *)F_PT(s,dest));
     /*------------------------------------------------------------*/
 
         if( i < loopend-FETCH_UP ){
-	  prefetch_VVVV((su3_vector *)gen_pt[XDOWN][i+FETCH_UP],
-			(su3_vector *)gen_pt[YDOWN][i+FETCH_UP],
-			(su3_vector *)gen_pt[ZDOWN][i+FETCH_UP],
-			(su3_vector *)gen_pt[TDOWN][i+FETCH_UP] );
+	  prefetch_VVVV((vector *)gen_pt[XDOWN][i+FETCH_UP],
+			(vector *)gen_pt[YDOWN][i+FETCH_UP],
+			(vector *)gen_pt[ZDOWN][i+FETCH_UP],
+			(vector *)gen_pt[TDOWN][i+FETCH_UP] );
 	}
 #ifndef INLINE
-      sub_four_su3_vecs( (su3_vector *)F_PT(s,dest),
-	    (su3_vector *)(gen_pt[XDOWN][i]),
-	    (su3_vector *)(gen_pt[YDOWN][i]),
-	    (su3_vector *)(gen_pt[ZDOWN][i]),
-	    (su3_vector *)(gen_pt[TDOWN][i]) );
+      sub_four_su3_vecs( (vector *)F_PT(s,dest),
+	    (vector *)(gen_pt[XDOWN][i]),
+	    (vector *)(gen_pt[YDOWN][i]),
+	    (vector *)(gen_pt[ZDOWN][i]),
+	    (vector *)(gen_pt[TDOWN][i]) );
 
 #else
 
       /* Inline version */
-      a =  (su3_vector *)F_PT(s,dest);
-      b1 = (su3_vector *)(gen_pt[XDOWN][i]);
-      b2 = (su3_vector *)(gen_pt[YDOWN][i]);
-      b3 = (su3_vector *)(gen_pt[ZDOWN][i]);
-      b4 = (su3_vector *)(gen_pt[TDOWN][i]);
+      a =  (vector *)F_PT(s,dest);
+      b1 = (vector *)(gen_pt[XDOWN][i]);
+      b2 = (vector *)(gen_pt[YDOWN][i]);
+      b3 = (vector *)(gen_pt[ZDOWN][i]);
+      b4 = (vector *)(gen_pt[TDOWN][i]);
 
       CSUB(a->c[0], b1->c[0], a->c[0]);
       CSUB(a->c[1], b1->c[1], a->c[1]);
@@ -453,7 +453,7 @@ void dslash_site_special( field_offset src, field_offset dest,
 register int i;
 register site *s;
 register int dir,otherparity;
-register su3_vector *a,*b1,*b2,*b3,*b4;
+register vector *a,*b1,*b2,*b3,*b4;
 
 #ifdef DSLASHTIMES
 double dtime0,dtime1,dtime2,dtime3,dtime4,dtime5,dtime6,dclock();
@@ -471,9 +471,9 @@ double dtime0,dtime1,dtime2,dtime3,dtime4,dtime5,dtime6,dclock();
     /* Start gathers from positive directions */
     for(dir=XUP; dir<=TUP; dir++){
 /**printf("dslash_site_special: up gathers, start=%d\n",start);**/
-	if(start==1) tag[dir] = start_gather_site( src, sizeof(su3_vector),
+	if(start==1) tag[dir] = start_gather_site( src, sizeof(vector),
 	    dir, parity, gen_pt[dir] );
-	else restart_gather_site( src, sizeof(su3_vector),
+	else restart_gather_site( src, sizeof(vector),
 	    dir, parity, gen_pt[dir] , tag[dir] );
     }
 
@@ -490,11 +490,11 @@ dtimem -= dclock();
     FORSOMEPARITYDOMAIN(i,s,otherparity){
       if( i < loopend-FETCH_UP ){
 	prefetch_4MV4V( &((s+FETCH_UP)->link[XUP]),
-			(su3_vector *)F_PT((s+FETCH_UP),src),
+			(vector *)F_PT((s+FETCH_UP),src),
 			&((s+FETCH_UP)->tempvec));
       }
-	mult_adj_su3_mat_vec_4dir( s->link,
-	    (su3_vector *)F_PT(s,src), s->tempvec );
+	mult_adj_mat_vec_4dir( s->link,
+	    (vector *)F_PT(s,src), s->tempvec );
     } END_LOOP
 
 #ifdef M4TIME
@@ -512,8 +512,8 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
     for( dir=XUP; dir <= TUP; dir++){
 /**printf("dslash_site_special: down gathers, start=%d\n",start);**/
 	if (start==1) tag[OPP_DIR(dir)] = start_gather_site( F_OFFSET(tempvec[dir]),
-	    sizeof(su3_vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
-	else restart_gather_site( F_OFFSET(tempvec[dir]), sizeof(su3_vector),
+	    sizeof(vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
+	else restart_gather_site( F_OFFSET(tempvec[dir]), sizeof(vector),
 	    OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] , tag[OPP_DIR(dir)] );
     }
 
@@ -543,51 +543,51 @@ if(otherparity==EVENANDODD)dtimem_iters +=2; else dtimem_iters++;
 #ifdef SCHROED_FUN
     FORSOMEPARITY(i,s,parity) if(s->t > 0){
 	if(s->t == (nt-1)){
-	    mult_su3_mat_vec( &(s->link[XUP]),
-		(su3_vector *)(gen_pt[XUP][i]), (su3_vector *)F_PT(s,dest));
+	    mult_mat_vec( &(s->link[XUP]),
+		(vector *)(gen_pt[XUP][i]), (vector *)F_PT(s,dest));
 	    for(dir=YUP; dir<TUP; dir++){
-		mult_su3_mat_vec_sum( &(s->link[dir]),
-		    (su3_vector *)(gen_pt[dir][i]), (su3_vector *)F_PT(s,dest));
+		mult_mat_vec_sum( &(s->link[dir]),
+		    (vector *)(gen_pt[dir][i]), (vector *)F_PT(s,dest));
 	    }
 	}
 	else{
 #else
     FORSOMEPARITY(i,s,parity){
       if( i < loopend-FETCH_UP ){
-	prefetch_VVVV( (su3_vector *)gen_pt[XUP][i+FETCH_UP],
-		       (su3_vector *)gen_pt[YUP][i+FETCH_UP],
-		       (su3_vector *)gen_pt[ZUP][i+FETCH_UP],
-		       (su3_vector *)gen_pt[TUP][i+FETCH_UP] );
+	prefetch_VVVV( (vector *)gen_pt[XUP][i+FETCH_UP],
+		       (vector *)gen_pt[YUP][i+FETCH_UP],
+		       (vector *)gen_pt[ZUP][i+FETCH_UP],
+		       (vector *)gen_pt[TUP][i+FETCH_UP] );
       }
 #endif
-      mult_su3_mat_vec_sum_4dir( s->link,
-	(su3_vector *)gen_pt[XUP][i], (su3_vector *)gen_pt[YUP][i],
-	(su3_vector *)gen_pt[ZUP][i], (su3_vector *)gen_pt[TUP][i],
-	(su3_vector *)F_PT(s,dest));
+      mult_mat_vec_sum_4dir( s->link,
+	(vector *)gen_pt[XUP][i], (vector *)gen_pt[YUP][i],
+	(vector *)gen_pt[ZUP][i], (vector *)gen_pt[TUP][i],
+	(vector *)F_PT(s,dest));
 
     /*------------------------------------------------------------*/
 	if( i < loopend-FETCH_UP ){
-	    prefetch_VVVV((su3_vector *)gen_pt[XDOWN][i+FETCH_UP],
-			  (su3_vector *)gen_pt[YDOWN][i+FETCH_UP],
-			  (su3_vector *)gen_pt[ZDOWN][i+FETCH_UP],
-			  (su3_vector *)gen_pt[TDOWN][i+FETCH_UP] );
+	    prefetch_VVVV((vector *)gen_pt[XDOWN][i+FETCH_UP],
+			  (vector *)gen_pt[YDOWN][i+FETCH_UP],
+			  (vector *)gen_pt[ZDOWN][i+FETCH_UP],
+			  (vector *)gen_pt[TDOWN][i+FETCH_UP] );
 	}
 
 #ifndef INLINE
 
-      sub_four_su3_vecs( (su3_vector *)F_PT(s,dest),
-	    (su3_vector *)(gen_pt[XDOWN][i]),
-	    (su3_vector *)(gen_pt[YDOWN][i]),
-	    (su3_vector *)(gen_pt[ZDOWN][i]),
-	    (su3_vector *)(gen_pt[TDOWN][i]) ); 
+      sub_four_su3_vecs( (vector *)F_PT(s,dest),
+	    (vector *)(gen_pt[XDOWN][i]),
+	    (vector *)(gen_pt[YDOWN][i]),
+	    (vector *)(gen_pt[ZDOWN][i]),
+	    (vector *)(gen_pt[TDOWN][i]) ); 
 #else
 
       /* Inline version */
-      a =  (su3_vector *)F_PT(s,dest);
-      b1 = (su3_vector *)(gen_pt[XDOWN][i]);
-      b2 = (su3_vector *)(gen_pt[YDOWN][i]);
-      b3 = (su3_vector *)(gen_pt[ZDOWN][i]);
-      b4 = (su3_vector *)(gen_pt[TDOWN][i]);
+      a =  (vector *)F_PT(s,dest);
+      b1 = (vector *)(gen_pt[XDOWN][i]);
+      b2 = (vector *)(gen_pt[YDOWN][i]);
+      b3 = (vector *)(gen_pt[ZDOWN][i]);
+      b4 = (vector *)(gen_pt[TDOWN][i]);
 
       CSUB(a->c[0], b1->c[0], a->c[0]);
       CSUB(a->c[1], b1->c[1], a->c[1]);

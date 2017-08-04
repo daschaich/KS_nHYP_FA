@@ -78,10 +78,10 @@
 
 /* Smear in a specified source direction. */
 void ape_smear_dir(
-  field_offset src,       /* field offset for su3_matrix[4] type 
+  field_offset src,       /* field offset for matrix[4] type 
 			     input unsmeared links */
   int dir1,               /* link direction to smear */
-  field_offset dest,      /* field offset for su3_matrix type 
+  field_offset dest,      /* field offset for matrix type 
 			     pointing to a specific direction 
 			     output smeared links */
   Real staple_weight,    /* single staple weight */
@@ -101,14 +101,14 @@ void ape_smear_dir(
 {
   register int i,dir2;
   register site *s;
-  su3_matrix tmat1,tmat2;
+  matrix tmat1,tmat2;
   msg_tag *mtag0,*mtag1;
   Real w_link, w_staple, norm_factor;
   int nstaples;
-  su3_matrix *temp;
+  matrix *temp;
   
   /* Allocate temporary space for staple calculation */
-  temp = (su3_matrix *)malloc(sites_on_node*sizeof(su3_matrix));
+  temp = (matrix *)malloc(sites_on_node*sizeof(matrix));
   if(temp == NULL){
     printf("ape_smear: No room for temp\n");
     terminate(1);
@@ -122,58 +122,58 @@ void ape_smear_dir(
   /* dest <- src w_link */ 
   FORALLSITES(i,s)
     {
-      scalar_mult_su3_matrix( 
-		     &(((su3_matrix *)F_PT(s,src))[dir1]), w_link, 
-		     (su3_matrix *)F_PT(s,dest) );
+      scalar_mult_matrix( 
+		     &(((matrix *)F_PT(s,src))[dir1]), w_link, 
+		     (matrix *)F_PT(s,dest) );
     }
   for(dir2=XUP;dir2<=(space_only==1?ZUP:TUP);dir2++)if(dir2!=dir1){
     
     /* Upper staple, and simple link */
-    mtag0 = start_gather_site( src+dir2*sizeof(su3_matrix),
-			  sizeof(su3_matrix), dir1, EVENANDODD, gen_pt[0] );
-    mtag1 = start_gather_site( src+dir1*sizeof(su3_matrix),
-			  sizeof(su3_matrix), dir2, EVENANDODD, gen_pt[1] );
+    mtag0 = start_gather_site( src+dir2*sizeof(matrix),
+			  sizeof(matrix), dir1, EVENANDODD, gen_pt[0] );
+    mtag1 = start_gather_site( src+dir1*sizeof(matrix),
+			  sizeof(matrix), dir2, EVENANDODD, gen_pt[1] );
     wait_gather(mtag0);
     wait_gather(mtag1);
     
     /* dest += w_staple * upper staple */ 
     FORALLSITES(i,s)
       {
-	mult_su3_na( (su3_matrix *)gen_pt[1][i],
-		     (su3_matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_nn( &(((su3_matrix *)F_PT(s,src))[dir2]), 
+	mult_su3_na( (matrix *)gen_pt[1][i],
+		     (matrix *)gen_pt[0][i], &tmat1 );
+	mult_su3_nn( &(((matrix *)F_PT(s,src))[dir2]), 
 		     &tmat1, &tmat2 );
-	scalar_mult_add_su3_matrix( 
-			   (su3_matrix *)F_PT(s,dest),
+	scalar_mult_add_matrix( 
+			   (matrix *)F_PT(s,dest),
 			   &tmat2, w_staple,
-			   (su3_matrix *)F_PT(s,dest) );
+			   (matrix *)F_PT(s,dest) );
       }
     cleanup_gather(mtag0);
     cleanup_gather(mtag1);
     
     /* lower staple */
-    mtag0 = start_gather_site( src+dir2*sizeof(su3_matrix),
-			  sizeof(su3_matrix), dir1,
+    mtag0 = start_gather_site( src+dir2*sizeof(matrix),
+			  sizeof(matrix), dir1,
 			  EVENANDODD, gen_pt[0] );
     wait_gather(mtag0);
     FORALLSITES(i,s)
       {
-	mult_su3_nn( &(((su3_matrix *)F_PT(s,src))[dir1]),
-		     (su3_matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_an( &(((su3_matrix *)F_PT(s,src))[dir2]),
+	mult_su3_nn( &(((matrix *)F_PT(s,src))[dir1]),
+		     (matrix *)gen_pt[0][i], &tmat1 );
+	mult_su3_an( &(((matrix *)F_PT(s,src))[dir2]),
 		     &tmat1, &temp[i] );
       }
     cleanup_gather(mtag0);
-    mtag1 = start_gather_field( temp, sizeof(su3_matrix),
+    mtag1 = start_gather_field( temp, sizeof(matrix),
 				    OPP_DIR(dir2), EVENANDODD, gen_pt[1] );
     wait_gather(mtag1);
     
     /* dest += w_staple * lower staple */ 
     FORALLSITES(i,s){
-      scalar_mult_add_su3_matrix( 
-			 (su3_matrix *)F_PT(s,dest),
-			 (su3_matrix *)gen_pt[1][i], w_staple, 
-			 (su3_matrix *)F_PT(s,dest) );
+      scalar_mult_add_matrix( 
+			 (matrix *)F_PT(s,dest),
+			 (matrix *)gen_pt[1][i], w_staple, 
+			 (matrix *)F_PT(s,dest) );
     }
     cleanup_gather(mtag1);
     
@@ -183,12 +183,12 @@ void ape_smear_dir(
   if(nhits > 0){
     FORALLSITES(i,s){
       /* Use partially reunitarized link for guess */
-      tmat1 = *((su3_matrix *)F_PT(s,dest));
+      tmat1 = *((matrix *)F_PT(s,dest));
       reunit_su3(&tmat1);
       project_su3(&tmat1,
-		  (su3_matrix *)F_PT(s,dest),nhits,tol);
+		  (matrix *)F_PT(s,dest),nhits,tol);
       /* Copy projected matrix to dest */
-      *((su3_matrix *)F_PT(s,dest)) = tmat1;
+      *((matrix *)F_PT(s,dest)) = tmat1;
     }
   }
   
@@ -198,9 +198,9 @@ void ape_smear_dir(
 
 
 void ape_smear(
-  field_offset src,       /* field offset for su3_matrix type 
+  field_offset src,       /* field offset for matrix type 
 			     input unsmeared links */
-  field_offset dest,      /* field offset for su3_matrix type 
+  field_offset dest,      /* field offset for matrix type 
 			     output smeared links */
   Real staple_weight,    /* single staple weight */
   Real link_u0,          /* single link weight - used in normalization
@@ -220,7 +220,7 @@ void ape_smear(
   register int dir1;
   
   for(dir1=XUP;dir1<=TUP;dir1++){
-    ape_smear_dir(src,dir1,dest+dir1*sizeof(su3_matrix),
+    ape_smear_dir(src,dir1,dest+dir1*sizeof(matrix),
 		  staple_weight,link_u0,space_only,nhits,tol);
   }
 } /* ape_smear */
@@ -235,10 +235,10 @@ void ape_smear(
    throughout - CD */
 
 void ape_smear_field_dir(
-  su3_matrix *src,        /* su3_matrix[4] type 
+  matrix *src,        /* matrix[4] type 
 			     input unsmeared links */
   int dir1,               /* link direction to smear */
-  su3_matrix *dest,       /* su3_matrix[4] type smeared links */
+  matrix *dest,       /* matrix[4] type smeared links */
   Real staple_weight,    /* single staple weight */
   Real link_u0,          /* single link weight - used in normalization
                              if SU(3) projection is turned off */
@@ -256,14 +256,14 @@ void ape_smear_field_dir(
 {
   register int i,dir2;
   register site *s;
-  su3_matrix tmat1,tmat2;
+  matrix tmat1,tmat2;
   msg_tag *mtag0,*mtag1;
   Real w_link, w_staple, norm_factor;
   int nstaples;
-  su3_matrix *temp;
+  matrix *temp;
   
   /* Allocate temporary space for staple calculation */
-  temp = (su3_matrix *)malloc(sites_on_node*sizeof(su3_matrix));
+  temp = (matrix *)malloc(sites_on_node*sizeof(matrix));
   if(temp == NULL){
     printf("ape_smear: No room for temp\n");
     terminate(1);
@@ -277,19 +277,19 @@ void ape_smear_field_dir(
   /* dest <- src w_link */ 
   FORALLSITES(i,s)
     {
-      scalar_mult_su3_matrix( &src[4*i+dir1], w_link, &dest[4*i+dir1] );
+      scalar_mult_matrix( &src[4*i+dir1], w_link, &dest[4*i+dir1] );
     }
   for(dir2=XUP;dir2<=(space_only==1?ZUP:TUP);dir2++)if(dir2!=dir1){
     
     /* Upper staple, and simple link */
-    mtag0 = declare_strided_gather( (char *)&src[dir2], 4*sizeof(su3_matrix),
-				    sizeof(su3_matrix), dir1, 
+    mtag0 = declare_strided_gather( (char *)&src[dir2], 4*sizeof(matrix),
+				    sizeof(matrix), dir1, 
 				    EVENANDODD, gen_pt[0] );
     prepare_gather(mtag0);
     do_gather(mtag0);
 
-    mtag1 = declare_strided_gather( (char *)&src[dir1], 4*sizeof(su3_matrix),
-				    sizeof(su3_matrix), dir2, 
+    mtag1 = declare_strided_gather( (char *)&src[dir1], 4*sizeof(matrix),
+				    sizeof(matrix), dir2, 
 				    EVENANDODD, gen_pt[1] );
     prepare_gather(mtag1);
     do_gather(mtag1);
@@ -300,18 +300,18 @@ void ape_smear_field_dir(
     /* dest += w_staple * upper staple */ 
     FORALLSITES(i,s)
       {
-	mult_su3_na( (su3_matrix *)gen_pt[1][i],
-		     (su3_matrix *)gen_pt[0][i], &tmat1 );
+	mult_su3_na( (matrix *)gen_pt[1][i],
+		     (matrix *)gen_pt[0][i], &tmat1 );
 	mult_su3_nn( &src[4*i+dir2], &tmat1, &tmat2 );
-	scalar_mult_add_su3_matrix( &dest[4*i+dir1], &tmat2, w_staple,
+	scalar_mult_add_matrix( &dest[4*i+dir1], &tmat2, w_staple,
 				    &dest[4*i+dir1] );
       }
     cleanup_gather(mtag0);
     cleanup_gather(mtag1);
     
     /* lower staple */
-    mtag0 = declare_strided_gather( (char *)&src[dir2], 4*sizeof(su3_matrix),
-				    sizeof(su3_matrix), dir1,
+    mtag0 = declare_strided_gather( (char *)&src[dir2], 4*sizeof(matrix),
+				    sizeof(matrix), dir1,
 				    EVENANDODD, gen_pt[0] );
     prepare_gather(mtag0);
     do_gather(mtag0);
@@ -319,18 +319,18 @@ void ape_smear_field_dir(
     wait_gather(mtag0);
     FORALLSITES(i,s)
       {
-	mult_su3_nn( &src[4*i+dir1], (su3_matrix *)gen_pt[0][i], &tmat1 );
+	mult_su3_nn( &src[4*i+dir1], (matrix *)gen_pt[0][i], &tmat1 );
 	mult_su3_an( &src[4*i+dir2], &tmat1, &temp[i] );
       }
     cleanup_gather(mtag0);
-    mtag1 = start_gather_field( temp, sizeof(su3_matrix),
+    mtag1 = start_gather_field( temp, sizeof(matrix),
 				    OPP_DIR(dir2), EVENANDODD, gen_pt[1] );
     wait_gather(mtag1);
     
     /* dest += w_staple * lower staple */ 
     FORALLSITES(i,s){
-      scalar_mult_add_su3_matrix( &dest[4*i+dir1], 
-			 (su3_matrix *)gen_pt[1][i], w_staple, 
+      scalar_mult_add_matrix( &dest[4*i+dir1], 
+			 (matrix *)gen_pt[1][i], w_staple, 
 			 &dest[4*i+dir1] );
     }
     cleanup_gather(mtag1);
@@ -356,8 +356,8 @@ void ape_smear_field_dir(
 /* Input field has four contigous SU(3) matrices per site */
 
 void ape_smear_field(
-  su3_matrix *src,       /* Gauge field input unsmeared */
-  su3_matrix *dest,      /* Gauge field output smeared */
+  matrix *src,       /* Gauge field input unsmeared */
+  matrix *dest,      /* Gauge field output smeared */
   Real staple_weight,    /* single staple weight */
   Real link_u0,          /* single link weight - used in normalization
                              if SU(3) projection is turned off */

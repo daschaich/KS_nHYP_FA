@@ -28,18 +28,18 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Staggered phases, which have been absorbed into the matrices
   // Also the antiperiodic boundary conditions
   Real phase[4];
 
   // Staggered complex vectors
-  su3_vector g_rand;      // Gaussian random vector
-  su3_vector psi;         // Solution vector
-  su3_vector chi;         // Source vector
-  su3_vector temp;        // For Matrix_Vec_mult
-  su3_vector tempvec[4];  // For dslash
+  vector g_rand;      // Gaussian random vector
+  vector psi;         // Solution vector
+  vector chi;         // Source vector
+  vector temp;        // For Matrix_Vec_mult
+  vector tempvec[4];  // For dslash
 } site;
 // -----------------------------------------------------------------
 
@@ -67,7 +67,7 @@ EXTERN u_int32type nersc_checksum;
 // Eigenvalue stuff
 EXTERN int Nvecs;
 EXTERN double *eigVal;
-EXTERN su3_vector **eigVec;
+EXTERN vector **eigVec;
 EXTERN Real eig_tol;      // Tolerance for the eigenvalue computation
 EXTERN Real error_decr;   // Error decrease per Rayleigh minimization
 EXTERN int maxIter;       // max  Rayleigh iterations
@@ -98,19 +98,19 @@ EXTERN site *lattice;
 #define N_POINTERS 8  // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff -- hyplinks, Staples, tempmat used by generic_nhyp/block_nhyp.c
 EXTERN int nsmear;
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
+EXTERN matrix *tempmat1;
 
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

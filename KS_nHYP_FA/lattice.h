@@ -28,11 +28,11 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Program-dependent fields
 #ifdef HMC_ALGORITHM
-  su3_matrix old_link[4];  // For accept/reject
+  matrix old_link[4];  // For accept/reject
 #endif
 
   // Antihermitian momentum matrices in each direction
@@ -43,20 +43,20 @@ typedef struct {
   Real phase[4];
 
   // Staggered single-spin three-element complex vectors
-  su3_vector g_rand;            // Gaussian random vector
-  su3_vector chi[MAX_FIELDS][MAX_MASSES];  // Gaussian random source vector
-  su3_vector psi[MAX_FIELDS][MAX_MASSES];  // Solution vector = Kinverse * chi
-  su3_vector p;                 // CG change vector
-  su3_vector mp;                // CG temporary vector
-  su3_vector r;                 // CG residual vector
-  su3_vector ttt[MAX_FIELDS][MAX_MASSES];  // Temporary vectors for D*psi
+  vector g_rand;            // Gaussian random vector
+  vector chi[MAX_FIELDS][MAX_MASSES];  // Gaussian random source vector
+  vector psi[MAX_FIELDS][MAX_MASSES];  // Solution vector = Kinverse * chi
+  vector p;                 // CG change vector
+  vector mp;                // CG temporary vector
+  vector r;                 // CG residual vector
+  vector ttt[MAX_FIELDS][MAX_MASSES];  // Temporary vectors for D*psi
 #ifdef PHI_ALGORITHM
-  su3_vector old_psi[MAX_FIELDS][MAX_MASSES];  // For predicting next psi
+  vector old_psi[MAX_FIELDS][MAX_MASSES];  // For predicting next psi
 #endif
-  su3_vector M_inv;
+  vector M_inv;
 
   // Temporary vectors and matrices
-  su3_vector tempvec[4];  // One for each direction
+  vector tempvec[4];  // One for each direction
 } site;
 // -----------------------------------------------------------------
 
@@ -122,30 +122,30 @@ EXTERN site *lattice;
 #define N_POINTERS 10
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
-EXTERN su3_matrix *gauge_field_save[4];
-EXTERN su3_matrix *gauge_field_temp[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field_save[4];
+EXTERN matrix *gauge_field_temp[4];
 
 // nHYP stuff
 EXTERN int Nsmear;
 EXTERN Real alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Sigma[4];
-EXTERN su3_matrix *SigmaH[4];
-EXTERN su3_matrix *SigmaH2[4][4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Sigma[4];
+EXTERN matrix *SigmaH[4];
+EXTERN matrix *SigmaH2[4][4];
 
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *LambdaU[4];
-EXTERN su3_matrix *Lambda1[4];
-EXTERN su3_matrix *Lambda2[4];
+EXTERN matrix *LambdaU[4];
+EXTERN matrix *Lambda1[4];
+EXTERN matrix *Lambda2[4];
 
 // Temporary matrices
-EXTERN su3_matrix *tempmat, *tempmat2;
+EXTERN matrix *tempmat, *tempmat2;
 
 // Up to 20 concurrent timers for timing
 #ifdef TIMING

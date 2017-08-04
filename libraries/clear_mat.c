@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void clear_su3mat(su3_matrix *dest) {
+void clear_mat(matrix *dest) {
   register int i,j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {

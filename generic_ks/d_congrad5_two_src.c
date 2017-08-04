@@ -3,7 +3,7 @@
 #include "generic_ks_includes.h"
 
 int ks_congrad_two_src(	/* Return value is number of iterations taken */
-    field_offset src1,    /* source vector (type su3_vector) */
+    field_offset src1,    /* source vector (type vector) */
     field_offset src2,
     field_offset dest1,	/* solution vectors */
     field_offset dest2,

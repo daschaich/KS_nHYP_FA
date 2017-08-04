@@ -15,7 +15,7 @@ int main(int argc, char *argv[])  {
   double rr[10], t = 0, old_value, new_value = 0, der_value, E, chirality;
   double td, check, topo, dtime, tot_time;
   complex plp, xplp, tc;
-  su3_matrix **bak, t_mat, *S[4];
+  matrix **bak, t_mat, *S[4];
   anti_hermitmat *A[4];
 
   // Set up
@@ -47,10 +47,10 @@ int main(int argc, char *argv[])  {
                  (double)xplp.real, (double)xplp.imag);
 
     // Allocate fields used by integrator -- must not be used after blocking
-    FIELD_ALLOC(tempmat1, su3_matrix);
-    FIELD_ALLOC(tempmat2, su3_matrix);
+    FIELD_ALLOC(tempmat1, matrix);
+    FIELD_ALLOC(tempmat2, matrix);
     for (dir = 0; dir < 4; dir++) {
-      S[dir] = (su3_matrix *)malloc(sites_on_node * sizeof(su3_matrix));
+      S[dir] = (matrix *)malloc(sites_on_node * sizeof(matrix));
       A[dir] = (anti_hermitmat *)malloc(sites_on_node * sizeof(anti_hermitmat));
     }
 
@@ -165,9 +165,9 @@ int main(int argc, char *argv[])  {
     fflush(stdout);
 
     // Allocate backup space and save one set of blocked links
-    bak = (su3_matrix **)malloc((volume / 16) * sizeof(su3_matrix *));
+    bak = (matrix **)malloc((volume / 16) * sizeof(matrix *));
     for (j = 0; j < (volume / 16); j++)
-      bak[j] = (su3_matrix *)malloc(4 * sizeof(su3_matrix));
+      bak[j] = (matrix *)malloc(4 * sizeof(matrix));
 
     node0_printf("(dx, dy, dz, dt) = (%i, %i, %i, %i)\n", dx, dy, dz, dt);
     FORALLSITES(i, s) {
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])  {
         j = (s->x - dx) * nt * nz * ny / 16 + (s->y - dy) * nt * nz / 8
                      + (s->z - dz) * nt / 4 + (s->t - dt) / 2;
         for (dir = XUP; dir <= TUP; dir++)
-          su3mat_copy(&(s->link[dir]), &(bak[j][dir]));
+          mat_copy(&(s->link[dir]), &(bak[j][dir]));
       }
     }
 
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])  {
       j = s->x * nt * nz * ny + s->y * nt * nz
                               + s->z * nt + s->t;
       for (dir = XUP; dir <= TUP; dir++)
-        su3mat_copy(&(bak[j][dir]), &(s->link[dir]));
+        mat_copy(&(bak[j][dir]), &(s->link[dir]));
     }
     for (j = 0; j < volume; j++)
       free(bak[j]);
@@ -262,9 +262,9 @@ int main(int argc, char *argv[])  {
 
     // Allocate eigenvectors
     eigVal = (double *)malloc(Nvecs * sizeof(double));
-    eigVec = (su3_vector **)malloc(Nvecs * sizeof(su3_vector *));
+    eigVec = (vector **)malloc(Nvecs * sizeof(vector *));
     for (i = 0; i < Nvecs; i++)
-      eigVec[i] = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+      eigVec[i] = (vector *)malloc(sites_on_node * sizeof(vector));
 
     // Hard-code EVEN parity in Kalkreuter
     total_iters = Kalkreuter(eigVec, eigVal, eig_tol, error_decr,
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])  {
 
       dslash(F_OFFSET(chi), F_OFFSET(psi), ODD);
       FORODDSITES(i, s)
-        scalar_mult_su3_vector(&(s->psi), 1.0 / sqrt(eigVal[ivec]),
+        scalar_mult_vector(&(s->psi), 1.0 / sqrt(eigVal[ivec]),
                                &(eigVec[ivec][i]));
 
       // Hard-code EVENANDODD parity in measure_chirality

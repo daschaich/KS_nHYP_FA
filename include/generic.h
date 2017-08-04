@@ -30,7 +30,7 @@ Real check_unitarity();
 
 // reunitarize.c
 void reunitarize();
-int reunit_su3(su3_matrix *c);
+int reunit_su3(matrix *c);
 
 // linktrsum.c
 void linktrsum(double_complex *linktr);
@@ -39,8 +39,8 @@ void linktrsum(double_complex *linktr);
 void plaquette(double *ss_plaq, double *st_plaq);
 
 // field_strength.c
-// link_src is offset for su3_matrix link[4] in site struct
-// field_dest is offset for su3_matrix fieldstrength[6] in site struct
+// link_src is offset for matrix link[4] in site struct
+// field_dest is offset for matrix fieldstrength[6] in site struct
 void make_field_strength(field_offset link_src, field_offset field_dest);
 
 /* gaugefix.c and gaugefix2.c */
@@ -127,20 +127,20 @@ u_int32type nersc_cksum();
 void make_global_fields();
 
 /* path_product.c */
-void path_product(const int *dir, const int length, su3_matrix *tempmat1);
-void path_product_fields(su3_matrix *src[4], const int *dir,
-                         const int length, su3_matrix *tempmat1);
+void path_product(const int *dir, const int length, matrix *tempmat1);
+void path_product_fields(matrix *src[4], const int *dir,
+                         const int length, matrix *tempmat1);
 void path_prod_subl(const int *dir, const int length, const int subl,
-                    su3_matrix *tempmat1);
+                    matrix *tempmat1);
 
 /* ploop.c */
 complex ploop(int dir);
 
 /* project_su3_hit.c */
 void project_su3(
-   su3_matrix *w,         /* input initial guess. output resulting
+   matrix *w,         /* input initial guess. output resulting
                              SU(3) matrix */
-   su3_matrix *q,         /* starting 3 x 3 complex matrix */
+   matrix *q,         /* starting 3 x 3 complex matrix */
    int Nhit,              /* number of SU(2) hits. 0 for no projection */
    Real tol              /* tolerance for SU(3) projection.
            If nonzero, treat Nhit as a maximum
@@ -167,7 +167,7 @@ void restrict_fourier_site(
      field_offset src,   /* src is field to be transformed */
      int size,     /* Size of field in bytes.  The field must
           consist of size/sizeof(complex) consecutive
-          complex numbers.  For example, an su3_vector
+          complex numbers.  For example, an vector
           is 3 complex numbers. */
      int isign);   /* 1 for x -> k, -1 for k -> x */
 
@@ -175,7 +175,7 @@ void restrict_fourier_field(
      complex *src,       /* src is field to be transformed */
      int size,     /* Size of field in bytes.  The field must
           consist of size/sizeof(complex) consecutive
-          complex numbers.  For example, an su3_vector
+          complex numbers.  For example, an vector
           is 3 complex numbers. */
      int isign);   /* 1 for x -> k, -1 for k -> x */
 void cleanup_restrict_fourier();
@@ -185,7 +185,7 @@ void show_generic_opts();
 
 /* Do Morninstar-Peardon stout smearing to construct unitary W from
    smeared link V and unsmeared link U */
-void stout_smear(su3_matrix *W, su3_matrix *V, su3_matrix *U);
+void stout_smear(matrix *W, matrix *V, matrix *U);
 
 /* For quark source and sink routines - both Wilson and KS */
 /* The Weyl representation types are included for w_source_h */

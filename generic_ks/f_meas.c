@@ -44,16 +44,16 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
     // Fermion action = chi.psi
     // pbp on even sites = g_rand.psi
     FOREVENSITES(i, s) {
-      cc = su3_dot((su3_vector *)F_PT(s, chi_off),
-                   (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot((vector *)F_PT(s, chi_off),
+                   (vector *)F_PT(s, psi_off));
       rfaction += cc.real;
-      cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
       CSUM(pbp_e, cc);
     }
 
     // pbp on odd sites
     FORODDSITES(i, s) {
-      cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
       CSUM(pbp_o, cc);
     }
     g_dcomplexsum(&pbp_o);
@@ -74,12 +74,12 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
 #ifdef NPBP_REPS
     pbp_pbp = 0;
     FORALLSITES(i, s)
-      su3vec_copy((su3_vector *)F_PT(s, psi_off), &(s->M_inv));
+      su3vec_copy((vector *)F_PT(s, psi_off), &(s->M_inv));
 
     clear_latvec(psi_off, EVENANDODD);
     mat_invert_uml(F_OFFSET(M_inv), psi_off, chi_off, mass);
     FORALLSITES(i, s) {
-      cc = su3_dot(&(s->g_rand), (su3_vector *)F_PT(s, psi_off));
+      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
       pbp_pbp += cc.real;
     }
     g_doublesum(&pbp_pbp);

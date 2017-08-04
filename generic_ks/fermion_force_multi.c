@@ -24,7 +24,7 @@
 /**********************************************************************/
 /*   Wrapper for fermion force routines with multiple sources         */
 /**********************************************************************/
-void eo_fermion_force_multi( Real eps, Real *residues, su3_vector **xxx, 
+void eo_fermion_force_multi( Real eps, Real *residues, vector **xxx, 
 			     int nterms, int prec, ferm_links_t *fn,
 			     ks_action_paths *ap ) {
   switch(KS_MULTIFF){

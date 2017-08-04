@@ -48,10 +48,10 @@ int fpi_2(Real *masses) {
   Real pt_norm = 1.0 / ((Real)NSRCVECS * n_src * nx * ny * nz * nx * ny * nz);
   Real wall_norm = 1.0 / (3.0 * n_src * nx * ny * nz * nx * ny * nz);
   complex **props = malloc(NPROP * nmasses * nmasses * sizeof(**props));
-  su3_vector **fprops = malloc(nmasses * sizeof(**fprops));
-  su3_vector *temp_prop = malloc(sites_on_node * sizeof(*temp_prop));
-  su3_vector *wall_sink_m1 = malloc(nt * sizeof(*wall_sink_m1));
-  su3_vector *wall_sink_m2 = malloc(nt * sizeof(*wall_sink_m2));
+  vector **fprops = malloc(nmasses * sizeof(**fprops));
+  vector *temp_prop = malloc(sites_on_node * sizeof(*temp_prop));
+  vector *wall_sink_m1 = malloc(nt * sizeof(*wall_sink_m1));
+  vector *wall_sink_m2 = malloc(nt * sizeof(*wall_sink_m2));
 
   // Set up and clear arrays to accumulate propagators
   for (i = 0; i < NPROP * nmasses * nmasses; i++) {
@@ -60,8 +60,8 @@ int fpi_2(Real *masses) {
       props[i][j] = tc;
   }
   for (i = 0; i < nmasses; i++) {
-    fprops[i] = malloc(sites_on_node * sizeof(su3_vector));
-    memset((void *)fprops[i], '\0', sites_on_node * sizeof(su3_vector));
+    fprops[i] = malloc(sites_on_node * sizeof(vector));
+    memset((void *)fprops[i], '\0', sites_on_node * sizeof(vector));
   }
 
   // Loop over sources
@@ -83,7 +83,7 @@ int fpi_2(Real *masses) {
           }
           // Factor of 2 because we invert 2m + 2 Dslash
           tr = 2.0 / sqrt(magsq_su3vec(&(s->chi)));
-          scalar_mult_su3_vector(&(s->chi), tr, &(s->chi));
+          scalar_mult_vector(&(s->chi), tr, &(s->chi));
         }
       }
 
@@ -93,9 +93,9 @@ int fpi_2(Real *masses) {
       // Multiply by M^dag
       dslash_wrapper(fprops[0], temp_prop, EVENANDODD);
       FORALLSITES(i, s) {
-        scalar_mult_su3_vector(&(fprops[0][i]), 2 * masses[0],
+        scalar_mult_vector(&(fprops[0][i]), 2 * masses[0],
                                &(fprops[0][i]));
-        dif_su3_vector(&(temp_prop[i]), &(fprops[0][i]));
+        dif_vector(&(temp_prop[i]), &(fprops[0][i]));
       }
 
       /* 0-+ (kaon) propagators */
@@ -107,8 +107,8 @@ int fpi_2(Real *masses) {
             clearvec(&(wall_sink_m2[i]));
           }
           FORALLSITES(i, s) {
-            sum_su3_vector(&(fprops[m1][i]), &(wall_sink_m1[s->t]));
-            sum_su3_vector(&(fprops[m2][i]), &(wall_sink_m2[s->t]));
+            sum_vector(&(fprops[m1][i]), &(wall_sink_m1[s->t]));
+            sum_vector(&(fprops[m2][i]), &(wall_sink_m2[s->t]));
             tc = su3_dot(&(fprops[m1][i]), &(fprops[m2][i]));
             CSUM(props[offset + PP][(s->t + nt - t_src) % nt], tc);
           }
@@ -137,9 +137,9 @@ int fpi_2(Real *masses) {
       for (j = 0; j < nmasses; j++) {
         dslash_wrapper(fprops[j], temp_prop, EVENANDODD);
         FORALLSITES(i,s) {
-          scalar_mult_su3_vector(&(fprops[j][i]), 2.0 * masses[j],
+          scalar_mult_vector(&(fprops[j][i]), 2.0 * masses[j],
                                  &(fprops[j][i]));
-          dif_su3_vector(&(temp_prop[i]), &(fprops[j][i]));
+          dif_vector(&(temp_prop[i]), &(fprops[j][i]));
         }
       }
 
@@ -152,8 +152,8 @@ int fpi_2(Real *masses) {
             clearvec(&(wall_sink_m2[i]));
           }
           FORALLSITES(i,s) {
-            sum_su3_vector(&(fprops[m1][i]), &(wall_sink_m1[s->t]));
-            sum_su3_vector(&(fprops[m2][i]), &(wall_sink_m2[s->t]));
+            sum_vector(&(fprops[m1][i]), &(wall_sink_m1[s->t]));
+            sum_vector(&(fprops[m2][i]), &(wall_sink_m2[s->t]));
             tc = su3_dot(&(fprops[m1][i]), &(fprops[m2][i]));
             CSUM(props[offset + WP][(s->t + nt - t_src) % nt], tc);
           }

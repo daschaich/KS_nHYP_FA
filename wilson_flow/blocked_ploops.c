@@ -36,13 +36,13 @@ complex blocked_ploop(int block, int dir) {
 
   // Copy links to tempmat
   FORALLSITES(i, s)
-    su3mat_copy(&(s->link[dir]), &(tempmat[i]));
+    mat_copy(&(s->link[dir]), &(tempmat[i]));
 
   // Compute the bl-strided Polyakov loop "at" ALL the sites
   // on the first 2^block timeslices
   for (k = bl; k < N; k += bl) {
     d[dir] = k;                     // Distance from which to gather
-    tag = start_general_gather_field(tempmat, sizeof(su3_matrix),
+    tag = start_general_gather_field(tempmat, sizeof(matrix),
                                      d, EVENANDODD, gen_pt[0]);
     wait_general_gather(tag);
     FORALLSITES(i, s) {
@@ -54,9 +54,9 @@ complex blocked_ploop(int block, int dir) {
         case ZUP: if (s->z >= bl) continue; break;
         case TUP: if (s->t >= bl) continue; break;
       }
-      mult_su3_nn(&(tempmat[i]), (su3_matrix *)gen_pt[0][i],
+      mult_su3_nn(&(tempmat[i]), (matrix *)gen_pt[0][i],
                   &(tempmat2[i]));
-      su3mat_copy(&(tempmat2[i]), &(tempmat[i]));
+      mat_copy(&(tempmat2[i]), &(tempmat[i]));
     }
     cleanup_general_gather(tag);
   }

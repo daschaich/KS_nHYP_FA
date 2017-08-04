@@ -34,7 +34,7 @@ setup_input_usqcd_ksprop_file(ks_prop_file *kspf)
    according to file type */
 static int 
 read_usqcd_ksprop_record(ks_prop_file *kspf, 
-			 int color, su3_vector *dest,
+			 int color, vector *dest,
 			 ks_quark_source *ksqs )
 {
   int status = 0;
@@ -155,7 +155,7 @@ r_open_ksprop(int flag, char *filename)
 {
   ks_prop_file *kspf = NULL;
   int file_type, color;
-  su3_vector *ksp;
+  vector *ksp;
   char myname[] = "r_open_ksprop";
 
   /* ASCII file */
@@ -180,7 +180,7 @@ r_open_ksprop(int flag, char *filename)
   if(file_type == FILE_TYPE_KS_PROP){
     kspf = r_serial_ks_i(filename);
     kspf->file_type = file_type;
-    kspf->prop = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector)*3);
+    kspf->prop = (vector *)malloc(sites_on_node*sizeof(vector)*3);
     ksp = kspf->prop;
     if(ksp == NULL){
       printf("%s: Can't malloc for full input propagator\n", myname);
@@ -199,7 +199,7 @@ r_open_ksprop(int flag, char *filename)
   else if(file_type == FILE_TYPE_KS_FMPROP){
     kspf = r_serial_ks_fm_i(filename);
     kspf->file_type = file_type;
-    kspf->prop = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector)*3);
+    kspf->prop = (vector *)malloc(sites_on_node*sizeof(vector)*3);
     ksp = kspf->prop;
     if(ksp == NULL){
       printf("%s: Can't malloc for full input propagator\n", myname);
@@ -233,7 +233,7 @@ ks_prop_file *
 w_open_ksprop(int flag, char *filename, int source_type)
 {
   ks_prop_file *kspf = NULL;
-  su3_vector *ksp;
+  vector *ksp;
 #ifdef HAVE_QIO
   char *fileinfo;
   int volfmt, serpar, file_type;
@@ -252,8 +252,8 @@ w_open_ksprop(int flag, char *filename, int source_type)
   case SAVE_SERIAL:
     kspf = w_serial_ks_i(filename);
     /* Allocate space for the entire propagator */
-    kspf->prop = (su3_vector *)
-      malloc(sites_on_node*sizeof(su3_vector)*3);
+    kspf->prop = (vector *)
+      malloc(sites_on_node*sizeof(vector)*3);
     ksp = kspf->prop;
     if(ksp == NULL){
       printf("Can't malloc for full output propagator\n");
@@ -264,8 +264,8 @@ w_open_ksprop(int flag, char *filename, int source_type)
   case SAVE_SERIAL_FM:
     kspf = w_serial_ks_fm_i(filename);
     /* Allocate space for the entire propagator */
-    kspf->prop = (su3_vector *)
-      malloc(sites_on_node*sizeof(su3_vector)*3);
+    kspf->prop = (vector *)
+      malloc(sites_on_node*sizeof(vector)*3);
     ksp = kspf->prop;
     if(ksp == NULL){
       printf("Can't malloc for full output propagator\n");
@@ -332,7 +332,7 @@ r_close_ksprop(int flag, ks_prop_file *kspf)
 void 
 w_close_ksprop(int flag, ks_prop_file *kspf)
 {
-  su3_vector *ksp;
+  vector *ksp;
   int color;
 
   if(kspf == NULL)return;
@@ -381,7 +381,7 @@ w_close_ksprop(int flag, ks_prop_file *kspf)
 int 
 reload_ksprop_c_to_field( int flag, ks_prop_file *kspf, 
 			  ks_quark_source *ksqs, int color, 
-			  su3_vector *dest, int timing)
+			  vector *dest, int timing)
 {
   /* 0 normal exit value
      1 read error */
@@ -389,8 +389,8 @@ reload_ksprop_c_to_field( int flag, ks_prop_file *kspf,
   double dtime = 0;
   int i,status;
   site *s;
-  su3_vector *ksp;
-  su3_vector *cv;
+  vector *ksp;
+  vector *cv;
   int c0;
   int file_type = FILE_TYPE_UNKNOWN;  /* So the compiler doesn't say uninit */
   char myname[] = "reload_ksprop_c_to_field";
@@ -476,14 +476,14 @@ reload_ksprop_c_to_field( int flag, ks_prop_file *kspf,
 int 
 save_ksprop_c_from_field( int flag, ks_prop_file *kspf, 
 			  ks_quark_source *ksqs,
-			  int color, su3_vector *src, 
+			  int color, vector *src, 
 			  char *recinfo, int timing)
 {
   double dtime = 0;
   int status;
   int i; site *s;
-  su3_vector *ksp;
-  su3_vector *cv;
+  vector *ksp;
+  vector *cv;
   int c0;
 #ifdef HAVE_QIO
   int file_type;
@@ -528,7 +528,7 @@ save_ksprop_c_from_field( int flag, ks_prop_file *kspf,
        (file_type == FILE_TYPE_KS_USQCD_C1V3 && color == 0))
       {
 	if(ksqs->c_src == NULL){
-	  su3_vector *cvtmp = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+	  vector *cvtmp = (vector *)malloc(sizeof(vector)*sites_on_node);
 	  if(cvtmp == NULL){
 	    printf("%s(%d) no room for tmp\n",myname,this_node);
 	    terminate(1);
@@ -543,7 +543,7 @@ save_ksprop_c_from_field( int flag, ks_prop_file *kspf,
     /* Save color vector source field */
     else if(file_type == FILE_TYPE_KS_USQCD_VV_PAIRS){
 	if(ksqs->cv_src == NULL){
-	  su3_vector *cvtmp = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+	  vector *cvtmp = (vector *)malloc(sizeof(vector)*sites_on_node);
 	  if(cvtmp == NULL){
 	    printf("%s(%d) no room for tmp\n",myname,this_node);
 	    terminate(1);
@@ -587,7 +587,7 @@ save_ksprop_c_from_field( int flag, ks_prop_file *kspf,
 */
 int 
 reload_ksprop_to_field3( int flag, char *filename, ks_quark_source *ksqs,
-			 su3_vector *dest, int timing)
+			 vector *dest, int timing)
 {
   /* 0 normal exit value
      1 read error */
@@ -595,7 +595,7 @@ reload_ksprop_to_field3( int flag, char *filename, ks_quark_source *ksqs,
   ks_prop_file *kspf;
   int i,color,status;
   site *s;
-  su3_vector *ksp;
+  vector *ksp;
 
   ksp = create_v_field();
 
@@ -666,9 +666,9 @@ reload_ksprop_to_site3( int flag, char *filename, ks_quark_source *ksqs,
 
   int i,status;
   site *s;
-  su3_vector *ksp, *vec;
+  vector *ksp, *vec;
 
-  ksp = (su3_vector *)malloc(sites_on_node * 3 * sizeof(su3_vector));
+  ksp = (vector *)malloc(sites_on_node * 3 * sizeof(vector));
   if(ksp == NULL){
     printf("reload_ksprop_to_site(%d): no room for ksp\n",this_node);
     return 1;
@@ -677,7 +677,7 @@ reload_ksprop_to_site3( int flag, char *filename, ks_quark_source *ksqs,
   status = reload_ksprop_to_field3( flag, filename, ksqs, ksp, timing);
 
   FORALLSITES(i,s){
-    vec = (su3_vector *)F_PT(s,dest);
+    vec = (vector *)F_PT(s,dest);
     vec[0] = ksp[3*i];
     vec[1] = ksp[3*i+1];
     vec[2] = ksp[3*i+2];
@@ -698,12 +698,12 @@ reload_ksprop_to_site3( int flag, char *filename, ks_quark_source *ksqs,
 void 
 save_ksprop_from_field3( int flag, char *filename, char *recxml, 
 			 ks_quark_source *ksqs,
-			 su3_vector *src, int timing)
+			 vector *src, int timing)
 {
   ks_prop_file *kspf;
   int i, color, status;
   site *s;
-  su3_vector *ksp;
+  vector *ksp;
 
   ksp = create_v_field();
 
@@ -762,7 +762,7 @@ save_ksprop_from_ksp_field( int flag, char *filename, char *recxml,
 
    DEPRECATED.  Kept for compatibility.
 
-   src has type su3_vector[3]
+   src has type vector[3]
 
    */
 void 
@@ -772,9 +772,9 @@ save_ksprop_from_site3( int flag, char *filename, char *recxml,
 {
   int i, color;
   site *s;
-  su3_vector *ksp, *vec;
+  vector *ksp, *vec;
 
-  ksp = (su3_vector *)malloc(3 * sites_on_node * sizeof(su3_vector));
+  ksp = (vector *)malloc(3 * sites_on_node * sizeof(vector));
   if(ksp == NULL){
     printf("save_ksprop_from_site(%d): no room for ksp\n",this_node);
     return;
@@ -782,7 +782,7 @@ save_ksprop_from_site3( int flag, char *filename, char *recxml,
 
   FORALLSITES(i,s){
     for(color = 0; color < 3; color++){
-      vec = (su3_vector *)F_PT(s,src);
+      vec = (vector *)F_PT(s,src);
       ksp[3*i+color] = vec[color];
     }
   }

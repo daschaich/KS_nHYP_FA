@@ -16,7 +16,7 @@
 #include "generic_ks_includes.h"	/* definitions files and prototypes */
 
 /* Temporary work space for dslash_eo_field */ 
-static su3_vector *temp ;
+static vector *temp ;
 /* Flag indicating if temp is allocated               */
 static int temp_not_allocated=1 ;
 
@@ -45,20 +45,20 @@ void dslash_eo_site( field_offset src, field_offset dest, int parity,
   /* Parallel transport by all the paths in the action.  
      Multiply by coefficient in table
   */
-  FORSOMEPARITY(i,s,parity){ clearvec( (su3_vector *)F_PT(s,dest) ); }
+  FORSOMEPARITY(i,s,parity){ clearvec( (vector *)F_PT(s,dest) ); }
   
   for( ipath=0; ipath<num_q_paths; ipath++ ){  /* loop over paths */
     path_transport_site( src, F_OFFSET(tempvec[0]), parity,
 		    q_paths[ipath].dir, q_paths[ipath].length );
     x=q_paths[ipath].coeff;
     FORSOMEPARITY(i,s,parity){
-      scalar_mult_add_su3_vector(  (su3_vector *)F_PT(s,dest),
-		   &(s->tempvec[0]), x, (su3_vector *)F_PT(s,dest) );
+      scalar_mult_add_vector(  (vector *)F_PT(s,dest),
+		   &(s->tempvec[0]), x, (vector *)F_PT(s,dest) );
     }
   }   /* ipath */
 } /* dslash_eo_site */
 
-void dslash_eo_field( su3_vector *src, su3_vector *dest, int parity,
+void dslash_eo_field( vector *src, vector *dest, int parity,
 		      ferm_links_t *fn )
 {
   register int i;
@@ -72,7 +72,7 @@ void dslash_eo_field( su3_vector *src, su3_vector *dest, int parity,
   /* allocate temporary work space only if not already allocated */
   if(temp_not_allocated)
     {
-      temp =(su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+      temp =(vector *)malloc(sites_on_node*sizeof(vector));
     }
   
   switch(parity){
@@ -91,7 +91,7 @@ void dslash_eo_field( su3_vector *src, su3_vector *dest, int parity,
 		    q_paths[ipath].dir, q_paths[ipath].length );
     x=q_paths[ipath].coeff;
     FORSOMEPARITY(i,s,parity){
-      scalar_mult_add_su3_vector(  &(dest[i]), &(temp[i]), x, &(dest[i]) );
+      scalar_mult_add_vector(  &(dest[i]), &(temp[i]), x, &(dest[i]) );
     }
   }   /* ipath */
 } /* dslash_eo_field */

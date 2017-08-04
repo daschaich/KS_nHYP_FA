@@ -114,7 +114,7 @@ double action() {
 
 
 // -----------------------------------------------------------------
-// Copy a gauge field as an array of four su3_matrices
+// Copy a gauge field as an array of four matrices
 void gauge_field_copy(field_offset src, field_offset dest) {
   register int i, dir, src2, dest2;
   register site *s;
@@ -123,10 +123,10 @@ void gauge_field_copy(field_offset src, field_offset dest) {
     src2 = src;
     dest2 = dest;
     FORALLUPDIR(dir) {
-      su3mat_copy((su3_matrix *)F_PT(s, src2),
-                  (su3_matrix *)F_PT(s, dest2));
-      src2 += sizeof(su3_matrix);
-      dest2 += sizeof(su3_matrix);
+      mat_copy((matrix *)F_PT(s, src2),
+                  (matrix *)F_PT(s, dest2));
+      src2 += sizeof(matrix);
+      dest2 += sizeof(matrix);
     }
   }
 }
@@ -140,19 +140,19 @@ void gauge_field_copy(field_offset src, field_offset dest) {
 void plaquette_a(double *ss_plaq, double *st_plaq) {
   register int i, dir, dir2;
   register site *s;
-  register su3_matrix *m1, *m4;
+  register matrix *m1, *m4;
   double ss_sum = 0.0, st_sum = 0.0;
   complex tc;
   msg_tag *mtag, *mtag2;
-  su3_matrix tmat;
+  matrix tmat;
 
   // We can exploit a symmetry under dir<-->dir2
   for (dir = YUP; dir <= TUP; dir++) {
     for (dir2 = XUP; dir2 < dir; dir2++) {
       // gen_pt[0] is U_b(x+a), gen_pt[1] is U_a(x+b)
-      mtag = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+      mtag = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                dir, EVENANDODD, gen_pt[0]);
-      mtag2 = start_gather_site(F_OFFSET(link[dir]), sizeof(su3_matrix),
+      mtag2 = start_gather_site(F_OFFSET(link[dir]), sizeof(matrix),
                                 dir2, EVENANDODD, gen_pt[1]);
 
       // tempmat = Udag_b(x) U_a(x)
@@ -167,8 +167,8 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
       // Compute tc = tr[Udag_a(x+b) Udag_b(x) U_a(x) U_b(x+a)] / 3
       // and combine tc.real + beta_A * |tc|^2
       FORALLSITES(i, s) {
-        m1 = (su3_matrix *)(gen_pt[0][i]);
-        m4 = (su3_matrix *)(gen_pt[1][i]);
+        m1 = (matrix *)(gen_pt[0][i]);
+        m4 = (matrix *)(gen_pt[1][i]);
         mult_su3_nn(&tempmat[i], m1, &tmat);
         tc = complextrace_su3(m4, &tmat);
 

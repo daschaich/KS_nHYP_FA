@@ -11,7 +11,7 @@
 #include "../include/loopend.h"
 
 /* Temporary work space for dslash_field_special */ 
-static su3_vector *temp[4] ;
+static vector *temp[4] ;
 static int temp_not_allocated=1 ;
 
 static void 
@@ -73,9 +73,9 @@ void dslash_site_special( field_offset src, field_offset dest,
 
   /* Start gathers from positive directions */
   for(dir=XUP; dir<=TUP; dir++){
-    if(start==1) tag[dir] = start_gather_site( src, sizeof(su3_vector),
+    if(start==1) tag[dir] = start_gather_site( src, sizeof(vector),
                  dir, parity, gen_pt[dir] );
-    else restart_gather_site( src, sizeof(su3_vector),
+    else restart_gather_site( src, sizeof(vector),
             dir, parity, gen_pt[dir] , tag[dir] );
   }
 
@@ -83,18 +83,18 @@ void dslash_site_special( field_offset src, field_offset dest,
   FORSOMEPARITYDOMAIN(i,s,otherparity){
     if( i < loopend-FETCH_UP ){
       prefetch_4MV4V( &((s+FETCH_UP)->link[XUP]),
-          (su3_vector *)F_PT((s+FETCH_UP),src),
+          (vector *)F_PT((s+FETCH_UP),src),
           (s+FETCH_UP)->tempvec);
     }
-    mult_adj_su3_mat_vec_4dir( s->link,
-             (su3_vector *)F_PT(s,src), s->tempvec);
+    mult_adj_mat_vec_4dir( s->link,
+             (vector *)F_PT(s,src), s->tempvec);
   } END_LOOP
 
   /* Start gathers from negative directions */
   for( dir=XUP; dir <= TUP; dir++){
     if (start==1) tag[OPP_DIR(dir)] = start_gather_site( F_OFFSET(tempvec[dir]),
-               sizeof(su3_vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
-    else restart_gather_site( F_OFFSET(tempvec[dir]), sizeof(su3_vector),
+               sizeof(vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
+    else restart_gather_site( F_OFFSET(tempvec[dir]), sizeof(vector),
             OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] , tag[OPP_DIR(dir)] );
   }
 
@@ -107,11 +107,11 @@ void dslash_site_special( field_offset src, field_offset dest,
 #ifdef SCHROED_FUN
   FORSOMEPARITY(i,s,parity) if(s->t > 0){
     if(s->t == (nt-1)){
-      mult_su3_mat_vec( &(s->link[XUP]),
-      (su3_vector *)(gen_pt[XUP][i]), (su3_vector *)F_PT(s,dest));
+      mult_mat_vec( &(s->link[XUP]),
+      (vector *)(gen_pt[XUP][i]), (vector *)F_PT(s,dest));
       for(dir=YUP; dir<TUP; dir++){
-  mult_su3_mat_vec_sum( &(s->link[dir]),
-            (su3_vector *)(gen_pt[dir][i]), (su3_vector *)F_PT(s,dest));
+  mult_mat_vec_sum( &(s->link[dir]),
+            (vector *)(gen_pt[dir][i]), (vector *)F_PT(s,dest));
       }
     }
     else{
@@ -119,16 +119,16 @@ void dslash_site_special( field_offset src, field_offset dest,
       FORSOMEPARITY(i,s,parity){
   if( i < loopend-FETCH_UP ){
     prefetch_4MVVVV(&((s+FETCH_UP)->link[XUP]), 
-        (su3_vector *)gen_pt[XUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[YUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[ZUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[TUP][i+FETCH_UP] );
+        (vector *)gen_pt[XUP][i+FETCH_UP],
+        (vector *)gen_pt[YUP][i+FETCH_UP],
+        (vector *)gen_pt[ZUP][i+FETCH_UP],
+        (vector *)gen_pt[TUP][i+FETCH_UP] );
   }
 #endif
-  mult_su3_mat_vec_sum_4dir( s->link,
-       (su3_vector *)gen_pt[XUP][i], (su3_vector *)gen_pt[YUP][i],
-       (su3_vector *)gen_pt[ZUP][i], (su3_vector *)gen_pt[TUP][i],
-       (su3_vector *)F_PT(s,dest));
+  mult_mat_vec_sum_4dir( s->link,
+       (vector *)gen_pt[XUP][i], (vector *)gen_pt[YUP][i],
+       (vector *)gen_pt[ZUP][i], (vector *)gen_pt[TUP][i],
+       (vector *)F_PT(s,dest));
   /*------------------------------------------------------------*/
 #ifdef SCHROED_FUN
       }
@@ -144,22 +144,22 @@ void dslash_site_special( field_offset src, field_offset dest,
   FORSOMEPARITYDOMAIN(i,s,parity){
     if( i < loopend-FETCH_UP ){
       prefetch_VVVV( 
-        (su3_vector *)gen_pt[XDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[YDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[ZDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[TDOWN][i+FETCH_UP] );
+        (vector *)gen_pt[XDOWN][i+FETCH_UP],
+        (vector *)gen_pt[YDOWN][i+FETCH_UP],
+        (vector *)gen_pt[ZDOWN][i+FETCH_UP],
+        (vector *)gen_pt[TDOWN][i+FETCH_UP] );
     }
 
-    sub_four_su3_vecs( (su3_vector *)F_PT(s,dest),
-           (su3_vector *)(gen_pt[XDOWN][i]),
-           (su3_vector *)(gen_pt[YDOWN][i]),
-           (su3_vector *)(gen_pt[ZDOWN][i]),
-           (su3_vector *)(gen_pt[TDOWN][i]) ); 
+    sub_four_su3_vecs( (vector *)F_PT(s,dest),
+           (vector *)(gen_pt[XDOWN][i]),
+           (vector *)(gen_pt[YDOWN][i]),
+           (vector *)(gen_pt[ZDOWN][i]),
+           (vector *)(gen_pt[TDOWN][i]) ); 
       /*------------------------------------------------------------*/
   } END_LOOP
 }
 
-void dslash_field( su3_vector *src, su3_vector *dest, int parity ) {
+void dslash_field( vector *src, vector *dest, int parity ) {
   msg_tag *tag[16];
 
    dslash_field_special(src, dest, parity, tag, 1 );
@@ -172,7 +172,7 @@ void dslash_field( su3_vector *src, su3_vector *dest, int parity ) {
   if this is the first use, otherwise reused. If start=1,use
   start_gather_field, otherwise use restart_gather_field. 
   The calling program must clean up the gathers! */
-void dslash_field_special( su3_vector *src, su3_vector *dest,
+void dslash_field_special( vector *src, vector *dest,
         int parity, msg_tag **tag, int start ){
   register int i;
   register site *s;
@@ -182,7 +182,7 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
   if(temp_not_allocated)
     {
       for( dir=XUP; dir<=TUP; dir++ ){
-  temp[dir]  =(su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  temp[dir]  =(vector *)malloc(sites_on_node*sizeof(vector));
       }
       temp_not_allocated = 0 ;
     }
@@ -195,9 +195,9 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
   
   /* Start gathers from positive directions */
   for(dir=XUP; dir<=TUP; dir++){
-    if(start==1) tag[dir] = start_gather_field( src, sizeof(su3_vector),
+    if(start==1) tag[dir] = start_gather_field( src, sizeof(vector),
                  dir, parity, gen_pt[dir] );
-    else restart_gather_field( src, sizeof(su3_vector),
+    else restart_gather_field( src, sizeof(vector),
              dir, parity, gen_pt[dir] , tag[dir] );
   }
   
@@ -212,15 +212,15 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
            &(temp[2][i+FETCH_UP]),
            &(temp[3][i+FETCH_UP]) );
     }
-    mult_adj_su3_mat_4vec( s->link, &(src[i]), &(temp[0][i]),
+    mult_adj_mat_4vec( s->link, &(src[i]), &(temp[0][i]),
          &(temp[1][i]), &(temp[2][i]), &(temp[3][i]) );
   } END_LOOP
       
   /* Start gathers from negative directions */
   for( dir=XUP; dir <= TUP; dir++){
     if (start==1) tag[OPP_DIR(dir)] = start_gather_field( temp[dir],
-    sizeof(su3_vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
-    else restart_gather_field( temp[dir], sizeof(su3_vector), 
+    sizeof(vector), OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)] );
+    else restart_gather_field( temp[dir], sizeof(vector), 
      OPP_DIR( dir), parity, gen_pt[OPP_DIR(dir)], tag[OPP_DIR(dir)] );
   }
   
@@ -233,11 +233,11 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
 #ifdef SCHROED_FUN
   FORSOMEPARITY(i,s,parity) if(s->t > 0){
     if(s->t == (nt-1)){
-      mult_su3_mat_vec( &(s->link[XUP]),
-      (su3_vector *)(gen_pt[XUP][i]), &(dest[i]));
+      mult_mat_vec( &(s->link[XUP]),
+      (vector *)(gen_pt[XUP][i]), &(dest[i]));
       for(dir=YUP; dir<TUP; dir++){
-  mult_su3_mat_vec_sum( &(s->link[dir]),
-            (su3_vector *)(gen_pt[dir][i]), &(dest[i]));
+  mult_mat_vec_sum( &(s->link[dir]),
+            (vector *)(gen_pt[dir][i]), &(dest[i]));
       }
     }
     else{
@@ -245,15 +245,15 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
       FORSOMEPARITY(i,s,parity){
   if( i < loopend-FETCH_UP ){
     prefetch_4MVVVV(&((s+FETCH_UP)->link[XUP]), 
-        (su3_vector *)gen_pt[XUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[YUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[ZUP][i+FETCH_UP],
-        (su3_vector *)gen_pt[TUP][i+FETCH_UP] );
+        (vector *)gen_pt[XUP][i+FETCH_UP],
+        (vector *)gen_pt[YUP][i+FETCH_UP],
+        (vector *)gen_pt[ZUP][i+FETCH_UP],
+        (vector *)gen_pt[TUP][i+FETCH_UP] );
   }
 #endif
-  mult_su3_mat_vec_sum_4dir( s->link,
-       (su3_vector *)gen_pt[XUP][i], (su3_vector *)gen_pt[YUP][i],
-       (su3_vector *)gen_pt[ZUP][i], (su3_vector *)gen_pt[TUP][i],
+  mult_mat_vec_sum_4dir( s->link,
+       (vector *)gen_pt[XUP][i], (vector *)gen_pt[YUP][i],
+       (vector *)gen_pt[ZUP][i], (vector *)gen_pt[TUP][i],
        &(dest[i]));
   /*------------------------------------------------------------*/
 #ifdef SCHROED_FUN
@@ -270,17 +270,17 @@ void dslash_field_special( su3_vector *src, su3_vector *dest,
   FORSOMEPARITYDOMAIN(i,s,parity){
     if( i < loopend-FETCH_UP ){
       prefetch_VVVV( 
-        (su3_vector *)gen_pt[XDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[YDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[ZDOWN][i+FETCH_UP],
-        (su3_vector *)gen_pt[TDOWN][i+FETCH_UP] );
+        (vector *)gen_pt[XDOWN][i+FETCH_UP],
+        (vector *)gen_pt[YDOWN][i+FETCH_UP],
+        (vector *)gen_pt[ZDOWN][i+FETCH_UP],
+        (vector *)gen_pt[TDOWN][i+FETCH_UP] );
     }
     
     sub_four_su3_vecs( &(dest[i]),
-           (su3_vector *)(gen_pt[XDOWN][i]),
-           (su3_vector *)(gen_pt[YDOWN][i]),
-           (su3_vector *)(gen_pt[ZDOWN][i]),
-           (su3_vector *)(gen_pt[TDOWN][i]) ); 
+           (vector *)(gen_pt[XDOWN][i]),
+           (vector *)(gen_pt[YDOWN][i]),
+           (vector *)(gen_pt[ZDOWN][i]),
+           (vector *)(gen_pt[TDOWN][i]) ); 
       /*------------------------------------------------------------*/
   } END_LOOP
 }

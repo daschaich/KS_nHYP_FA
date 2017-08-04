@@ -145,13 +145,13 @@ static gauge_file *w_serial_i(char *filename)
 
 /* Flush lbuf to output */
 /* buf_length is reset */
-static void flush_lbuf_to_file(gauge_file *gf, fsu3_matrix *lbuf,
+static void flush_lbuf_to_file(gauge_file *gf, fmatrix *lbuf,
              int *buf_length)
 {
   FILE *fp = gf->fp;
 
   if(*buf_length <= 0)return;
-  if( (int)g_write(lbuf,4*sizeof(fsu3_matrix),*buf_length,fp) !=
+  if( (int)g_write(lbuf,4*sizeof(fmatrix),*buf_length,fp) !=
       *buf_length)
     {
       printf("w_serial: Node %d gauge configuration write error %d file %s\n",
@@ -180,17 +180,17 @@ static void accum_cksums(gauge_file *gf, int *rank29, int *rank31,
 /* Flush tbuf to lbuf and accumulate checksums */
 /* tbuf_length is not reset here */
 static void flush_tbuf_to_lbuf(gauge_file *gf, int *rank29, int *rank31,
-             fsu3_matrix *lbuf, int *buf_length,
-             fsu3_matrix *tbuf, int tbuf_length){
+             fmatrix *lbuf, int *buf_length,
+             fmatrix *tbuf, int tbuf_length){
 
   int nword;
   u_int32type *buf;
 
   if(tbuf_length > 0){
     memcpy((void *)&lbuf[4*(*buf_length)],
-     (void *)tbuf, 4*tbuf_length*sizeof(fsu3_matrix));
+     (void *)tbuf, 4*tbuf_length*sizeof(fmatrix));
 
-    nword= 4*(int)sizeof(fsu3_matrix)/(int)sizeof(int32type)*tbuf_length;
+    nword= 4*(int)sizeof(fmatrix)/(int)sizeof(int32type)*tbuf_length;
     buf = (u_int32type *)&lbuf[4*(*buf_length)];
     accum_cksums(gf, rank29, rank31, buf, nword);
 
@@ -198,13 +198,13 @@ static void flush_tbuf_to_lbuf(gauge_file *gf, int *rank29, int *rank31,
   }
 }
 
-static void send_buf_to_node0(fsu3_matrix *tbuf, int tbuf_length,
+static void send_buf_to_node0(fmatrix *tbuf, int tbuf_length,
             int currentnode){
   if(this_node == currentnode){
-    send_field((char *)tbuf,4*tbuf_length*sizeof(fsu3_matrix),0);
+    send_field((char *)tbuf,4*tbuf_length*sizeof(fmatrix),0);
   }
   else if(this_node == 0){
-    get_field((char *)tbuf,4*tbuf_length*sizeof(fsu3_matrix),
+    get_field((char *)tbuf,4*tbuf_length*sizeof(fmatrix),
         currentnode);
   }
 }
@@ -216,8 +216,8 @@ static void w_serial(gauge_file *gf)
   FILE *fp = NULL;
   gauge_header *gh = NULL;
   int rank29,rank31;
-  fsu3_matrix *lbuf = NULL;
-  fsu3_matrix *tbuf = NULL;
+  fmatrix *lbuf = NULL;
+  fmatrix *tbuf = NULL;
   int buf_length, tbuf_length;
   register int i,j;
   off_t offset;             /* File stream pointer */
@@ -234,7 +234,7 @@ static void w_serial(gauge_file *gf)
      hypercube */
   /* The largest possible space we need is nx */
 
-  tbuf = (fsu3_matrix *)malloc(nx*4*sizeof(fsu3_matrix));
+  tbuf = (fmatrix *)malloc(nx*4*sizeof(fmatrix));
   if(tbuf == NULL){
     printf("%s(%d): No room for tbuf\n",myname,this_node);
     terminate(1);
@@ -245,7 +245,7 @@ static void w_serial(gauge_file *gf)
       if(gf->parallel)
   printf("w_serial: Attempting serial write to parallel file \n");
 
-      lbuf = (fsu3_matrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fsu3_matrix));
+      lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
       if(lbuf == NULL)
   {
     printf("w_serial: Node 0 can't malloc lbuf\n");
@@ -282,8 +282,8 @@ static void w_serial(gauge_file *gf)
   gf->check.sum29 = 0;
   /* counts 32-bit words mod 29 and mod 31 in order of appearance on file */
   /* Here only node 0 uses these values -- both start at 0 */
-  rank29 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 29;
-  rank31 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 31;
+  rank29 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 29;
+  rank31 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 31;
 
   g_sync();
   currentnode=0;  /* The node delivering data */
@@ -391,8 +391,8 @@ static void r_serial(gauge_file *gf)
   gauge_check test_gc;
   u_int32type *val;
   int rank29,rank31;
-  fsu3_matrix *lbuf = NULL;
-  fsu3_matrix tmpsu3[4];
+  fmatrix *lbuf = NULL;
+  fmatrix tmpsu3[4];
   char myname[] = "r_serial";
   int idest = 0;
 
@@ -424,7 +424,7 @@ static void r_serial(gauge_file *gf)
   printf("%s: Attempting serial read from parallel file \n",myname);
 
       /* Allocate single precision read buffer */
-      lbuf = (fsu3_matrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fsu3_matrix));
+      lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
       if(lbuf == NULL)
   {
     printf("%s: Node %d can't malloc lbuf\n",myname,this_node);
@@ -489,7 +489,7 @@ static void r_serial(gauge_file *gf)
       if(buf_length > MAX_BUF_LENGTH)buf_length = MAX_BUF_LENGTH;
       /* then do read */
 
-      if( (int)g_read(lbuf,4*sizeof(fsu3_matrix),buf_length,fp)
+      if( (int)g_read(lbuf,4*sizeof(fmatrix),buf_length,fp)
     != buf_length)
         {
     printf("%s: node %d gauge configuration read error %d file %s\n",
@@ -502,11 +502,11 @@ static void r_serial(gauge_file *gf)
   if(destnode==0){  /* just copy links */
     idest = node_index(x,y,z,t);
     /* Save 4 matrices in tmpsu3 for further processing */
-    memcpy(tmpsu3,&lbuf[4*where_in_buf],4*sizeof(fsu3_matrix));
+    memcpy(tmpsu3,&lbuf[4*where_in_buf],4*sizeof(fmatrix));
   }
   else {    /* send to correct node */
     send_field((char *)&lbuf[4*where_in_buf],
-         4*sizeof(fsu3_matrix),destnode);
+         4*sizeof(fmatrix),destnode);
   }
   where_in_buf++;
       }
@@ -516,7 +516,7 @@ static void r_serial(gauge_file *gf)
   if(this_node==destnode){
     idest = node_index(x,y,z,t);
     /* Receive 4 matrices in temporary space for further processing */
-    get_field((char *)tmpsu3,4*sizeof(fsu3_matrix),0);
+    get_field((char *)tmpsu3,4*sizeof(fmatrix),0);
   }
       }
 
@@ -528,10 +528,10 @@ static void r_serial(gauge_file *gf)
   {
     if(byterevflag==1)
       byterevn((int32type *)tmpsu3,
-         4*sizeof(fsu3_matrix)/sizeof(int32type));
+         4*sizeof(fmatrix)/sizeof(int32type));
     /* Accumulate checksums */
     for(k = 0, val = (u_int32type *)tmpsu3;
-        k < 4*(int)sizeof(fsu3_matrix)/(int)sizeof(int32type);
+        k < 4*(int)sizeof(fmatrix)/(int)sizeof(int32type);
         k++, val++)
       {
         test_gc.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
@@ -545,8 +545,8 @@ static void r_serial(gauge_file *gf)
   }
       else
   {
-    rank29 += 4*sizeof(fsu3_matrix)/sizeof(int32type);
-    rank31 += 4*sizeof(fsu3_matrix)/sizeof(int32type);
+    rank29 += 4*sizeof(fmatrix)/sizeof(int32type);
+    rank31 += 4*sizeof(fmatrix)/sizeof(int32type);
     rank29 %= 29;
     rank31 %= 31;
   }
@@ -596,7 +596,7 @@ static void r_serial_arch(gauge_file *gf)
   gauge_check test_gc;
   u_int32type *val;
   int rank29,rank31;
-  su3_matrix tmpsu3[4];
+  matrix tmpsu3[4];
   int dataformat = gf->dataformat;
   int precision = gf->precision;
   char myname[] = "r_serial_arch";
@@ -734,10 +734,10 @@ static void r_serial_arch(gauge_file *gf)
     i = node_index(x,y,z,t);
      /*   printf("lattice node_index = %d, mu = %d\n", i, mu); */
     /* Copy from tmpsu3 to site structure */
-    memcpy((void *)lattice[i].link,(void *)tmpsu3,4*sizeof(su3_matrix));
+    memcpy((void *)lattice[i].link,(void *)tmpsu3,4*sizeof(matrix));
   } else {
     /* send to correct node */
-    send_field((char *)tmpsu3, 4*sizeof(su3_matrix),destnode);
+    send_field((char *)tmpsu3, 4*sizeof(matrix),destnode);
   }
       }
       /* The node which contains this site reads message */
@@ -745,9 +745,9 @@ static void r_serial_arch(gauge_file *gf)
   /* for all nodes other than node 0 */
   if(this_node==destnode){
     i = node_index(x,y,z,t);
-    get_field((char *)tmpsu3,4*sizeof(su3_matrix),0);
+    get_field((char *)tmpsu3,4*sizeof(matrix),0);
     /* Store in site structure, converting to generic precision */
-    memcpy((void *)lattice[i].link,(void *)tmpsu3,4*sizeof(su3_matrix));
+    memcpy((void *)lattice[i].link,(void *)tmpsu3,4*sizeof(matrix));
   }
       }
 
@@ -759,7 +759,7 @@ static void r_serial_arch(gauge_file *gf)
   {
     /* Accumulate checksums */
     for(k = 0, val = (u_int32type *)tmpsu3;
-        k < 4*(int)sizeof(su3_matrix)/(int)sizeof(int32type); k++, val++)
+        k < 4*(int)sizeof(matrix)/(int)sizeof(int32type); k++, val++)
         {
         test_gc.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
         test_gc.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -769,8 +769,8 @@ static void r_serial_arch(gauge_file *gf)
   }
       else
   {
-    rank29 += 4*sizeof(su3_matrix)/sizeof(int32type);
-    rank31 += 4*sizeof(su3_matrix)/sizeof(int32type);
+    rank29 += 4*sizeof(matrix)/sizeof(int32type);
+    rank31 += 4*sizeof(matrix)/sizeof(int32type);
     rank29 %= 29;
     rank31 %= 31;
   }
@@ -817,7 +817,7 @@ static void w_parallel(gauge_file *gf)
   /* gf  = file descriptor as opened by w_parallel_i */
 
   FILE *fp;
-  fsu3_matrix *lbuf;
+  fmatrix *lbuf;
   int buf_length,where_in_buf;
   u_int32type *val;
   int rank29,rank31;
@@ -827,7 +827,7 @@ static void w_parallel(gauge_file *gf)
   int x,y,z,t;
   struct {
     short x,y,z,t;
-    fsu3_matrix link[4];
+    fmatrix link[4];
   } msg;
   int isite,ksite,site_block;
   int rcv_coords,rcv_rank;
@@ -909,7 +909,7 @@ static void w_parallel(gauge_file *gf)
     where_in_buf = buf_length;
     d2f_4mat(&lattice[i].link[0],&lbuf[4*where_in_buf]);
     rank29 = rank31 =
-      4*sizeof(fsu3_matrix)/sizeof(int32type)*rcv_rank;
+      4*sizeof(fmatrix)/sizeof(int32type)*rcv_rank;
         }
         else {
     /* Receive a message */
@@ -924,15 +924,15 @@ static void w_parallel(gauge_file *gf)
 
     /* Move data to buffer */
     memcpy((void *)&lbuf[4*where_in_buf],
-           (void *)msg.link,4*sizeof(fsu3_matrix));
-    rank29 = rank31 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*i;
+           (void *)msg.link,4*sizeof(fmatrix));
+    rank29 = rank31 = 4*sizeof(fmatrix)/sizeof(int32type)*i;
         }
 
         /* Receiving node accumulates checksums as the values
      are inserted into its buffer */
         rank29 %= 29; rank31 %= 31;
         for(k = 0, val = (u_int32type *)&lbuf[4*where_in_buf];
-      k < 4*(int)sizeof(fsu3_matrix)/(int)sizeof(int32type); k++, val++)
+      k < 4*(int)sizeof(fmatrix)/(int)sizeof(int32type); k++, val++)
     {
       gf->check.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
       gf->check.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -946,7 +946,7 @@ static void w_parallel(gauge_file *gf)
     {
       /* write out buffer */
 
-      if( (int)g_write(lbuf,4*sizeof(fsu3_matrix),buf_length,fp)
+      if( (int)g_write(lbuf,4*sizeof(fmatrix),buf_length,fp)
          != buf_length)
         {
           printf("%s: Node %d gauge configuration write error %d file %s\n",
@@ -1006,7 +1006,7 @@ static void w_checkpoint(gauge_file *gf)
   /* gf  = file descriptor as opened by w_checkpoint_i */
 
   FILE *fp;
-  fsu3_matrix *lbuf;
+  fmatrix *lbuf;
   u_int32type *val;
   int k;
   int rank29,rank31;
@@ -1027,8 +1027,8 @@ static void w_checkpoint(gauge_file *gf)
   gf->check.sum29 = 0;
   /* counts 32-bit words mod 29 and mod 31 in order of appearance on file */
   /* Here all nodes use these values */
-  rank29 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 29;
-  rank31 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 31;
+  rank29 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 29;
+  rank31 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 31;
 
   buf_length = 0;
 
@@ -1041,7 +1041,7 @@ static void w_checkpoint(gauge_file *gf)
 
     /* Accumulate checksums - contribution from next site moved into buffer*/
     for(k = 0, val = (u_int32type *)&lbuf[4*buf_length];
-  k < 4*(int)sizeof(fsu3_matrix)/(int)sizeof(int32type); k++, val++)
+  k < 4*(int)sizeof(fmatrix)/(int)sizeof(int32type); k++, val++)
       {
   gf->check.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
   gf->check.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -1056,7 +1056,7 @@ static void w_checkpoint(gauge_file *gf)
   /* write out buffer */
 
   fflush(stdout);
-  if( (int)g_write(lbuf,4*sizeof(fsu3_matrix),buf_length,fp) != buf_length)
+  if( (int)g_write(lbuf,4*sizeof(fmatrix),buf_length,fp) != buf_length)
     {
       printf("%s: Node %d gauge configuration write error %d file %s\n",
        myname,this_node,errno,gf->filename);
@@ -1160,10 +1160,10 @@ static void r_parallel(gauge_file *gf)
   FILE *fp;
   gauge_header *gh;
   char *filename;
-  fsu3_matrix *lbuf;
+  fmatrix *lbuf;
   struct {
     short x,y,z,t;
-    fsu3_matrix link[4];
+    fmatrix link[4];
   } msg;
 
   int buf_length,where_in_buf;
@@ -1193,14 +1193,14 @@ static void r_parallel(gauge_file *gf)
     printf("%s: Attempting parallel read from serial file.\n",myname);
 
   /* Allocate single precision read buffer */
-  lbuf = (fsu3_matrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fsu3_matrix));
+  lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
   if(lbuf == NULL)
     {
       printf("%s: Node %d can't malloc lbuf\n",myname,this_node);
       fflush(stdout);terminate(1);
     }
 
-  gauge_node_size = sites_on_node*4*sizeof(fsu3_matrix) ;
+  gauge_node_size = sites_on_node*4*sizeof(fmatrix) ;
 
   /* (1996 gauge configuration files had a 32-bit unused checksum
      record before the gauge link data) */
@@ -1234,8 +1234,8 @@ static void r_parallel(gauge_file *gf)
   test_gc.sum31 = 0;
   /* counts 32-bit words mod 29 and mod 31 in order of appearance on file */
   /* Here all nodes use these values */
-  rank29 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 29;
-  rank31 = 4*sizeof(fsu3_matrix)/sizeof(int32type)*sites_on_node*this_node % 31;
+  rank29 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 29;
+  rank31 = 4*sizeof(fmatrix)/sizeof(int32type)*sites_on_node*this_node % 31;
 
   /* Read and deal */
 
@@ -1302,7 +1302,7 @@ static void r_parallel(gauge_file *gf)
     /* then do read */
     /* each node reads its sites */
 
-    if( g_read(lbuf,buf_length*4*sizeof(fsu3_matrix),1,fp) != 1)
+    if( g_read(lbuf,buf_length*4*sizeof(fmatrix),1,fp) != 1)
       {
         printf("%s: node %d gauge configuration read error %d file %s\n",
          myname,this_node,errno,filename);
@@ -1314,11 +1314,11 @@ static void r_parallel(gauge_file *gf)
       /* Do byte reversal if needed */
       if(gf->byterevflag==1)
         byterevn((int32type *)&lbuf[4*where_in_buf],
-           4*sizeof(fsu3_matrix)/sizeof(int32type));
+           4*sizeof(fmatrix)/sizeof(int32type));
 
       /* Accumulate checksums - contribution from next site */
       for(k = 0, val = (u_int32type *)&lbuf[4*where_in_buf];
-    k < 4*(int)sizeof(fsu3_matrix)/(int)sizeof(int32type); k++, val++)
+    k < 4*(int)sizeof(fmatrix)/(int)sizeof(int32type); k++, val++)
         {
     test_gc.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
     test_gc.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -1329,7 +1329,7 @@ static void r_parallel(gauge_file *gf)
       if(destnode==sendnode){
         /* just copy links, converting to generic precision */
         i = node_index(x,y,z,t);
-        f2d_4mat((fsu3_matrix *)&lbuf[4*where_in_buf],
+        f2d_4mat((fmatrix *)&lbuf[4*where_in_buf],
            &lattice[i].link[0]);
       }
       else {
@@ -1337,7 +1337,7 @@ static void r_parallel(gauge_file *gf)
         /* Message consists of site coordinates and 4 link matrices */
         msg.x = x; msg.y = y; msg.z = z; msg.t = t;
         memcpy((void *)msg.link,
-         (void *)&lbuf[4*where_in_buf],4*sizeof(fsu3_matrix));
+         (void *)&lbuf[4*where_in_buf],4*sizeof(fmatrix));
 
         send_field((char *)&msg,sizeof(msg),destnode);
       }
@@ -1419,7 +1419,7 @@ gauge_file *restore_ascii(char *filename) {
   FILE *fp = NULL;
   int destnode;
   int version_number,i,j,x,y,z,t,dir;
-  fsu3_matrix lbuf[4];
+  fmatrix lbuf[4];
 
   /* Set up a gauge file and guage header structure for reading */
 
@@ -1519,14 +1519,14 @@ gauge_file *restore_ascii(char *filename) {
   f2d_4mat(lbuf, lattice[i].link);
       }
       else {    /* send to correct node */
-  send_field((char *)lbuf,4*sizeof(fsu3_matrix),destnode);
+  send_field((char *)lbuf,4*sizeof(fmatrix),destnode);
       }
     }
 
     /* The node which contains this site reads message */
     else {  /* for all nodes other than node 0 */
       if(this_node==destnode){
-  get_field((char *)lbuf,4*sizeof(fsu3_matrix),0);
+  get_field((char *)lbuf,4*sizeof(fmatrix),0);
   i = node_index(x,y,z,t);
   f2d_4mat(lbuf, lattice[i].link);
       }
@@ -1554,7 +1554,7 @@ gauge_file *save_ascii(char *filename) {
   FILE *fp = NULL;
   int currentnode,newnode;
   int i,j,x,y,z,t,dir;
-  fsu3_matrix lbuf[4];
+  fmatrix lbuf[4];
   gauge_file *gf;
   gauge_header *gh;
 
@@ -1610,7 +1610,7 @@ gauge_file *save_ascii(char *filename) {
   d2f_4mat(lattice[i].link, lbuf);
       }
       else{
-  get_field((char *)lbuf,4*sizeof(fsu3_matrix),currentnode);
+  get_field((char *)lbuf,4*sizeof(fmatrix),currentnode);
       }
       for(dir=XUP;dir<=TUP;dir++){
   for(i=0;i<3;i++)for(j=0;j<3;j++){
@@ -1625,7 +1625,7 @@ gauge_file *save_ascii(char *filename) {
       if(this_node==currentnode){
   i=node_index(x,y,z,t);
   d2f_4mat(lattice[i].link, lbuf);
-  send_field((char *)lbuf,4*sizeof(fsu3_matrix),0);
+  send_field((char *)lbuf,4*sizeof(fmatrix),0);
       }
     }
   }
@@ -1768,7 +1768,7 @@ gauge_file *save_serial_archive(char *filename) {
 
   int currentnode,newnode;
   int i,j,x,y,z,dir;
-  su3_matrix lbuf[4];
+  matrix lbuf[4];
   gauge_file *gf;
   gauge_header *gh;
 
@@ -1874,7 +1874,7 @@ gauge_file *save_serial_archive(char *filename) {
     }
   }
   else{
-    get_field((char *)lbuf,4*sizeof(su3_matrix),currentnode);
+    get_field((char *)lbuf,4*sizeof(matrix),currentnode);
     for(mu=0; mu<4; ++mu) {
       for(a=0; a<2; ++a) {
         for(b=0; b<3; ++b) {
@@ -1892,7 +1892,7 @@ gauge_file *save_serial_archive(char *filename) {
   if(this_node==currentnode){
     i=node_index(x,y,z,tslice);
     for(dir=XUP;dir<=TUP;dir++)lbuf[dir]=lattice[i].link[dir];
-    send_field((char *)lbuf,4*sizeof(su3_matrix),0);
+    send_field((char *)lbuf,4*sizeof(matrix),0);
   }
       }
     }

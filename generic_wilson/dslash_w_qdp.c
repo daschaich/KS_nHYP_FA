@@ -114,10 +114,10 @@ msg_tag *tag[8];
     FORSOMEPARITY(i,s,otherparity){
         my_wp_shrink_4dir( (wilson_vector *)F_PT(s,src),
 	    &hwvx, &hwvy, &hwvz, &hwvt, -isign);
-	mult_adj_su3_mat_hwvec( &(s->link[XUP]), &hwvx, &(s->htmp[XDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[YUP]), &hwvy, &(s->htmp[YDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[ZUP]), &hwvz, &(s->htmp[ZDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[TUP]), &hwvt, &(s->htmp[TDOWN]));
+	mult_adj_mat_hwvec( &(s->link[XUP]), &hwvx, &(s->htmp[XDOWN]));
+	mult_adj_mat_hwvec( &(s->link[YUP]), &hwvy, &(s->htmp[YDOWN]));
+	mult_adj_mat_hwvec( &(s->link[ZUP]), &hwvz, &(s->htmp[ZDOWN]));
+	mult_adj_mat_hwvec( &(s->link[TUP]), &hwvt, &(s->htmp[TDOWN]));
     }
 
     for( dir=XUP; dir <= TUP; dir++) {
@@ -135,13 +135,13 @@ msg_tag *tag[8];
 	wait_gather(tag[dir]);
     }
     FORSOMEPARITY(i,s,parity){
-	mult_su3_mat_hwvec( &(s->link[XUP]), 
+	mult_mat_hwvec( &(s->link[XUP]), 
 		(half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-	mult_su3_mat_hwvec( &(s->link[YUP]), 
+	mult_mat_hwvec( &(s->link[YUP]), 
 		(half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-	mult_su3_mat_hwvec( &(s->link[ZUP]), 
+	mult_mat_hwvec( &(s->link[ZUP]), 
 		(half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-	mult_su3_mat_hwvec( &(s->link[TUP]), 
+	mult_mat_hwvec( &(s->link[TUP]), 
 		(half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
 	my_grow_add_four_wvecs( (wilson_vector *)F_PT(s,dest),
 	    &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */
@@ -227,10 +227,10 @@ register int dir,otherparity;
     FORSOMEPARITY(i,s,otherparity){
         my_wp_shrink_4dir( (wilson_vector *)F_PT(s,src),
 	    &hwvx, &hwvy, &hwvz, &hwvt, -isign);
-	mult_adj_su3_mat_hwvec( &(s->link[XUP]), &hwvx, &(s->htmp[XDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[YUP]), &hwvy, &(s->htmp[YDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[ZUP]), &hwvz, &(s->htmp[ZDOWN]));
-	mult_adj_su3_mat_hwvec( &(s->link[TUP]), &hwvt, &(s->htmp[TDOWN]));
+	mult_adj_mat_hwvec( &(s->link[XUP]), &hwvx, &(s->htmp[XDOWN]));
+	mult_adj_mat_hwvec( &(s->link[YUP]), &hwvy, &(s->htmp[YDOWN]));
+	mult_adj_mat_hwvec( &(s->link[ZUP]), &hwvz, &(s->htmp[ZDOWN]));
+	mult_adj_mat_hwvec( &(s->link[TUP]), &hwvt, &(s->htmp[TDOWN]));
     }
 
     for( dir=XUP; dir <= TUP; dir++) {
@@ -252,13 +252,13 @@ register int dir,otherparity;
 	wait_gather(tag[dir]);
     }
     FORSOMEPARITY(i,s,parity){
-	mult_su3_mat_hwvec( &(s->link[XUP]), 
+	mult_mat_hwvec( &(s->link[XUP]), 
 		(half_wilson_vector * )(gen_pt[XUP][i]), &hwvx ); 
-	mult_su3_mat_hwvec( &(s->link[YUP]), 
+	mult_mat_hwvec( &(s->link[YUP]), 
 		(half_wilson_vector * )(gen_pt[YUP][i]), &hwvy ); 
-	mult_su3_mat_hwvec( &(s->link[ZUP]), 
+	mult_mat_hwvec( &(s->link[ZUP]), 
 		(half_wilson_vector * )(gen_pt[ZUP][i]), &hwvz ); 
-	mult_su3_mat_hwvec( &(s->link[TUP]), 
+	mult_mat_hwvec( &(s->link[TUP]), 
 		(half_wilson_vector * )(gen_pt[TUP][i]), &hwvt ); 
 	my_grow_add_four_wvecs( (wilson_vector *)F_PT(s,dest),
 	    &hwvx, &hwvy, &hwvz, &hwvt, isign, 0 ); /* "0" is NOSUM */

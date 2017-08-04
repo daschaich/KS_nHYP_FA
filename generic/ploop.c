@@ -25,18 +25,18 @@ complex ploop(int dir) {
 
   // First multiply the link on every even site by the next link
   // Compute the loop "at" the even sites in the first two time slices
-  tag = start_gather_site(F_OFFSET(link[dir]), sizeof(su3_matrix),
+  tag = start_gather_site(F_OFFSET(link[dir]), sizeof(matrix),
                           dir, EVEN, gen_pt[0]);
 
   wait_gather(tag);
   FOREVENSITES(i, s)
-    mult_su3_nn(&(s->link[dir]), (su3_matrix *)gen_pt[0][i], &(tempmat[i]));
+    mult_su3_nn(&(s->link[dir]), (matrix *)gen_pt[0][i], &(tempmat[i]));
 
   cleanup_gather(tag);
 
   for (j = 2; j < N; j += 2) {
     d[dir] = j;     // Distance from which to gather
-    tag = start_general_gather_field(tempmat, sizeof(su3_matrix),
+    tag = start_general_gather_field(tempmat, sizeof(matrix),
                                      d, EVEN, gen_pt[0]);
     wait_general_gather(tag);
     FOREVENSITES(i, s) {
@@ -48,8 +48,8 @@ complex ploop(int dir) {
         case ZUP: if (s->z > 1) continue; break;
         case TUP: if (s->t > 1) continue; break;
       }
-      mult_su3_nn(&(tempmat[i]), (su3_matrix *)gen_pt[0][i], &(tempmat2[i]));
-      su3mat_copy(&(tempmat2[i]), &(tempmat[i]));
+      mult_su3_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &(tempmat2[i]));
+      mat_copy(&(tempmat2[i]), &(tempmat[i]));
     }
     cleanup_general_gather(tag);
   }

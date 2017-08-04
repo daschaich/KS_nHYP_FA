@@ -33,8 +33,8 @@ void dslash(field_offset chi, field_offset psi, int parity);
 
 // -----------------------------------------------------------------
 // Eigenvalue routines
-int make_evs(double *start, int Nvecs, su3_vector **eigVec, double *eigVal);
+int make_evs(double *start, int Nvecs, vector **eigVec, double *eigVal);
 
-void measure_chirality(su3_vector *src, double *chirality);
-void print_densities(su3_vector *src, char *tag, int y, int z, int t);
+void measure_chirality(vector *src, double *chirality);
+void print_densities(vector *src, char *tag, int y, int z, int t);
 // -----------------------------------------------------------------

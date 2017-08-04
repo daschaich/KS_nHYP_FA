@@ -6,18 +6,18 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void mult_adj_su3_mat_vec_4dir(su3_matrix *a, su3_vector *b, su3_vector *c) {
+void mult_adj_mat_vec_4dir(matrix *a, vector *b, vector *c) {
 #ifndef FAST
-  mult_adj_su3_mat_vec(a, b, c);
-  mult_adj_su3_mat_vec(a + 1, b, c + 1);
-  mult_adj_su3_mat_vec(a + 2, b, c + 2);
-  mult_adj_su3_mat_vec(a + 3, b, c + 3);
+  mult_adj_mat_vec(a, b, c);
+  mult_adj_mat_vec(a + 1, b, c + 1);
+  mult_adj_mat_vec(a + 2, b, c + 2);
+  mult_adj_mat_vec(a + 3, b, c + 3);
 
 #else
   register int n;
   register Real c0r, c0i, c1r, c1i, c2r, c2i, br, bi, a0, a1, a2;
-  register su3_matrix *mat;
-  register su3_vector *vec, *dest;
+  register matrix *mat;
+  register vector *vec, *dest;
 
   mat = a;
   vec = b;

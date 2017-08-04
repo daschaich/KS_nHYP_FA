@@ -40,10 +40,10 @@ int mat_invert_uml(field_offset src, field_offset dest,
   // dest_o <-- 1/2m (Dslash_oe * dest_e + src_o)
   dslash(dest, F_OFFSET(ttt), ODD);
   FORODDSITES(i, s) {
-    sub_su3_vector((su3_vector *)F_PT(s, src), &(s->ttt),
-                   (su3_vector *)F_PT(s, dest));
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), norm,
-                           (su3_vector *)F_PT(s, dest));
+    sub_vector((vector *)F_PT(s, src), &(s->ttt),
+                   (vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), norm,
+                           (vector *)F_PT(s, dest));
   }
 
   // Polish off odd sites to correct for possible roundoff error

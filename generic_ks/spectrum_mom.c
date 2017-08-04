@@ -571,8 +571,8 @@ void mult_pi_mom( int fb, int px, int py, int pz,
 	    (double)(py*s->y)/(double)(ny) +
 	    (double)(pz*s->z)/(double)(nz))*2.0*PI );
 	if( fb==BACKWARDS )phase.imag = -phase.imag;
-	c_scalar_mult_su3vec( (su3_vector *)F_PT(s,src), &phase,
-	    (su3_vector *)F_PT(s,dest) );
+	c_scalar_mult_su3vec( (vector *)F_PT(s,src), &phase,
+	    (vector *)F_PT(s,dest) );
     }
 }
 
@@ -590,8 +590,8 @@ void mult_pi2_mom( int fb, int px, int py, int pz,
 	    (double)(pz*s->z)/(double)(nz))*2.0*PI );
 	if( fb==BACKWARDS )phase.imag = -phase.imag;
 	if( ((s->x+s->y+s->z)&0x1) != 0 ) CMULREAL( phase, -1.0, phase );
-	c_scalar_mult_su3vec( (su3_vector *)F_PT(s,src), &phase,
-	    (su3_vector *)F_PT(s,dest) );
+	c_scalar_mult_su3vec( (vector *)F_PT(s,src), &phase,
+	    (vector *)F_PT(s,dest) );
     }
 }
 
@@ -610,8 +610,8 @@ void mult_rho_mom( int fb, int pdir, int px, int py, int pz,
 	if( ((((short *)&(s->x))[pdir]) & 0x1) != 0 ){
 	     CMULREAL( phase, -1.0, phase );
 	}
-	c_scalar_mult_su3vec( (su3_vector *)F_PT(s,src), &phase,
-		(su3_vector *)F_PT(s,dest) );
+	c_scalar_mult_su3vec( (vector *)F_PT(s,src), &phase,
+		(vector *)F_PT(s,dest) );
     }
 }
 
@@ -630,8 +630,8 @@ void mult_rho2_mom( int fb, int pdir, int px, int py, int pz,
 	if( ((((short *)&(s->x))[pdir] + s->x+s->y+s->z) & 0x1) != 0 ){
 	     CMULREAL( phase, -1.0, phase );
 	}
-	c_scalar_mult_su3vec( (su3_vector *)F_PT(s,src), &phase,
-		(su3_vector *)F_PT(s,dest) );
+	c_scalar_mult_su3vec( (vector *)F_PT(s,src), &phase,
+		(vector *)F_PT(s,dest) );
     }
 }
 

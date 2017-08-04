@@ -3,11 +3,11 @@
 #include "generic_ks_includes.h"
 
 /*--------------------------------------------------------------------*/
-su3_vector *create_v_field(void){
-  su3_vector *cv;
+vector *create_v_field(void){
+  vector *cv;
   
-  cv = (su3_vector *)
-    malloc(sizeof(su3_vector)*sites_on_node);
+  cv = (vector *)
+    malloc(sizeof(vector)*sites_on_node);
   
   if(cv == NULL){
     printf("create_cv_field(%d): No room for temporary\n",this_node);
@@ -17,7 +17,7 @@ su3_vector *create_v_field(void){
 }
 
 /*--------------------------------------------------------------------*/
-void clear_v_field(su3_vector *v){
+void clear_v_field(vector *v){
 
   int i;
   site *s;
@@ -28,7 +28,7 @@ void clear_v_field(su3_vector *v){
 }
 
 /*--------------------------------------------------------------------*/
-void destroy_v_field(su3_vector *v){
+void destroy_v_field(vector *v){
   free(v);
 }
 
@@ -37,7 +37,7 @@ ks_prop_field create_ksp_field(void){
   ks_prop_field ksp;
   int color;
   
-  ksp = (ks_prop_field) malloc(3*sizeof(su3_vector *));
+  ksp = (ks_prop_field) malloc(3*sizeof(vector *));
   if(ksp == NULL){
     printf("create_ksp_field(%d): No room for temporary\n",this_node);
     terminate(1);

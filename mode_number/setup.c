@@ -72,19 +72,19 @@ int initial_set() {
 // Allocate all space for fields
 void make_fields() {
   int ipbp;
-  Real size = (Real)(8.0 * sizeof(su3_matrix));
-  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
-  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
+  Real size = (Real)(8.0 * sizeof(matrix));
+  FIELD_ALLOC_VEC(gauge_field, matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);
 
-  size += (Real)((4.0 + 4.0 * 12.0) * sizeof(su3_matrix));
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
+  size += (Real)((4.0 + 4.0 * 12.0) * sizeof(matrix));
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple2, matrix, 4);
+  FIELD_ALLOC_VEC(Staple3, matrix, 4);
 
-  size += (Real)(sizeof(su3_matrix));
-  FIELD_ALLOC(tempmat, su3_matrix);
+  size += (Real)(sizeof(matrix));
+  FIELD_ALLOC(tempmat, matrix);
 
   size *= sites_on_node;
   node0_printf("Mallocing %.1f MBytes per core for fields\n", size / 1e6);
@@ -178,9 +178,9 @@ int readin(int prompt) {
 
   // Include some mallocs here (which is called after make_fields)
   npbp = par_buf.npbp;
-  source = malloc(npbp * sizeof(su3_vector *));   // Stochastic sources
+  source = malloc(npbp * sizeof(vector *));   // Stochastic sources
   for (ipbp = 0; ipbp < npbp; ipbp++)
-    FIELD_ALLOC(source[ipbp], su3_vector);
+    FIELD_ALLOC(source[ipbp], vector);
 
   Norder = par_buf.order;
   coeffs = malloc((Norder + 1) * sizeof(double)); // Polynomial coefficients

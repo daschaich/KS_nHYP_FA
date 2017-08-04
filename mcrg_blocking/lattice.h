@@ -21,8 +21,8 @@ typedef struct {
   // No random numbers
   // HYP stuff needed for MCRG measurements
   // Tripled gauge field provides workspace and backup storage
-  su3_matrix link[12];
-  su3_matrix hyplink1[12], hyplink2[12];
+  matrix link[12];
+  matrix hyplink1[12], hyplink2[12];
 } site;
 // -----------------------------------------------------------------
 
@@ -82,7 +82,7 @@ EXTERN site *lattice;
 EXTERN char **gen_pt[N_POINTERS];
 
 // Temporary fields
-EXTERN su3_matrix *tempmat, *tempmat2;
+EXTERN matrix *tempmat, *tempmat2;
 
 // MCRG blocking stuff
 EXTERN int num_alpha;

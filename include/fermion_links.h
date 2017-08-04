@@ -97,18 +97,18 @@ typedef struct {
 #include "../include/macros.h"
 
 /* fermion_force_asqtad_qop.c, fermion_force_asqtad.c */
-void eo_fermion_force_oneterm( Real eps, Real weight, su3_vector *x_off,
+void eo_fermion_force_oneterm( Real eps, Real weight, vector *x_off,
 			       int prec, fermion_links_t *fn);
 void eo_fermion_force_oneterm_site( Real eps, Real weight, field_offset x_off,
 				    int prec, fermion_links_t *fn);
 void eo_fermion_force_twoterms( Real eps, Real weight1, Real weight2,
-				su3_vector *x1_off, su3_vector *x2_off,
+				vector *x1_off, vector *x2_off,
 				int prec, fermion_links_t *fn);
 void eo_fermion_force_twoterms_site( Real eps, Real weight1, Real weight2,
 				     field_offset x1_off, field_offset x2_off,
 				     int prec, fermion_links_t *fn);
 void fermion_force_asqtad_block( Real eps, Real *residues, 
-				 su3_vector **xxx, int nterms, int veclength, 
+				 vector **xxx, int nterms, int veclength, 
 				 int prec, fermion_links_t *fl );
 void
 eo_fermion_force_twoterms_field_cpu( Real eps, Real weight1, Real weight2,
@@ -127,48 +127,48 @@ eo_fermion_force_twoterms_field_gpu( Real eps, Real weight1, Real weight2,
 #endif
 
 void fermion_force_block( Real eps, Real *residues, 
-			  su3_vector **xxx, int nterms, int veclength, 
+			  vector **xxx, int nterms, int veclength, 
 			  int prec, fermion_links_t *fn);
 
 
 /* fermion_force_asqtad_qop_F.c */
 
-void eo_fermion_force_oneterm_F( Real eps, Real weight, su3_vector *x_off,
+void eo_fermion_force_oneterm_F( Real eps, Real weight, vector *x_off,
 				 fermion_links_t *fl);
 void eo_fermion_force_twoterms_F( Real eps, Real weight1, Real weight2, 
-				  su3_vector *x1_off, su3_vector *x2_off,
+				  vector *x1_off, vector *x2_off,
 				  fermion_links_t *fl);
 void fermion_force_multi_F( Real eps, Real *residues, 
-			    su3_vector **xxx, int nterms,
+			    vector **xxx, int nterms,
 			    fermion_links_t *fl );
 void fermion_force_block_F( Real eps, Real *residues, 
-			    su3_vector **xxx, int nterms, 
+			    vector **xxx, int nterms, 
 			    int veclength, fermion_links_t *fl );
 
 /* fermion_force_hisq_qop_F.c*/
 
 void fermion_force_multi_hisq_F( Real eps, Real *residues, 
-				 su3_vector **xxx, int n_orders_naik[],
+				 vector **xxx, int n_orders_naik[],
 				 fermion_links_t *fn);
 
 /* fermion_force_asqtad_qop_D.c, fermion_force_hisq_qop_D.c */
 
-void eo_fermion_force_oneterm_D( Real eps, Real weight, su3_vector *x_off,
+void eo_fermion_force_oneterm_D( Real eps, Real weight, vector *x_off,
 				  fermion_links_t *fl );
 void eo_fermion_force_twoterms_D( Real eps, Real weight1, Real weight2, 
-				  su3_vector *x1_off, su3_vector *x2_off,
+				  vector *x1_off, vector *x2_off,
 				  fermion_links_t *fl );
 void fermion_force_multi_D( Real eps, Real *residues, 
-			    su3_vector **xxx, int nterms,
+			    vector **xxx, int nterms,
 			    fermion_links_t *fl );
 void fermion_force_block_D( Real eps, Real *residues, 
-			    su3_vector **xxx, int nterms, 
+			    vector **xxx, int nterms, 
 			    int veclength, fermion_links_t *fl );
 
 /* fermion_force_hisq_qop_D.c*/
 
 void fermion_force_multi_hisq_D( Real eps, Real *residues, 
-				 su3_vector **xxx, int n_orders_naik[],
+				 vector **xxx, int n_orders_naik[],
 				 fermion_links_t *fn);
 /* fermion_force_fn_multi.c */
 
@@ -176,15 +176,15 @@ enum ks_multiff_opt_t {ASVEC, FNMAT, FNMATREV};
   
 const char *ks_multiff_opt_chr( void );
 
-void eo_fermion_force_multi( Real eps, Real *residues, su3_vector **xxx, 
+void eo_fermion_force_multi( Real eps, Real *residues, vector **xxx, 
 			     int nterms, int prec, fermion_links_t *fn);
-void fermion_force_fn_multi( Real eps, Real *residues, su3_vector **multi_x, 
+void fermion_force_fn_multi( Real eps, Real *residues, vector **multi_x, 
 			     int nterms, int prec, fermion_links_t *fn);
 void fermion_force_fn_multi_reverse( Real eps, Real *residues, 
-				     su3_vector **multi_x, int nterms,
+				     vector **multi_x, int nterms,
 				     fermion_links_t *fn);
 void show_hisq_force_opts( void );
-void show_su3_mat_opts( void );
+void show_mat_opts( void );
 void show_hisq_links_opts( void );
 
 /* Temporary, until we move completely to field-based gauge links */
@@ -195,13 +195,13 @@ void restore_fermion_links_from_site(fermion_links_t *fl, int prec);
 
 /* fermion_links_milc.c routines dealing with fermion_links_t */
 
-fermion_links_t *create_fermion_links(int precision, int phases_in, su3_matrix *links);
+fermion_links_t *create_fermion_links(int precision, int phases_in, matrix *links);
 void destroy_fermion_links(fermion_links_t *fl);
 imp_ferm_links_t **get_fm_links(fermion_links_t *fl);
 imp_ferm_links_t **get_fm_du0_links(fermion_links_t *fl);
 ks_action_paths *get_action_paths(fermion_links_t *fl);
 void invalidate_fermion_links(fermion_links_t *fl);
-void restore_fermion_links(fermion_links_t *fl, int precision, int phases_in, su3_matrix *links);
+void restore_fermion_links(fermion_links_t *fl, int precision, int phases_in, matrix *links);
 int valid_fermion_links(fermion_links_t *fl, int precision);
 
 /* fermion_links_eo_milc.c routines dealing with fermion_links_t */
@@ -214,11 +214,11 @@ ks_action_paths *get_action_paths_eo(fermion_links_t *fl);
 /* fermion_links_asqtad_qop.c routines dealing with fermion_links_t */
 
 fermion_links_t *create_fermion_links_hisq(int precision, int n_naiks, 
-			   double eps_naik[], int phases_in, su3_matrix *links);
+			   double eps_naik[], int phases_in, matrix *links);
 void destroy_fermion_links_hisq(fermion_links_t *fl);
 void invalidate_fermion_links(fermion_links_t *fl);
 void restore_fermion_links_hisq(fermion_links_t *fl, int precision,
-				int phases_in, su3_matrix *links);
+				int phases_in, matrix *links);
 imp_ferm_links_t **get_fm_links(fermion_links_t *fl);
 imp_ferm_links_t **get_fm_du0_links(fermion_links_t *fl);
 imp_ferm_links_t *get_fn_deps_links(fermion_links_t *fl);

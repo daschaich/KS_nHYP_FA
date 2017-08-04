@@ -28,21 +28,21 @@ void hvy_pot( field_offset links ) {
     for( t_dist=1; t_dist<= MAX_T; t_dist ++){
 	if(t_dist==1 ){
 	    FORALLSITES(i,s){
-		su3mat_copy( &(((su3_matrix *)(F_PT(s,links)))[TUP]),
+		mat_copy( &(((matrix *)(F_PT(s,links)))[TUP]),
 		    &(s->tempmat1) );
 	    }
 	}
 	else{
-	    mtag0 = start_gather_site( F_OFFSET(tempmat1), sizeof(su3_matrix),
+	    mtag0 = start_gather_site( F_OFFSET(tempmat1), sizeof(matrix),
 	        TUP, EVENANDODD, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORALLSITES(i,s){
-	 	mult_su3_nn( &(((su3_matrix *)(F_PT(s,links)))[TUP]),
-		    (su3_matrix *)gen_pt[0][i], &(s->staple) );
+	 	mult_su3_nn( &(((matrix *)(F_PT(s,links)))[TUP]),
+		    (matrix *)gen_pt[0][i], &(s->staple) );
 	    }
 	    cleanup_gather( mtag0 );
 	    FORALLSITES(i,s){
-	 	su3mat_copy( &(s->staple), &(s->tempmat1) );
+	 	mat_copy( &(s->staple), &(s->tempmat1) );
 	    }
 	}
 	/* now tempmat1 is path of length t_dist in TUP direction */
@@ -54,7 +54,7 @@ void hvy_pot( field_offset links ) {
 	    for( y_dist=0; y_dist<=MAX_X; y_dist+= 1 ){
 		/* now gather from spatial dirs, compute products of paths */
 		FORALLSITES(i,s){
-		    su3mat_copy( &(s->tempmat1), (su3_matrix *)F_PT(s,oldmat) );
+		    mat_copy( &(s->tempmat1), (matrix *)F_PT(s,oldmat) );
 		}
 		for(i=0;i<x_dist;i++){
 		    shiftmat( oldmat, newmat, XUP );
@@ -69,7 +69,7 @@ void hvy_pot( field_offset links ) {
 		    wloop = 0.0;
 		    FORALLSITES(i,s){
 			wloop += (double)realtrace_su3( &(s->tempmat1),
-			    (su3_matrix *)F_PT(s,oldmat) );
+			    (matrix *)F_PT(s,oldmat) );
 		    }
 		    g_doublesum( &wloop );
 		    node0_printf("POT_LOOP: %d %d %d %d \t%e\n",
@@ -89,11 +89,11 @@ void shiftmat( field_offset src, field_offset dest, int dir ){
     register int i;
     register site *s;
     msg_tag *mtag;
-    mtag = start_gather_site( src, sizeof(su3_matrix),
+    mtag = start_gather_site( src, sizeof(matrix),
         dir, EVENANDODD, gen_pt[0] );
     wait_gather(mtag);
     FORALLSITES(i,s){
-        su3mat_copy( (su3_matrix *)gen_pt[0][i], (su3_matrix *)F_PT(s,dest) );
+        mat_copy( (matrix *)gen_pt[0][i], (matrix *)F_PT(s,dest) );
     }
     cleanup_gather( mtag );
 }

@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void su3mat_copy(su3_matrix *src, su3_matrix *dest) {
+void mat_copy(matrix *src, matrix *dest) {
   *dest = *src;
 }
 // -----------------------------------------------------------------

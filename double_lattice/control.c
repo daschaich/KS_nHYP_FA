@@ -13,7 +13,7 @@ int main(int argc, char *argv[])  {
   int j, prompt, *index;
   int ox, oy, oz, ot;   // Original nx, ny, nz, nt, to avoid lots of " / 2"
   double ssplaq, stplaq, dtime;
-  su3_matrix **bak;
+  matrix **bak;
 
   // Set up
   setlinebuf(stdout); // DEBUG
@@ -33,14 +33,14 @@ int main(int argc, char *argv[])  {
     node0_printf("Initial plaquettes: %.8g %.8g\n", ssplaq, stplaq);
 
     // Allocate backup space and save links along with corresponding index
-    bak = (su3_matrix **)malloc(volume * sizeof(su3_matrix *));
+    bak = (matrix **)malloc(volume * sizeof(matrix *));
     index = (int *)malloc(volume * sizeof(int));
     for (j = 0; j <= volume; j++)
-      bak[j] = (su3_matrix *)malloc(4 * sizeof(su3_matrix));
+      bak[j] = (matrix *)malloc(4 * sizeof(matrix));
 
     FORALLSITES(i, s) {
       for (dir = XUP; dir <= TUP; dir++)
-        su3mat_copy(&(s->link[dir]), &(bak[i][dir]));
+        mat_copy(&(s->link[dir]), &(bak[i][dir]));
 
       j = s->x * nt * nz * ny + s->y * nt * nz + s->z * nt + s->t;
       index[j] = i;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])  {
       j = (s->x % ox) * ot * oz * oy + (s->y % oy) * ot * oz
                   + (s->z % oz) * ot + (s->t % ot);
       for (dir = XUP; dir <= TUP; dir++)
-        su3mat_copy(&(bak[index[j]][dir]), &(s->link[dir]));
+        mat_copy(&(bak[index[j]][dir]), &(s->link[dir]));
     }
 
     // Check final plaquette

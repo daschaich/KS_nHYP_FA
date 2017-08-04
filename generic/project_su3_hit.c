@@ -15,9 +15,9 @@
 #define Nc 3
 
 void project_su3(
-   su3_matrix *w,         /* input initial guess. output resulting
+   matrix *w,         /* input initial guess. output resulting
                              SU(3) matrix */
-   su3_matrix *q,         /* 3 x 3 complex matrix to be projected */
+   matrix *q,         /* 3 x 3 complex matrix to be projected */
    int Nhit,              /* number of SU(2) hits. 0 for no projection */
    Real tol              /* tolerance for SU(3) projection.
 			     If nonzero, treat Nhit as a maximum
@@ -28,7 +28,7 @@ void project_su3(
    int index1, ina, inb,ii;
    Real v0,v1,v2,v3, vsq;
    Real z;
-   su3_matrix action;
+   matrix action;
    su2_matrix h;
    Real conver, old_tr = 0, new_tr;
 

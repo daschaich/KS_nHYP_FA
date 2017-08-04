@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
 
     // Allocate eigenvectors
     eigVal = (double *)malloc((block + 1) * sizeof(double));
-    eigVec = (su3_vector **)malloc((block + 1) * sizeof(su3_vector *));
+    eigVec = (vector **)malloc((block + 1) * sizeof(vector *));
     for (ivec = 0; ivec < block + 1; ivec++)
-      eigVec[ivec] = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+      eigVec[ivec] = (vector *)malloc(sites_on_node * sizeof(vector));
 
     // Cycle over blocks, after special case first
     // Calculate eigenvectors -- I haven't checked them,

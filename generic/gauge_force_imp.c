@@ -35,10 +35,10 @@ void printpath( int *path, int length );
 void imp_gauge_force( Real eps, field_offset mom_off ){
     register int i,dir;
     register site *st;
-    su3_matrix tmat1,tmat2;
+    matrix tmat1,tmat2;
     register Real eb3;
     register anti_hermitmat* momentum;
-    su3_matrix *staple, *tempmat1;
+    matrix *staple, *tempmat1;
 
     /* lengths of various kinds of loops */
     int *loop_length = get_loop_length();
@@ -81,13 +81,13 @@ void imp_gauge_force( Real eps, field_offset mom_off ){
       printf("%s(%d): Can't malloc path_dir\n",myname,this_node);
       terminate(1);
     }
-    staple = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    staple = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(staple == NULL){
       printf("%s(%d): Can't malloc temporary\n",myname,this_node);
       terminate(1);
     }
 
-    tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(tempmat1 == NULL){
       printf("%s(%d): Can't malloc temporary\n",myname,this_node);
       terminate(1);
@@ -159,7 +159,7 @@ node0_printf("WARNING: THIS CODE IS NOT TESTED\n"); exit(0);
 			    }
 			}  /* end if nreps > 1 */
 
-			scalar_mult_add_su3_matrix( &(staple[i]), &tmat1,
+			scalar_mult_add_matrix( &(staple[i]), &tmat1,
 				new_term, &(staple[i]) );
 
 		    } END_LOOP
@@ -175,7 +175,7 @@ node0_printf("WARNING: THIS CODE IS NOT TESTED\n"); exit(0);
 	    mult_su3_na( &(st->link[dir]), &(staple[i]), &tmat1 );
 	    momentum = (anti_hermitmat *)F_PT(st,mom_off);
 	    uncompress_anti_hermitian( &momentum[dir], &tmat2 );
-	    scalar_mult_sub_su3_matrix( &tmat2, &tmat1,
+	    scalar_mult_sub_matrix( &tmat2, &tmat1,
 		eb3, &(staple[i]) );
 	    make_anti_hermitian( &(staple[i]), &momentum[dir] );
 	} END_LOOP

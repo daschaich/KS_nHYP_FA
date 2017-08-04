@@ -47,9 +47,9 @@ int main(int argc, char **argv) {
 
     // Allocate eigenvectors
     eigVal = (double *)malloc(Nvecs * sizeof(double));
-    eigVec = (su3_vector **)malloc(Nvecs * sizeof(su3_vector *));
+    eigVec = (vector **)malloc(Nvecs * sizeof(vector *));
     for (i = 0; i < Nvecs; i++)
-      eigVec[i] = (su3_vector *)malloc(sites_on_node * sizeof(su3_vector));
+      eigVec[i] = (vector *)malloc(sites_on_node * sizeof(vector));
 
     // Hard-code EVEN parity in Kalkreuter
     total_iters = Kalkreuter(eigVec, eigVal, eig_tol, error_decr,
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 
       dslash(F_OFFSET(chi), F_OFFSET(psi), ODD);
       FORODDSITES(i, s)
-        scalar_mult_su3_vector(&(s->psi), 1.0 / sqrt(eigVal[ivec]),
+        scalar_mult_vector(&(s->psi), 1.0 / sqrt(eigVal[ivec]),
                                &(eigVec[ivec][i]));
 
       // Hard-code EVENANDODD parity in measure_chirality

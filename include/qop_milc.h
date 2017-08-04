@@ -14,7 +14,7 @@
 #define QOP_FermionLinksAsqtad_struct QOP_F3_FermionLinksAsqtad_struct
 
 struct QOP_ColorVector_struct {
-  fsu3_vector *v;
+  fvector *v;
   int evenodd;
 };
 
@@ -24,12 +24,12 @@ struct QOP_DiracFermion_struct {
 };
 
 struct QOP_GaugeField_struct {
-  fsu3_matrix *g;
+  fmatrix *g;
   int evenodd;
 };
 
 struct QOP_Force_struct {
-  fsu3_matrix *f;
+  fmatrix *f;
   int evenodd;
 };
 
@@ -42,7 +42,7 @@ struct QOP_Force_struct {
 #define QOP_FermionLinksAsqtad_struct QOP_D3_FermionLinksAsqtad_struct
 
 struct QOP_ColorVector_struct {
-  dsu3_vector *v;
+  dvector *v;
   int evenodd;
 };
 
@@ -52,12 +52,12 @@ struct QOP_DiracFermion_struct {
 };
 
 struct QOP_GaugeField_struct {
-  dsu3_matrix *g;
+  dmatrix *g;
   int evenodd;
 };
 
 struct QOP_Force_struct {
-  dsu3_matrix *f;
+  dmatrix *f;
   int evenodd;
 };
 
@@ -73,16 +73,16 @@ struct QOP_FermionLinksAsqtad_struct {
    into flat arrays */
 /* qop_milc_utilities.c */
 
-su3_matrix * create_links_from_qop_milc_F(fsu3_matrix *src);
-void destroy_links_from_qop_milc_F(su3_matrix *g);
-su3_matrix *create_links_from_qop_milc_D(dsu3_matrix *src);
-void destroy_links_from_qop_milc_D(su3_matrix *g);
-su3_vector *create_latvec_from_qop_milc_F(fsu3_vector *src);
-void destroy_latvec_from_qop_milc_F(su3_vector *v);
-su3_vector *create_latvec_from_qop_milc_D(dsu3_vector *src);
-void destroy_latvec_from_qop_milc_D(su3_vector *v);
-void copy_latvec_to_qop_milc_F( fsu3_vector *dest, su3_vector *src);
-void copy_latvec_to_qop_milc_D( dsu3_vector *dest, su3_vector *src);
+matrix * create_links_from_qop_milc_F(fmatrix *src);
+void destroy_links_from_qop_milc_F(matrix *g);
+matrix *create_links_from_qop_milc_D(dmatrix *src);
+void destroy_links_from_qop_milc_D(matrix *g);
+vector *create_latvec_from_qop_milc_F(fvector *src);
+void destroy_latvec_from_qop_milc_F(vector *v);
+vector *create_latvec_from_qop_milc_D(dvector *src);
+void destroy_latvec_from_qop_milc_D(vector *v);
+void copy_latvec_to_qop_milc_F( fvector *dest, vector *src);
+void copy_latvec_to_qop_milc_D( dvector *dest, vector *src);
 
 #include <qop.h>
 

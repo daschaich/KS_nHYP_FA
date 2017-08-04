@@ -1,5 +1,5 @@
 /************************** d_plaq4_lcl.c **************************/
-/* This version mallocs the temporary su3_matrix */
+/* This version mallocs the temporary matrix */
 
 /* Double precision version of "plaquette4.c" including optional
    Schroedinger functional - UMH - 1/27/00 */
@@ -39,12 +39,12 @@ static int print_dir=0;
 #include "generic_includes.h"
 
 void d_plaquette_lcl(double *ss_plaq,double *st_plaq) {
-/* su3mat is scratch space of size su3_matrix */
-su3_matrix_f *su3mat;
+/* mat is scratch space of size matrix */
+matrix_f *mat;
 register int i,dir1,dir2;
 register site *s;
-register su3_matrix_f *m1,*m4;
-su3_matrix_f mtmp;
+register matrix_f *m1,*m4;
+matrix_f mtmp;
 double ss_sum,st_sum,cur_plaq;
 #ifdef MIN_PLAQ
 double min_plaq=NCOL;
@@ -65,25 +65,25 @@ double *plaq_perp,*plaq_prll;
     }
 #endif
 
-    su3mat = (su3_matrix_f *)malloc(sizeof(su3_matrix_f)*sites_on_node);
-    if(su3mat == NULL)
+    mat = (matrix_f *)malloc(sizeof(matrix_f)*sites_on_node);
+    if(mat == NULL)
       {
-	printf("plaquette: can't malloc su3mat\n");
+	printf("plaquette: can't malloc mat\n");
 	fflush(stdout); terminate(1);
       }
 
     for(dir1=YUP;dir1<=TUP;dir1++){
 	for(dir2=XUP;dir2<dir1;dir2++){
 
-	    mtag0 = start_gather_site( F_OFFSET(link[dir2]), sizeof(su3_matrix_f),
+	    mtag0 = start_gather_site( F_OFFSET(link[dir2]), sizeof(matrix_f),
 		dir1, EVENANDODD, gen_pt[0] );
-	    mtag1 = start_gather_site( F_OFFSET(link[dir1]), sizeof(su3_matrix_f),
+	    mtag1 = start_gather_site( F_OFFSET(link[dir1]), sizeof(matrix_f),
 		dir2, EVENANDODD, gen_pt[1] );
 
 	    FORALLSITES(i,s){
 		m1 = &(s->link[dir1]);
 		m4 = &(s->link[dir2]);
-		mult_su3_an_f(m4,m1,&su3mat[i]);
+		mult_su3_an_f(m4,m1,&mat[i]);
 	    }
 
 	    wait_gather(mtag0);
@@ -96,10 +96,10 @@ double *plaq_perp,*plaq_prll;
 /* SF: we need the space-time plaquettes associated with t=0 as well  */
             if (dir1==TUP ) {
                FORALLSITES(i,s){
-	          mult_su3_nn_f( &(su3mat[i]), (su3_matrix_f *)(gen_pt[0][i]),
+	          mult_su3_nn_f( &(mat[i]), (matrix_f *)(gen_pt[0][i]),
                         &mtmp);
                   cur_plaq = (double)
-		      realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]),&mtmp);
+		      realtrace_su3_f((matrix_f *)(gen_pt[1][i]),&mtmp);
 #ifdef MIN_PLAQ
                   if(cur_plaq<min_plaq) min_plaq=cur_plaq;
 #endif
@@ -117,10 +117,10 @@ double *plaq_perp,*plaq_prll;
 /* SF: space-space plaquettes only for t>0  */
             else {
                FORALLSITESDOMAIN(i,s){
-		  mult_su3_nn_f( &(su3mat[i]), (su3_matrix_f *)(gen_pt[0][i]),
+		  mult_su3_nn_f( &(mat[i]), (matrix_f *)(gen_pt[0][i]),
 			&mtmp);
                   cur_plaq = (double)
-		        realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]),&mtmp);
+		        realtrace_su3_f((matrix_f *)(gen_pt[1][i]),&mtmp);
 #ifdef MIN_PLAQ
                   if(cur_plaq<min_plaq) min_plaq=cur_plaq;
 #endif
@@ -140,30 +140,30 @@ double *plaq_perp,*plaq_prll;
 #ifdef SCHROED_FUN
 *		if(dir1==TUP ){
 *		    if(s->t==(nt-1)){
-*			mult_su3_nn_f( &su3mat[i],
+*			mult_su3_nn_f( &mat[i],
 *			    &(s->boundary[dir2]), &mtmp);
 *		    }
 *		    else{
-*			mult_su3_nn_f( &su3mat[i],
-*			    (su3_matrix_f *)(gen_pt[0][i]), &mtmp);
+*			mult_su3_nn_f( &mat[i],
+*			    (matrix_f *)(gen_pt[0][i]), &mtmp);
 *		    }
 *		    st_sum +=
-*			realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]), &mtmp);
+*			realtrace_su3_f((matrix_f *)(gen_pt[1][i]), &mtmp);
 *		}
 *		else if(s->t > 0){
-*		    mult_su3_nn_f( &su3mat[i], (su3_matrix_f *)(gen_pt[0][i]),
+*		    mult_su3_nn_f( &mat[i], (matrix_f *)(gen_pt[0][i]),
 *			&mtmp);
 *		    ss_sum +=
-*			realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]), &mtmp);
+*			realtrace_su3_f((matrix_f *)(gen_pt[1][i]), &mtmp);
 *		}
 #else
-*		mult_su3_nn_f( &su3mat[i], (su3_matrix_f *)(gen_pt[0][i]),
+*		mult_su3_nn_f( &mat[i], (matrix_f *)(gen_pt[0][i]),
 *		    &mtmp);
 *
 *		if(dir1==TUP )st_sum += (double)
-*		    realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]),&mtmp);
+*		    realtrace_su3_f((matrix_f *)(gen_pt[1][i]),&mtmp);
 *		else          ss_sum += (double)
-*		    realtrace_su3_f((su3_matrix_f *)(gen_pt[1][i]),&mtmp);
+*		    realtrace_su3_f((matrix_f *)(gen_pt[1][i]),&mtmp);
 #endif
 *	    }
 */
@@ -181,7 +181,7 @@ double *plaq_perp,*plaq_prll;
 #endif
     *st_plaq = st_sum /((double)(3*nx*ny*nz*nt));
 
-    free(su3mat);
+    free(mat);
 
 #ifdef LOCAL_PLAQ
     for(xx=0;xx<MY_N;xx++){
@@ -236,12 +236,12 @@ double *plaq_perp,*plaq_prll;
 
 /*** fermion irrep's plaquette  ***/
 void d_plaquette_frep_lcl(double *ss_plaq_frep, double *st_plaq_frep) {
-/* su3mat is scratch space of size su3_matrix */
-su3_matrix *su3mat;
+/* mat is scratch space of size matrix */
+matrix *mat;
 register int i,dir1,dir2;
 register site *s;
-register su3_matrix *m1,*m4;
-su3_matrix mtmp;
+register matrix *m1,*m4;
+matrix mtmp;
 double ss_sum,st_sum,cur_plaq;
 #ifdef MIN_PLAQ
 double min_plaq=DIMF;
@@ -262,25 +262,25 @@ double *plaq_perp,*plaq_prll;
     }
 #endif
 
-    su3mat = (su3_matrix *)malloc(sizeof(su3_matrix)*sites_on_node);
-    if(su3mat == NULL)
+    mat = (matrix *)malloc(sizeof(matrix)*sites_on_node);
+    if(mat == NULL)
       {
-	printf("plaquette: can't malloc su3mat\n");
+	printf("plaquette: can't malloc mat\n");
 	fflush(stdout); terminate(1);
       }
 
     for(dir1=YUP;dir1<=TUP;dir1++){
 	for(dir2=XUP;dir2<dir1;dir2++){
 
-	    mtag0 = start_gather_site( F_OFFSET(link[dir2]), sizeof(su3_matrix),
+	    mtag0 = start_gather_site( F_OFFSET(link[dir2]), sizeof(matrix),
 		dir1, EVENANDODD, gen_pt[0] );
-	    mtag1 = start_gather_site( F_OFFSET(link[dir1]), sizeof(su3_matrix),
+	    mtag1 = start_gather_site( F_OFFSET(link[dir1]), sizeof(matrix),
 		dir2, EVENANDODD, gen_pt[1] );
 
 	    FORALLSITES(i,s){
 		m1 = &(s->link[dir1]);
 		m4 = &(s->link[dir2]);
-		mult_su3_an(m4,m1,&su3mat[i]);
+		mult_su3_an(m4,m1,&mat[i]);
 	    }
 
 	    wait_gather(mtag0);
@@ -293,10 +293,10 @@ double *plaq_perp,*plaq_prll;
 /* SF: we need the space-time plaquettes associated with t=0 as well  */
             if (dir1==TUP ) {
                FORALLSITES(i,s){
-	          mult_su3_nn( &(su3mat[i]), (su3_matrix *)(gen_pt[0][i]),
+	          mult_su3_nn( &(mat[i]), (matrix *)(gen_pt[0][i]),
                         &mtmp);
                   cur_plaq = (double)
-		      realtrace_su3((su3_matrix *)(gen_pt[1][i]),&mtmp);
+		      realtrace_su3((matrix *)(gen_pt[1][i]),&mtmp);
 #ifdef MIN_PLAQ
                   if(cur_plaq<min_plaq) min_plaq=cur_plaq;
 #endif
@@ -318,10 +318,10 @@ double *plaq_perp,*plaq_prll;
 /* SF: space-space plaquettes only for t>0  */
             else {
                FORALLSITESDOMAIN(i,s){
-		  mult_su3_nn( &(su3mat[i]), (su3_matrix *)(gen_pt[0][i]),
+		  mult_su3_nn( &(mat[i]), (matrix *)(gen_pt[0][i]),
 			&mtmp);
                   cur_plaq = (double)
-		        realtrace_su3((su3_matrix *)(gen_pt[1][i]),&mtmp);
+		        realtrace_su3((matrix *)(gen_pt[1][i]),&mtmp);
 #ifdef MIN_PLAQ
                   if(cur_plaq<min_plaq) min_plaq=cur_plaq;
 #endif
@@ -356,7 +356,7 @@ double *plaq_perp,*plaq_prll;
 #endif
     *st_plaq_frep = st_sum /((double)(3*nx*ny*nz*nt));
 
-    free(su3mat);
+    free(mat);
 
 #ifdef LOCAL_PLAQ
     for(xx=0;xx<MY_N;xx++){

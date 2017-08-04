@@ -4,13 +4,13 @@
 
 #if ( QOP_PrecisionInt == 1 )
 #define MYREAL float
-#define MYSU3_VECTOR fsu3_vector
-#define MYSU3_MATRIX fsu3_matrix
+#define MYSU3_VECTOR fvector
+#define MYSU3_MATRIX fmatrix
 #define MYWILSON_VECTOR fwilson_vector
 #else
 #define MYREAL double
-#define MYSU3_VECTOR dsu3_vector
-#define MYSU3_MATRIX dsu3_matrix
+#define MYSU3_VECTOR dvector
+#define MYSU3_MATRIX dmatrix
 #define MYWILSON_VECTOR dwilson_vector
 #endif
 

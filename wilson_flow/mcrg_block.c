@@ -14,7 +14,7 @@ void mcrg_block(Real t, int blmax) {
   // Save the original links
   FORALLSITES(i, s) {
     FORALLUPDIR(dir)
-      su3mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
+      mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
   }
 
   // Set up loop tables
@@ -66,7 +66,7 @@ void mcrg_block(Real t, int blmax) {
   // Restore the original links
   FORALLSITES(i, s) {
     FORALLUPDIR(dir)
-      su3mat_copy(&(s->link[dir + 8]), &(s->link[dir]));
+      mat_copy(&(s->link[dir + 8]), &(s->link[dir]));
   }
 
   node0_printf("BLOCKING COMPLETED\n");

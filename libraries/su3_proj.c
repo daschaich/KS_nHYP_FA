@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void su3_projector(su3_vector *a, su3_vector *b, su3_matrix *c) {
+void su3_projector(vector *a, vector *b, matrix *c) {
   register int i, j;
 #ifndef FAST
   for (i = 0; i < 3; i++) {

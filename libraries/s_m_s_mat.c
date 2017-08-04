@@ -5,8 +5,8 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void scalar_mult_sub_su3_matrix(su3_matrix *a, su3_matrix *b, Real s,
-                                su3_matrix *c) {
+void scalar_mult_sub_matrix(matrix *a, matrix *b, Real s,
+                                matrix *c) {
 
   register int i,j;
   for (i = 0; i < 3; i++) {

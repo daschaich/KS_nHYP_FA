@@ -35,28 +35,28 @@ enum prop_name {
 #define mat_invert mat_invert_uml
 
 int test_converge(int t_source);
-void mult_sigma(su3_vector *src, su3_vector *dest, su3_vector *temp );
-void mult_eta_l(su3_vector *src, su3_vector *dest, su3_vector *temp, su3_matrix *smearlink );
-void mult_eta_nl(su3_vector *src, su3_vector *dest, su3_vector *temp );
-static su3_matrix *smear_links();
-void sym_shift_smear(int dir, su3_vector * src, su3_vector * dest,
-		     su3_matrix *smearlink);
-void zeta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
-		      su3_matrix *smearlink);
-void eta_shift_smear(int n, int *d, su3_vector *src, su3_vector *dest,
-		     su3_matrix *smearlink);
-void mult_flavor_vector_smear(int mu, su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void mult_flavor_tensor_smear(int mu, int nu, su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void mult_flavor_pseudovector_smear(int mu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink );
-void mult_flavor_pseudoscalar_smear(su3_vector * src, su3_vector * dest,
-				    su3_matrix *smearlink);
-void mult_spin_vector_smear(int mu, su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void mult_spin_tensor_smear(int mu, int nu, su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void mult_spin_pseudovector_smear(int mu, su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void mult_spin_pseudoscalar_smear(su3_vector *src, su3_vector *dest, su3_matrix *smearlink );
-void rephase_smear(su3_matrix *smearlink );
+void mult_sigma(vector *src, vector *dest, vector *temp );
+void mult_eta_l(vector *src, vector *dest, vector *temp, matrix *smearlink );
+void mult_eta_nl(vector *src, vector *dest, vector *temp );
+static matrix *smear_links();
+void sym_shift_smear(int dir, vector * src, vector * dest,
+		     matrix *smearlink);
+void zeta_shift_smear(int n, int *d, vector * src, vector * dest,
+		      matrix *smearlink);
+void eta_shift_smear(int n, int *d, vector *src, vector *dest,
+		     matrix *smearlink);
+void mult_flavor_vector_smear(int mu, vector *src, vector *dest, matrix *smearlink );
+void mult_flavor_tensor_smear(int mu, int nu, vector *src, vector *dest, matrix *smearlink );
+void mult_flavor_pseudovector_smear(int mu, vector * src, vector * dest, matrix *smearlink );
+void mult_flavor_pseudoscalar_smear(vector * src, vector * dest,
+				    matrix *smearlink);
+void mult_spin_vector_smear(int mu, vector *src, vector *dest, matrix *smearlink );
+void mult_spin_tensor_smear(int mu, int nu, vector *src, vector *dest, matrix *smearlink );
+void mult_spin_pseudovector_smear(int mu, vector *src, vector *dest, matrix *smearlink );
+void mult_spin_pseudoscalar_smear(vector *src, vector *dest, matrix *smearlink );
+void rephase_smear(matrix *smearlink );
 
-su3_vector *temp, *R, *R1,*R2,*R3, *X,*X_sigma,*X_eta_l,*X_eta_nl;
+vector *temp, *R, *R1,*R2,*R3, *X,*X_sigma,*X_eta_l,*X_eta_nl;
 
 #ifdef ONEMASS
 #define RSRC phi
@@ -67,7 +67,7 @@ su3_vector *temp, *R, *R1,*R2,*R3, *X,*X_sigma,*X_eta_l,*X_eta_nl;
 int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
 		       ferm_links_t *fn){
   /* arguments are mass, tolerance for inverter check,
-   * temporary lattice su3_vector.
+   * temporary lattice vector.
      return C.G. iteration number */
 
   int cgn;
@@ -79,23 +79,23 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
   Real x;
   complex **props;	/* arrays of propagators */
   complex cc1,cc2,cc3,cc4,cc5;
-  su3_matrix *smearlink;
+  matrix *smearlink;
 
   cgn=0; /* number of CG iterations */
   czero.real = czero.imag = 0.0;
 
   /* allocate space for quark propagators */
-  temp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  temp = (vector *)malloc(sites_on_node*sizeof(vector));
   /* allocate space for "R" and "X" vectors.  "R..." is source multiplied
    * by meson operator, "X..." are inversion solutions */
-  R = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  R1 = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  R2 = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  R3 = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  X = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  X_sigma = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  X_eta_l = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  X_eta_nl = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  R = (vector *)malloc(sites_on_node*sizeof(vector));
+  R1 = (vector *)malloc(sites_on_node*sizeof(vector));
+  R2 = (vector *)malloc(sites_on_node*sizeof(vector));
+  R3 = (vector *)malloc(sites_on_node*sizeof(vector));
+  X = (vector *)malloc(sites_on_node*sizeof(vector));
+  X_sigma = (vector *)malloc(sites_on_node*sizeof(vector));
+  X_eta_l = (vector *)malloc(sites_on_node*sizeof(vector));
+  X_eta_nl = (vector *)malloc(sites_on_node*sizeof(vector));
 
   /* allocate space for meson propagators */
   props = (complex **)malloc( NPROPS*sizeof(complex *) );
@@ -125,7 +125,7 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
 	}
 	x = 2.0/sqrt( magsq_su3vec( &(R[i]) ) );
 	/* "2" because we invert 2m + 2 Dslash */
-	scalar_mult_su3_vector( &(R[i]), x, &(R[i]) );
+	scalar_mult_vector( &(R[i]), x, &(R[i]) );
     }
 
     /* loop over "source" time slice */
@@ -168,7 +168,7 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
         mult_sigma(  R1, R2, temp );
         FORALLSITES(i,s){
   	  s->RSRC = R2[i];
-          if(s->parity==ODD)scalar_mult_su3_vector( &(s->RSRC), -1.0, &(s->RSRC) );
+          if(s->parity==ODD)scalar_mult_vector( &(s->RSRC), -1.0, &(s->RSRC) );
         }
 
         cgn += mat_invert( F_OFFSET(RSRC), F_OFFSET(g_rand), temp_offset, 
@@ -176,13 +176,13 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
 
         FORALLSITES(i,s){
   	  X_sigma[i]=s->g_rand;
-          if(s->parity==ODD)scalar_mult_su3_vector( &(X_sigma[i]), -1.0, &(X_sigma[i]) );
+          if(s->parity==ODD)scalar_mult_vector( &(X_sigma[i]), -1.0, &(X_sigma[i]) );
         }
     
         mult_eta_l(  R1, R2, temp, smearlink );
         FORALLSITES(i,s){
   	s->RSRC = R2[i];
-          if(s->parity==ODD)scalar_mult_su3_vector( &(s->RSRC), -1.0, &(s->RSRC) );
+          if(s->parity==ODD)scalar_mult_vector( &(s->RSRC), -1.0, &(s->RSRC) );
         }
 
         cgn += mat_invert( F_OFFSET(RSRC), F_OFFSET(g_rand), temp_offset, 
@@ -190,7 +190,7 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
 
         FORALLSITES(i,s){
   	  X_eta_l[i]=s->g_rand;
-          if(s->parity==ODD)scalar_mult_su3_vector( &(X_eta_l[i]), -1.0, &(X_eta_l[i]) );
+          if(s->parity==ODD)scalar_mult_vector( &(X_eta_l[i]), -1.0, &(X_eta_l[i]) );
         }
     
         // mult_eta_nl is not written yet
@@ -198,13 +198,13 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
         //mult_eta_nl(  R1, R2, temp );
         //FORALLSITES(i,s){
   	//s->RSRC = R2[i];
-          //if(s->parity==ODD)scalar_mult_su3_vector( &(s->RSRC), -1.0, &(s->RSRC) );
+          //if(s->parity==ODD)scalar_mult_vector( &(s->RSRC), -1.0, &(s->RSRC) );
         //}
         //cgn += mat_invert( F_OFFSET(RSRC), F_OFFSET(g_rand), 
 	//     temp_offset, mass, PRECISION, fn );
         //FORALLSITES(i,s){
   	//X_eta_nl[i]=s->g_rand;
-          //if(s->parity==ODD)scalar_mult_su3_vector( &(X_eta_nl[i]), -1.0, &(X_eta_nl[i]) );
+          //if(s->parity==ODD)scalar_mult_vector( &(X_eta_nl[i]), -1.0, &(X_eta_nl[i]) );
         //}
     
         /* store X multiplied by "sigma", xxx to store an
@@ -314,14 +314,14 @@ int spectrum_singlets( Real mass, Real tol, field_offset temp_offset,
 
 /* "Multiply by" taste singlet 0++ operator.  */
 /* mostly this is a dummy for testing - the operator is "one" */
-void mult_sigma(su3_vector *src, su3_vector *dest, su3_vector *temp ) {
+void mult_sigma(vector *src, vector *dest, vector *temp ) {
   register int i;
   register site *s;
   FORALLSITES(i,s){ dest[i]=src[i]; }
 }
 
 /* "Multiply by" the three link taste singlet pion operator.  */
-void mult_eta_l(su3_vector *src, su3_vector *dest, su3_vector *temp, su3_matrix *smearlink ) {
+void mult_eta_l(vector *src, vector *dest, vector *temp, matrix *smearlink ) {
   register int i;
   register site *s;
   int c ;
@@ -346,14 +346,14 @@ void mult_eta_l(su3_vector *src, su3_vector *dest, su3_vector *temp, su3_matrix 
       //zeta_shift_smear(3,p[c].d,src,temp,smearlink) ; // Eric Gregory 3/1/05
       eta_shift_smear(3,p[c].d,src,temp,smearlink) ;
       FORALLSITES(i,s){
-	scalar_mult_sum_su3_vector( &(dest[i]),
+	scalar_mult_sum_vector( &(dest[i]),
 				   &(temp[i]), p[c].sign );
       }
     }
 }
 
 /* "Multiply by" the four link  nonlocal-time taste singlet pion operator.  */
-void mult_eta_nl(su3_vector *src, su3_vector *dest, su3_vector *temp ) {
+void mult_eta_nl(vector *src, vector *dest, vector *temp ) {
   register int i;
   register site *s;
   //NOT WRITTEN YET, set to zero
@@ -361,20 +361,20 @@ void mult_eta_nl(su3_vector *src, su3_vector *dest, su3_vector *temp ) {
 }
 
 
-static su3_matrix *smear_links()
+static matrix *smear_links()
 {
-  su3_matrix *smearlink, *smearlink0;
+  matrix *smearlink, *smearlink0;
   int i,j, dir;
   site *s;
 
   rephase(OFF);
   if(this_node==0)printf("SMEARING IS ON, level %d\n",SMEAR);
-  smearlink = (su3_matrix *)malloc(sites_on_node*4*sizeof(su3_matrix));
+  smearlink = (matrix *)malloc(sites_on_node*4*sizeof(matrix));
   if(smearlink == NULL){
     printf("spectrum_singlets: No room for smeared links\n");
     terminate(1);
   }
-  smearlink0 = (su3_matrix *)malloc(sites_on_node*4*sizeof(su3_matrix));
+  smearlink0 = (matrix *)malloc(sites_on_node*4*sizeof(matrix));
   if(smearlink0 == NULL){
     printf("spectrum_singlets: No room for smeared links\n");
     terminate(1);
@@ -449,39 +449,39 @@ static struct {
 /* Apply the symmetric shift opperator in direction "dir" *
  * This is the explicit version                           *
  * Covariant shifts are used                              */
-void sym_shift_smear(int dir, su3_vector * src, su3_vector * dest,
-		     su3_matrix *smearlink) {
+void sym_shift_smear(int dir, vector * src, vector * dest,
+		     matrix *smearlink) {
   register int i ;
   register site *s ;
   msg_tag *tag[2];
-  su3_vector *tvec;
+  vector *tvec;
   
-  tvec = (su3_vector *)malloc( sites_on_node*sizeof(su3_vector) );
+  tvec = (vector *)malloc( sites_on_node*sizeof(vector) );
 
-  tag[0] = start_gather_field( src, sizeof(su3_vector), dir, EVENANDODD ,gen_pt[0] );
+  tag[0] = start_gather_field( src, sizeof(vector), dir, EVENANDODD ,gen_pt[0] );
   FORALLSITES(i,s)
     {
-      mult_adj_su3_mat_vec( &smearlink[4*i+dir], &(src[i]),
+      mult_adj_mat_vec( &smearlink[4*i+dir], &(src[i]),
 			    &(tvec[i]) ) ;
     }
-  tag[1] = start_gather_field(tvec, sizeof(su3_vector), OPP_DIR(dir), 
+  tag[1] = start_gather_field(tvec, sizeof(vector), OPP_DIR(dir), 
 				  EVENANDODD ,gen_pt[1] );
   wait_gather(tag[0]);
   FORALLSITES(i,s)
     {
-    mult_su3_mat_vec( &smearlink[4*i+dir], (su3_vector *)gen_pt[0][i], 
+    mult_mat_vec( &smearlink[4*i+dir], (vector *)gen_pt[0][i], 
 		      &(dest[i]) ) ;    
     }
 
   wait_gather(tag[1]);
   FORALLSITES(i,s)
     {
-      add_su3_vector( &(dest[i]), (su3_vector *)gen_pt[1][i], &(dest[i]) ) ;    
+      add_vector( &(dest[i]), (vector *)gen_pt[1][i], &(dest[i]) ) ;    
     }
   /* Now divide by 2 eq. (4.2b) of Golterman's Meson paper*/
  FORALLSITES(i,s)
    {
-     scalar_mult_su3_vector( &(dest[i]), 0.5, &(dest[i]) );
+     scalar_mult_vector( &(dest[i]), 0.5, &(dest[i]) );
    }
   for(i=0;i<2;i++) cleanup_gather(tag[i]) ;
   free(tvec);
@@ -492,14 +492,14 @@ void sym_shift_smear(int dir, su3_vector * src, su3_vector * dest,
  * n is the number of shifts                                            *
  * This is the E_\mu(x,y)=\Xi_\mu operator defined by Golterman.        *
  * Nucl. Phys. B245  eq.3.5 and eq. 4.2b                                */
-void zeta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
-		      su3_matrix *smearlink) {
+void zeta_shift_smear(int n, int *d, vector * src, vector * dest,
+		      matrix *smearlink) {
   register int i,c ;
   short coords[4];
   register site *s;
   register Real sign ;
-  su3_vector *ltemp;
-  ltemp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp = (vector *)malloc(sites_on_node*sizeof(vector));
 
   for(c=0;c<n;c++)
     {  
@@ -524,7 +524,7 @@ void zeta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
 	  sign = -1.0 ;
 	/* And the (-1)^coord[d[c]] */
 	if(coords[d[c]]%2==1) sign=-sign ;
-	scalar_mult_su3_vector( &(ltemp[i]), sign, &(dest[i]) );
+	scalar_mult_vector( &(ltemp[i]), sign, &(dest[i]) );
       }
     }
     free(ltemp);
@@ -535,12 +535,12 @@ void zeta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
  * In fact since \eta_k are already absorbed into the U matrices do     *
  * no action is needed. Just do the symmetric shift.                    *
  * n is the number of shifts                                            */
-void eta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
-		     su3_matrix *smearlink) {
+void eta_shift_smear(int n, int *d, vector * src, vector * dest,
+		     matrix *smearlink) {
   int c ;
-  su3_vector *temp0, *temp1, *tmp ;
-  temp0 = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
-  temp1 = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *temp0, *temp1, *tmp ;
+  temp0 = (vector *)malloc(sites_on_node*sizeof(vector));
+  temp1 = (vector *)malloc(sites_on_node*sizeof(vector));
   
   if(n==1)
     {
@@ -565,7 +565,7 @@ void eta_shift_smear(int n, int *d, su3_vector * src, su3_vector * dest,
 }
 
 /* Multiply by the Xi_mu flavor operator */
-void mult_flavor_vector_smear(int mu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) {
+void mult_flavor_vector_smear(int mu, vector * src, vector * dest, matrix *smearlink ) {
   int d[1] ;
   
   d[0] = mu ;
@@ -573,12 +573,12 @@ void mult_flavor_vector_smear(int mu, su3_vector * src, su3_vector * dest, su3_m
 }
 
 /* Multiply by the 1/2(Xi_mu Xi_nu - Xi_nu Xi_mu)flavor operator */
-void mult_flavor_tensor_smear(int mu, int nu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) { 
+void mult_flavor_tensor_smear(int mu, int nu, vector * src, vector * dest, matrix *smearlink ) { 
   register int i;
   register site *s;
   int d[2];
-  su3_vector *ltemp;
-  ltemp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp = (vector *)malloc(sites_on_node*sizeof(vector));
 
   d[0] = mu ; d[1]=nu ;
   zeta_shift_smear(2, d,src,dest,smearlink) ;
@@ -588,19 +588,19 @@ void mult_flavor_tensor_smear(int mu, int nu, su3_vector * src, su3_vector * des
 
   
   FORALLSITES(i,s){
-    scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), -1.0);
-    scalar_mult_su3_vector( &(dest[i]), 0.5, &(dest[i]) );
+    scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), -1.0);
+    scalar_mult_vector( &(dest[i]), 0.5, &(dest[i]) );
   }
   free(ltemp);
 }
 
 /* Multiply by the Xi_mu Xi_5 flavor operator */
-void mult_flavor_pseudovector_smear(int mu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) {
+void mult_flavor_pseudovector_smear(int mu, vector * src, vector * dest, matrix *smearlink ) {
   register int i;
   register site *s;
   int p ; 
-  su3_vector *ltemp;
-  ltemp=(su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp=(vector *)malloc(sites_on_node*sizeof(vector));
 
   /*clean up dest */
   FORALLSITES(i,s){
@@ -613,20 +613,20 @@ void mult_flavor_pseudovector_smear(int mu, su3_vector * src, su3_vector * dest,
 	  /* Multiply the extra 1/6 needed by the definition    *
 	   * of the operator (number of permutations)           */
 	  FORALLSITES(i,s){
-	    scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/6.0);
+	    scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/6.0);
 	  }
 	}
    free(ltemp);
 }
 
 /* Multiply by the Xi_5 flavor operator */
-void mult_flavor_pseudoscalar_smear(su3_vector * src, su3_vector * dest,
-				    su3_matrix *smearlink) { 
+void mult_flavor_pseudoscalar_smear(vector * src, vector * dest,
+				    matrix *smearlink) { 
   register int i;
   register site *s;
   int p ; 
-  su3_vector *ltemp;
-  ltemp=(su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp=(vector *)malloc(sites_on_node*sizeof(vector));
   
   /*clean up dest */
   FORALLSITES(i,s){
@@ -637,14 +637,14 @@ void mult_flavor_pseudoscalar_smear(su3_vector * src, su3_vector * dest,
        /*  Multiply the the extra 1/24 needed by the            *
 	* definition of the operator (number of permutations)   */
        FORALLSITES(i,s){
-	 scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/24.0);
+	 scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/24.0);
        }
      } 
   free(ltemp);
 }
 
 /* Multiply by the Gamma_mu spin operator */
-void mult_spin_vector_smear(int mu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) {
+void mult_spin_vector_smear(int mu, vector * src, vector * dest, matrix *smearlink ) {
   int d[1] ;
   
   d[0] = mu ;
@@ -652,12 +652,12 @@ void mult_spin_vector_smear(int mu, su3_vector * src, su3_vector * dest, su3_mat
 }
 
 /* Multiply by the 1/2(Gamma_mu Gamma_nu - Gamma_nu gamma_mu) spin operator */
-void mult_spin_tensor_smear(int mu, int nu, su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) { 
+void mult_spin_tensor_smear(int mu, int nu, vector * src, vector * dest, matrix *smearlink ) { 
   register int i;
   register site *s;
   int d[2];
-  su3_vector *ltemp;
-  ltemp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp = (vector *)malloc(sites_on_node*sizeof(vector));
 
   d[0] = mu ; d[1]=nu ;
   eta_shift_smear( 2, d, src, dest, smearlink) ;
@@ -666,20 +666,20 @@ void mult_spin_tensor_smear(int mu, int nu, su3_vector * src, su3_vector * dest,
   eta_shift_smear( 2, d, src, ltemp, smearlink ) ;
 
   FORALLSITES(i,s){
-    scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), -1.0);
-    scalar_mult_su3_vector( &(dest[i]), 0.5, &(dest[i]) );
+    scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), -1.0);
+    scalar_mult_vector( &(dest[i]), 0.5, &(dest[i]) );
   }
   free(ltemp);
 }
 
 /* Multiply by the Gamma_mu Gamma_5 spin operator */
-void mult_spin_pseudovector_smear(int mu, su3_vector * src, su3_vector * dest, 
-				  su3_matrix *smearlink ) {
+void mult_spin_pseudovector_smear(int mu, vector * src, vector * dest, 
+				  matrix *smearlink ) {
   register int i;
   register site *s;
   int p ; 
-  su3_vector *ltemp;
-  ltemp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp = (vector *)malloc(sites_on_node*sizeof(vector));
 
   /*clean up dest */
   FORALLSITES(i,s){
@@ -692,19 +692,19 @@ void mult_spin_pseudovector_smear(int mu, su3_vector * src, su3_vector * dest,
 	  /* Multiply the extra 1/6 needed by the definition    *
 	     of the operator (number of permutations)           */
 	  FORALLSITES(i,s){
-	    scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/6.0);
+	    scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/6.0);
 	  }
 	}
    free(ltemp);
 }
 
 /* Multiply by the Gamma_5 spin operator */
-void mult_spin_pseudoscalar_smear(su3_vector * src, su3_vector * dest, su3_matrix *smearlink ) { 
+void mult_spin_pseudoscalar_smear(vector * src, vector * dest, matrix *smearlink ) { 
   register int i;
   register site *s;
   int p ; 
-  su3_vector *ltemp;
-  ltemp = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+  vector *ltemp;
+  ltemp = (vector *)malloc(sites_on_node*sizeof(vector));
   
   /*clean up dest */
   FORALLSITES(i,s){
@@ -716,14 +716,14 @@ void mult_spin_pseudoscalar_smear(su3_vector * src, su3_vector * dest, su3_matri
        /*  Multiply the the extra 1/24 needed by the            *
 	* definition of the operator (number of permutations)   */
        FORALLSITES(i,s){
-	 scalar_mult_sum_su3_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/24.0);
+	 scalar_mult_sum_vector( &(dest[i]), &(ltemp[i]), eps[p].sign/24.0);
        }
      } 
   free(ltemp);
 }
 
 /* Put KS phases into smeared links */
-void rephase_smear(su3_matrix *smearlink ){
+void rephase_smear(matrix *smearlink ){
 register int i,j,k,dir;
 register site *s;
     FORALLSITES(i,s){

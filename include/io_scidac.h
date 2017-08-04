@@ -29,7 +29,7 @@ QIO_Reader *r_open_complex_scidac_file(char *filename, int serpar);
 void restore_color_matrix_scidac_to_site(char *filename, 
           field_offset dest, int count);
 void restore_color_matrix_scidac_to_field(char *filename, 
-          su3_matrix *dest, int count);
+          matrix *dest, int count);
 void restore_random_state_scidac_to_site(char *filename, field_offset dest);
 
 int read_lat_dim_scidac(char *filename, int *ndim, int dims[]);
@@ -45,7 +45,7 @@ void save_color_matrix_scidac_from_site(char *filename, char *filexml,
                        char *recxml, int volfmt, field_offset src, int count);
 
 void save_color_matrix_scidac_from_field(char *filename, char *filexml,
-           char *recxml, int volfmt, su3_matrix *src, int count);
+           char *recxml, int volfmt, matrix *src, int count);
 void save_random_state_scidac_from_site(char *filename, 
   char *filexml, char *recxml, int volfmt, field_offset src);
 
@@ -83,9 +83,9 @@ int read_F_R_to_field(QIO_Reader *infile, QIO_String *xml_record_in,
 int read_F_C_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
       complex *dest, int count);
 int read_F3_V_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
-      su3_vector *dest, int count);
+      vector *dest, int count);
 int read_F3_M_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
-      su3_matrix *dest, int count);
+      matrix *dest, int count);
 
 int read_D_C_to_site(QIO_Reader *infile, QIO_String *xml_record_in, 
       field_offset dest, int count);
@@ -97,9 +97,9 @@ int read_D3_M_to_site(QIO_Reader *infile, QIO_String *xml_record_in,
 int read_D_C_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
       complex *dest, int count);
 int read_D3_V_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
-      su3_vector *dest, int count);
+      vector *dest, int count);
 int read_D3_M_to_field(QIO_Reader *infile, QIO_String *xml_record_in, 
-      su3_matrix *dest, int count);
+      matrix *dest, int count);
 
 int write_F_R_from_site(QIO_Writer *outfile, 
      QIO_String *xml_record_out, field_offset src, int count);
@@ -142,26 +142,26 @@ int write_F_R_from_field(QIO_Writer *outfile,
 int write_F_C_from_field(QIO_Writer *outfile, 
      QIO_String *xml_record_out,  complex *src, int count);
 int write_F3_V_from_field(QIO_Writer *outfile, 
-      QIO_String *xml_record_out, su3_vector *src, int count);
+      QIO_String *xml_record_out, vector *src, int count);
 int write_F3_M_from_field(QIO_Writer *outfile, 
-      QIO_String *xml_record_out, su3_matrix *src, int count);
+      QIO_String *xml_record_out, matrix *src, int count);
 
 int write_D_C_from_field(QIO_Writer *outfile, 
      QIO_String *xml_record_out,  complex *src, int count);
 int write_D3_V_from_field(QIO_Writer *outfile, 
-      QIO_String *xml_record_out, su3_vector *src, int count);
+      QIO_String *xml_record_out, vector *src, int count);
 
 int write_F_R_timeslice_from_field(QIO_Writer *outfile, 
      QIO_String *xml_record_out,  Real *src, int count, int t0);
 int write_F_C_timeslice_from_field(QIO_Writer *outfile, 
      QIO_String *xml_record_out,  complex *src, int count, int t0);
 int write_F3_V_timeslice_from_field(QIO_Writer *outfile, 
-   QIO_String *xml_record_out,  su3_vector *src, int count, int t0);
+   QIO_String *xml_record_out,  vector *src, int count, int t0);
 
 int write_D_C_timeslice_from_field(QIO_Writer *outfile, 
      QIO_String *xml_record_out,  complex *src, int count, int t0);
 int write_D3_V_timeslice_from_field(QIO_Writer *outfile, 
-    QIO_String *xml_record_out, su3_vector *src, int count, int t0);
+    QIO_String *xml_record_out, vector *src, int count, int t0);
 
 /**********************************************************************/
 /* In gauge_info.c (application dependent) */

@@ -20,7 +20,7 @@ typedef struct {
   int index;          // Index in the array
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Wilson complex vectors
   wilson_vector psi;  // Solution vector
@@ -85,19 +85,19 @@ EXTERN wilson_vector *tmpvec; // Used in sign check in eig.c
 EXTERN Real eig_tol;          // Tolerance for the eigenvalue computation
 EXTERN int maxIter;           // Maximum iterations
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff -- hyplinks, Staples, tempmat used by generic_nhyp/block_nhyp.c
 EXTERN int nsmear;
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat1;
+EXTERN matrix *tempmat1;
 
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

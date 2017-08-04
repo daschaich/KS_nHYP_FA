@@ -7,7 +7,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void compress_anti_hermitian( su3_matrix *mat_su3,
+void compress_anti_hermitian( matrix *mat_su3,
 	anti_hermitmat *mat_antihermit ) {
 	mat_antihermit->m00im=mat_su3->e[0][0].imag;
 	mat_antihermit->m11im=mat_su3->e[1][1].imag;

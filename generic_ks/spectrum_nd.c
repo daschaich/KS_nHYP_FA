@@ -58,8 +58,8 @@ enum prop_name {
 #include "../include/dslash_ks_redefine.h"
 
 int test_converge( int t_source );
-su3_vector * lightprop[3];
-su3_vector * heavyprop[3];
+vector * lightprop[3];
+vector * heavyprop[3];
 
 int spectrum_nd( Real mass1, Real mass2, Real tol, ferm_links_t *fn ){
   /* arguments are light and heavy quark masses, return C.G. iteration number */
@@ -72,7 +72,7 @@ int spectrum_nd( Real mass1, Real mass2, Real tol, ferm_links_t *fn ){
   int color;	/* color for source */
   int src_count; /* number of source time slices used */
   complex **props;	/* arrays of propagators */
-  su3_matrix tmat;
+  matrix tmat;
   Real finalrsq;
   
   cgn=0; /* number of CG iterations */
@@ -89,8 +89,8 @@ int spectrum_nd( Real mass1, Real mass2, Real tol, ferm_links_t *fn ){
 
   /* allocate light and heavy quark propagators for each color */
   for( color=0; color<3; color++){
-    lightprop[color] = (su3_vector *)malloc( sizeof(su3_vector)*sites_on_node );
-    heavyprop[color] = (su3_vector *)malloc( sizeof(su3_vector)*sites_on_node );
+    lightprop[color] = (vector *)malloc( sizeof(vector)*sites_on_node );
+    heavyprop[color] = (vector *)malloc( sizeof(vector)*sites_on_node );
   }
 
   /* loop over "source" time slice */

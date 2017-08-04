@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-Real su3_rdot(su3_vector *a, su3_vector *b) {
+Real su3_rdot(vector *a, vector *b) {
   register Real tr, sum;
   sum = a->c[0].real * b->c[0].real;
   tr = a->c[0].imag * b->c[0].imag; sum += tr;

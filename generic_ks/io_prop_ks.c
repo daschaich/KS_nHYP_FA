@@ -34,9 +34,9 @@
 #endif
 
 /*---------------------------------------------------------------------------*/
-/* Convert (or copy) one single precision su3_vector to generic precision */
+/* Convert (or copy) one single precision vector to generic precision */
 
-void f2d_vec(fsu3_vector *a, su3_vector *b){
+void f2d_vec(fvector *a, vector *b){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -45,8 +45,8 @@ void f2d_vec(fsu3_vector *a, su3_vector *b){
   }
 }
 
-/* Convert (or copy) one generic precision su3_vector to single precision */
-void d2f_vec(su3_vector *a, fsu3_vector *b){
+/* Convert (or copy) one generic precision vector to single precision */
+void d2f_vec(vector *a, fvector *b){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -414,23 +414,23 @@ void write_checksum_ks(int parallel, ks_prop_file *kspf)
 
 /*---------------------------------------------------------------------------*/
 /* Here only node 0 writes propagator to a serial file 
-   The propagator is passed as 3 su3_vectors, one for each source color 
+   The propagator is passed as 3 vectors, one for each source color 
 */
 
 void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
-		 su3_vector *src_field)
+		 vector *src_field)
 {
   /* kspf  = file descriptor as opened by ks_serial_w_i 
-     src   = field offset for propagator su3 vector (type su3_vector)  */
+     src   = field offset for propagator su3 vector (type vector)  */
 
   FILE *fp = NULL;
   ks_prop_header *ksph;
   u_int32type *val;
   int rank29,rank31;
-  fsu3_vector *pbuf = NULL;
+  fvector *pbuf = NULL;
   int fseek_return;  /* added by S.G. for large file debugging */
   struct {
-    fsu3_vector ksv;
+    fvector ksv;
     char pad[PAD_SEND_BUF]; /* Introduced because some switches
 			       perform better if message lengths are longer */
   } msg;
@@ -452,7 +452,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
       if(kspf->parallel == PARALLEL)
 	printf("w_serial_ks: Attempting serial write to file opened in parallel \n");
 
-      pbuf = (fsu3_vector *)malloc(MAX_BUF_LENGTH*sizeof(fsu3_vector));
+      pbuf = (fvector *)malloc(MAX_BUF_LENGTH*sizeof(fvector));
       if(pbuf == NULL)
 	{
 	  printf("w_serial_ks: Node 0 can't malloc pbuf\n"); 
@@ -462,7 +462,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
       fp = kspf->fp;
       ksph = kspf->header;
 
-      ks_prop_size = volume*sizeof(fsu3_vector);
+      ks_prop_size = volume*sizeof(fvector);
       ks_prop_check_size = sizeof(kspf->check.color) +
 	sizeof(kspf->check.sum29) + sizeof(kspf->check.sum31);
       body_size = ks_prop_size + ks_prop_check_size;
@@ -493,8 +493,8 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
   kspf->check.sum29 = 0;
   /* counts 32-bit words mod 29 and mod 31 in order of appearance on file */
   /* Here only node 0 uses these values */
-  rank29 = sizeof(fsu3_vector)/sizeof(int32type)*sites_on_node*this_node % 29;
-  rank31 = sizeof(fsu3_vector)/sizeof(int32type)*sites_on_node*this_node % 31;
+  rank29 = sizeof(fvector)/sizeof(int32type)*sites_on_node*this_node % 29;
+  rank31 = sizeof(fvector)/sizeof(int32type)*sites_on_node*this_node % 31;
 
   g_sync();
   currentnode=0;
@@ -522,7 +522,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
 	      if(src_site == (field_offset)(-1))
 		d2f_vec(src_field+3*i+color, &msg.ksv);
 	      else
-		d2f_vec((su3_vector *)F_PT(&lattice[i],src_site), &msg.ksv);
+		d2f_vec((vector *)F_PT(&lattice[i],src_site), &msg.ksv);
 	    }
 	  else
 	    {
@@ -533,7 +533,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
 
 	  /* Accumulate checksums - contribution from next site */
 	  for(k = 0, val = (u_int32type *)&pbuf[buf_length]; 
-	      k < (int)sizeof(fsu3_vector)/(int)sizeof(int32type); k++, val++)
+	      k < (int)sizeof(fvector)/(int)sizeof(int32type); k++, val++)
 	    {
 	      kspf->check.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
 	      kspf->check.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -547,7 +547,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
 	    {
 	      /* write out buffer */
 	      
-	      if( (int)fwrite(pbuf,sizeof(fsu3_vector),buf_length,fp) 
+	      if( (int)fwrite(pbuf,sizeof(fvector),buf_length,fp) 
 		  != buf_length)
 		{
 		  printf("w_serial_ks: Node %d prop write error %d file %s\n",
@@ -566,7 +566,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
 	    if(src_site == (field_offset)(-1))
 	      d2f_vec(src_field+3*i+color, &msg.ksv);
 	    else
-	      d2f_vec((su3_vector *)F_PT(&lattice[i],src_site), &msg.ksv);
+	      d2f_vec((vector *)F_PT(&lattice[i],src_site), &msg.ksv);
 	    send_field((char *)&msg, sizeof(msg),0);
 	  }
 	}
@@ -603,7 +603,7 @@ void w_serial_ks(ks_prop_file *kspf, int color, field_offset src_site,
 
 /*---------------------------------------------------------------------------*/
 /* Here only node 0 writes propagator to a serial file 
-   The propagator is passed as a single su3_vector in the site structure
+   The propagator is passed as a single vector in the site structure
 */
 
 void w_serial_ks_from_site(ks_prop_file *kspf, int color, 
@@ -613,14 +613,14 @@ void w_serial_ks_from_site(ks_prop_file *kspf, int color,
 }
 /*---------------------------------------------------------------------------*/
 /* Here only node 0 writes propagator to a serial file 
-   The propagator is passed as a single su3_vector in a field.
-   We assume the field is organized with three contiguous su3_vectors
+   The propagator is passed as a single vector in a field.
+   We assume the field is organized with three contiguous vectors
    per site.  But this call reads the vector for one color at a time.
    So the values for the ith site are taken from src_field[color + 3*i].
 */
 
 void w_serial_ks_from_field(ks_prop_file *kspf, int color, 
-			    su3_vector *src_field)
+			    vector *src_field)
 {
   w_serial_ks(kspf, color, (field_offset)(-1), src_field);
 }
@@ -814,7 +814,7 @@ ks_prop_file *r_serial_ks_i(char *filename)
 /* Here only node 0 reads the KS propagator from a binary file */
 
 int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
-		su3_vector *dest_field)
+		vector *dest_field)
 {
   /* 0 is normal exit code
      1 for seek, read error, or missing data error */
@@ -839,12 +839,12 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
   ks_prop_check test_kspc;
   u_int32type *val;
   int rank29,rank31;
-  fsu3_vector *pbuf = NULL;
-  su3_vector *dest;
+  fvector *pbuf = NULL;
+  vector *dest;
   int idest = 0;
 
   struct {
-    fsu3_vector ksv;
+    fvector ksv;
     char pad[PAD_SEND_BUF];    /* Introduced because some switches
 				  perform better if message lengths are longer */
   } msg;
@@ -862,7 +862,7 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
       if(kspf->parallel == PARALLEL)
 	printf("%s: Attempting serial read from parallel file \n",myname);
       
-      ks_prop_size = volume*sizeof(fsu3_vector) ;
+      ks_prop_size = volume*sizeof(fvector) ;
       ks_prop_check_size = sizeof(kspf->check.color) +
 	sizeof(kspf->check.sum29) + sizeof(kspf->check.sum31);
 
@@ -880,7 +880,7 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
      
       offset = head_size + body_size*color;
 
-      pbuf = (fsu3_vector *)malloc(MAX_BUF_LENGTH*sizeof(fsu3_vector));
+      pbuf = (fvector *)malloc(MAX_BUF_LENGTH*sizeof(fvector));
       if(pbuf == NULL)
 	{
 	  printf("%s: Node %d can't malloc pbuf\n",myname,this_node);
@@ -949,7 +949,7 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
       z = rcv_coords % nz;   rcv_coords /= nz;
       t = rcv_coords % nt;
       
-      /* The node that gets the next su3_vector */
+      /* The node that gets the next vector */
       destnode=node_number(x,y,z,t);
 
       if(this_node==0){
@@ -962,7 +962,7 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
 	    if(buf_length > MAX_BUF_LENGTH) buf_length = MAX_BUF_LENGTH;
 	    /* then do read */
 	    
-	    if( (int)fread(pbuf,sizeof(fsu3_vector),buf_length,fp) 
+	    if( (int)fread(pbuf,sizeof(fvector),buf_length,fp) 
 		!= buf_length)
 	      {
 		if(status == 0)
@@ -976,7 +976,7 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
 
 	/* Save vector in msg structure for further processing */
 	msg.ksv = pbuf[where_in_buf];
-	if(destnode==0){	/* just copy su3_vector */
+	if(destnode==0){	/* just copy vector */
 	  idest = node_index(x,y,z,t);
 	}
 	else {		        /* send to correct node */
@@ -1002,10 +1002,10 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
 	{
 	  if(byterevflag==1)
 	    byterevn((int32type *)(&msg.ksv),
-		     sizeof(fsu3_vector)/sizeof(int32type));
+		     sizeof(fvector)/sizeof(int32type));
 	  /* Accumulate checksums */
 	  for(k = 0, val = (u_int32type *)(&msg.ksv); 
-	      k < (int)sizeof(fsu3_vector)/(int)sizeof(int32type); k++, val++)
+	      k < (int)sizeof(fvector)/(int)sizeof(int32type); k++, val++)
 	    {
 	      test_kspc.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
 	      test_kspc.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -1016,13 +1016,13 @@ int r_serial_ks(ks_prop_file *kspf, int color, field_offset dest_site,
 	  if(dest_site == (field_offset)(-1))
 	    dest = dest_field + 3*idest + color;
 	  else
-	    dest = (su3_vector *)F_PT( &(lattice[idest]), dest_site );
+	    dest = (vector *)F_PT( &(lattice[idest]), dest_site );
 	  f2d_vec(&msg.ksv, dest);
 	}
       else
 	{
-	  rank29 += sizeof(fsu3_vector)/sizeof(int32type);
-	  rank31 += sizeof(fsu3_vector)/sizeof(int32type);
+	  rank29 += sizeof(fvector)/sizeof(int32type);
+	  rank31 += sizeof(fvector)/sizeof(int32type);
 	  rank29 %= 29;
 	  rank31 %= 31;
 	}
@@ -1079,13 +1079,13 @@ int r_serial_ks_to_site(ks_prop_file *kspf, int color, field_offset dest_site)
 
 /* Node 0 reads the KS propagator from a binary file with result in 
    a field.
-   The propagator is read as a single su3_vector in a field.
-   We assume the field is organized with three contiguous su3_vectors
+   The propagator is read as a single vector in a field.
+   We assume the field is organized with three contiguous vectors
    per site.  But this call reads the vector for one color at a time.
    So the values for the ith site are read to dest_field[color + 3*i]
  */
 
-int r_serial_ks_to_field(ks_prop_file *kspf, int color, su3_vector *dest_field)
+int r_serial_ks_to_field(ks_prop_file *kspf, int color, vector *dest_field)
 {
   return r_serial_ks(kspf, color, (field_offset)(-1), dest_field);
 }
@@ -1191,7 +1191,7 @@ void w_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
   FILE *fp;
   int currentnode,newnode;
   int b,l,x,y,z,t;
-  fsu3_vector pbuf;
+  fvector pbuf;
   int node0=0;
 
   g_sync();
@@ -1229,11 +1229,11 @@ void w_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
 	    {
 	      l=node_index(x,y,z,t);
 	      /* Copy, converting precision if necessary */
-	      d2f_vec((su3_vector *)F_PT( &(lattice[l]), src ), &pbuf);
+	      d2f_vec((vector *)F_PT( &(lattice[l]), src ), &pbuf);
 	    }
 	  else
 	    {
-	      get_field((char *)&pbuf,sizeof(fsu3_vector),currentnode);
+	      get_field((char *)&pbuf,sizeof(fvector),currentnode);
 	    }
 	  for(b=0;b<3;b++)
 	    {
@@ -1251,8 +1251,8 @@ void w_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
 	    {
 	      l=node_index(x,y,z,t);
 	      /* Copy, converting precision if necessary */
-	      d2f_vec((su3_vector *)F_PT( &(lattice[l]), src ), &pbuf);
-	      send_field((char *)&pbuf,sizeof(fsu3_vector),node0);
+	      d2f_vec((vector *)F_PT( &(lattice[l]), src ), &pbuf);
+	      send_field((char *)&pbuf,sizeof(fvector),node0);
 	    }
 	}
     }
@@ -1388,7 +1388,7 @@ int r_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
   FILE *fp;
   int destnode;
   int i,j,x,y,z,t;
-  fsu3_vector pbuf;
+  fvector pbuf;
   int status;
 
   ksph = kspf->header;
@@ -1428,19 +1428,19 @@ int r_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
 			  &(pbuf.c[j].imag)) )!= 2)
 		{
 		  if(status == 0)
-		    printf("r_ascii_ks: Error reading su3_vector\n"); 
+		    printf("r_ascii_ks: Error reading vector\n"); 
 		  status = 1;
 		}
 	    }
 	  if(destnode==0)
-	    {              /* just copy su3_vector */
+	    {              /* just copy vector */
 	      i = node_index(x,y,z,t);
 	      /* Copy, converting precision if necessary */
-	      f2d_vec(&pbuf, (su3_vector *)F_PT( &(lattice[i]), src ));
+	      f2d_vec(&pbuf, (vector *)F_PT( &(lattice[i]), src ));
 	    }
 	  else 
 	    {              /* send to correct node */
-	      send_field((char *)&pbuf, sizeof(fsu3_vector), destnode);
+	      send_field((char *)&pbuf, sizeof(fvector), destnode);
 	    }
 	}
       
@@ -1450,10 +1450,10 @@ int r_ascii_ks(ks_prop_file *kspf, int color, field_offset src)
 	  /* for all nodes other than node 0 */
 	  if(this_node==destnode)
 	    {
-	      get_field((char *)&pbuf, sizeof(fsu3_vector),0);
+	      get_field((char *)&pbuf, sizeof(fvector),0);
 	      i = node_index(x,y,z,t);
 	      /* Copy, converting precision if necessary */
-	      f2d_vec(&pbuf, (su3_vector *)F_PT( &(lattice[i]), src ));
+	      f2d_vec(&pbuf, (vector *)F_PT( &(lattice[i]), src ));
 	    }
 	}
     }
@@ -1508,8 +1508,8 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
   int currentnode, newnode;
   int x,y,z,t;
   register int i,a,b;
-  fsu3_matrix pbuf;
-  su3_vector *proppt;
+  fmatrix pbuf;
+  vector *proppt;
   site *s;
     
   /* Set up ks_prop file and ks_prop header structs and load header values */
@@ -1517,7 +1517,7 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
   ksph = kspf->header;
   ksph->order = NATURAL_ORDER;
 
-  ks_prop_size = volume*sizeof(fsu3_matrix)/nt;
+  ks_prop_size = volume*sizeof(fmatrix)/nt;
   body_size = ks_prop_size;
 
   /* No coordinate list was written because fields are to be written
@@ -1592,7 +1592,7 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
 	  /* just copy */
 	  i = node_index(x,y,z,t);
 	  s = &(lattice[i]);
-	  proppt = (su3_vector *)F_PT(s,prop);
+	  proppt = (vector *)F_PT(s,prop);
 	  /* Copy, converting precision if necessary */
 	  for(a=0; a<3; a++){
 	    for(b=0; b<3; b++){
@@ -1602,7 +1602,7 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
 	  }
 	}
 	else {
-	  get_field((char *)&pbuf,sizeof(fsu3_matrix),currentnode);
+	  get_field((char *)&pbuf,sizeof(fmatrix),currentnode);
 	}
 	
 	/* write out */
@@ -1631,7 +1631,7 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
 	    i=node_index(x,y,z,t);
 	    /* Copy data into send buffer and send to node 0 with padding */
 	    s = &(lattice[i]);
-	    proppt = (su3_vector *)F_PT(s,prop);
+	    proppt = (vector *)F_PT(s,prop);
 	    /* Copy, converting precision if necessary */
 	    for(a=0; a<3; a++){
 	      for(b=0; b<3; b++){
@@ -1639,7 +1639,7 @@ void w_serial_ksprop_tt( char *filename, field_offset prop)
 		pbuf.e[a][b].imag = proppt[a].c[b].imag;
 	      }
 	    }
-	    send_field((char *)&pbuf,sizeof(fsu3_matrix),0);
+	    send_field((char *)&pbuf,sizeof(fmatrix),0);
 	  }
       }
 
@@ -1669,8 +1669,8 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
   int currentnode, newnode;
   int x,y,z,t;
   register int i,a,b;
-  fsu3_matrix pbuf;
-  su3_vector *proppt;
+  fmatrix pbuf;
+  vector *proppt;
   site *s;
 
   /* Set up ks_prop file and ks_prop header structs and load header values */
@@ -1720,7 +1720,7 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
 	if(currentnode==0){ 
 	  i = node_index(x,y,z,t);
 	  s = &(lattice[i]);
-	  proppt = (su3_vector *)F_PT(s,prop);
+	  proppt = (vector *)F_PT(s,prop);
 
 	  /* Copy, converting precision if necessary */
 	  for(a=0; a<3; a++){
@@ -1731,7 +1731,7 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
 	  }
 	}
 	else {
-	  get_field((char *)&pbuf,sizeof(fsu3_matrix),currentnode);
+	  get_field((char *)&pbuf,sizeof(fmatrix),currentnode);
 	}
 	
 	for(a=0;a<3;a++)for(b=0;b<3;b++){
@@ -1747,7 +1747,7 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
 	if(this_node==currentnode){
 	  i = node_index(x,y,z,t);
 	  s = &(lattice[i]);
-	  proppt = (su3_vector *)F_PT(s,prop);
+	  proppt = (vector *)F_PT(s,prop);
 	  /* Copy, converting precision if necessary */
 	  for(a=0; a<3; a++){
 	    for(b=0; b<3; b++){
@@ -1755,7 +1755,7 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
 	      pbuf.e[a][b].imag = proppt[a].c[b].imag;
 	    }
 	  }
-	  send_field((char *)&pbuf,sizeof(fsu3_matrix),0);
+	  send_field((char *)&pbuf,sizeof(fmatrix),0);
 	} /* if */
       } /* else */
 
@@ -1790,7 +1790,7 @@ void w_ascii_ksprop_tt( char *filename, field_offset prop)
     }
 */
 
-/* one su3_vector for each source color */
+/* one vector for each source color */
 ks_prop_file *restore_ksprop_ascii( char *filename, field_offset prop )
 {
 
@@ -1799,9 +1799,9 @@ ks_prop_file *restore_ksprop_ascii( char *filename, field_offset prop )
   FILE *fp = NULL;
   int destnode;
   int version_number,i,a,b,x,y,z,t;
-  fsu3_matrix pbuf;
+  fmatrix pbuf;
   int src_clr;
-  su3_vector *proppt;
+  vector *proppt;
   site *s;
 
   /* Set up a prop file and prop header structure for reading */
@@ -1896,7 +1896,7 @@ ks_prop_file *restore_ksprop_ascii( char *filename, field_offset prop )
       if(destnode==0){	/* just copy */
 	i = node_index(x,y,z,t);
 	s = &(lattice[i]);
-	proppt = (su3_vector *)F_PT(s,prop);
+	proppt = (vector *)F_PT(s,prop);
 	/* Copy, converting precision if necessary */
 	for(src_clr=0; src_clr<3; src_clr++){
 	  for(b=0; b<3; b++){
@@ -1906,17 +1906,17 @@ ks_prop_file *restore_ksprop_ascii( char *filename, field_offset prop )
 	}
       }
       else {		/* send to correct node */
-	send_field((char *)&pbuf,sizeof(fsu3_matrix),destnode);
+	send_field((char *)&pbuf,sizeof(fmatrix),destnode);
       }
     }
 
     /* The node which contains this site reads message */
     else {	/* for all nodes other than node 0 */
       if(this_node==destnode){
-	get_field((char *)&pbuf,sizeof(fsu3_matrix),0);
+	get_field((char *)&pbuf,sizeof(fmatrix),0);
 	i = node_index(x,y,z,t);
 	s = &(lattice[i]);
-	proppt = (su3_vector *)F_PT(s,prop);
+	proppt = (vector *)F_PT(s,prop);
 	/* Copy, converting precision if necessary */
 	for(src_clr=0; src_clr<3; src_clr++){
 	  for(b=0; b<3; b++){
@@ -1947,7 +1947,7 @@ ks_prop_file *restore_ksprop_ascii( char *filename, field_offset prop )
 
 /* Save a KS propagator in ASCII format serially (node 0 only) */
 
-/* one su3_vector for each source color */
+/* one vector for each source color */
 ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
 {
 
@@ -1956,9 +1956,9 @@ ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
   FILE *fp = NULL;
   int currentnode, newnode;
   int i,a,b,x,y,z,t;
-  fsu3_matrix pbuf;
+  fmatrix pbuf;
   int src_clr;
-  su3_vector *proppt;
+  vector *proppt;
   site *s;
 
   /* Set up a prop file and prop header structure for reading */
@@ -2015,7 +2015,7 @@ ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
       if(currentnode==0){ 
 	i = node_index(x,y,z,t);
 	s = &(lattice[i]);
-	proppt = (su3_vector *)F_PT(s,prop);
+	proppt = (vector *)F_PT(s,prop);
 	/* Copy, converting precision if necessary */
 	for(src_clr=0; src_clr<3; src_clr++){
 	  for(b=0; b<3; b++){
@@ -2025,7 +2025,7 @@ ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
 	}
       }
       else {
-	get_field((char *)&pbuf,sizeof(fsu3_matrix),currentnode);
+	get_field((char *)&pbuf,sizeof(fmatrix),currentnode);
       }
 
       for(a=0;a<3;a++)for(b=0;b<3;b++){
@@ -2041,7 +2041,7 @@ ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
       if(this_node==currentnode){
 	i = node_index(x,y,z,t);
 	s = &(lattice[i]);
-	proppt = (su3_vector *)F_PT(s,prop);
+	proppt = (vector *)F_PT(s,prop);
 	/* Copy, converting precision if necessary */
 	for(src_clr=0; src_clr<3; src_clr++){
 	  for(b=0; b<3; b++){
@@ -2049,7 +2049,7 @@ ks_prop_file *save_ksprop_ascii(char *filename, field_offset prop)
 	    pbuf.e[src_clr][b].imag = proppt[src_clr].c[b].imag;
 	  }
 	}
-	send_field((char *)&pbuf,sizeof(fsu3_matrix),0);
+	send_field((char *)&pbuf,sizeof(fmatrix),0);
       } /* if */
     } /* else */
 

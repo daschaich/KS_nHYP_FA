@@ -538,7 +538,7 @@ Kalkreuter_qdp(QDP_ColorVector **eigVec, double *eigVal, Real Tolerance,
  */
 
 int
-Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
+Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
 	   Real RelTol, int Nvecs, int MaxIter,
 	   int Restart, int Kiters, int parity,
 	   ferm_links_t *fn)
@@ -547,8 +547,8 @@ Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
   QDP_ColorVector **vec;
   QDP_Subset subset;
   int i, its;
-  su3_matrix *t_fatlink;
-  su3_matrix *t_longlink;
+  matrix *t_fatlink;
+  matrix *t_longlink;
 
 #ifdef DEBUG
   if(QDP_this_node==0) printf("begin Kalkreuter\n");
@@ -644,7 +644,7 @@ print_densities_qdp(QDP_ColorVector *src, char *tag, int y, int z, int t,
 }
 
 /* measures the chiraliry of a normalized fermion state */
-void measure_chirality(su3_vector *src, double *chirality, int parity)
+void measure_chirality(vector *src, double *chirality, int parity)
 {
   register int i;
   register site *s;

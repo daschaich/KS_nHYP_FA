@@ -10,10 +10,10 @@
 void ax_gauge() {
   register int i, dir, t, j, k;
   register site *s;
-  su3_matrix tmat;
+  matrix tmat;
   msg_tag *mtag[4];
 
-  mtag[TUP] = start_gather_site( F_OFFSET(link[TUP]), sizeof(su3_matrix), TDOWN, EVENANDODD, gen_pt[TUP]);
+  mtag[TUP] = start_gather_site( F_OFFSET(link[TUP]), sizeof(matrix), TDOWN, EVENANDODD, gen_pt[TUP]);
 
     // Put gauge transformation into staple; it is unity for t=0 */
     FORALLSITES(i,s) if( (s->t)==0 ){
@@ -36,39 +36,39 @@ void ax_gauge() {
   wait_gather( mtag[TUP]);
 
   FORALLSITES(i,s) if( (s->t)==t ){
-      su3mat_copy( (su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
-      su3mat_copy( &(s->link[TUP]), &tmat);
+      mat_copy( (matrix *)(gen_pt[TUP][i]), &(s->staple));
+      mat_copy( &(s->link[TUP]), &tmat);
       mult_su3_nn( &(s->staple), &tmat, &(s->link[TUP]));
   }
 
   if(t<(nt-1)){
-      restart_gather_site( F_OFFSET(link[TUP]), sizeof(su3_matrix),
+      restart_gather_site( F_OFFSET(link[TUP]), sizeof(matrix),
     TDOWN, EVENANDODD, gen_pt[TUP], mtag[TUP] );
   }
   else{
       cleanup_gather( mtag[TUP]);
       mtag[TUP] = start_gather_site( F_OFFSET(link[TUP]),
-    sizeof(su3_matrix), TUP, EVENANDODD, gen_pt[TUP] );
+    sizeof(matrix), TUP, EVENANDODD, gen_pt[TUP] );
   }
     }
 
     /* Now do the gauge transformation of the space-like links */
     for(dir=XUP;dir<=ZUP;dir++){
-  mtag[dir] = start_gather_site( F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[dir] = start_gather_site( F_OFFSET(staple), sizeof(matrix),
       dir, EVENANDODD, gen_pt[dir] );
     }
 
     for(dir=XUP;dir<=ZUP;dir++){
   FORALLSITES(i,s){
-      su3mat_copy( &(s->link[dir]), &tmat);
+      mat_copy( &(s->link[dir]), &tmat);
       mult_su3_nn( &(s->staple), &tmat, &(s->link[dir]));
   }
 
   wait_gather( mtag[dir]);
 
   FORALLSITES(i,s){
-      su3mat_copy( &(s->link[dir]), &tmat);
-      mult_su3_na( &tmat, (su3_matrix *)(gen_pt[dir][i]),
+      mat_copy( &(s->link[dir]), &tmat);
+      mult_su3_na( &tmat, (matrix *)(gen_pt[dir][i]),
     &(s->link[dir]));
   }
     }
@@ -83,10 +83,10 @@ void ax_gauge() {
   wait_gather( mtag[TUP]);
 
   FORALLSITES(i,s) if( (s->t)==t ){
-             su3mat_copy( (su3_matrix *)(gen_pt[TUP][i]),&(s->link[TUP]));
+             mat_copy( (matrix *)(gen_pt[TUP][i]),&(s->link[TUP]));
   }
 
-  if(t>0) restart_gather_site( F_OFFSET(link[TUP]), sizeof(su3_matrix),
+  if(t>0) restart_gather_site( F_OFFSET(link[TUP]), sizeof(matrix),
         TUP, EVENANDODD, gen_pt[TUP], mtag[TUP] );
     }
 

@@ -108,7 +108,7 @@ int spectrum_fzw( Real vmass, field_offset temp1, field_offset temp2,
       clear_latvec( temp2,    EVENANDODD);
       
       if( node_number(xs,ys,zs,t_src) == mynode() ) {       
-	 ((su3_vector *)(F_PT(&lattice[ node_index(xs,ys,zs,t_src)],temp1)))->c[icol].real=-1.0;
+	 ((vector *)(F_PT(&lattice[ node_index(xs,ys,zs,t_src)],temp1)))->c[icol].real=-1.0;
       }
       
       /* do a C.G. (source in temp1, result in temp2) */

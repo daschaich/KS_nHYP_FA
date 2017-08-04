@@ -32,9 +32,9 @@ void dslash(field_offset chi, field_offset psi, int parity);
 
 // -----------------------------------------------------------------
 // Eigenvalue routines
-int Kalkreuter(su3_vector **eigVec, double *eigVal, Real Tolerance,
+int Kalkreuter(vector **eigVec, double *eigVal, Real Tolerance,
                Real RelTol, int Nvecs, int maxIter, int restart, int kiters);
 
-void measure_chirality(su3_vector *src, double *chirality);
-void print_densities(su3_vector *src, char *tag, int y, int z, int t);
+void measure_chirality(vector *src, double *chirality);
+void print_densities(vector *src, char *tag, int y, int z, int t);
 // -----------------------------------------------------------------

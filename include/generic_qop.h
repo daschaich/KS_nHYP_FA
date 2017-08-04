@@ -123,7 +123,7 @@ QOP_status_t initialize_qop(void);
 #endif
 
 QOP_F3_ColorVector* create_F_V_from_site(field_offset src, int parity);
-QOP_F3_ColorVector* create_F_V_from_field(su3_vector *src, int parity);
+QOP_F3_ColorVector* create_F_V_from_field(vector *src, int parity);
 QOP_F3_DiracFermion* create_F_D_from_site(field_offset src,	int parity);
 QOP_F3_DiracFermion* create_F_D_from_field(wilson_vector *src, 
 					       int parity);
@@ -132,7 +132,7 @@ QOP_F3_Force *create_F_F_from_site4(field_offset mom, int parity);
 
 void unload_F_V_to_site(field_offset dest, QOP_F3_ColorVector* src, 
 			int parity);
-void unload_F_V_to_field(su3_vector *dest, QOP_F3_ColorVector* src, 
+void unload_F_V_to_field(vector *dest, QOP_F3_ColorVector* src, 
 			int parity);
 void unload_F_D_to_site(field_offset dest, QOP_F3_DiracFermion* src, 
 			int parity);
@@ -146,15 +146,15 @@ void unload_F_G_to_site4(field_offset link, QOP_F3_GaugeField *qop,
 QOP_F3_FermionLinksAsqtad* create_F_L_from_sites( field_offset fat, 
 			 field_offset lng, int parity);
 
-QOP_F3_FermionLinksAsqtad* create_F_L_from_fields( su3_matrix *fat, 
-			  su3_matrix *lng, int parity);
+QOP_F3_FermionLinksAsqtad* create_F_L_from_fields( matrix *fat, 
+			  matrix *lng, int parity);
 
-void unload_F_L_to_fields( su3_matrix *fat, su3_matrix *lng, 
+void unload_F_L_to_fields( matrix *fat, matrix *lng, 
 			  QOP_F3_FermionLinksAsqtad* qop, int parity);
 
 
 QOP_D3_ColorVector* create_D_V_from_site(field_offset src, int parity);
-QOP_D3_ColorVector* create_D_V_from_field(su3_vector *src, int parity);
+QOP_D3_ColorVector* create_D_V_from_field(vector *src, int parity);
 QOP_D3_DiracFermion* create_D_D_from_site(field_offset src,	int parity);
 QOP_D3_DiracFermion* create_D_D_from_field(wilson_vector *src, 
 					       int parity);
@@ -163,7 +163,7 @@ QOP_D3_Force *create_D_F_from_site4(field_offset mom, int parity);
 
 void unload_D_V_to_site(field_offset dest, QOP_D3_ColorVector* src, 
 			int parity);
-void unload_D_V_to_field(su3_vector *dest, QOP_D3_ColorVector* src, 
+void unload_D_V_to_field(vector *dest, QOP_D3_ColorVector* src, 
 			int parity);
 
 void unload_D_D_to_site(field_offset dest, QOP_D3_DiracFermion* src, 
@@ -178,10 +178,10 @@ void unload_D_G_to_site4(field_offset link, QOP_D3_GaugeField *qop,
 QOP_D3_FermionLinksAsqtad* create_D_L_from_sites( field_offset fat, 
 			 field_offset lng, int parity);
 
-QOP_D3_FermionLinksAsqtad* create_D_L_from_fields( su3_matrix *fat, 
-			  su3_matrix *lng, int parity);
+QOP_D3_FermionLinksAsqtad* create_D_L_from_fields( matrix *fat, 
+			  matrix *lng, int parity);
 
-void unload_D_L_to_fields( su3_matrix *fat, su3_matrix *lng, 
+void unload_D_L_to_fields( matrix *fat, matrix *lng, 
 			  QOP_D3_FermionLinksAsqtad* qop, int parity);
 
 #endif /* GENERIC_QOPQDP_H */

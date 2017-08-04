@@ -53,7 +53,7 @@ int main(int argc, char *argv[])  {
     // Save the original links
     FORALLSITES(i, s) {
       for (dir = XUP; dir <= TUP; dir++)
-        su3mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
+        mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
     }
 
     // Checked that this reproduces the original ploop() result
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])  {
       // Restore the original links
       FORALLSITES(i, s) {
         for (dir = XUP; dir <= TUP; dir++)
-          su3mat_copy(&(s->link[dir + 8]), &(s->link[dir]));
+          mat_copy(&(s->link[dir + 8]), &(s->link[dir]));
       }
 
       // Loop over blocking levels (automatically determined)

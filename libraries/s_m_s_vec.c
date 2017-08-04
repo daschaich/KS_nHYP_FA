@@ -5,8 +5,8 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void scalar_mult_sub_su3_vector(su3_vector *a, su3_vector *b, Real s,
-                                su3_vector *c) {
+void scalar_mult_sub_vector(vector *a, vector *b, Real s,
+                                vector *c) {
 
   register int i;
   for (i = 0; i < 3; i++) {

@@ -134,7 +134,7 @@ int spectrum(ferm_links_t *fn)
 		{
 		  if( node_number(x,y,z,t_off) != mynode() )continue;
 		  i=node_index(x,y,z,t_off);
-		  cc = det_su3( (su3_matrix *)lattice[i].propmat );
+		  cc = det_su3( (matrix *)lattice[i].propmat );
 		  barprop += cc.real;
 		}
 		      

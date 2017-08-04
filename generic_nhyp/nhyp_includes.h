@@ -24,18 +24,18 @@ void block_and_fatten();
 void just_fatten();
 void leanlinks();
 void block_nhyp();
-void staple_nhyp(int dir1, int dir2, su3_matrix *lnk1,
-                 su3_matrix *lnk2, su3_matrix *stp);
+void staple_nhyp(int dir1, int dir2, matrix *lnk1,
+                 matrix *lnk2, matrix *stp);
 
 void block_nhyp1();
 void block_nhyp2();
 void block_nhyp3();
 #ifndef NHYP_DEBUG
-void compute_fhb(su3_matrix *Q, Real *f, Real b[3][3], int compute_b);
+void compute_fhb(matrix *Q, Real *f, Real b[3][3], int compute_b);
 #else
-void compute_fhb(su3_matrix *Omega, su3_matrix *Q, Real *f,
+void compute_fhb(matrix *Omega, matrix *Q, Real *f,
                  Real b[3][3], int compute_b);
 #endif
-void scalar_add_diag_su3(su3_matrix *a, Real s);
-void c_scalar_add_diag_su3(su3_matrix *a, complex *c);
+void scalar_add_diag_su3(matrix *a, Real s);
+void c_scalar_add_diag_su3(matrix *a, complex *c);
 // -----------------------------------------------------------------

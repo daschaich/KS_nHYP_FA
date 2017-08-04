@@ -162,7 +162,7 @@ void map_dwp_to_dcp(dirac_clover_param *dcp, dirac_wilson_param *dwp);
 
 /* f_mu_nu.c */
 
-void f_mu_nu(su3_matrix f_mn[],int mu,int nu);
+void f_mu_nu(matrix f_mn[],int mu,int nu);
 
 /* make_clov2.c */
 

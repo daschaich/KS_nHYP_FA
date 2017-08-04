@@ -10,7 +10,7 @@
 
 
 // -----------------------------------------------------------------
-Real check_su3(su3_matrix *c) {
+Real check_su3(matrix *c) {
   register int i, j, k;
   register Real ar, ai, ari, max = 0.0;
 
@@ -57,7 +57,7 @@ Real check_unitarity() {
   register int i,dir;
   int ii, jj, status = 0;
   register site *s;
-  register su3_matrix *mat;
+  register matrix *mat;
   Real deviation, max_deviation = 0.0;
   double av_deviation = 0.0;
   union {
@@ -71,7 +71,7 @@ Real check_unitarity() {
 #else
     for (dir=XUP; dir<=TUP; dir++) {
 #endif
-      mat = (su3_matrix *)&(s->link[dir]);
+      mat = (matrix *)&(s->link[dir]);
       deviation = check_su3(mat);
       if (deviation > TOLERANCE) {
         printf("Unitarity problem on node %d, site %d, dir %d, deviation=%f\n",

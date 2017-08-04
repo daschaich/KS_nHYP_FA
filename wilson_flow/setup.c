@@ -66,9 +66,9 @@ int setup() {
   // Set up neighbor pointers and comlink structures
   make_nn_gathers();
   // Allocate temporary fields and Wilson flow stuff
-  FIELD_ALLOC(tempmat, su3_matrix);
-  FIELD_ALLOC(tempmat2, su3_matrix);
-  FIELD_ALLOC_VEC(S, su3_matrix, NDIMS);
+  FIELD_ALLOC(tempmat, matrix);
+  FIELD_ALLOC(tempmat2, matrix);
+  FIELD_ALLOC_VEC(S, matrix, NDIMS);
   FIELD_ALLOC_VEC(A, anti_hermitmat, NDIMS);
 
   return prompt;

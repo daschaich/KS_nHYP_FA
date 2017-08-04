@@ -51,12 +51,12 @@ void clear_ksqs(ks_quark_source *ksqs){
 void alloc_ksqs_cv_src(ks_quark_source *ksqs)
 {
   if(ksqs->cv_src == NULL)
-    ksqs->cv_src = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+    ksqs->cv_src = (vector *)malloc(sizeof(vector)*sites_on_node);
   if(ksqs->cv_src == NULL){
     printf("alloc_ksqs_cv_src(%d): No room for source field\n",this_node);
     terminate(1);
   }
-  memset(ksqs->cv_src,'\0', sizeof(su3_vector)*sites_on_node);
+  memset(ksqs->cv_src,'\0', sizeof(vector)*sites_on_node);
 }
 
 void alloc_ksqs_c_src(ks_quark_source *ksqs)
@@ -73,7 +73,7 @@ void alloc_ksqs_c_src(ks_quark_source *ksqs)
 /* remove "if 0" when we need it */
 #if 0
 /* Copy c-source from vector */
-static void extract_C_from_V(complex *dest, su3_vector *src, int color){
+static void extract_C_from_V(complex *dest, vector *src, int color){
   int i; site *s;
   FORALLSITES(i,s){
     dest[i] = src[i].c[color];
@@ -83,7 +83,7 @@ static void extract_C_from_V(complex *dest, su3_vector *src, int color){
 
 #ifdef HAVE_QIO
 /* Copy vector from c-source */
-static void insert_V_from_C(su3_vector *dest, complex *src, int color){
+static void insert_V_from_C(vector *dest, complex *src, int color){
   int i; site *s;
   FORALLSITES(i,s){
     dest[i].c[color] = src[i];
@@ -91,7 +91,7 @@ static void insert_V_from_C(su3_vector *dest, complex *src, int color){
 }
 
 /* Copy color vector source */
-static void copy_V(su3_vector *dest, su3_vector *src)
+static void copy_V(vector *dest, vector *src)
 {
   int i; site *s;
   FORALLSITES(i,s){
@@ -125,7 +125,7 @@ int choose_usqcd_ks_file_type(int source_type){
   return file_type;
 }
 
-static void insert_mom_V(su3_vector *v, int mom[3], int t0){
+static void insert_mom_V(vector *v, int mom[3], int t0){
   int i; site *s;
   int c;
   Real pi = M_PI;
@@ -240,7 +240,7 @@ void r_open_ks_source(ks_quark_source *ksqs){
 #endif
 }
 
-int ks_source_field(su3_vector *src, ks_quark_source *ksqs)
+int ks_source_field(vector *src, ks_quark_source *ksqs)
 {
   register int i;
   register site *s; 
@@ -431,7 +431,7 @@ void w_open_ks_source(ks_quark_source *ksqs, char *fileinfo){
 
 /* For now we support writing only a color vector source field */
 
-int ks_source_write(su3_vector *src, ks_quark_source *ksqs)
+int ks_source_write(vector *src, ks_quark_source *ksqs)
 {
   char myname[] = "ks_source_write";
   
@@ -511,11 +511,11 @@ int ks_source_site(field_offset src, ks_quark_source *ksqs)
 {
   int i;
   site *s;
-  su3_vector *t_src;
+  vector *t_src;
   int status;
 
 #define PAD 0
-  t_src  = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
+  t_src  = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
   
   if(t_src == NULL){
     printf("ks_source_site(%d): Can't allocate t_src\n",this_node);
@@ -526,7 +526,7 @@ int ks_source_site(field_offset src, ks_quark_source *ksqs)
 
   /* copy src back */
   FORALLSITES(i,s) {
-    *(su3_vector *)F_PT(s,src) = t_src[i];
+    *(vector *)F_PT(s,src) = t_src[i];
   }
 
   free(t_src);

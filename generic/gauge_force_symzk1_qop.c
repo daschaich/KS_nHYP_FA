@@ -22,8 +22,8 @@ void load_qop_imp_gauge_coeffs(QOP_gauge_coeffs_t *c)
 
 void imp_gauge_force( Real eps, field_offset mom_off ){
 
-  su3_matrix **rawlinks;
-  su3_matrix **rawmom;
+  matrix **rawlinks;
+  matrix **rawmom;
 
   QOP_GaugeField *links;
   QOP_Force *mom;

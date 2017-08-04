@@ -16,20 +16,20 @@ params par_buf;
 // -----------------------------------------------------------------
 // Allocate all space for fields
 void make_fields() {
-  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
-  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field, matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);
 
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple2, matrix, 4);
+  FIELD_ALLOC_VEC(Staple3, matrix, 4);
 
-  FIELD_ALLOC(tempmat1, su3_matrix);
+  FIELD_ALLOC(tempmat1, matrix);
 
-  // Check the total number of su3_matrices; this may not be accurate
+  // Check the total number of matrices; this may not be accurate
   node0_printf("Mallocing %.1f MBytes per core for fields\n",
-               (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
+               (double)sites_on_node * 98 * sizeof(matrix) / 1e6);
 }
 // -----------------------------------------------------------------
 
@@ -47,7 +47,7 @@ int setup() {
   make_lattice();
   // Set up neighbor pointers and comlink structures
   make_nn_gathers();
-  // Allocate space for temporary su3_matrix field
+  // Allocate space for temporary matrix field
   make_fields();
 
   return prompt;

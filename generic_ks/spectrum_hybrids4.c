@@ -905,9 +905,9 @@ void mult_pion( field_offset src, field_offset dest ){
 	so nothing to do */
     register int i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
     FORALLSITES(i,s){
-	*(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+	*(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
     }
 }
 
@@ -919,10 +919,10 @@ void mult_pion2( field_offset src, field_offset dest ){
     register site *s;
     FORALLSITES(i,s){
 	if( ((s->x+s->y+s->z+s->t)&0x1) == 0 ){
-	    *(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+	    *(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
 	} else {
-	    scalar_mult_su3_vector( (su3_vector *)F_PT(s,src), -1.0,
-		(su3_vector *)F_PT(s,dest) );
+	    scalar_mult_vector( (vector *)F_PT(s,src), -1.0,
+		(vector *)F_PT(s,dest) );
 	}
     }
 }
@@ -934,10 +934,10 @@ void mult_rho( int pdir,  field_offset src, field_offset dest ){
     register site *s;
     FORALLSITES(i,s){
 	if( ((((short *)&(s->x))[pdir]) & 0x1) == 0 ){
-	    *(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+	    *(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
 	} else {
-	    scalar_mult_su3_vector( (su3_vector *)F_PT(s,src), -1.0,
-		(su3_vector *)F_PT(s,dest) );
+	    scalar_mult_vector( (vector *)F_PT(s,src), -1.0,
+		(vector *)F_PT(s,dest) );
 	}
     }
 }
@@ -947,13 +947,13 @@ void mult_rho2( int pdir,  field_offset src, field_offset dest ){
    /* operator is gamma_0 gamma_pdir, another (-1)^(x+y+z+t) for antiquark */
     register int i,j;
     register site *s;
-    su3_vector tvec1,tvec2;
+    vector tvec1,tvec2;
     FORALLSITES(i,s){
 	if( ((((short *)&(s->x))[pdir] + s->x+s->y+s->z) & 0x1) == 0 ){
-	    *(su3_vector *)F_PT(s,dest) = *(su3_vector *)F_PT(s,src);
+	    *(vector *)F_PT(s,dest) = *(vector *)F_PT(s,src);
 	} else {
-	    scalar_mult_su3_vector( (su3_vector *)F_PT(s,src), -1.0,
-		(su3_vector *)F_PT(s,dest) );
+	    scalar_mult_vector( (vector *)F_PT(s,src), -1.0,
+		(vector *)F_PT(s,dest) );
 	}
     }
 }
@@ -964,7 +964,7 @@ void mult_a1( int pdir,  field_offset src, field_offset dest ){
 	for antiquark */
     register int i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
 if(this_node==0)printf("OOPS, mult_a1 NOT WRITTEN\n");
 exit(0);
     FORALLSITES(i,s){
@@ -976,7 +976,7 @@ void mult_b1( int pdir,  field_offset src, field_offset dest ){
    /* operator is gamma_pdir, gamma_0, (-1)^(x+y+z+t), another (-1)^(x+y+z+t) for antiquark */
     register int i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
 if(this_node==0)printf("OOPS, mult_b1 NOT WRITTEN\n");
 exit(0);
     FORALLSITES(i,s){
@@ -988,7 +988,7 @@ void mult_zero_pm_B( field_offset src, field_offset dest ){
    /* operator is gamma_0, another (-1)^(x+y+z+t) for antiquark */
     register int i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
 if(this_node==0)printf("OOPS, mult_zero_pm_B NOT WRITTEN\n");
 exit(0);
     FORALLSITES(i,s){
@@ -1001,13 +1001,13 @@ exit(0);
 void mult_zero_pm( field_offset src, field_offset dest ){
     register int dir,i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
 
 if(this_node==0)printf("OOPS, mult_zero_pm NOT WRITTEN\n");
 exit(0);
     /* set destination to zero */
     FORALLSITES(i,s){
-	clearvec( (su3_vector *)F_PT(s,dest) );
+	clearvec( (vector *)F_PT(s,dest) );
     }
 
     /* Loop over spatial directions */
@@ -1028,13 +1028,13 @@ exit(0);
 void mult_zero_mm( field_offset src, field_offset dest ){
     register int dir,i;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
 
 if(this_node==0)printf("OOPS, mult_zero_mm NOT WRITTEN\n");
 exit(0);
     /* set destination to zero */
     FORALLSITES(i,s){
-	clearvec( (su3_vector *)F_PT(s,dest) );
+	clearvec( (vector *)F_PT(s,dest) );
     }
 
     /* Loop over spatial directions */
@@ -1060,11 +1060,11 @@ void mult_one_mp( int pdir, field_offset src, field_offset dest ){
     register int dir,i;
     register site *s;
     Real x;
-    su3_vector tvec1,tvec2;
+    vector tvec1,tvec2;
 
     /* set destination to zero */
     FORALLSITES(i,s){
-	clearvec( (su3_vector *)F_PT(s,dest) );
+	clearvec( (vector *)F_PT(s,dest) );
     }
 
     /* Loop over spatial directions orthogonal to pdir */
@@ -1076,8 +1076,8 @@ void mult_one_mp( int pdir, field_offset src, field_offset dest ){
 	FORALLSITES(i,s){
 	    if( ( (((short *)&(s->x))[pdir]) & 0x1 ) == 0 ) x = 1.0;
 	    else x = -1.0;
-	    scalar_mult_add_su3_vector( (su3_vector *)F_PT(s,dest),
-		(su3_vector *)&(s->cg_p), x, (su3_vector *)F_PT(s,dest) );
+	    scalar_mult_add_vector( (vector *)F_PT(s,dest),
+		(vector *)&(s->cg_p), x, (vector *)F_PT(s,dest) );
 	}
     } /* end loop on dir */
 } /* end mult_one_mp */
@@ -1091,17 +1091,17 @@ void mult_one_mp2( int pdir, field_offset src, field_offset dest ){
     /* use cg_p as temporary storage */
     register int dir,i;
     register site *s;
-    su3_vector tvec1;
+    vector tvec1;
 
     /* Multiply by pdir component of electric field, 
     multiply by gamma_0 and gamma_five (for antiquark propagator ) */
     mult_by_field_strength( TUP, pdir, src, F_OFFSET(cg_p) );
     FORALLSITES(i,s){
 	if( (s->t & 0x1) == 0 ){
-	    *(su3_vector *)F_PT(s,dest) = *((su3_vector *)&(s->cg_p));
+	    *(vector *)F_PT(s,dest) = *((vector *)&(s->cg_p));
 	} else {
-	    scalar_mult_su3_vector( (su3_vector *)&(s->cg_p), -1.0,
-		(su3_vector *)F_PT(s,dest) );
+	    scalar_mult_vector( (vector *)&(s->cg_p), -1.0,
+		(vector *)F_PT(s,dest) );
 	}
     }
 } /* end mult_one_mp2 */
@@ -1115,7 +1115,7 @@ void mult_qqqq1mp( int src_t, int pdir, field_offset src, field_offset dest,
     field_offset work, field_offset temp, Real mass ){
     register int dir,i;
     register site *s;
-    su3_vector tvec1;
+    vector tvec1;
     /* use "work" and "temp" as temporary storage */
 if(this_node==0)printf("OOPS, mult_qqqq1mp NOT WRITTEN\n");
 exit(0);
@@ -1144,7 +1144,7 @@ void mult_one_mm( int pdir, field_offset src, field_offset dest ){
     /* use cg_p as temporary storage */
     register int dir,i;
     register site *s;
-    su3_vector tvec1,tvec2;
+    vector tvec1,tvec2;
 
     /* multiply by magnetic field.  (-1)^(x+y+z+t) for antiquark cancels
 	(-1)^(x+y+z+t) in pion operator. */
@@ -1160,12 +1160,12 @@ void mult_one_pp( int pdir, field_offset src, field_offset dest ){
     /* use cg_p as temporary storage */
     register int i,j,k;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
     register Real sign;
 
     /* set destination to zero */
     FORALLSITES(i,s){
-	clearvec( (su3_vector *)F_PT(s,dest) );
+	clearvec( (vector *)F_PT(s,dest) );
     }
     /* loop over directions, sign is sign of epsilon tensor */
     for(j=XUP;j<=ZUP;j++)for(k=XUP;k<=ZUP;k++){
@@ -1177,8 +1177,8 @@ void mult_one_pp( int pdir, field_offset src, field_offset dest ){
 	FORALLSITES(i,s){
 	    if( ( (((short *)&(s->x))[pdir]) & 0x1 ) == 0 ) sign *= 1.0;
 	    else sign *= -1.0;
-	    scalar_mult_add_su3_vector( (su3_vector *)F_PT(s,dest), &tvec, sign,
-		(su3_vector *)F_PT(s,dest) );
+	    scalar_mult_add_vector( (vector *)F_PT(s,dest), &tvec, sign,
+		(vector *)F_PT(s,dest) );
 	}
 
     }/* end loop over j,k (directions) */
@@ -1192,12 +1192,12 @@ void mult_zero_mp( field_offset src, field_offset dest ){
     /* use cg_p as temporary storage */
     register int i,j,k,in;
     register site *s;
-    su3_vector tvec;
+    vector tvec;
     register Real x;
 
     /* set destination to zero */
     FORALLSITES(i,s){
-	clearvec( (su3_vector *)F_PT(s,dest) );
+	clearvec( (vector *)F_PT(s,dest) );
     }
     /* loop over directions, */
     for(i=XUP;i<=ZUP;i++){
@@ -1208,8 +1208,8 @@ void mult_zero_mp( field_offset src, field_offset dest ){
 	FORALLSITES(in,s){
 	    if( ( (((short *)&(s->x))[i]) & 0x1 ) == 0 ) x = 1.0;
 	    else x = -1.0;
-	    scalar_mult_add_su3_vector( (su3_vector *)F_PT(s,dest), &(s->cg_p),
-		x, (su3_vector *)F_PT(s,dest) );
+	    scalar_mult_add_vector( (vector *)F_PT(s,dest), &(s->cg_p),
+		x, (vector *)F_PT(s,dest) );
 	}
 
     }/* end loop over i,j,k (directions) */
@@ -1236,7 +1236,7 @@ exit(0);
   field strength tensor, source and dest vectors */
 void mult_by_field_strength( int dir1, int dir2,
     field_offset src, field_offset dest ){
-    su3_vector tvec;
+    vector tvec;
 
     register site *s;
     register int i;
@@ -1267,9 +1267,9 @@ void mult_by_field_strength( int dir1, int dir2,
 
     /* multiply by matrix */
     FORALLSITES(i,s){
-	mult_su3_mat_vec( &(s->field_strength[fs_dir]), 
-	    (su3_vector *)F_PT(s,src), &tvec );
-	scalar_mult_su3_vector( &tvec, sign, (su3_vector *)F_PT(s,dest) );
+	mult_mat_vec( &(s->field_strength[fs_dir]), 
+	    (vector *)F_PT(s,src), &tvec );
+	scalar_mult_vector( &tvec, sign, (vector *)F_PT(s,dest) );
     }
 }
 

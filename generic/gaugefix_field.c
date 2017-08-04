@@ -46,8 +46,8 @@
 
 /* Scratch space */
 
-static su3_matrix_f *diffmatp;               /* malloced diffmat pointer */
-static su3_vector_f *sumvecp;                /* malloced sumvec pointer */
+static matrix_f *diffmatp;               /* malloced diffmat pointer */
+static vector_f *sumvecp;                /* malloced sumvec pointer */
 void accum_gauge_hit(int gauge_dir,int parity);
 void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost);
 double get_gauge_fix_action(int gauge_dir,int parity);
@@ -64,7 +64,7 @@ void accum_gauge_hit(int gauge_dir,int parity)
 /* in sumvec  */
 
   register int j;
-  register su3_matrix_f *m1,*m2;
+  register matrix_f *m1,*m2;
   register int dir,i;
   register site *s;
 
@@ -72,7 +72,7 @@ void accum_gauge_hit(int gauge_dir,int parity)
 
   FORSOMEPARITY(i,s,parity)
     {
-      clear_su3mat_f(&diffmatp[i]);
+      clear_mat_f(&diffmatp[i]);
       clearvec_f(&sumvecp[i]);
     }
 
@@ -84,7 +84,7 @@ void accum_gauge_hit(int gauge_dir,int parity)
         {
           /* Upward link matrix */
           m1 = &(s->link[dir]);
-          sub_su3_matrix_f( &diffmatp[i], m1, &diffmatp[i]);
+          sub_matrix_f( &diffmatp[i], m1, &diffmatp[i]);
           for(j=0;j<NCOL;j++)CSUM( sumvecp[i].c[j],m1->e[j][j]);
         }
     }
@@ -96,8 +96,8 @@ void accum_gauge_hit(int gauge_dir,int parity)
       FORALLUPDIRBUT(gauge_dir,dir)
         {
           /* Downward link matrix */
-          m2 = (su3_matrix_f *)gen_pt[dir][i];
-          add_su3_matrix_f( &diffmatp[i], m2, &diffmatp[i]);
+          m2 = (matrix_f *)gen_pt[dir][i];
+          add_matrix_f( &diffmatp[i], m2, &diffmatp[i]);
           /* Add diagonal elements to sumvec  */
           for(j=0;j<NCOL;j++)CSUM( sumvecp[i].c[j], m2->e[j][j]);
         }
@@ -170,7 +170,7 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost)
       /* Do SU(2) hit on all downward links */
 
       FORALLUPDIR(dir)
-	right_su2_hit_a_f(&u,p,q,(su3_matrix_f *)gen_pt[dir][i]);
+	right_su2_hit_a_f(&u,p,q,(matrix_f *)gen_pt[dir][i]);
 
     }
 
@@ -187,7 +187,7 @@ double get_gauge_fix_action(int gauge_dir,int parity)
 
   register int dir,i,ndir;
   register site *s;
-  register su3_matrix_f *m1, *m2;
+  register matrix_f *m1, *m2;
   double gauge_fix_action;
   complex trace;
 
@@ -198,7 +198,7 @@ double get_gauge_fix_action(int gauge_dir,int parity)
       FORALLUPDIRBUT(gauge_dir,dir)
 	{
 	  m1 = &(s->link[dir]);
-	  m2 = (su3_matrix_f *)gen_pt[dir][i];
+	  m2 = (matrix_f *)gen_pt[dir][i];
 
 	  trace = trace_su3_f(m1);
 	  gauge_fix_action += (double)trace.real;
@@ -240,7 +240,7 @@ void gaugefixstep(int gauge_dir,double *av_gauge_fix_action,Real relax_boost)
 
       FORALLUPDIR(dir)
 	{
-	  mtag[dir] = start_gather_site( F_OFFSET(link[dir]), sizeof(su3_matrix_f),
+	  mtag[dir] = start_gather_site( F_OFFSET(link[dir]), sizeof(matrix_f),
 			   OPP_DIR(dir), parity, gen_pt[dir] );
 	}
 
@@ -293,7 +293,7 @@ For the same reason, U_dir(t=0) is always copied back unmodified.
 
 	  FORSOMEPARITY(i,s,parity)
 	  {
-	      su3mat_copy_f((su3_matrix_f *)(gen_pt[dir][i]), &diffmatp[i]);
+	      mat_copy_f((matrix_f *)(gen_pt[dir][i]), &diffmatp[i]);
 	  }
 
 	  /* Now we are finished with gen_pt[dir] */
@@ -304,7 +304,7 @@ For the same reason, U_dir(t=0) is always copied back unmodified.
 	  g_sync();
 
 	  /* Gather diffmat onto sites of opposite parity */
-	  mtag[dir] = start_gather_field( diffmatp, sizeof(su3_matrix_f),
+	  mtag[dir] = start_gather_field( diffmatp, sizeof(matrix_f),
 				      dir, OPP_PAR(parity), gen_pt[dir] );
 
 	  wait_gather(mtag[dir]);
@@ -312,7 +312,7 @@ For the same reason, U_dir(t=0) is always copied back unmodified.
          /* Copy modified matrices into proper location */
 
          FORSOMEPARITY(i,s,OPP_PAR(parity))
-	      su3mat_copy_f((su3_matrix_f *)(gen_pt[dir][i]),&(s->link[dir]));
+	      mat_copy_f((matrix_f *)(gen_pt[dir][i]),&(s->link[dir]));
 
 	  cleanup_gather(mtag[dir]);
 	}
@@ -322,14 +322,14 @@ For the same reason, U_dir(t=0) is always copied back unmodified.
 
 void gaugefixscratch()
 {
-      diffmatp = (su3_matrix_f *)malloc(sizeof(su3_matrix_f)*sites_on_node);
+      diffmatp = (matrix_f *)malloc(sizeof(matrix_f)*sites_on_node);
       if(diffmatp == NULL)
 	{
 	  node0_printf("gaugefix: Can't malloc diffmat\n");
 	  fflush(stdout);terminate(1);
 	}
 
-      sumvecp = (su3_vector_f *)malloc(sizeof(su3_vector_f)*sites_on_node);
+      sumvecp = (vector_f *)malloc(sizeof(vector_f)*sites_on_node);
       if(sumvecp == NULL)
 	{
 	  node0_printf("gaugefix: Can't malloc sumvec\n");

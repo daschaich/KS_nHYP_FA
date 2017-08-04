@@ -48,9 +48,9 @@ short get_coord(int i, int dir) {
 /* as specified by the color vector c                            */
 /* Result is put in tempmat1 */
 void accum_delta_prop(int i,int c[3], field_offset tempmat1) {
-  register su3_matrix *tmp1;
+  register matrix *tmp1;
   int j = -1, dir;
-  su3_matrix *af, *ab;
+  matrix *af, *ab;
 
   FORALLUPDIRBUT(TUP, dir) {
     /* For timeward propagation, this step is pedantic */
@@ -63,14 +63,14 @@ void accum_delta_prop(int i,int c[3], field_offset tempmat1) {
     }
 
     /* gen_pt points to the "q" propagator on the next neighbor    */
-    af = (su3_matrix *)gen_pt[dir][i];
-    ab = (su3_matrix *)gen_pt[dir+4][i];
-    tmp1 = (su3_matrix *)F_PT(&lattice[i], tempmat1);
-    su3vec_copy((su3_vector *)(af->e[c[j]]),
-        (su3_vector *)(tmp1->e[j]));
-    add_su3_vector((su3_vector *)(ab->e[c[j]]),
-        (su3_vector *)(tmp1->e[j]),
-        (su3_vector *)(tmp1->e[j]));
+    af = (matrix *)gen_pt[dir][i];
+    ab = (matrix *)gen_pt[dir+4][i];
+    tmp1 = (matrix *)F_PT(&lattice[i], tempmat1);
+    su3vec_copy((vector *)(af->e[c[j]]),
+        (vector *)(tmp1->e[j]));
+    add_vector((vector *)(ab->e[c[j]]),
+        (vector *)(tmp1->e[j]),
+        (vector *)(tmp1->e[j]));
 
   }
 }
@@ -98,7 +98,7 @@ void delta_prop(int c0,int c1,int c2,int perm,int t,double *delprop,
     /*  Calculate for the cube origin only */
     accum_delta_prop(i, c, tempmat1);
 
-    tc = det_su3((su3_matrix *)F_PT(&lattice[i], tempmat1));
+    tc = det_su3((matrix *)F_PT(&lattice[i], tempmat1));
 
     if (perm > 0)
       *delprop += tc.real;
@@ -113,36 +113,36 @@ void accum_nl_meson_prop(int i,int dir,
      /* for all source wall colors */
      /* at site i in direction dir */
      /* destq <- D_dir q; desto <- D_dir o */
-     /* destq and desto must be of size su3_matrix */
+     /* destq and desto must be of size matrix */
 {
-  su3_matrix *af, *ab;
-  register su3_matrix *dstq, *dsto;
+  matrix *af, *ab;
+  register matrix *dstq, *dsto;
 
   /* gen_pt[0+dir] points to the "q" propagator       */
   /* destq <- D_dir q                       */
-  af = (su3_matrix *)gen_pt[dir][i];
-  ab = (su3_matrix *)gen_pt[dir+4][i];
-  dstq = (su3_matrix *)F_PT(&lattice[i],destq);
-  su3mat_copy(af, dstq);
-  add_su3_matrix(ab, dstq, dstq);
+  af = (matrix *)gen_pt[dir][i];
+  ab = (matrix *)gen_pt[dir+4][i];
+  dstq = (matrix *)F_PT(&lattice[i],destq);
+  mat_copy(af, dstq);
+  add_matrix(ab, dstq, dstq);
 
   /* gen_pt[8+dir] points to the "o" propagator      */
   /* desto <- D_dir o                       */
-  af = (su3_matrix *)gen_pt[8+dir][i];
-  ab = (su3_matrix *)gen_pt[8+dir+4][i];
-  dsto = (su3_matrix *)F_PT(&lattice[i],desto);
-  su3mat_copy(af, dsto);
-  add_su3_matrix(ab, dsto, dsto);
+  af = (matrix *)gen_pt[8+dir][i];
+  ab = (matrix *)gen_pt[8+dir+4][i];
+  dsto = (matrix *)F_PT(&lattice[i],desto);
+  mat_copy(af, dsto);
+  add_matrix(ab, dsto, dsto);
 
 }
 
 /* Calculate non-local pion propagator pi_3 and pi_3 tilde */
 /* and local pion propagators for a check */
-/* tempmat1 and tempmat2 are scratch space of size su3_matrix each */
+/* tempmat1 and tempmat2 are scratch space of size matrix each */
 void nl_meson_prop (int t, double *nlpiprop, double *nlpi2prop,
                     double *ckpiprop, double *ckpi2prop,
                     field_offset tempmat1, field_offset tempmat2) {
-  register su3_matrix *tmp1, *tmp2;
+  register matrix *tmp1, *tmp2;
   int x, y, z, i, icol, coord;
   complex tc;
 
@@ -162,21 +162,21 @@ void nl_meson_prop (int t, double *nlpiprop, double *nlpi2prop,
       if (coord%2 ==0) {
         /* propmat contains "q" and tempmat1 contains "Dq" */
         /* q^adj D q  */
-        tmp1 = (su3_matrix *)F_PT(&lattice[i], tempmat1);
+        tmp1 = (matrix *)F_PT(&lattice[i], tempmat1);
         tc = su3_dot(&lattice[i].propmat[icol],
-                     (su3_vector *)(tmp1->e[icol]));
+                     (vector *)(tmp1->e[icol]));
         *nlpiprop += tc.real;
 
         /* propmat2 contains "o" and tempmat2 contains "Do" */
         /* q^adj D q - o^adj D o  */
-        tmp2 = (su3_matrix *)F_PT(&lattice[i], tempmat2);
+        tmp2 = (matrix *)F_PT(&lattice[i], tempmat2);
         tc = su3_dot(&(lattice[i].propmat2[icol]),
-                     (su3_vector *)(tmp2->e[icol]));
+                     (vector *)(tmp2->e[icol]));
         *nlpiprop -= tc.real;
 
         /* o^adj D q          */
         tc = su3_dot(&lattice[i].propmat2[icol],
-                     (su3_vector *)(tmp1->e[icol]));
+                     (vector *)(tmp1->e[icol]));
 
         if ((x + y + z) % 2 == 0)
           *nlpi2prop += tc.real;
@@ -185,7 +185,7 @@ void nl_meson_prop (int t, double *nlpiprop, double *nlpi2prop,
 
         /* o^adj D q - q^adj D o          */
         tc = su3_dot(&(lattice[i].propmat[icol]),
-                     (su3_vector *)(tmp2 ->e[icol]));
+                     (vector *)(tmp2 ->e[icol]));
 
         if ((x + y + z) % 2 == 0)
           *nlpi2prop -= tc.real;
@@ -230,7 +230,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
   register int i, x, y, z, t, icol, cgn = 0, t_src, t_off;
   register site *s;
   register complex tc;
-  register su3_matrix *tmp1;
+  register matrix *tmp1;
   int dir, isrc;
   Real vmass_x2 = 2 * vmass, one_ov_N = 1.0 / (Real)n_src;
   double proptmp;
@@ -289,7 +289,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
           if (node_number(x, y, z, t_src) != mynode())
             continue;
           i = node_index(x, y, z, t_src);
-          ((su3_vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
+          ((vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
         }
       }
 
@@ -314,7 +314,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
           if (node_number(x, y, z, t_src) != mynode())
             continue;
           i = node_index(x,y,z, t_src);
-          ((su3_vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
+          ((vector *)(F_PT(&lattice[i], tempvec1)))->c[icol].real = -0.25;
         }
       }
 
@@ -357,7 +357,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
       for (x=0;x<nx;x+=2)for (y=0;y<ny;y+=2)for (z=0;z<nz;z+=2) {
         if (node_number(x, y, z, t_off) != mynode())continue;
         i=node_index(x, y, z, t_off);
-        tc = det_su3((su3_matrix *)(lattice[i].propmat));
+        tc = det_su3((matrix *)(lattice[i].propmat));
         proptmp += tc.real;
       }
 
@@ -393,13 +393,13 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
     /* Put q = E + O in propmat and o = E - O in propmat2 */
 
     FORALLSITES(i,s) {
-      tmp1 = (su3_matrix *)F_PT(s, tempmat1);
+      tmp1 = (matrix *)F_PT(s, tempmat1);
       for (icol = 0; icol < 3; icol++) {
-        add_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
-            (su3_vector *)(tmp1->e[icol]));
-        sub_su3_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
+        add_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
+            (vector *)(tmp1->e[icol]));
+        sub_vector (&(s->propmat[icol]), &(s->propmat2[icol]),
             &(s->propmat2[icol]));
-        su3vec_copy((su3_vector *)(tmp1->e[icol]),
+        su3vec_copy((vector *)(tmp1->e[icol]),
             &(s->propmat[icol]));
       }
     }
@@ -410,12 +410,12 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
       /* Start bringing "q" = propmat from forward sites    */
 
       mtag[dir] = start_gather_site(F_OFFSET(propmat[0]),
-          sizeof(su3_matrix), dir, EVENANDODD, gen_pt[dir]);
+          sizeof(matrix), dir, EVENANDODD, gen_pt[dir]);
 
       /* Start bringing "q" from backward neighbors       */
 
       mtag[dir+4] = start_gather_site(F_OFFSET(propmat[0]),
-          sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
+          sizeof(matrix), OPP_DIR(dir), EVENANDODD,
           gen_pt[dir+4]);
       wait_gather(mtag[dir]);
       wait_gather(mtag[dir+4]);
@@ -423,12 +423,12 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
       /* Start bringing "o" = propmat2 from forward sites   */
 
       mtag[8+dir] = start_gather_site(F_OFFSET(propmat2[0]),
-          sizeof(su3_matrix), dir, EVENANDODD, gen_pt[8+dir]);
+          sizeof(matrix), dir, EVENANDODD, gen_pt[8+dir]);
 
       /* Start bringing "o" from backward neighbors       */
 
       mtag[8+dir+4] = start_gather_site(F_OFFSET(propmat2[0]),
-          sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD,
+          sizeof(matrix), OPP_DIR(dir), EVENANDODD,
           gen_pt[8+dir+4]);
       wait_gather(mtag[8+dir]);
       wait_gather(mtag[8+dir+4]);
@@ -467,7 +467,7 @@ int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
         if (node_number(x,y,z, t_off) != mynode())continue;
         i=node_index(x,y,z, t_off);
         /* The q propagator is in propmat */
-        tc = det_su3((su3_matrix *)(lattice[i].propmat));
+        tc = det_su3((matrix *)(lattice[i].propmat));
         proptmp += tc.real;
       }
 

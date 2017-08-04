@@ -16,7 +16,7 @@ void w_loop2(int tot_smear) {
   int nth,nxh,nrmax;
   int disp[4];      // Displacement vector for general gather
   double *wils_loop2, dt;
-  su3_matrix tmat1, tmat2;
+  matrix tmat1, tmat2;
   msg_tag *mtag[8], *gmtag;
 
   if (nx != ny || nx != nz) {
@@ -38,13 +38,13 @@ void w_loop2(int tot_smear) {
     for (dir2 = dir1 + 1; dir2 <= ZUP; dir2++) {
       // First "sqrt(2)" loops in the (dir1, dir2) plane
       // Construct the "diagonal" link in the (dir1, dir2) direction
-      mtag[dir1] = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+      mtag[dir1] = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                      dir1, EVENANDODD, gen_pt[dir1]);
-      mtag[dir2] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+      mtag[dir2] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                                      dir2, EVENANDODD, gen_pt[dir2]);
 
       FORALLSITES(i,s)
-        su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+        mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
       // Concurrently start gather of temporal links across the diagonal
       for (i = XUP; i <= TUP; i++)
@@ -53,19 +53,19 @@ void w_loop2(int tot_smear) {
       disp[dir1] = 1;
       disp[dir2] = 1;
       gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
       wait_gather(mtag[dir1]);
       wait_gather(mtag[dir2]);
       dt = 0.5;
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[dir1][i]),
+        mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                     &(s->diag));
-        mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[dir2][i]),
+        mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
                     &tmat1);
-        add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-        scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+        add_matrix(&(s->diag), &tmat1, &(s->diag));
+        scalar_mult_matrix(&(s->diag), dt, &(s->diag));
       }
       cleanup_gather(mtag[dir1]);
       cleanup_gather(mtag[dir2]);
@@ -75,45 +75,45 @@ void w_loop2(int tot_smear) {
       for (r = 0; r < nxh; r++) {
         if (r == 0) {
           FORALLSITES(i, s)
-            su3mat_copy(&(s->diag), &(s->s_link));
+            mat_copy(&(s->diag), &(s->s_link));
         }
         else {
           wait_general_gather(gmtag);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
           cleanup_general_gather(gmtag);
 
           // Concurrently gather temporal links across the diagonal
           gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                            sizeof(su3_matrix), disp,
+                                            sizeof(matrix), disp,
                                             EVENANDODD, gen_pt[4]);
 
           FORALLSITES(i, s)
             mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
         }
         FORALLSITES(i, s)
-          su3mat_copy(&(s->s_link), &(s->s_link_f));
+          mat_copy(&(s->s_link), &(s->s_link_f));
 
         // Start gather of forward spatial segments
         mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                      sizeof(su3_matrix), TUP,
+                                      sizeof(matrix), TUP,
                                       EVENANDODD, gen_pt[TUP]);
 
         // Collect forward temporal links
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+          mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
         FORALLSITES(i, s)
-          su3mat_copy(&(s->staple), &(s->t_link_f));
+          mat_copy(&(s->staple), &(s->t_link_f));
 
         cleanup_general_gather(gmtag);
 
         // Concurrently gather spatial links across the diagonal for next r
         if (r < nxh - 1)
           gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                            sizeof(su3_matrix), disp,
+                                            sizeof(matrix), disp,
                                             EVENANDODD, gen_pt[4]);
 
         // Recursively compute the Wilson loops of different time extent
@@ -121,14 +121,14 @@ void w_loop2(int tot_smear) {
           // Collect forward spatial segments
           wait_gather(mtag[TUP]);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
           FORALLSITES(i, s)
-            su3mat_copy(&(s->staple), &(s->s_link_f));
+            mat_copy(&(s->staple), &(s->s_link_f));
 
           // Start gather for next t, if still needed
           if (t < nth - 1)
-            restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+            restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                                 TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
           else
             cleanup_gather(mtag[TUP]);
@@ -156,23 +156,23 @@ void w_loop2(int tot_smear) {
 
       disp[dir1] = 1;
       disp[dir2] = -1;
-      gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+      gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                         disp, EVENANDODD, gen_pt[4]);
 
       // Multiply one corner and then gather it
       FORALLSITES(i, s)
         mult_su3_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
 
-      mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+      mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                                      OPP_DIR(dir2), EVENANDODD, gen_pt[dir2]);
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+        mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
       // Make second corner
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]),
+        mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                     &(s->diag));
 
       cleanup_general_gather(gmtag);
@@ -181,14 +181,14 @@ void w_loop2(int tot_smear) {
       wait_gather(mtag[dir2]);
       dt = 0.5;
       FORALLSITES(i, s) {
-        add_su3_matrix(&(s->diag), (su3_matrix *)(gen_pt[dir2][i]),
+        add_matrix(&(s->diag), (matrix *)(gen_pt[dir2][i]),
                        &(s->diag));
-        scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+        scalar_mult_matrix(&(s->diag), dt, &(s->diag));
       }
       cleanup_gather(mtag[dir2]);
 
       // Start gather of temporal links across the diagonal
-      gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+      gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                         disp, EVENANDODD, gen_pt[4]);
 
       // Recursively construct the spatial segments
@@ -196,45 +196,45 @@ void w_loop2(int tot_smear) {
       for (r = 0; r < nxh; r++) {
         if (r == 0) {
           FORALLSITES(i, s)
-            su3mat_copy(&(s->diag), &(s->s_link));
+            mat_copy(&(s->diag), &(s->s_link));
         }
         else {
           wait_general_gather(gmtag);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
           cleanup_general_gather(gmtag);
 
           // Concurrently gather temporal links across the diagonal
           gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                            sizeof(su3_matrix), disp,
+                                            sizeof(matrix), disp,
                                             EVENANDODD, gen_pt[4]);
 
           FORALLSITES(i, s)
             mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
         }
         FORALLSITES(i, s)
-          su3mat_copy(&(s->s_link), &(s->s_link_f));
+          mat_copy(&(s->s_link), &(s->s_link_f));
 
         // Start gather of forward spatial segments
         mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                      sizeof(su3_matrix), TUP,
+                                      sizeof(matrix), TUP,
                                       EVENANDODD, gen_pt[TUP]);
 
         // Collect forward temporal links
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+          mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
         FORALLSITES(i, s)
-          su3mat_copy(&(s->staple), &(s->t_link_f));
+          mat_copy(&(s->staple), &(s->t_link_f));
 
         cleanup_general_gather(gmtag);
 
         // Concurrently gather spatial links across the diagonal for next r
         if (r < nxh - 1)
           gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                            sizeof(su3_matrix), disp,
+                                            sizeof(matrix), disp,
                                             EVENANDODD, gen_pt[4]);
 
         // Recursively compute the Wilson loops of different time extent
@@ -242,14 +242,14 @@ void w_loop2(int tot_smear) {
           // Collect forward spatial segments
           wait_gather(mtag[TUP]);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
           FORALLSITES(i, s)
-            su3mat_copy(&(s->staple), &(s->s_link_f));
+            mat_copy(&(s->staple), &(s->s_link_f));
 
           // Start gather for next t, if still needed
           if (t < nth - 1)
-            restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+            restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                                 TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
           else
             cleanup_gather(mtag[TUP]);
@@ -280,7 +280,7 @@ void w_loop2(int tot_smear) {
         // First, "sqrt(5)" loops in (dir1, dir2) plane
         // Construct the "diagonal" link in the (2 * dir1, dir2) direction
         mtag[dir1] = start_gather_site(F_OFFSET(link[dir1]),
-                                       sizeof(su3_matrix), dir1,
+                                       sizeof(matrix), dir1,
                                        EVENANDODD, gen_pt[dir1]);
 
         // Start gather of dir2-link from 2 * dir1
@@ -289,28 +289,28 @@ void w_loop2(int tot_smear) {
 
         disp[dir1] = 2;
         gmtag = start_general_gather_site(F_OFFSET(link[dir2]),
-                                          sizeof(su3_matrix), disp,
+                                          sizeof(matrix), disp,
                                           EVENANDODD, gen_pt[4]);
 
         FORALLSITES(i, s)
-          su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+          mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
         // Make double links in dir1 direction
         wait_gather(mtag[dir1]);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[dir1][i]),
+          mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                       &(s->s_link));
 
         cleanup_gather(mtag[dir1]);
 
         // Gather the double links from dir2 direction
-        mtag[dir2] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+        mtag[dir2] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                                        dir2, EVENANDODD, gen_pt[dir2]);
 
         // Make first corner
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->s_link), (su3_matrix *)(gen_pt[4][i]),
+          mult_su3_nn(&(s->s_link), (matrix *)(gen_pt[4][i]),
                       &(s->diag));
 
         cleanup_general_gather(gmtag);
@@ -319,10 +319,10 @@ void w_loop2(int tot_smear) {
         wait_gather(mtag[dir2]);
         dt = 0.5;
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[dir2][i]),
+          mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
                       &tmat1);
-          add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-          scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+          add_matrix(&(s->diag), &tmat1, &(s->diag));
+          scalar_mult_matrix(&(s->diag), dt, &(s->diag));
         }
         cleanup_gather(mtag[dir2]);
 
@@ -333,7 +333,7 @@ void w_loop2(int tot_smear) {
         disp[dir1] = 2;
         disp[dir2] = 1;
         gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                          sizeof(su3_matrix), disp,
+                                          sizeof(matrix), disp,
                                           EVENANDODD, gen_pt[4]);
 
         // Recursively construct the spatial segments
@@ -341,45 +341,45 @@ void w_loop2(int tot_smear) {
         for (r = 0; r < nxh / 2; r++) {
           if (r == 0) {
             FORALLSITES(i, s)
-              su3mat_copy(&(s->diag), &(s->s_link));
+              mat_copy(&(s->diag), &(s->s_link));
           }
           else {
             wait_general_gather(gmtag);
             FORALLSITES(i, s)
-              su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+              mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
             cleanup_general_gather(gmtag);
 
             // Concurrently gather temporal links across the diagonal
             gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                              sizeof(su3_matrix), disp,
+                                              sizeof(matrix), disp,
                                               EVENANDODD, gen_pt[4]);
 
             FORALLSITES(i, s)
               mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
           }
           FORALLSITES(i, s)
-            su3mat_copy(&(s->s_link), &(s->s_link_f));
+            mat_copy(&(s->s_link), &(s->s_link_f));
 
           // Start gather of forward spatial segments
           mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                        sizeof(su3_matrix), TUP,
+                                        sizeof(matrix), TUP,
                                         EVENANDODD, gen_pt[TUP]);
 
           // Collect forward temporal links
           wait_general_gather(gmtag);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
           FORALLSITES(i, s)
-            su3mat_copy(&(s->staple), &(s->t_link_f));
+            mat_copy(&(s->staple), &(s->t_link_f));
 
           cleanup_general_gather(gmtag);
 
           // Concurrently gather spatial links across the diagonal for next r
           if (r < nxh / 2 - 1)
             gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                              sizeof(su3_matrix), disp,
+                                              sizeof(matrix), disp,
                                               EVENANDODD, gen_pt[4]);
 
           // Recursively compute the Wilson loops of different time extent
@@ -387,14 +387,14 @@ void w_loop2(int tot_smear) {
             // Collect forward spatial segments
             wait_gather(mtag[TUP]);
             FORALLSITES(i, s)
-              su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+              mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
             FORALLSITES(i, s)
-              su3mat_copy(&(s->staple), &(s->s_link_f));
+              mat_copy(&(s->staple), &(s->s_link_f));
 
             // Start gather for next t, if still needed
             if (t < nth - 1)
-              restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+              restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                                   TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
             else
               cleanup_gather(mtag[TUP]);
@@ -416,7 +416,7 @@ void w_loop2(int tot_smear) {
 
         // Next, "sqrt(5)" loops in the (dir1, -dir2) plane
         // Construct the "diagonal" link in the (2 * dir1, -dir2) direction
-        mtag[dir1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+        mtag[dir1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                                        dir1, EVENANDODD, gen_pt[dir1]);
 
         // Gather dir2-link from across the diagonal
@@ -426,16 +426,16 @@ void w_loop2(int tot_smear) {
         disp[dir1] = 2;
         disp[dir2] = -1;
         gmtag = start_general_gather_site(F_OFFSET(link[dir2]),
-                                          sizeof(su3_matrix), disp,
+                                          sizeof(matrix), disp,
                                           EVENANDODD, gen_pt[4]);
 
         FORALLSITES(i, s)
-          su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+          mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
         // Make double links in dir1 direction
         wait_gather(mtag[dir1]);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[dir1][i]),
+          mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                       &(s->s_link));
 
         cleanup_gather(mtag[dir1]);
@@ -444,13 +444,13 @@ void w_loop2(int tot_smear) {
         FORALLSITES(i, s)
         mult_su3_an(&(s->link[dir2]), &(s->s_link), &(s->staple));
 
-        mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+        mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                                        OPP_DIR(dir2), EVENANDODD, gen_pt[dir2]);
 
         // Make second corner
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          mult_su3_na(&(s->s_link), (su3_matrix *)(gen_pt[4][i]),
+          mult_su3_na(&(s->s_link), (matrix *)(gen_pt[4][i]),
                       &(s->diag));
 
         cleanup_general_gather(gmtag);
@@ -459,15 +459,15 @@ void w_loop2(int tot_smear) {
         wait_gather(mtag[dir2]);
         dt = 0.5;
         FORALLSITES(i, s) {
-          add_su3_matrix(&(s->diag), (su3_matrix *)(gen_pt[dir2][i]),
+          add_matrix(&(s->diag), (matrix *)(gen_pt[dir2][i]),
                          &(s->diag));
-          scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+          scalar_mult_matrix(&(s->diag), dt, &(s->diag));
         }
         cleanup_gather(mtag[dir2]);
 
         // Start gather of temporal links across the diagonal
         gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                          sizeof(su3_matrix), disp,
+                                          sizeof(matrix), disp,
                                           EVENANDODD, gen_pt[4]);
 
         // Recursively construct the spatial segments
@@ -475,45 +475,45 @@ void w_loop2(int tot_smear) {
         for (r = 0; r < nxh / 2; r++) {
           if (r == 0) {
             FORALLSITES(i, s)
-              su3mat_copy(&(s->diag), &(s->s_link));
+              mat_copy(&(s->diag), &(s->s_link));
           }
           else {
             wait_general_gather(gmtag);
             FORALLSITES(i, s)
-              su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+              mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
             cleanup_general_gather(gmtag);
 
             // Concurrently gather temporal links across the diagonal
             gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                              sizeof(su3_matrix), disp,
+                                              sizeof(matrix), disp,
                                               EVENANDODD, gen_pt[4]);
 
             FORALLSITES(i, s)
               mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
           }
           FORALLSITES(i, s)
-            su3mat_copy(&(s->s_link), &(s->s_link_f));
+            mat_copy(&(s->s_link), &(s->s_link_f));
 
           // Start gather of forward spatial segments
           mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                        sizeof(su3_matrix), TUP,
+                                        sizeof(matrix), TUP,
                                         EVENANDODD, gen_pt[TUP]);
 
           // Collect forward temporal links
           wait_general_gather(gmtag);
           FORALLSITES(i, s)
-            su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+            mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
           FORALLSITES(i, s)
-            su3mat_copy(&(s->staple), &(s->t_link_f));
+            mat_copy(&(s->staple), &(s->t_link_f));
 
           cleanup_general_gather(gmtag);
 
           // Concurrently gather spatial links across the diagonal for next r
           if (r < nxh / 2 - 1)
             gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                              sizeof(su3_matrix), disp,
+                                              sizeof(matrix), disp,
                                               EVENANDODD, gen_pt[4]);
 
           // Recursively compute the Wilson loops of different time extent
@@ -521,14 +521,14 @@ void w_loop2(int tot_smear) {
             // Collect forward spatial segments
             wait_gather(mtag[TUP]);
             FORALLSITES(i, s)
-              su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+              mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
             FORALLSITES(i, s)
-              su3mat_copy(&(s->staple), &(s->s_link_f));
+              mat_copy(&(s->staple), &(s->s_link_f));
 
             // Start gather for next t, if still needed
             if (t < nth - 1)
-              restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+              restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                                   TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
             else
               cleanup_gather(mtag[TUP]);
@@ -560,58 +560,58 @@ void w_loop2(int tot_smear) {
   // First, "sqrt(3)" loops in (x, y, z) space
   // Construct the "body diagonal" link in the (x, y, z) direction
   // Gather for first "plaquette"
-  mtag[0] = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
-  mtag[1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[1]);
 
   // Gather for second "plaquette"
-  mtag[7] = start_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  mtag[7] = start_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[7]);
-  mtag[5] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+  mtag[5] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[5]);
 
   FORALLSITES(i, s)
-    su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+    mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
   // Make diagonal link in (x, y) direction and gather it
   wait_gather(mtag[0]);
   wait_gather(mtag[1]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]),
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat1);
-    add_su3_matrix(&(s->s_link), &tmat1, &(s->s_link));
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
+    add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
   cleanup_gather(mtag[1]);
-  mtag[2] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+  mtag[2] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[2]);
 
   // Gather for third "plaquette"
-  mtag[1] = start_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[1]);
-  mtag[3] = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  mtag[3] = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[3]);
 
   // Make diagonal link in (x, z) direction and gather it
   wait_gather(mtag[7]);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[7][i]),
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[7][i]),
                 &(s->s_link_f));
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[5][i]), &tmat1);
-    add_su3_matrix(&(s->s_link_f), &tmat1, &(s->s_link_f));
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &tmat1);
+    add_matrix(&(s->s_link_f), &tmat1, &(s->s_link_f));
   }
   cleanup_gather(mtag[7]);
   cleanup_gather(mtag[5]);
-  mtag[6] = start_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+  mtag[6] = start_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[6]);
 
   // Make first body diagonal
   wait_gather(mtag[2]);
   FORALLSITES(i, s)
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[2][i]), &(s->diag));
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &(s->diag));
 
   cleanup_gather(mtag[2]);
 
@@ -619,21 +619,21 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[1]);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]),
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[3][i]), &tmat1);
-    add_su3_matrix(&(s->s_link), &tmat1, &(s->s_link));
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[3][i]), &tmat1);
+    add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[1]);
   cleanup_gather(mtag[3]);
-  mtag[0] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
 
   // Make second body diagonal and add to first
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[6][i]), &tmat1);
-    add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &tmat1);
+    add_matrix(&(s->diag), &tmat1, &(s->diag));
   }
   cleanup_gather(mtag[6]);
 
@@ -641,9 +641,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]), &tmat1);
-    add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-    scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    add_matrix(&(s->diag), &tmat1, &(s->diag));
+    scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
   cleanup_gather(mtag[0]);
 
@@ -652,7 +652,7 @@ void w_loop2(int tot_smear) {
   disp[dir2] = 1;
   disp[dir3] = 1;
   disp[TUP] = 0;
-  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
 
   // Recursively construct the spatial segments
@@ -660,45 +660,45 @@ void w_loop2(int tot_smear) {
   for (r = 0; r < nxh; r++) {
     if (r == 0) {
       FORALLSITES(i, s)
-        su3mat_copy(&(s->diag), &(s->s_link));
+        mat_copy(&(s->diag), &(s->s_link));
     }
     else {
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
       cleanup_general_gather(gmtag);
 
       // Concurrently gather temporal links across the diagonal
       gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
         mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
-      su3mat_copy(&(s->s_link), &(s->s_link_f));
+      mat_copy(&(s->s_link), &(s->s_link_f));
 
     // Start gather of forward spatial segments
     mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                  sizeof(su3_matrix), TUP,
+                                  sizeof(matrix), TUP,
                                   EVENANDODD, gen_pt[TUP]);
 
     // Collect forward temporal links
     wait_general_gather(gmtag);
     FORALLSITES(i, s)
-      su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+      mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
     FORALLSITES(i, s)
-      su3mat_copy(&(s->staple), &(s->t_link_f));
+      mat_copy(&(s->staple), &(s->t_link_f));
 
     cleanup_general_gather(gmtag);
 
     // Concurrently gather spatial links across the diagonal for next r
     if (r < nxh - 1)
       gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
     // Recursively compute the Wilson loops of different time extent
@@ -706,14 +706,14 @@ void w_loop2(int tot_smear) {
       // Collect forward spatial segments
       wait_gather(mtag[TUP]);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->s_link_f));
+        mat_copy(&(s->staple), &(s->s_link_f));
 
       // Start gather for next t, if still needed
       if (t < nth - 1)
-        restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                             TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
       else
         cleanup_gather(mtag[TUP]);
@@ -736,9 +736,9 @@ void w_loop2(int tot_smear) {
   // Next, "sqrt(3)" loops in (x, y, -z) space
   // Construct the "body diagonal" link in the (x, y, -z) direction
   // Gather for first "plaquette"
-  mtag[0] = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
-  mtag[1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[1]);
 
   // Start one corner for second "plaquette" and gather
@@ -750,9 +750,9 @@ void w_loop2(int tot_smear) {
 
   disp[dir1] = 1;
   disp[dir3] = -1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[5] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[5] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               OPP_DIR(dir3), EVENANDODD, gen_pt[5]);
 
   // Make diagonal link in (x, y) direction
@@ -760,28 +760,28 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   wait_gather(mtag[1]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]), &tmat1);
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]), &tmat2);
-    add_su3_matrix(&tmat1, &tmat2, &tmat1);
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat2);
+    add_matrix(&tmat1, &tmat2, &tmat1);
     mult_su3_an(&(s->link[dir3]), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
   cleanup_gather(mtag[1]);
-  mtag[2] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+  mtag[2] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                               OPP_DIR(dir3), EVENANDODD, gen_pt[2]);
 
   // Make diagonal link in (x, -z) direction and gather it
   wait_general_gather(gmtag);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]),
+    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                 &(s->s_link_f));
-    add_su3_matrix(&(s->s_link_f), (su3_matrix *)(gen_pt[5][i]),
+    add_matrix(&(s->s_link_f), (matrix *)(gen_pt[5][i]),
                    &(s->s_link_f));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[5]);
-  mtag[6] = start_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+  mtag[6] = start_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[6]);
 
   // Start one corner for third "plaquette" and gather
@@ -793,34 +793,34 @@ void w_loop2(int tot_smear) {
 
   disp[dir2] = 1;
   disp[dir3] = -1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(su3_matrix),
+  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(matrix),
                               OPP_DIR(dir3), EVENANDODD, gen_pt[3]);
 
   FORALLSITES(i, s)
-    su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+    mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
   // Make diagonal link in (y, -z) direction and gather it
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir2]), (su3_matrix *)(gen_pt[4][i]),
+    mult_su3_na(&(s->link[dir2]), (matrix *)(gen_pt[4][i]),
                 &(s->staple));
-    add_su3_matrix(&(s->staple), (su3_matrix *)(gen_pt[3][i]),
+    add_matrix(&(s->staple), (matrix *)(gen_pt[3][i]),
                    &(s->staple));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[3]);
-  mtag[0] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
 
   // Make second body diagonal and add to that gathered first
   wait_gather(mtag[2]);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[6][i]), &(s->diag));
-    add_su3_matrix(&(s->diag), (su3_matrix *)(gen_pt[2][i]), &(s->diag));
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &(s->diag));
+    add_matrix(&(s->diag), (matrix *)(gen_pt[2][i]), &(s->diag));
   }
   cleanup_gather(mtag[2]);
   cleanup_gather(mtag[6]);
@@ -829,9 +829,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]), &tmat1);
-    add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-    scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    add_matrix(&(s->diag), &tmat1, &(s->diag));
+    scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
   cleanup_gather(mtag[0]);
 
@@ -840,7 +840,7 @@ void w_loop2(int tot_smear) {
   disp[dir2] = 1;
   disp[dir3] = -1;
   disp[TUP] = 0;
-  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
 
   // Recursively construct the spatial segments
@@ -848,45 +848,45 @@ void w_loop2(int tot_smear) {
   for (r = 0; r < nxh; r++) {
     if (r == 0) {
       FORALLSITES(i, s)
-        su3mat_copy(&(s->diag), &(s->s_link));
+        mat_copy(&(s->diag), &(s->s_link));
     }
     else {
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
       cleanup_general_gather(gmtag);
 
       // Concurrently gather temporal links across the diagonal
       gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
         mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
-      su3mat_copy(&(s->s_link), &(s->s_link_f));
+      mat_copy(&(s->s_link), &(s->s_link_f));
 
     // Start gather of forward spatial segments
     mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                  sizeof(su3_matrix), TUP,
+                                  sizeof(matrix), TUP,
                                   EVENANDODD, gen_pt[TUP]);
 
     // Collect forward temporal links
     wait_general_gather(gmtag);
     FORALLSITES(i, s)
-      su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+      mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
     FORALLSITES(i, s)
-      su3mat_copy(&(s->staple), &(s->t_link_f));
+      mat_copy(&(s->staple), &(s->t_link_f));
 
     cleanup_general_gather(gmtag);
 
     // Concurrently gather spatial links across the diagonal for next r
     if (r < nxh - 1)
       gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
     // Recursively compute the Wilson loops of different time extent
@@ -894,14 +894,14 @@ void w_loop2(int tot_smear) {
       // Collect forward spatial segments
       wait_gather(mtag[TUP]);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->s_link_f));
+        mat_copy(&(s->staple), &(s->s_link_f));
 
       // Start gather for next t, if still needed
       if (t < nth - 1)
-        restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                             TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
       else
         cleanup_gather(mtag[TUP]);
@@ -924,9 +924,9 @@ void w_loop2(int tot_smear) {
   // Next, "sqrt(3)" loops in (x, -y, z) space
   // Construct the "body diagonal" link in the (x, -y, z) direction
   // Gather for first "plaquette"
-  mtag[0] = start_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
-  mtag[2] = start_gather_site(F_OFFSET(link[dir1]), sizeof(su3_matrix),
+  mtag[2] = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[2]);
 
   // Start one corner for second "plaquette" and gather
@@ -938,9 +938,9 @@ void w_loop2(int tot_smear) {
 
   disp[dir1] = 1;
   disp[dir2] = -1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[6] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[6] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               OPP_DIR(dir2), EVENANDODD, gen_pt[6]);
 
   // Make diagonal link in (x, z) direction
@@ -948,28 +948,28 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   wait_gather(mtag[2]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]), &tmat1);
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[2][i]), &tmat2);
-    add_su3_matrix(&tmat1, &tmat2, &tmat1);
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat2);
+    add_matrix(&tmat1, &tmat2, &tmat1);
     mult_su3_an(&(s->link[dir2]), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
   cleanup_gather(mtag[2]);
-  mtag[1] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                               OPP_DIR(dir2), EVENANDODD, gen_pt[1]);
 
   // Make diagonal link in (x, -y) direction and gather it
   wait_general_gather(gmtag);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]),
+    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                 &(s->s_link_f));
-    add_su3_matrix(&(s->s_link_f), (su3_matrix *)(gen_pt[6][i]),
+    add_matrix(&(s->s_link_f), (matrix *)(gen_pt[6][i]),
                    &(s->s_link_f));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[6]);
-  mtag[5] = start_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+  mtag[5] = start_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[5]);
 
   // Start one corner for third "plaquette" and gather
@@ -981,34 +981,34 @@ void w_loop2(int tot_smear) {
 
   disp[dir2] = -1;
   disp[dir3] = 1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(su3_matrix),
+  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(matrix),
                               OPP_DIR(dir2), EVENANDODD, gen_pt[3]);
 
   FORALLSITES(i, s)
-    su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+    mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
   // Make diagonal link in (-y, z) direction and gather it
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir3]), (su3_matrix *)(gen_pt[4][i]),
+    mult_su3_na(&(s->link[dir3]), (matrix *)(gen_pt[4][i]),
                 &(s->staple));
-    add_su3_matrix(&(s->staple), (su3_matrix *)(gen_pt[3][i]),
+    add_matrix(&(s->staple), (matrix *)(gen_pt[3][i]),
                    &(s->staple));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[3]);
-  mtag[0] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[0] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               dir1, EVENANDODD, gen_pt[0]);
 
   // Make second body diagonal and add to that gathered first
   wait_gather(mtag[1]);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[5][i]), &(s->diag));
-    add_su3_matrix(&(s->diag), (su3_matrix *)(gen_pt[1][i]), &(s->diag));
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &(s->diag));
+    add_matrix(&(s->diag), (matrix *)(gen_pt[1][i]), &(s->diag));
   }
   cleanup_gather(mtag[1]);
   cleanup_gather(mtag[5]);
@@ -1017,9 +1017,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (su3_matrix *)(gen_pt[0][i]), &tmat1);
-    add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-    scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    add_matrix(&(s->diag), &tmat1, &(s->diag));
+    scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
   cleanup_gather(mtag[0]);
 
@@ -1028,7 +1028,7 @@ void w_loop2(int tot_smear) {
   disp[dir2] = -1;
   disp[dir3] = 1;
   disp[TUP] = 0;
-  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
 
   // Recursively construct the spatial segments
@@ -1036,45 +1036,45 @@ void w_loop2(int tot_smear) {
   for (r = 0; r < nxh; r++) {
     if (r == 0) {
       FORALLSITES(i, s)
-        su3mat_copy(&(s->diag), &(s->s_link));
+        mat_copy(&(s->diag), &(s->s_link));
     }
     else {
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
       cleanup_general_gather(gmtag);
 
       // Concurrently gather temporal links across the diagonal
       gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
         mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
-      su3mat_copy(&(s->s_link), &(s->s_link_f));
+      mat_copy(&(s->s_link), &(s->s_link_f));
 
     // Start gather of forward spatial segments
     mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                  sizeof(su3_matrix), TUP,
+                                  sizeof(matrix), TUP,
                                   EVENANDODD, gen_pt[TUP]);
 
     // Collect forward temporal links
     wait_general_gather(gmtag);
     FORALLSITES(i, s)
-      su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+      mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
     FORALLSITES(i, s)
-      su3mat_copy(&(s->staple), &(s->t_link_f));
+      mat_copy(&(s->staple), &(s->t_link_f));
 
     cleanup_general_gather(gmtag);
 
     // Concurrently gather spatial links across the diagonal for next r
     if (r < nxh - 1)
       gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
     // Recursively compute the Wilson loops of different time extent
@@ -1082,14 +1082,14 @@ void w_loop2(int tot_smear) {
       // Collect forward spatial segments
       wait_gather(mtag[TUP]);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->s_link_f));
+        mat_copy(&(s->staple), &(s->s_link_f));
 
       // Start gather for next t, if still needed
       if (t < nth - 1)
-        restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                             TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
       else
         cleanup_gather(mtag[TUP]);
@@ -1112,9 +1112,9 @@ void w_loop2(int tot_smear) {
   // Next, "sqrt(3)" loops in (x, -y, -z) space
   // Construct the "body diagonal" link in the (x, -y, -z) direction
   // Gather for first "plaquette"
-  mtag[1] = start_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                               dir2, EVENANDODD, gen_pt[1]);
-  mtag[2] = start_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  mtag[2] = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                               dir3, EVENANDODD, gen_pt[2]);
 
   // Start one corner for second "plaquette" and gather
@@ -1126,19 +1126,19 @@ void w_loop2(int tot_smear) {
 
   disp[dir1] = 1;
   disp[dir2] = -1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[6] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[6] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               OPP_DIR(dir2), EVENANDODD, gen_pt[6]);
 
   // Make diagonal link in (y, z) direction
   wait_gather(mtag[1]);
   wait_gather(mtag[2]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (su3_matrix *)(gen_pt[1][i]),
+    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir3]), (su3_matrix *)(gen_pt[2][i]), &tmat1);
-    add_su3_matrix(&(s->s_link), &tmat1, &(s->s_link));
+    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat1);
+    add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[1]);
   cleanup_gather(mtag[2]);
@@ -1148,13 +1148,13 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]), &tmat1);
-    add_su3_matrix(&tmat1, (su3_matrix *)(gen_pt[6][i]), &tmat1);
+    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    add_matrix(&tmat1, (matrix *)(gen_pt[6][i]), &tmat1);
     mult_su3_an(&(s->link[dir3]), &tmat1, &(s->s_link_f));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[6]);
-  mtag[2] = start_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+  mtag[2] = start_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                               OPP_DIR(dir3), EVENANDODD, gen_pt[2]);
 
   // Start one corner for third "plaquette" and gather
@@ -1166,26 +1166,26 @@ void w_loop2(int tot_smear) {
 
   disp[dir1] = 1;
   disp[dir3] = -1;
-  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(link[dir3]), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
-  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(su3_matrix),
+  mtag[3] = start_gather_site(F_OFFSET(diag), sizeof(matrix),
                               OPP_DIR(dir3), EVENANDODD, gen_pt[3]);
 
   FORALLSITES(i, s)
-      su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+      mat_copy(&(s->link[TUP]), &(s->t_link_f));
 
   // Make diagonal link in (x, -z) direction
   // Multiply to get third body diagonal and gather it
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]), &tmat1);
-    add_su3_matrix(&tmat1, (su3_matrix *)(gen_pt[3][i]), &tmat1);
+    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    add_matrix(&tmat1, (matrix *)(gen_pt[3][i]), &tmat1);
     mult_su3_an(&(s->link[dir2]), &tmat1, &(s->staple));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[3]);
-  mtag[1] = start_gather_site(F_OFFSET(staple), sizeof(su3_matrix),
+  mtag[1] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                               OPP_DIR(dir2), EVENANDODD, gen_pt[1]);
 
   // Finally gather first "plaquette"
@@ -1193,15 +1193,15 @@ void w_loop2(int tot_smear) {
   disp[dir2] = -1;
   disp[dir3] = -1;
   disp[TUP] = 0;
-  gmtag = start_general_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(s_link), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
 
   // Collect second and third body diagonal and add them
   wait_gather(mtag[1]);
   wait_gather(mtag[2]);
   FORALLSITES(i, s)
-    add_su3_matrix((su3_matrix *)(gen_pt[1][i]),
-                   (su3_matrix *)(gen_pt[2][i]), &(s->diag));
+    add_matrix((matrix *)(gen_pt[1][i]),
+                   (matrix *)(gen_pt[2][i]), &(s->diag));
 
   cleanup_gather(mtag[1]);
   cleanup_gather(mtag[2]);
@@ -1210,14 +1210,14 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (su3_matrix *)(gen_pt[4][i]), &tmat1);
-    add_su3_matrix(&(s->diag), &tmat1, &(s->diag));
-    scalar_mult_su3_matrix(&(s->diag), dt, &(s->diag));
+    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    add_matrix(&(s->diag), &tmat1, &(s->diag));
+    scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
   cleanup_general_gather(gmtag);
 
   // Start gather of temporal links across the body diagonal
-  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+  gmtag = start_general_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                     disp, EVENANDODD, gen_pt[4]);
 
   // Recursively construct the spatial segments
@@ -1225,45 +1225,45 @@ void w_loop2(int tot_smear) {
   for (r = 0; r < nxh; r++) {
     if (r == 0) {
       FORALLSITES(i, s)
-        su3mat_copy(&(s->diag), &(s->s_link));
+        mat_copy(&(s->diag), &(s->s_link));
     }
     else {
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
       cleanup_general_gather(gmtag);
 
       // Concurrently gather temporal links across the diagonal
       gmtag = start_general_gather_site(F_OFFSET(t_link_f),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
         mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
-      su3mat_copy(&(s->s_link), &(s->s_link_f));
+      mat_copy(&(s->s_link), &(s->s_link_f));
 
     // Start gather of forward spatial segments
     mtag[TUP] = start_gather_site(F_OFFSET(s_link_f),
-                                  sizeof(su3_matrix), TUP,
+                                  sizeof(matrix), TUP,
                                   EVENANDODD, gen_pt[TUP]);
 
     // Collect forward temporal links
     wait_general_gather(gmtag);
     FORALLSITES(i, s)
-      su3mat_copy((su3_matrix *)(gen_pt[4][i]), &(s->staple));
+      mat_copy((matrix *)(gen_pt[4][i]), &(s->staple));
 
     FORALLSITES(i, s)
-      su3mat_copy(&(s->staple), &(s->t_link_f));
+      mat_copy(&(s->staple), &(s->t_link_f));
 
     cleanup_general_gather(gmtag);
 
     // Concurrently gather spatial links across the diagonal for next r
     if (r < nxh - 1)
       gmtag = start_general_gather_site(F_OFFSET(s_link),
-                                        sizeof(su3_matrix), disp,
+                                        sizeof(matrix), disp,
                                         EVENANDODD, gen_pt[4]);
 
     // Recursively compute the Wilson loops of different time extent
@@ -1271,14 +1271,14 @@ void w_loop2(int tot_smear) {
       // Collect forward spatial segments
       wait_gather(mtag[TUP]);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->s_link_f));
+        mat_copy(&(s->staple), &(s->s_link_f));
 
       // Start gather for next t, if still needed
       if (t < nth - 1)
-        restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                             TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
       else
         cleanup_gather(mtag[TUP]);

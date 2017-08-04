@@ -36,29 +36,29 @@ typedef struct {
 #endif
 
   // Doubled gauge field provides workspace
-  su3_matrix link[8];
+  matrix link[8];
 
   // Staggered phases, which have been absorbed into the matrices
   // Also the antiperiodic boundary conditions
   Real phase[4];
 
   // Staggered complex vectors
-  su3_vector g_rand;            // Gaussian random vector
-  su3_vector chi;               // Gaussian random source vector
-  su3_vector psi;               // Solution vector = Kinverse * chi
-  su3_vector p;                 // CG change vector
-  su3_vector mp;                // CG temporary vector
-  su3_vector r;                 // CG residual vector
-  su3_vector ttt1[1];           // For ../generic_ks/mat_invert.c
-  su3_vector M_inv;
+  vector g_rand;            // Gaussian random vector
+  vector chi;               // Gaussian random source vector
+  vector psi;               // Solution vector = Kinverse * chi
+  vector p;                 // CG change vector
+  vector mp;                // CG temporary vector
+  vector r;                 // CG residual vector
+  vector ttt1[1];           // For ../generic_ks/mat_invert.c
+  vector M_inv;
 
   // Temporary vectors and matrices
-  su3_vector temp;                  // For Matrix_Vec_mult
-  su3_vector tempvec[4];            // For dslash
-  su3_matrix fieldstrength[6];      // For Wilson flow
+  vector temp;                  // For Matrix_Vec_mult
+  vector tempvec[4];            // For dslash
+  matrix fieldstrength[6];      // For Wilson flow
 
   // Accumulators for Wilson and Polyakov loops
-  su3_matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
+  matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
 } site;
 // -----------------------------------------------------------------
 
@@ -93,7 +93,7 @@ EXTERN int saveflag;  // 1 if we will save the lattice;
 // Eigenvalue stuff
 EXTERN int Nvecs;
 EXTERN double *eigVal;
-EXTERN su3_vector **eigVec;
+EXTERN vector **eigVec;
 EXTERN Real eig_tol;      // Tolerance for the eigenvalue computation
 EXTERN Real error_decr;   // Error decrease per Rayleigh minimization
 EXTERN int maxIter;       // max  Rayleigh iterations
@@ -138,22 +138,22 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // nHYP stuff
 EXTERN double alpha_store[3];
 EXTERN int nsmear;
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
 // Used and freed in Wilson flow calculation
-EXTERN su3_matrix *tempmat1;
-EXTERN su3_matrix *tempmat2;    // Used in Polyakov loop calculation
+EXTERN matrix *tempmat1;
+EXTERN matrix *tempmat2;    // Used in Polyakov loop calculation
 
 // Wilson flow stuff
 EXTERN double epsilon, tmax;

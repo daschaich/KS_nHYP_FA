@@ -26,8 +26,8 @@ static void report_status(quark_invert_control *qic){
 }
 
 int ks_invert( /* Return value is number of iterations taken */
-    field_offset src,   /* type su3_vector (preloaded source) */
-    field_offset dest,  /* type su3_vector (answer and initial guess) */
+    field_offset src,   /* type vector (preloaded source) */
+    field_offset dest,  /* type vector (answer and initial guess) */
     int (*invert_func)(field_offset src, field_offset dest,
 		       quark_invert_control *qic,
 		       Real mass, ferm_links_t *fn),
@@ -71,10 +71,10 @@ int ks_invert( /* Return value is number of iterations taken */
 
 int ks_invert_ksqs( /* Return value is number of iterations taken */
     ks_quark_source *ksqs, /* source parameters */
-    int (*source_func_field)(su3_vector *src, 
+    int (*source_func_field)(vector *src, 
 			      ks_quark_source *ksqs),  /* source function */
-    su3_vector *dest,  /* answer and initial guess */
-    int (*invert_func)(su3_vector *src, su3_vector *dest,
+    vector *dest,  /* answer and initial guess */
+    int (*invert_func)(vector *src, vector *dest,
 		       quark_invert_control *qic, Real mass, 
 		       ferm_links_t *fn),
     quark_invert_control *qic, /* inverter control */
@@ -83,13 +83,13 @@ int ks_invert_ksqs( /* Return value is number of iterations taken */
     )
 {
   int tot_iters;
-  su3_vector *src;
+  vector *src;
   char myname[] = "ks_invert_ksqs";
 
   /* Make the source */
   /* PAD may be used to avoid cache trashing */
 #define PAD 0
-  src = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
+  src = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
   if(src == NULL){
     printf("%s(%d): Can't allocate src\n",myname,this_node);
     terminate(1);

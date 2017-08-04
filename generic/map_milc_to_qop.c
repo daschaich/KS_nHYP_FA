@@ -65,17 +65,17 @@ destroy_raw_##P##_##T (MILCTYPE *raw){ \
 #if (PRECISION==1)
 
 static void 
-f2p_mat(su3_matrix *dest, fsu3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_matrix));
+f2p_mat(matrix *dest, fmatrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(fmatrix));
 }
 
 static void 
-p2f_mat(fsu3_matrix *dest, su3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_matrix));
+p2f_mat(fmatrix *dest, matrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(fmatrix));
 }
 
 static void 
-d2p_mat(su3_matrix *dest, dsu3_matrix *src){
+d2p_mat(matrix *dest, dmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -85,7 +85,7 @@ d2p_mat(su3_matrix *dest, dsu3_matrix *src){
 }
 
 static void 
-p2d_mat(dsu3_matrix *dest, su3_matrix *src){
+p2d_mat(dmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -95,17 +95,17 @@ p2d_mat(dsu3_matrix *dest, su3_matrix *src){
 }
 
 static void 
-f2p_vec(su3_vector *dest, fsu3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_vector));
+f2p_vec(vector *dest, fvector *src){
+  memcpy((void *)dest, (void *)src, sizeof(fvector));
 }
 
 static void 
-p2f_vec(fsu3_vector *dest, su3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_vector));
+p2f_vec(fvector *dest, vector *src){
+  memcpy((void *)dest, (void *)src, sizeof(fvector));
 }
 
 static void 
-d2p_vec(su3_vector *dest, dsu3_vector *src){
+d2p_vec(vector *dest, dvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -115,7 +115,7 @@ d2p_vec(su3_vector *dest, dsu3_vector *src){
 }
 
 static void 
-p2d_vec(dsu3_vector *dest, su3_vector *src){
+p2d_vec(dvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -127,7 +127,7 @@ p2d_vec(dsu3_vector *dest, su3_vector *src){
 #else
 
 static void 
-f2p_mat(su3_matrix *dest, fsu3_matrix *src){
+f2p_mat(matrix *dest, fmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -136,9 +136,9 @@ f2p_mat(su3_matrix *dest, fsu3_matrix *src){
   }
 }
 
-/* Convert (or copy) su3_matrix from prevailing to single precision */
+/* Convert (or copy) matrix from prevailing to single precision */
 static void 
-p2f_mat(fsu3_matrix *dest, su3_matrix *src){
+p2f_mat(fmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -148,17 +148,17 @@ p2f_mat(fsu3_matrix *dest, su3_matrix *src){
 }
 
 static void 
-d2p_mat(su3_matrix *dest, dsu3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_matrix));
+d2p_mat(matrix *dest, dmatrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(dmatrix));
 }
 
 static void 
-p2d_mat(dsu3_matrix *dest, su3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_matrix));
+p2d_mat(dmatrix *dest, matrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(dmatrix));
 }
 
 static void 
-f2p_vec(su3_vector *dest, fsu3_vector *src){
+f2p_vec(vector *dest, fvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -167,9 +167,9 @@ f2p_vec(su3_vector *dest, fsu3_vector *src){
   }
 }
 
-/* Convert (or copy) su3_vector from prevailing to single precision */
+/* Convert (or copy) vector from prevailing to single precision */
 static void 
-p2f_vec(fsu3_vector *dest, su3_vector *src){
+p2f_vec(fvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -179,13 +179,13 @@ p2f_vec(fsu3_vector *dest, su3_vector *src){
 }
 
 static void 
-d2p_vec(su3_vector *dest, dsu3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_vector));
+d2p_vec(vector *dest, dvector *src){
+  memcpy((void *)dest, (void *)src, sizeof(dvector));
 }
 
 static void 
-p2d_vec(dsu3_vector *dest, su3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_vector));
+p2d_vec(dvector *dest, vector *src){
+  memcpy((void *)dest, (void *)src, sizeof(dvector));
 }
 
 #endif
@@ -196,15 +196,15 @@ p2d_vec(dsu3_vector *dest, su3_vector *src){
 #define copy_milc_to_D_G(d,s) p2d_mat(d,s);
 
 static void
-copy_milc_to_F_F(fsu3_matrix *dest, anti_hermitmat *src){
-  su3_matrix t;
+copy_milc_to_F_F(fmatrix *dest, anti_hermitmat *src){
+  matrix t;
   uncompress_anti_hermitian( src, &t );
   p2f_mat( dest, &t );
 }
 
 static void
-copy_milc_to_D_F(dsu3_matrix *dest, anti_hermitmat *src){
-  su3_matrix t;
+copy_milc_to_D_F(dmatrix *dest, anti_hermitmat *src){
+  matrix t;
   uncompress_anti_hermitian( src, &t );
   p2d_mat( dest, &t );
 }
@@ -218,15 +218,15 @@ copy_milc_to_D_F(dsu3_matrix *dest, anti_hermitmat *src){
 #define copy_D_G_to_milc(d,s) d2p_mat(d,s);
 
 static void
-copy_F_F_to_milc(anti_hermitmat *dest, fsu3_matrix *src){
-  su3_matrix t;
+copy_F_F_to_milc(anti_hermitmat *dest, fmatrix *src){
+  matrix t;
   f2p_mat(&t, src);
   make_anti_hermitian( &t, dest );
 }
 
 static void
-copy_D_F_to_milc(anti_hermitmat *dest, dsu3_matrix *src){
-  su3_matrix t;
+copy_D_F_to_milc(anti_hermitmat *dest, dmatrix *src){
+  matrix t;
   d2p_mat(&t, src);
   make_anti_hermitian( &t, dest );
 }
@@ -446,7 +446,7 @@ load_##P##_links_and_mom_site(QOP_##P##3_GaugeField **links, \
 void \
 load_##P##_links_and_mom_field(QOP_##P##3_GaugeField **links, \
    QOP_##P##3_Force **mom, MILCTYPE ***rawlinks, MILCTYPE ***rawmom, \
-   su3_matrix *srclink, anti_hermitmat *srcmom) \
+   matrix *srclink, anti_hermitmat *srcmom) \
 { \
   *rawlinks = create_raw4_##P##_G_from_field(srclink, EVENANDODD); \
   if(*rawlinks == NULL)terminate(1); \
@@ -499,7 +499,7 @@ unload_##P##_links_and_mom_site(QOP_##P##3_GaugeField **links,  \
 
 #define make_unload_links_and_mom_field(P, MILCTYPE, MILCFLOAT) \
 void \
-unload_##P##_links_and_mom_field(su3_matrix *dstlink, anti_hermitmat *dstmom, \
+unload_##P##_links_and_mom_field(matrix *dstlink, anti_hermitmat *dstmom, \
    QOP_##P##3_GaugeField **links, QOP_##P##3_Force **mom, \
    MILCTYPE ***rawlinks, MILCTYPE ***rawmom) \
 { \
@@ -539,113 +539,113 @@ unload_##P##_##T##_to_field( MILC_DSTTYPE *dest, TYPE *qop, int parity){ \
 
 /* Storage for raw gauge field */
 
-make_create_raw4(F, G, fsu3_matrix);
-make_create_raw4(D, G, dsu3_matrix);
+make_create_raw4(F, G, fmatrix);
+make_create_raw4(D, G, dmatrix);
 
-make_destroy_raw4(F, G, fsu3_matrix);
-make_destroy_raw4(D, G, dsu3_matrix);
+make_destroy_raw4(F, G, fmatrix);
+make_destroy_raw4(D, G, dmatrix);
 
 /* Storage for raw gauge momentum */
 
-make_create_raw4(F, F, fsu3_matrix);
-make_create_raw4(D, F, dsu3_matrix);
+make_create_raw4(F, F, fmatrix);
+make_create_raw4(D, F, dmatrix);
 
-make_destroy_raw4(F, F, fsu3_matrix);
-make_destroy_raw4(D, F, dsu3_matrix);
+make_destroy_raw4(F, F, fmatrix);
+make_destroy_raw4(D, F, dmatrix);
 
 /* Storage for raw su3 vector field */
 
-make_create_raw(F, V, fsu3_vector);
-make_create_raw(D, V, dsu3_vector);
+make_create_raw(F, V, fvector);
+make_create_raw(D, V, dvector);
 
-make_destroy_raw(F, V, fsu3_vector);
-make_destroy_raw(D, V, dsu3_vector);
+make_destroy_raw(F, V, fvector);
+make_destroy_raw(D, V, dvector);
 
 /* Map gauge field from site to raw */
 
-make_create_raw4_from_site(F, G, fsu3_matrix, su3_matrix);
-make_create_raw4_from_site(D, G, dsu3_matrix, su3_matrix);
+make_create_raw4_from_site(F, G, fmatrix, matrix);
+make_create_raw4_from_site(D, G, dmatrix, matrix);
 
 /* Map gauge field from field to raw */
 
-make_create_raw4_from_field(F, G, fsu3_matrix, su3_matrix);
-make_create_raw4_from_field(D, G, dsu3_matrix, su3_matrix);
+make_create_raw4_from_field(F, G, fmatrix, matrix);
+make_create_raw4_from_field(D, G, dmatrix, matrix);
 
 /* Map gauge momentum from site to raw */
 
-make_create_raw4_from_site(F, F, fsu3_matrix, anti_hermitmat);
-make_create_raw4_from_site(D, F, dsu3_matrix, anti_hermitmat);
+make_create_raw4_from_site(F, F, fmatrix, anti_hermitmat);
+make_create_raw4_from_site(D, F, dmatrix, anti_hermitmat);
 
 /* Map gauge momentum from field to raw */
 
-make_create_raw4_from_field(F, F, fsu3_matrix, anti_hermitmat);
-make_create_raw4_from_field(D, F, dsu3_matrix, anti_hermitmat);
+make_create_raw4_from_field(F, F, fmatrix, anti_hermitmat);
+make_create_raw4_from_field(D, F, dmatrix, anti_hermitmat);
 
 /* Map color vector from site to raw */
 
-make_create_raw_from_site(F, V, fsu3_vector, su3_vector);
-make_create_raw_from_site(D, V, dsu3_vector, su3_vector);
+make_create_raw_from_site(F, V, fvector, vector);
+make_create_raw_from_site(D, V, dvector, vector);
 
 /* Map color vector from field to raw */
 
-make_create_raw_from_field(F, V, fsu3_vector, su3_vector);
-make_create_raw_from_field(D, V, dsu3_vector, su3_vector);
+make_create_raw_from_field(F, V, fvector, vector);
+make_create_raw_from_field(D, V, dvector, vector);
 
 /* Map gauge field from raw to site */
 
-make_unload_raw4_to_site(F, G, su3_matrix, fsu3_matrix);
-make_unload_raw4_to_site(D, G, su3_matrix, dsu3_matrix);
+make_unload_raw4_to_site(F, G, matrix, fmatrix);
+make_unload_raw4_to_site(D, G, matrix, dmatrix);
 
 /* Map gauge field from raw to field */
 
-make_unload_raw4_to_field(F, G, su3_matrix, fsu3_matrix);
-make_unload_raw4_to_field(D, G, su3_matrix, dsu3_matrix);
+make_unload_raw4_to_field(F, G, matrix, fmatrix);
+make_unload_raw4_to_field(D, G, matrix, dmatrix);
 
 /* Map gauge momentum from raw to site */
 
-make_unload_raw4_to_site(F, F, anti_hermitmat, fsu3_matrix);
-make_unload_raw4_to_site(D, F, anti_hermitmat, dsu3_matrix);
+make_unload_raw4_to_site(F, F, anti_hermitmat, fmatrix);
+make_unload_raw4_to_site(D, F, anti_hermitmat, dmatrix);
 
 /* Map gauge momentum from raw to field */
 
-make_unload_raw4_to_field(F, F, anti_hermitmat, fsu3_matrix);
-make_unload_raw4_to_field(D, F, anti_hermitmat, dsu3_matrix);
+make_unload_raw4_to_field(F, F, anti_hermitmat, fmatrix);
+make_unload_raw4_to_field(D, F, anti_hermitmat, dmatrix);
 
 /* Map color vector from raw to site */
 
-make_unload_raw_to_site(F, V, su3_vector, fsu3_vector);
-make_unload_raw_to_site(D, V, su3_vector, dsu3_vector);
+make_unload_raw_to_site(F, V, vector, fvector);
+make_unload_raw_to_site(D, V, vector, dvector);
 
 /* Map color vector from raw to field */
 
-make_unload_raw_to_field(F, V, su3_vector, fsu3_vector);
-make_unload_raw_to_field(D, V, su3_vector, dsu3_vector);
+make_unload_raw_to_field(F, V, vector, fvector);
+make_unload_raw_to_field(D, V, vector, dvector);
 
 /* Composite mapping */
 
-make_load_links_and_mom_site(F, fsu3_matrix, float);
-make_load_links_and_mom_site(D, dsu3_matrix, double);
+make_load_links_and_mom_site(F, fmatrix, float);
+make_load_links_and_mom_site(D, dmatrix, double);
 
-make_load_links_and_mom_field(F, fsu3_matrix, float);
-make_load_links_and_mom_field(D, dsu3_matrix, double);
+make_load_links_and_mom_field(F, fmatrix, float);
+make_load_links_and_mom_field(D, dmatrix, double);
 
-make_unload_links_and_mom_site(F, fsu3_matrix, float);
-make_unload_links_and_mom_site(D, dsu3_matrix, double);
+make_unload_links_and_mom_site(F, fmatrix, float);
+make_unload_links_and_mom_site(D, dmatrix, double);
 
-make_unload_links_and_mom_field(F, fsu3_matrix, float);
-make_unload_links_and_mom_field(D, dsu3_matrix, double);
+make_unload_links_and_mom_field(F, fmatrix, float);
+make_unload_links_and_mom_field(D, dmatrix, double);
 
-make_load_from_site(F, V, QOP_F3_ColorVector, fsu3_vector, float);
-make_load_from_site(D, V, QOP_D3_ColorVector, dsu3_vector, double);
+make_load_from_site(F, V, QOP_F3_ColorVector, fvector, float);
+make_load_from_site(D, V, QOP_D3_ColorVector, dvector, double);
 
-make_load_from_field(F, V, QOP_F3_ColorVector, fsu3_vector, su3_vector ,float);
-make_load_from_field(D, V, QOP_D3_ColorVector, dsu3_vector, su3_vector ,double);
+make_load_from_field(F, V, QOP_F3_ColorVector, fvector, vector ,float);
+make_load_from_field(D, V, QOP_D3_ColorVector, dvector, vector ,double);
 
-make_unload_to_site(F, V, QOP_F3_ColorVector, fsu3_vector, float);
-make_unload_to_site(D, V, QOP_D3_ColorVector, dsu3_vector, double);
+make_unload_to_site(F, V, QOP_F3_ColorVector, fvector, float);
+make_unload_to_site(D, V, QOP_D3_ColorVector, dvector, double);
 
-make_unload_to_field(F, V, QOP_F3_ColorVector, fsu3_vector, su3_vector, float);
-make_unload_to_field(D, V, QOP_D3_ColorVector, dsu3_vector, su3_vector, double);
+make_unload_to_field(F, V, QOP_F3_ColorVector, fvector, vector, float);
+make_unload_to_field(D, V, QOP_D3_ColorVector, dvector, vector, double);
 
 /* map_milc_to_qop.c */
 

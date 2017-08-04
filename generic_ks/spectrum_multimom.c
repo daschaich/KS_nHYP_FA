@@ -50,9 +50,9 @@ enum prop_name {
     propagators */
    /* quark-antiquark operators*/
 void mult_pion_mom_temp( int fb, int px, int py, int pz,
-    su3_vector *src, field_offset dest );
+    vector *src, field_offset dest );
 void mult_rho_mom_temp( int fb, int pdir, int px, int py, int pz,
-    su3_vector *src, field_offset dest );
+    vector *src, field_offset dest );
 int test_converge(int t_source);
 
 int spectrum_multimom( Real dyn_mass, Real low_mass, Real mass_inc, int nmasses, Real tol, ferm_links_t *fn){
@@ -70,7 +70,7 @@ int spectrum_multimom( Real dyn_mass, Real low_mass, Real mass_inc, int nmasses,
   int src_count; /* number of source time slices used */
   Real *masses; /* array of masses */
   Real finalrsq;
-  su3_vector **quark_props;
+  vector **quark_props;
   complex **props;	/* arrays of propagators */
   int prec = PRECISION;  /* make CG precision the same as the
 			    prevailing precision */
@@ -87,9 +87,9 @@ int spectrum_multimom( Real dyn_mass, Real low_mass, Real mass_inc, int nmasses,
   if(j_dyn== -1){node0_printf("DUMMY: one mass should be %e\n",dyn_mass);}
 
   /* allocate space for quark and antiquark propagators */
-  quark_props = (su3_vector **)malloc(nmasses*sizeof(su3_vector *));
+  quark_props = (vector **)malloc(nmasses*sizeof(vector *));
   for(i=0; i<nmasses; i++){
-      quark_props[i] = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+      quark_props[i] = (vector *)malloc(sites_on_node*sizeof(vector));
   }
   /* allocate space for meson propagators (one number per timeslice) */
   /* for meson number n, mass number m, use props[nmasses*n+m] */
@@ -135,10 +135,10 @@ if( t_source%2 != 0 ){node0_printf("Even sources only!\n"); terminate(0);}
 	for(j=0;j<nmasses;j++){
 	    dslash_field( quark_props[j], quark_props[j], ODD, fn );
 	    FOREVENSITES(i,s){
-		scalar_mult_su3_vector( &(quark_props[j][i]), 2.0*masses[j], &(quark_props[j][i]) );
+		scalar_mult_vector( &(quark_props[j][i]), 2.0*masses[j], &(quark_props[j][i]) );
 	    }
 	    FORODDSITES(i,s){
-		scalar_mult_su3_vector( &(quark_props[j][i]), -1.0, &(quark_props[j][i]) );
+		scalar_mult_vector( &(quark_props[j][i]), -1.0, &(quark_props[j][i]) );
 	    }
 
 	    FORALLSITES(i,s) s->ttt = quark_props[j][i];
@@ -363,7 +363,7 @@ if( t_source%2 != 0 ){node0_printf("Even sources only!\n"); terminate(0);}
 
 /* "Multiply by" the quark-antiquark local pion operator, mom=px,py,pz */
 void mult_pion_mom_temp( int fb, int px, int py, int pz,
-    su3_vector *src, field_offset dest ){
+    vector *src, field_offset dest ){
    /* operator is gamma_pdir, another (-1)^(x+y+z+t) for antiquark */
     register int i;
     register site *s;
@@ -374,14 +374,14 @@ void mult_pion_mom_temp( int fb, int px, int py, int pz,
 	    (double)(pz*s->z)/(double)(nz))*2.0*PI );
 	if( fb==BACKWARDS )phase.imag = -phase.imag;
 	c_scalar_mult_su3vec( &(src[i]), &phase,
-		(su3_vector *)F_PT(s,dest) );
+		(vector *)F_PT(s,dest) );
     }
 }
 
 
 /* "Multiply by" the quark-antiquark local rho operator, mom=px,py,pz */
 void mult_rho_mom_temp( int fb, int pdir, int px, int py, int pz,
-    su3_vector *src, field_offset dest ){
+    vector *src, field_offset dest ){
    /* operator is gamma_pdir, another (-1)^(x+y+z+t) for antiquark */
     register int i;
     register site *s;
@@ -395,6 +395,6 @@ void mult_rho_mom_temp( int fb, int pdir, int px, int py, int pz,
 	     CMULREAL( phase, -1.0, phase );
 	}
 	c_scalar_mult_su3vec( &(src[i]), &phase,
-		(su3_vector *)F_PT(s,dest) );
+		(vector *)F_PT(s,dest) );
     }
 }

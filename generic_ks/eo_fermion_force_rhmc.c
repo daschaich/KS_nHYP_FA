@@ -8,7 +8,7 @@
 #include "ks_imp_includes.h"	/* definitions files and prototypes */
 
 void eo_fermion_force_rhmc( Real eps, params_ratfunc *rf, 
-    su3_vector **multi_x, field_offset phi_off, Real my_rsqmin, int my_niter,
+    vector **multi_x, field_offset phi_off, Real my_rsqmin, int my_niter,
     int cg_prec, int ff_prec, ferm_links_t *fn, ks_action_paths *ap )
 {
     // at different time steps

@@ -6,14 +6,14 @@
 
 /*#define FF_DEBUG*/
 
-// Routines for type "veclist" = list of su3_vector's
+// Routines for type "veclist" = list of vector's
 
-void mult_adj_su3_fieldlink_latveclist( su3_matrix *link,
+void mult_adj_su3_fieldlink_latveclist( matrix *link,
 		veclist **src_pt, veclist *dest, int listlength ) {
 	int i,j;
 
 	veclist **b, *c;
-	su3_matrix *a;
+	matrix *a;
 	Real a0r,a0i,a1r,a1i,a2r,a2i;
 	Real b0r,b0i,b1r,b1i,b2r,b2i;
 
@@ -21,14 +21,14 @@ void mult_adj_su3_fieldlink_latveclist( su3_matrix *link,
 			i++, b++, c++, a++){
 #ifdef CACHE_TOUCH
 	    if(i < sites_on_node - 1){
-		su3_matrix *an = a + 1;
+		matrix *an = a + 1;
 
 		cache_touch(&(an->e[0][0].real));
 		cache_touch(&(an->e[1][1].real));
 	    }
 #endif
 #ifdef FF_DEBUG
-		mult_adj_su3_mat_hwvec( a, *b, c );
+		mult_adj_mat_hwvec( a, *b, c );
 #else
 	    for( j=0; j<listlength; j++ ) {
 		a0r=a->e[0][0].real;      a0i=a->e[0][0].imag;
@@ -64,7 +64,7 @@ void mult_adj_su3_fieldlink_latveclist( su3_matrix *link,
 
 #ifdef CACHE_TOUCH
 		if(i < sites_on_node - 1){
-			su3_matrix *an = a + 1;
+			matrix *an = a + 1;
 			veclist **bn = b + 1;
 
 			cache_touch(&(an->e[2][2].real));
@@ -88,7 +88,7 @@ void mult_su3_sitelink_latveclist( int dir,
   int i,j;
   site *s;
   veclist **b, *c;
-  su3_matrix *a;
+  matrix *a;
   Real a0r,a0i,a1r,a1i,a2r,a2i;
   Real b0r,b0i,b1r,b1i,b2r,b2i;
 
@@ -99,7 +99,7 @@ void mult_su3_sitelink_latveclist( int dir,
 #ifdef CACHE_TOUCH
       if(i < sites_on_node - 1){
 	    site *sn = s + 1;
-	    su3_matrix *an = &(sn->link[dir]);
+	    matrix *an = &(sn->link[dir]);
 	    veclist **bn = b + 1;
     
 	    cache_touch(&(an->e[0][0].real));
@@ -108,7 +108,7 @@ void mult_su3_sitelink_latveclist( int dir,
       }
 #endif
 #ifdef FF_DEBUG
-          mult_su3_mat_hwvec( a, *b, c );
+          mult_mat_hwvec( a, *b, c );
 #else
     
       for( j=0; j<listlength; j++ ) {
@@ -151,7 +151,7 @@ void mult_su3_sitelink_latveclist( int dir,
 #ifdef CACHE_TOUCH
           if(i < sites_on_node - 1){
 		site *sn = s + 1;
-		su3_matrix *an = &(sn->link[dir]);
+		matrix *an = &(sn->link[dir]);
 		veclist **bn = b + 1;
 		cache_touch(&((*bn)->v[j].c[0].real));
           }
@@ -169,7 +169,7 @@ void scalar_mult_add_latveclist_proj(anti_hermitmat *mom,
   site *s;
   Real *tmp_coeff, *tmp_coeffd2;
 #ifdef FF_DEBUG
-  su3_matrix tmat, tmat2;
+  matrix tmat, tmat2;
 #endif
   anti_hermitmat *a;
   veclist *b, *f;
@@ -198,9 +198,9 @@ void scalar_mult_add_latveclist_proj(anti_hermitmat *mom,
 #ifdef FF_DEBUG
     uncompress_anti_hermitian( a, &tmat2);
     su3_projector(&(b->v[0]), &(f->v[0]), &tmat);
-    scalar_mult_add_su3_matrix(&tmat2, &tmat, tmp_coeff[0], &tmat2 );
+    scalar_mult_add_matrix(&tmat2, &tmat, tmp_coeff[0], &tmat2 );
     su3_projector(&(b->v[1]), &(f->v[1]), &tmat);
-    scalar_mult_add_su3_matrix(&tmat2, &tmat, tmp_coeff[1], &tmat2 );
+    scalar_mult_add_matrix(&tmat2, &tmat, tmp_coeff[1], &tmat2 );
     make_anti_hermitian(&tmat2, a);
     
 #else
@@ -362,9 +362,9 @@ void scalar_mult_add_latveclist(veclist *dest,
       }
 #endif
 #ifdef FF_DEBUG
-      scalar_mult_add_su3_vector(&(a->v[0]), &(b->v[0]), s[0],
+      scalar_mult_add_vector(&(a->v[0]), &(b->v[0]), s[0],
 				 &(a->v[0]));
-      scalar_mult_add_su3_vector(&(a->v[1]), &(b->v[1]), s[1],
+      scalar_mult_add_vector(&(a->v[1]), &(b->v[1]), s[1],
 				 &(a->v[1]));
 #else
 

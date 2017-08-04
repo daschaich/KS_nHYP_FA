@@ -1,4 +1,4 @@
-#define _inline_sse_mult_adj_su3_mat_4vec(aa,bb,cc0,cc1,cc2,cc3) \
+#define _inline_sse_mult_adj_mat_4vec(aa,bb,cc0,cc1,cc2,cc3) \
 { \
 __asm__ __volatile__ ("movupd %0, %%xmm0 \n\t" \
                       "movupd %1, %%xmm1 \n\t" \

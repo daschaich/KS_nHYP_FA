@@ -61,7 +61,7 @@ p2d_complex(dcomplex *dest, complex *src){
 /* Color vector */
 
 static void 
-f2p_vec(su3_vector *dest, fsu3_vector *src){
+f2p_vec(vector *dest, fvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -71,7 +71,7 @@ f2p_vec(su3_vector *dest, fsu3_vector *src){
 }
 
 static void 
-p2f_vec(fsu3_vector *dest, su3_vector *src){
+p2f_vec(fvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -81,7 +81,7 @@ p2f_vec(fsu3_vector *dest, su3_vector *src){
 }
 
 static void 
-d2p_vec(su3_vector *dest, dsu3_vector *src){
+d2p_vec(vector *dest, dvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -91,7 +91,7 @@ d2p_vec(su3_vector *dest, dsu3_vector *src){
 }
 
 static void 
-p2d_vec(dsu3_vector *dest, su3_vector *src){
+p2d_vec(dvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -103,7 +103,7 @@ p2d_vec(dsu3_vector *dest, su3_vector *src){
 /* Color matrix */
 
 static void 
-f2p_mat(su3_matrix *dest, fsu3_matrix *src){
+f2p_mat(matrix *dest, fmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -113,7 +113,7 @@ f2p_mat(su3_matrix *dest, fsu3_matrix *src){
 }
 
 static void 
-p2f_mat(fsu3_matrix *dest, su3_matrix *src){
+p2f_mat(fmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -123,7 +123,7 @@ p2f_mat(fsu3_matrix *dest, su3_matrix *src){
 }
 
 static void 
-d2p_mat(su3_matrix *dest, dsu3_matrix *src){
+d2p_mat(matrix *dest, dmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -135,7 +135,7 @@ d2p_mat(su3_matrix *dest, dsu3_matrix *src){
 /* Compilation suppressed until we need it */
 #if 0
 static void 
-p2d_mat(dsu3_matrix *dest, su3_matrix *src){
+p2d_mat(dmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -222,22 +222,22 @@ void vput_##P##C##_##T##_to_field(char *buf, size_t index, int count, \
 
 make_vget(F,  , R, float,          Real,          p2f_real);
 make_vget(F,  , C, fcomplex,       complex,       p2f_complex);
-make_vget(F, 3, V, fsu3_vector,    su3_vector,    p2f_vec);
-make_vget(F, 3, M, fsu3_matrix,    su3_matrix,    p2f_mat);
+make_vget(F, 3, V, fvector,    vector,    p2f_vec);
+make_vget(F, 3, M, fmatrix,    matrix,    p2f_mat);
 
 make_vput(F,  , R, float,          Real,          f2p_real);
 make_vput(F,  , C, fcomplex,       complex,       f2p_complex);
-make_vput(F, 3, V, fsu3_vector,    su3_vector,    f2p_vec);
-make_vput(F, 3, M, fsu3_matrix,    su3_matrix,    f2p_mat);
+make_vput(F, 3, V, fvector,    vector,    f2p_vec);
+make_vput(F, 3, M, fmatrix,    matrix,    f2p_mat);
 
 /* Double precision */
 
 make_vget(D,  , C, dcomplex,       complex,       p2d_complex);
-make_vget(D, 3, V, dsu3_vector,    su3_vector,    p2d_vec);
+make_vget(D, 3, V, dvector,    vector,    p2d_vec);
 
 make_vput(D,  , C, dcomplex,       complex,       d2p_complex);
-make_vput(D, 3, V, dsu3_vector,    su3_vector,    d2p_vec);
-make_vput(D, 3, M, dsu3_matrix,    su3_matrix,    d2p_mat);
+make_vput(D, 3, V, dvector,    vector,    d2p_vec);
+make_vput(D, 3, M, dmatrix,    matrix,    d2p_mat);
 
 /* Write MILC site structure data */
 
@@ -375,19 +375,19 @@ int write_##P##C##_##T##_timeslice_from_field(QIO_Writer *outfile, \
 
 make_write_all(F, "F",  , 0, 0, R, "QLA_F_Real", float, Real, float);
 make_write_all(F, "F",  , 0, 0, C, "QLA_F_Complex", fcomplex, complex, float);
-make_write_all(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fsu3_vector, su3_vector, float);
-make_write_all(F, "F", 3, 3, 0, M, "USQCD_F3_ColorMatrix", fsu3_matrix, su3_matrix, float);
+make_write_all(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fvector, vector, float);
+make_write_all(F, "F", 3, 3, 0, M, "USQCD_F3_ColorMatrix", fmatrix, matrix, float);
 
 make_write_tslice(F, "F",  , 0, 0, R, "QLA_F_Real", float, Real, float);
 make_write_tslice(F, "F",  , 0, 0, C, "QLA_F_Complex", fcomplex, complex, float);
-make_write_tslice(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fsu3_vector, su3_vector, float);
+make_write_tslice(F, "F", 3, 3, 0, V, "USQCD_F3_ColorVector", fvector, vector, float);
 
 /* Double precision */
 
 make_write_all(D, "D",  , 0, 0, C, "QLA_D_Complex", dcomplex, complex, double);
-make_write_all(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dsu3_vector, su3_vector, double);
+make_write_all(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dvector, vector, double);
 make_write_tslice(D, "D",  , 0, 0, C, "QLA_D_Complex", dcomplex, complex, double);
-make_write_tslice(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dsu3_vector, su3_vector, double);
+make_write_tslice(D, "D", 3, 3, 0, V, "USQCD_D3_ColorVector", dvector, vector, double);
 
 
 /* Read MILC site structure data */
@@ -447,13 +447,13 @@ int read_##P##C##_##T##_to_field(QIO_Reader *infile, \
 /* Single precision */
 make_read(F,  , R, float, Real, float);
 make_read(F,  , C, fcomplex, complex, float);
-make_read(F, 3, V, fsu3_vector, su3_vector, float);
-make_read(F, 3, M, fsu3_matrix, su3_matrix, float);
+make_read(F, 3, V, fvector, vector, float);
+make_read(F, 3, M, fmatrix, matrix, float);
 
 /* Double precision */
 make_read(D,  , C, dcomplex, complex, double);
-make_read(D, 3, V, dsu3_vector, su3_vector, double);
-make_read(D, 3, M, dsu3_matrix, su3_matrix, double);
+make_read(D, 3, V, dvector, vector, double);
+make_read(D, 3, M, dmatrix, matrix, double);
 
 /* Factory function for moving random generator state from site structure to
    output */

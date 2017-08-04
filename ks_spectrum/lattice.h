@@ -28,7 +28,7 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Program-dependent fields
   // Staggered phases, which have been absorbed into the matrices
@@ -36,24 +36,24 @@ typedef struct {
   Real phase[4];
 
   // Staggered complex vectors
-  su3_vector g_rand;            // Gaussian random vector
-  su3_vector chi;               // Gaussian random source vector
-  su3_vector psi;               // Solution vector = Kinverse * chi
-  su3_vector p;                 // CG change vector
-  su3_vector mp;                // CG temporary vector
-  su3_vector r;                 // CG residual vector
-  su3_vector ttt;               // For ../generic_ks/mat_invert.c
+  vector g_rand;            // Gaussian random vector
+  vector chi;               // Gaussian random source vector
+  vector psi;               // Solution vector = Kinverse * chi
+  vector p;                 // CG change vector
+  vector mp;                // CG temporary vector
+  vector r;                 // CG residual vector
+  vector ttt;               // For ../generic_ks/mat_invert.c
                                 // and ../generic_ks/flavor_ops.c
-  su3_vector M_inv;
+  vector M_inv;
 
   // Spectrum stuff
-  su3_vector prop, aprop;       // For ../generic_ks/spectrum_nlpi2.c
-  su3_vector propmat[3];        // For three source colors
-  su3_vector propmat2[3];       // For three source colors in nl_spectrum.c
+  vector prop, aprop;       // For ../generic_ks/spectrum_nlpi2.c
+  vector propmat[3];        // For three source colors
+  vector propmat2[3];       // For three source colors in nl_spectrum.c
 
   // Temporary vectors and matrices -- for gauge fixing, spectrum
-  su3_vector tempvec[4];        // One for each direction
-  su3_matrix tempmat1, tempmat2, staple;
+  vector tempvec[4];        // One for each direction
+  matrix tempmat1, tempmat2, staple;
 } site;
 // -----------------------------------------------------------------
 
@@ -105,21 +105,21 @@ EXTERN site *lattice;
 #define N_POINTERS 16   // Needed by ../generic_ks/nl_spectrum.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // Spectrum stuff -- source timeslice and increment
 EXTERN int src_start, src_inc, n_src;
 
 // nHYP stuff
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
 
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat, *tempmat2;
+EXTERN matrix *tempmat, *tempmat2;
 #endif
 // -----------------------------------------------------------------

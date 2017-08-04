@@ -20,7 +20,7 @@ typedef struct {
 
   // No random numbers
   // Doubled gauge field provides workspace
-  su3_matrix link[4];
+  matrix link[4];
 } site;
 // -----------------------------------------------------------------
 

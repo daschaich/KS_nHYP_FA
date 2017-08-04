@@ -25,7 +25,7 @@ int readin(int prompt);
 
 // nHYP stuff specific to for MCRG-blocked measurements
 void clear_disp(int *disp);
-void diag_su3(su3_matrix *Q, complex *f);
+void diag_su3(matrix *Q, complex *f);
 void block_nhyp_mcrg(int num, int block);
 void block_mcrg(int num, int block);
 

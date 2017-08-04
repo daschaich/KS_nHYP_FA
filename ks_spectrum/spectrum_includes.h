@@ -28,12 +28,12 @@ void grsource_imp();
 void dslash(field_offset chi, field_offset psi, int parity);
 
 // CG stuff
-int CG_wrapper(field_offset src, su3_vector **props, Real M, int parity);
+int CG_wrapper(field_offset src, vector **props, Real M, int parity);
 int ks_congrad(field_offset src, field_offset dest, Real M, int parity);
 
 // Dslash stuff and associated helper functions
 // (latter were in v6/generic_ks/d_congrad5.c for some reason)
-void dslash_wrapper(su3_vector *src, su3_vector *dest, int parity);
+void dslash_wrapper(vector *src, vector *dest, int parity);
 void dslash(field_offset chi, field_offset psi, int parity);
 void dslash_special(field_offset chi, field_offset psi, int parity,
                     msg_tag **tag, int start);

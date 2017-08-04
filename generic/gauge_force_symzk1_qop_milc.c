@@ -40,10 +40,10 @@ void QOP_symanzik_1loop_gauge_force(QOP_info_t *info, QOP_GaugeField *gauge,
 {
     register int i,dir;
     register site *st;
-    su3_matrix tmat1;
+    matrix tmat1;
     register Real eb3;    /* Note: eps now includes eps*beta */
-    register su3_matrix* momentum;
-    su3_matrix *staple, *tempmat1;
+    register matrix* momentum;
+    matrix *staple, *tempmat1;
 
     /* lengths of various kinds of loops */
     int *loop_length = get_loop_length();
@@ -57,8 +57,8 @@ void QOP_symanzik_1loop_gauge_force(QOP_info_t *info, QOP_GaugeField *gauge,
     int max_length = get_max_length(); /* For Symanzik 1 loop! */
     int nloop = get_nloop();
     int nreps = get_nreps();
-    su3_matrix *forwardlink[4];
-    su3_matrix *tmpmom[4];
+    matrix *forwardlink[4];
+    matrix *tmpmom[4];
 
     int nflop = 153004;  /* For Symanzik1 action */
     Real final_flop;
@@ -115,13 +115,13 @@ void QOP_symanzik_1loop_gauge_force(QOP_info_t *info, QOP_GaugeField *gauge,
       printf("%s(%d): Can't malloc path_dir\n",myname,this_node);
       return;
     }
-    staple = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    staple = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(staple == NULL){
       printf("%s(%d): Can't malloc temporary\n",myname,this_node);
       return;
     }
 
-    tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(tempmat1 == NULL){
       printf("%s(%d): Can't malloc temporary\n",myname,this_node);
       return;
@@ -193,7 +193,7 @@ node0_printf("WARNING: THIS CODE IS NOT TESTED\n"); exit(0);
 			    }
 			}  /* end if nreps > 1 */
 
-			scalar_mult_add_su3_matrix( &(staple[i]), &tmat1,
+			scalar_mult_add_matrix( &(staple[i]), &tmat1,
 				new_term, &(staple[i]) );
 
 		    } END_LOOP
@@ -208,7 +208,7 @@ node0_printf("WARNING: THIS CODE IS NOT TESTED\n"); exit(0);
 	FORALLSITES(i,st){
 	    mult_su3_na( forwardlink[dir]+i, &(staple[i]), &tmat1 );
 	    momentum = tmpmom[dir] + i;
-	    scalar_mult_sub_su3_matrix( momentum, &tmat1,
+	    scalar_mult_sub_matrix( momentum, &tmat1,
 		eb3, momentum );
 	} END_LOOP
     } /* dir loop */

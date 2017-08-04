@@ -234,7 +234,7 @@ double imp_gauge_action() {
     complex trace;
     double g_action;
     double action,act2,total_action;
-    su3_matrix *tempmat1;
+    matrix *tempmat1;
     int length;
 
     /* these are for loop_table  */
@@ -242,7 +242,7 @@ double imp_gauge_action() {
 
     g_action=0.0;
 
-    tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(tempmat1 == NULL){
       printf("imp_gauge_action: Can't malloc temporary\n");
       terminate(1);
@@ -293,11 +293,11 @@ void g_measure( ){
     complex trace;
     double average[NREPS],action,act2,total_action;
     int length;
-    su3_matrix *tempmat1;
+    matrix *tempmat1;
     /* these are for loop_table  */
     int ln,iloop,rep;
 
-    tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+    tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
     if(tempmat1 == NULL){
       printf("g_measure: Can't malloc temporary\n");
       terminate(1);
@@ -374,25 +374,25 @@ register int i;
 int iloop, ln, k, j;
 int dirs[MAX_LENGTH], length;
 int path_dir[MAX_LENGTH], path_length;
-su3_matrix tmat1, *tempmat1, *staple;
+matrix tmat1, *tempmat1, *staple;
 int fsubl;
 
  assert(NREPS==1);   /* This procedure designed only for NREPS = 1 */
 
- tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+ tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
  if(tempmat1 == NULL){
    printf("dsdu_qhb_subl: Can't malloc temporary\n");
    terminate(1);
  }
 
- staple = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+ staple = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
  if(staple == NULL){
    printf("imp_gauge_force: Can't malloc temporary\n");
    terminate(1);
  }
  
     FORSOMESUBLATTICE(i,st,subl) {
-	clear_su3mat(&staple[i]);
+	clear_mat(&staple[i]);
     }
 
     for(iloop=0;iloop<NLOOP;iloop++){
@@ -431,7 +431,7 @@ int fsubl;
 		   So now take adjoint */
 		FORSOMESUBLATTICE(i,st,subl) {
 		    su3_adjoint( &tempmat1[i], &tmat1 );
-		    scalar_mult_add_su3_matrix(&staple[i], &tmat1,
+		    scalar_mult_add_matrix(&staple[i], &tmat1,
 			loop_coeff[iloop][0], &staple[i]) );
 		}
 	    } /* k (location in path) */

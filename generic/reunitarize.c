@@ -59,7 +59,7 @@ static int check_deviation(Real deviation) {
     return 1;
 }
 
-void reunit_report_problem_matrix(su3_matrix *mat, int i, int dir) {
+void reunit_report_problem_matrix(matrix *mat, int i, int dir) {
   int ii, jj;
   union {
     Real fval;
@@ -90,7 +90,7 @@ void reunit_report_problem_matrix(su3_matrix *mat, int i, int dir) {
   fflush(stdout);
 }
 
-int reunit_su3(su3_matrix *c) {
+int reunit_su3(matrix *c) {
      register Real bj0r, bj0i, bj1r, bj1i, bj2r, bj2i;
      register Real c0r, c0i, c1r, c1i, c2r, c2i;
      register Real ar, ai, tr, ti;
@@ -185,7 +185,7 @@ int reunit_su3(su3_matrix *c) {
 }
 
 void reunitarize() {
-  register su3_matrix *mat;
+  register matrix *mat;
   register int i, dir;
   register site *s;
   int errcount = 0;
@@ -200,7 +200,7 @@ void reunitarize() {
 #else
     for(dir=XUP; dir<=TUP; dir++) {
 #endif
-      mat = (su3_matrix *)&(s->link[dir]);
+      mat = (matrix *)&(s->link[dir]);
       errors = reunit_su3(mat);
       errcount += errors;
       if (errors)

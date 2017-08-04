@@ -6,7 +6,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void scalar_mult_sum_su3_matrix(su3_matrix *b, Real s, su3_matrix *c) {
+void scalar_mult_sum_matrix(matrix *b, Real s, matrix *c) {
   register int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
@@ -16,8 +16,8 @@ void scalar_mult_sum_su3_matrix(su3_matrix *b, Real s, su3_matrix *c) {
   }
 }
 
-void scalar_mult_add_su3_matrix(su3_matrix *a, su3_matrix *b, Real s,
-                                su3_matrix *c) {
+void scalar_mult_add_matrix(matrix *a, matrix *b, Real s,
+                                matrix *c) {
 
   register int i, j;
   for (i = 0; i < 3; i++) {

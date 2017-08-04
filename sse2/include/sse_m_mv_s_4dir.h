@@ -1,4 +1,4 @@
-#define _inline_sse_mult_su3_mat_vec_sum_4dir(aa,bb0,bb1,bb2,bb3,cc) \
+#define _inline_sse_mult_mat_vec_sum_4dir(aa,bb0,bb1,bb2,bb3,cc) \
 { \
 __asm__ __volatile__ ("movupd %0, %%xmm0 \n\t" \
                       "movupd %1, %%xmm1 \n\t" \

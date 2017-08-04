@@ -15,7 +15,7 @@ void w_loop1(int tot_smear) {
   register site *s;
   int nth, nxh;
   double *wils_loop1, td;
-  su3_matrix tmat1, tmat2;
+  matrix tmat1, tmat2;
   msg_tag *mtag[4];
 
   if (nx != ny || nx != nz) {
@@ -33,13 +33,13 @@ void w_loop1(int tot_smear) {
 
   for (dir = XUP; dir <= ZUP; dir++) {
     FORALLSITES(i, s) {
-      su3mat_copy(&(s->link[dir]), &(s->s_link));
-      su3mat_copy(&(s->link[TUP]), &(s->t_link_f));
+      mat_copy(&(s->link[dir]), &(s->s_link));
+      mat_copy(&(s->link[TUP]), &(s->t_link_f));
     }
 
     // Start gather of forward temporal links
     mtag[1] = NULL;    // Avoid compiler warning
-    mtag[0] = start_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+    mtag[0] = start_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                                 dir, EVENANDODD, gen_pt[0]);
 
     // Recursively construct the spatial segments and compute
@@ -48,25 +48,25 @@ void w_loop1(int tot_smear) {
       if (r > 0) {
         wait_gather(mtag[1]);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[1][i]), &(s->staple));
+          mat_copy((matrix *)(gen_pt[1][i]), &(s->staple));
 
         FORALLSITES(i, s)
           mult_su3_nn(&(s->link[dir]), &(s->staple), &(s->s_link));
       }
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->s_link), &(s->s_link_f));
+        mat_copy(&(s->s_link), &(s->s_link_f));
 
       // Start gather of forward spatial segments
-      mtag[TUP] = start_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+      mtag[TUP] = start_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                                     TUP, EVENANDODD, gen_pt[TUP]);
 
       // Concurrently gather spatial links for next r, if still needed
       if (r == 0)
-        mtag[1] = start_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+        mtag[1] = start_gather_site(F_OFFSET(s_link), sizeof(matrix),
                                     dir, EVENANDODD, gen_pt[1]);
       else if (r < nxh - 1)
-        restart_gather_site(F_OFFSET(s_link), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(s_link), sizeof(matrix),
                             dir, EVENANDODD, gen_pt[1], mtag[1]);
       else
         cleanup_gather(mtag[1]);
@@ -74,24 +74,24 @@ void w_loop1(int tot_smear) {
       // Collect forward temporal links
       wait_gather(mtag[0]);
       FORALLSITES(i, s)
-        su3mat_copy((su3_matrix *)(gen_pt[0][i]), &(s->staple));
+        mat_copy((matrix *)(gen_pt[0][i]), &(s->staple));
 
       FORALLSITES(i, s)
-        su3mat_copy(&(s->staple), &(s->t_link_f));
+        mat_copy(&(s->staple), &(s->t_link_f));
 
       // Recursively compute the Wilson loops of different time extent
       for (t = 0; t < nth; t++) {
         // Collect forward spatial segments
         wait_gather(mtag[TUP]);
         FORALLSITES(i, s)
-          su3mat_copy((su3_matrix *)(gen_pt[TUP][i]), &(s->staple));
+          mat_copy((matrix *)(gen_pt[TUP][i]), &(s->staple));
 
         FORALLSITES(i, s)
-          su3mat_copy(&(s->staple), &(s->s_link_f));
+          mat_copy(&(s->staple), &(s->s_link_f));
 
         // Start gather for next t, if still needed.
         if (t < nth - 1)
-          restart_gather_site(F_OFFSET(s_link_f), sizeof(su3_matrix),
+          restart_gather_site(F_OFFSET(s_link_f), sizeof(matrix),
                             TUP, EVENANDODD, gen_pt[TUP], mtag[TUP]);
         else
           cleanup_gather(mtag[TUP]);
@@ -113,7 +113,7 @@ void w_loop1(int tot_smear) {
 
       // Start gather of forward time-like links for next r
       if (r < (nxh - 1))
-        restart_gather_site(F_OFFSET(t_link_f), sizeof(su3_matrix),
+        restart_gather_site(F_OFFSET(t_link_f), sizeof(matrix),
                             dir, EVENANDODD, gen_pt[0], mtag[0]);
       else
         cleanup_gather(mtag[0]);

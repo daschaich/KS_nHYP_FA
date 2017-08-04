@@ -19,24 +19,24 @@
 
 #ifdef ASQ_OPTIMIZED_FATTENING
 static void 
-compute_gen_staple_field(su3_matrix *staple, int mu, int nu, 
-			 su3_matrix *link, su3_matrix *fatlink, Real coef);
+compute_gen_staple_field(matrix *staple, int mu, int nu, 
+			 matrix *link, matrix *fatlink, Real coef);
 
 static void 
-compute_gen_staple_site(su3_matrix *staple, int mu, int nu, 
-			field_offset link, su3_matrix* fatlink, Real coef);
+compute_gen_staple_site(matrix *staple, int mu, int nu, 
+			field_offset link, matrix* fatlink, Real coef);
 #endif
 
 void load_longlinks(ferm_links_t *fn, ks_action_paths *ap) {
-  su3_matrix **t_ll = &fn->lng;
+  matrix **t_ll = &fn->lng;
   register int i;
   register site *s;
   int ipath,dir;
   int disp[4];
   int num_q_paths = ap->num_q_paths;
   Q_path *q_paths = ap->q_paths;
-  register su3_matrix *long1;
-  su3_matrix *staple = NULL, *tempmat1 = NULL;
+  register matrix *long1;
+  matrix *staple = NULL, *tempmat1 = NULL;
   char myname[] = "load_longlinks";
 
 #ifdef LLTIME
@@ -51,20 +51,20 @@ void load_longlinks(ferm_links_t *fn, ks_action_paths *ap) {
   }
   /* Allocate space for t_ll if NULL */
   if(*t_ll == NULL){
-    *t_ll = (su3_matrix *)special_alloc(sites_on_node*4*sizeof(su3_matrix));
+    *t_ll = (matrix *)special_alloc(sites_on_node*4*sizeof(matrix));
     if(*t_ll==NULL){
       printf("%s(%d): no room for t_ll\n",myname, this_node);
       terminate(1);
     }
   }
   
-  staple = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  staple = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(staple == NULL){
     printf("%s(%d): Can't malloc temporary\n",myname,this_node);
     terminate(1);
   }
 
-  tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(tempmat1 == NULL){
     printf("%s(%d): Can't malloc temporary\n",myname,this_node);
     terminate(1);
@@ -74,7 +74,7 @@ void load_longlinks(ferm_links_t *fn, ks_action_paths *ap) {
     /* set longlink to zero */
     FORALLSITES(i,s){
       long1 = *t_ll + 4*i +dir;
-      clear_su3mat( long1 );
+      clear_mat( long1 );
     }
 
     /* loop over paths, checking for ones with total displacement 3*dir */
@@ -97,7 +97,7 @@ printf("\n");**/
 	FORALLSITES(i,s){
 	  su3_adjoint( &tempmat1[i], &staple[i] );
 	  long1 = *t_ll + 4*i + dir;
-          scalar_mult_add_su3_matrix( long1,
+          scalar_mult_add_matrix( long1,
 	    &staple[i], -q_paths[ipath].coeff, long1 );
 		/* minus sign in coeff. because we used backward path*/
 	}
@@ -124,12 +124,12 @@ node0_printf("LLTIME(long): time =  %e (Naik) mflops = %e\n",dtime,
 /* KS phases and APBC must be in the links. See long comment at 
    end of fermion_force_general.c */
 void load_fatlinks(ferm_links_t *fn, ks_action_paths *ap){
-  su3_matrix **t_fl = &fn->fat;
+  matrix **t_fl = &fn->fat;
   register int i;
   register site *s;
   int dir;
-  register su3_matrix *fat1;
-  su3_matrix *staple = NULL, *tempmat1 = NULL;
+  register matrix *fat1;
+  matrix *staple = NULL, *tempmat1 = NULL;
   char myname[] = "load_fatlinks";
 
 #ifdef ASQ_OPTIMIZED_FATTENING
@@ -162,20 +162,20 @@ dtime=-dclock();
 
   /* Allocate space for t_fl if NULL */
   if(*t_fl == NULL){
-    *t_fl = (su3_matrix *)special_alloc(sites_on_node*4*sizeof(su3_matrix));
+    *t_fl = (matrix *)special_alloc(sites_on_node*4*sizeof(matrix));
     if(*t_fl==NULL){
       printf("NODE %d: no room for t_fl\n",this_node);
       terminate(1);
     }
   }
   
-  staple = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  staple = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(staple == NULL){
     printf("%s: Can't malloc temporary\n",myname);
     terminate(1);
   }
 
-  tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(tempmat1 == NULL){
     printf("%s: Can't malloc temporary\n",myname);
     terminate(1);
@@ -186,7 +186,7 @@ dtime=-dclock();
     /* set fatlink to zero */
     FORALLSITES(i,s){
       fat1 = (*t_fl) + 4*i + dir;
-      clear_su3mat( fat1 );
+      clear_mat( fat1 );
     }
     
     /* loop over paths, checking for ones with total displacement 1*dir */
@@ -209,7 +209,7 @@ printf("\n");**/
 	FORALLSITES(i,s){
 	  su3_adjoint( &tempmat1[i], &staple[i] );
 	  fat1 = (*t_fl) +  4*i + dir;
-          scalar_mult_add_su3_matrix( fat1,
+          scalar_mult_add_matrix( fat1,
 	    &staple[i], -q_paths[ipath].coeff, fat1 );
 		/* minus sign in coeff. because we used backward path*/
 	}
@@ -228,7 +228,7 @@ printf("\n");**/
    FORALLSITES(i,s) /* Intialize fat links with c_1*U_\mu(x) */
      {
        fat1 = (*t_fl) +  4*i + dir;
-       scalar_mult_su3_matrix(&(s->link[dir]), one_link,
+       scalar_mult_matrix(&(s->link[dir]), one_link,
 			      fat1 );
      }
    for(nu=XUP; nu<=TUP; nu++) if(nu!=dir)
@@ -271,14 +271,14 @@ BOMB THE COMPILE
 #endif
 
 static void 
-compute_gen_staple_site(su3_matrix *staple, int mu, int nu, 
-			field_offset link, su3_matrix* fatlink, Real coef) {
-  su3_matrix tmat1,tmat2;
+compute_gen_staple_site(matrix *staple, int mu, int nu, 
+			field_offset link, matrix* fatlink, Real coef) {
+  matrix tmat1,tmat2;
   msg_tag *mtag0,*mtag1;
-  su3_matrix *tempmat = NULL;
+  matrix *tempmat = NULL;
   register site *s ;
   register int i ;
-  register su3_matrix *fat1;
+  register matrix *fat1;
 
   /* Computes the staple :
                    mu
@@ -286,32 +286,32 @@ compute_gen_staple_site(su3_matrix *staple, int mu, int nu,
           nu	|	|
 		|	|
 		X	X
-    Where the mu link can be any su3_matrix. The result is saved in staple.
+    Where the mu link can be any matrix. The result is saved in staple.
     if staple==NULL then the result is not saved.
     It also adds the computed staple to the fatlink[mu] with weight coef.
   */
 
   /* Upper staple */
-  mtag0 = start_gather_site( link, sizeof(su3_matrix), nu, EVENANDODD, gen_pt[0] );
-  mtag1 = start_gather_site( F_OFFSET(link[nu]), sizeof(su3_matrix), mu, 
+  mtag0 = start_gather_site( link, sizeof(matrix), nu, EVENANDODD, gen_pt[0] );
+  mtag1 = start_gather_site( F_OFFSET(link[nu]), sizeof(matrix), mu, 
 			EVENANDODD, gen_pt[1] );
   wait_gather(mtag0);
   wait_gather(mtag1);
   
   if(staple!=NULL){/* Save the staple */
     FORALLSITES(i,s){
-      mult_su3_na( (su3_matrix *)gen_pt[0][i],
-		   (su3_matrix *)gen_pt[1][i], &tmat1 );
+      mult_su3_na( (matrix *)gen_pt[0][i],
+		   (matrix *)gen_pt[1][i], &tmat1 );
       mult_su3_nn( &(s->link[nu]), &tmat1, &staple[i] );
     }
   }
   else{ /* No need to save the staple. Add it to the fatlinks */
     FORALLSITES(i,s){
-      mult_su3_na( (su3_matrix *)gen_pt[0][i],
-		   (su3_matrix *)gen_pt[1][i], &tmat1 );
+      mult_su3_na( (matrix *)gen_pt[0][i],
+		   (matrix *)gen_pt[1][i], &tmat1 );
       mult_su3_nn( &(s->link[nu]), &tmat1, &tmat2 );
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix(fat1, &tmat2, coef,
+      scalar_mult_add_matrix(fat1, &tmat2, coef,
 				 fat1) ;
     }
   }
@@ -319,25 +319,25 @@ compute_gen_staple_site(su3_matrix *staple, int mu, int nu,
   cleanup_gather(mtag1);
 
   /* lower staple */
-  tempmat = (su3_matrix *)special_alloc( sites_on_node*sizeof(su3_matrix) );
+  tempmat = (matrix *)special_alloc( sites_on_node*sizeof(matrix) );
   mtag0 = start_gather_site( F_OFFSET(link[nu]),
-			sizeof(su3_matrix), mu, EVENANDODD, gen_pt[0] );
+			sizeof(matrix), mu, EVENANDODD, gen_pt[0] );
   wait_gather(mtag0);
   FORALLSITES(i,s){
-    mult_su3_an( &(s->link[nu]),(su3_matrix *)F_PT(s,link), &tmat1 );
-    mult_su3_nn( &(tmat1),(su3_matrix *)gen_pt[0][i], &(tempmat[i]) );
+    mult_su3_an( &(s->link[nu]),(matrix *)F_PT(s,link), &tmat1 );
+    mult_su3_nn( &(tmat1),(matrix *)gen_pt[0][i], &(tempmat[i]) );
   }
   cleanup_gather(mtag0);
-  mtag0 = start_gather_field( tempmat, sizeof(su3_matrix),
+  mtag0 = start_gather_field( tempmat, sizeof(matrix),
 				  OPP_DIR(nu), EVENANDODD, gen_pt[0] );
   wait_gather(mtag0);
 
   if(staple!=NULL){/* Save the staple */
     FORALLSITES(i,s){
-      add_su3_matrix( &staple[i],(su3_matrix *)gen_pt[0][i], 
+      add_matrix( &staple[i],(matrix *)gen_pt[0][i], 
 		      &staple[i] );
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix( fat1,
+      scalar_mult_add_matrix( fat1,
 				 &staple[i], coef, 
 				 fat1 );
     }
@@ -345,8 +345,8 @@ compute_gen_staple_site(su3_matrix *staple, int mu, int nu,
   else{ /* No need to save the staple. Add it to the fatlinks */
     FORALLSITES(i,s){
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix( fat1,
-				 (su3_matrix *)gen_pt[0][i], coef, 
+      scalar_mult_add_matrix( fat1,
+				 (matrix *)gen_pt[0][i], coef, 
 				 fat1 );
     }
   }
@@ -362,14 +362,14 @@ BOMB THE COMPILE
 #endif
 
 static void 
-compute_gen_staple_field(su3_matrix *staple, int mu, int nu, 
-			 su3_matrix *link, su3_matrix *fatlink, Real coef) {
-  su3_matrix tmat1,tmat2;
+compute_gen_staple_field(matrix *staple, int mu, int nu, 
+			 matrix *link, matrix *fatlink, Real coef) {
+  matrix tmat1,tmat2;
   msg_tag *mtag0,*mtag1;
-  su3_matrix *tempmat = NULL;
+  matrix *tempmat = NULL;
   register site *s ;
   register int i ;
-  register su3_matrix *fat1;
+  register matrix *fat1;
 
   /* Computes the staple :
                    mu
@@ -377,32 +377,32 @@ compute_gen_staple_field(su3_matrix *staple, int mu, int nu,
           nu	|	|
 		|	|
 		X	X
-    Where the mu link can be any su3_matrix. The result is saved in staple.
+    Where the mu link can be any matrix. The result is saved in staple.
     if staple==NULL then the result is not saved.
     It also adds the computed staple to fatlink[mu] with weight coef.
   */
 
   /* Upper staple */
-  mtag0 = start_gather_field( link, sizeof(su3_matrix), nu, EVENANDODD, gen_pt[0] );
-  mtag1 = start_gather_site( F_OFFSET(link[nu]), sizeof(su3_matrix), mu, 
+  mtag0 = start_gather_field( link, sizeof(matrix), nu, EVENANDODD, gen_pt[0] );
+  mtag1 = start_gather_site( F_OFFSET(link[nu]), sizeof(matrix), mu, 
 			EVENANDODD, gen_pt[1] );
   wait_gather(mtag0);
   wait_gather(mtag1);
   
   if(staple!=NULL){/* Save the staple */
     FORALLSITES(i,s){
-      mult_su3_na( (su3_matrix *)gen_pt[0][i],
-		   (su3_matrix *)gen_pt[1][i], &tmat1 );
+      mult_su3_na( (matrix *)gen_pt[0][i],
+		   (matrix *)gen_pt[1][i], &tmat1 );
       mult_su3_nn( &(s->link[nu]), &tmat1, &staple[i] );
     }
   }
   else{ /* No need to save the staple. Add it to the fatlinks */
     FORALLSITES(i,s){
-      mult_su3_na( (su3_matrix *)gen_pt[0][i],
-		   (su3_matrix *)gen_pt[1][i], &tmat1 );
+      mult_su3_na( (matrix *)gen_pt[0][i],
+		   (matrix *)gen_pt[1][i], &tmat1 );
       mult_su3_nn( &(s->link[nu]), &tmat1, &tmat2 );
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix(fat1, &tmat2, coef,
+      scalar_mult_add_matrix(fat1, &tmat2, coef,
 				 fat1) ;
     }
   }
@@ -410,25 +410,25 @@ compute_gen_staple_field(su3_matrix *staple, int mu, int nu,
   cleanup_gather(mtag1);
 
   /* lower staple */
-  tempmat = (su3_matrix *)special_alloc( sites_on_node*sizeof(su3_matrix) );
+  tempmat = (matrix *)special_alloc( sites_on_node*sizeof(matrix) );
   mtag0 = start_gather_site( F_OFFSET(link[nu]),
-			sizeof(su3_matrix), mu, EVENANDODD, gen_pt[0] );
+			sizeof(matrix), mu, EVENANDODD, gen_pt[0] );
   wait_gather(mtag0);
   FORALLSITES(i,s){
     mult_su3_an( &(s->link[nu]),&link[i], &tmat1 );
-    mult_su3_nn( &(tmat1),(su3_matrix *)gen_pt[0][i], &(tempmat[i]) );
+    mult_su3_nn( &(tmat1),(matrix *)gen_pt[0][i], &(tempmat[i]) );
   }
   cleanup_gather(mtag0);
-  mtag0 = start_gather_field( tempmat, sizeof(su3_matrix),
+  mtag0 = start_gather_field( tempmat, sizeof(matrix),
 				  OPP_DIR(nu), EVENANDODD, gen_pt[0] );
   wait_gather(mtag0);
 
   if(staple!=NULL){/* Save the staple */
     FORALLSITES(i,s){
-      add_su3_matrix( &staple[i],(su3_matrix *)gen_pt[0][i], 
+      add_matrix( &staple[i],(matrix *)gen_pt[0][i], 
 		      &staple[i] );
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix( fat1,
+      scalar_mult_add_matrix( fat1,
 				 &staple[i], coef, 
 				 fat1 );
     }
@@ -436,8 +436,8 @@ compute_gen_staple_field(su3_matrix *staple, int mu, int nu,
   else{ /* No need to save the staple. Add it to the fatlinks */
     FORALLSITES(i,s){
       fat1 = &(fatlink[4*i+mu]);
-      scalar_mult_add_su3_matrix( fat1,
-				 (su3_matrix *)gen_pt[0][i], coef, 
+      scalar_mult_add_matrix( fat1,
+				 (matrix *)gen_pt[0][i], coef, 
 				 fat1 );
     }
   }
@@ -450,25 +450,25 @@ compute_gen_staple_field(su3_matrix *staple, int mu, int nu,
 /* Move up the backward longlinks.  Result in t_lbl */
 void 
 load_longbacklinks(ferm_links_t *fn){
-  su3_matrix **t_lbl = &fn->lngback;
-  su3_matrix *t_ll = fn->lng;
+  matrix **t_lbl = &fn->lngback;
+  matrix *t_ll = fn->lng;
   register int i;
   register site *s;
   int dir;
-  su3_matrix *tempmat1 = NULL;
+  matrix *tempmat1 = NULL;
   msg_tag *tag[4];
   char myname[] = "load_longbacklinks";
 
   /* Allocate space for t_lbl if NULL */
   if(*t_lbl == NULL){
-    *t_lbl = (su3_matrix *)special_alloc(sites_on_node*4*sizeof(su3_matrix));
+    *t_lbl = (matrix *)special_alloc(sites_on_node*4*sizeof(matrix));
     if(*t_lbl==NULL){
       printf("%s(%d): no room for t_lbl\n",myname,this_node);
       terminate(1);
     }
   }
 
-  tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(tempmat1 == NULL){
     printf("%s: Can't malloc temporary\n",myname);
     terminate(1);
@@ -480,10 +480,10 @@ load_longbacklinks(ferm_links_t *fn){
       tempmat1[i] = t_ll[dir+4*i];
     }
     tag[dir] = start_gather_field( tempmat1,
-      sizeof(su3_matrix), OPP_3_DIR(DIR3(dir)), EVENANDODD, gen_pt[dir] );
+      sizeof(matrix), OPP_3_DIR(DIR3(dir)), EVENANDODD, gen_pt[dir] );
     wait_gather( tag[dir] );
     FORALLSITES(i,s){
-      su3_adjoint( (su3_matrix *)gen_pt[dir][i],
+      su3_adjoint( (matrix *)gen_pt[dir][i],
       (*t_lbl) + dir + 4*i );
     }
     cleanup_gather( tag[dir] );
@@ -495,25 +495,25 @@ load_longbacklinks(ferm_links_t *fn){
 /* Move up the backward fatlinks.  Result in t_fbl */
 void 
 load_fatbacklinks(ferm_links_t *fn){
-  su3_matrix **t_fbl = &fn->fatback;
-  su3_matrix *t_fl = fn->fat;
+  matrix **t_fbl = &fn->fatback;
+  matrix *t_fl = fn->fat;
   register int i;
   register site *s;
   int dir;
-  su3_matrix *tempmat1 = NULL;
+  matrix *tempmat1 = NULL;
   msg_tag *tag[4];
   char myname[] = "load_fatbacklinks";
 
   /* Allocate space for t_fbl if NULL */
   if(*t_fbl == NULL){
-    *t_fbl = (su3_matrix *)special_alloc(sites_on_node*4*sizeof(su3_matrix));
+    *t_fbl = (matrix *)special_alloc(sites_on_node*4*sizeof(matrix));
     if(*t_fbl==NULL){
       printf("%s(%d): no room for t_fbl\n",myname,this_node);
       terminate(1);
     }
   }
 
-  tempmat1 = (su3_matrix *)special_alloc(sites_on_node*sizeof(su3_matrix));
+  tempmat1 = (matrix *)special_alloc(sites_on_node*sizeof(matrix));
   if(tempmat1 == NULL){
     printf("%s: Can't malloc temporary\n",myname);
     terminate(1);
@@ -525,10 +525,10 @@ load_fatbacklinks(ferm_links_t *fn){
       tempmat1[i] = t_fl[dir+4*i];
     }
     tag[dir] = start_gather_field( tempmat1,
-      sizeof(su3_matrix), OPP_DIR(dir), EVENANDODD, gen_pt[dir] );
+      sizeof(matrix), OPP_DIR(dir), EVENANDODD, gen_pt[dir] );
     wait_gather( tag[dir] );
     FORALLSITES(i,s){
-      su3_adjoint( (su3_matrix *)gen_pt[dir][i],
+      su3_adjoint( (matrix *)gen_pt[dir][i],
       (*t_fbl) + dir + 4*i );
     }
     cleanup_gather( tag[dir] );
@@ -538,7 +538,7 @@ load_fatbacklinks(ferm_links_t *fn){
 }
 
 static void 
-free_t_links(su3_matrix **t_l){
+free_t_links(matrix **t_l){
   if(*t_l != NULL) special_free(*t_l);
   *t_l = NULL;
 }

@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-Real magsq_su3vec(su3_vector *a) {
+Real magsq_su3vec(vector *a) {
   register Real sum = 0.0;
 #ifndef FAST
   register int i;

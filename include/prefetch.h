@@ -38,14 +38,14 @@
 /*                Prefetch via subroutine calls                            */
 /***************************************************************************/
 
-void _prefetch_M(su3_matrix *);
-void _prefetch_V(su3_vector *);
-void _prefetch_VV(su3_vector *, su3_vector *);
-void _prefetch_VVV(su3_vector *, su3_vector *, su3_vector *);
-void _prefetch_VVVV(su3_vector *, su3_vector *, su3_vector *, su3_vector *);
-void _prefetch_VVVVV(su3_vector *, su3_vector *, su3_vector *, su3_vector *, su3_vector *);
-void _prefetch_4MVVVV(su3_matrix *, su3_vector *, su3_vector *, su3_vector *, su3_vector *);
-void _prefetch_4MV4V(su3_matrix *, su3_vector *, su3_vector *);
+void _prefetch_M(matrix *);
+void _prefetch_V(vector *);
+void _prefetch_VV(vector *, vector *);
+void _prefetch_VVV(vector *, vector *, vector *);
+void _prefetch_VVVV(vector *, vector *, vector *, vector *);
+void _prefetch_VVVVV(vector *, vector *, vector *, vector *, vector *);
+void _prefetch_4MVVVV(matrix *, vector *, vector *, vector *, vector *);
+void _prefetch_4MV4V(matrix *, vector *, vector *);
 
 #define prefetch_M(a0)                    _prefetch_M(a0)
 #define prefetch_V(a0)                    _prefetch_V(a0)

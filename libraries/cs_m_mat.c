@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void c_scalar_mult_su3mat(su3_matrix *b, complex *s, su3_matrix *c) {
+void c_scalar_mult_mat(matrix *b, complex *s, matrix *c) {
   register int i, j;
   for (i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {

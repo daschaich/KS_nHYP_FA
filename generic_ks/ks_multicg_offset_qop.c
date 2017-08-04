@@ -15,8 +15,8 @@
 /* Offsets are 4 * mass * mass and must be positive */
 int 
 ks_multicg_offset(	/* Return value is number of iterations taken */
-   field_offset src,	/* source vector (type su3_vector) */
-   su3_vector **psim,	/* solution vectors */
+   field_offset src,	/* source vector (type vector) */
+   vector **psim,	/* solution vectors */
    Real *offsets,	/* the offsets */
    int num_offsets,	/* number of offsets */
    int niter,		/* maximal number of CG interations */
@@ -49,8 +49,8 @@ ks_multicg_offset(	/* Return value is number of iterations taken */
 
 int
 ks_multicg_mass(	/* Return value is number of iterations taken */
-    field_offset src,	/* source vector (type su3_vector) */
-    su3_vector **psim,	/* solution vectors (preallocated) */
+    field_offset src,	/* source vector (type vector) */
+    vector **psim,	/* solution vectors (preallocated) */
     Real *masses,	/* the masses */
     int num_masses,	/* number of masses */
     int niter,		/* maximal number of CG interations */

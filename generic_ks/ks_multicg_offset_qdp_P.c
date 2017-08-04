@@ -77,7 +77,7 @@ setup_congrad(void)
 
 static int
 ks_multicg_mass_qdp(	/* Return value is number of iterations taken */
-	       QDP_ColorVector *src,	/* source vector (type su3_vector) */
+	       QDP_ColorVector *src,	/* source vector (type vector) */
 	       QDP_ColorVector **dest,	/* solution vectors */
 	       QLA_Real *masses,	/* the masses */
 	       int num_masses,	        /* number of masses */
@@ -88,7 +88,7 @@ ks_multicg_mass_qdp(	/* Return value is number of iterations taken */
 	       ferm_links_t *fn           /* Storage for fat and Naik links */
 	       )
 {
-  /* Site su3_vector's resid, cg_p and ttt are used as temporaies */
+  /* Site vector's resid, cg_p and ttt are used as temporaies */
   double c1, c2, oldrsq;		/* pkp = cg_p.K.cg_p */
   double rsqstop;	/* stopping residual normalized by source norm */
   QLA_Real rsq, pkp;
@@ -329,8 +329,8 @@ ks_multicg_mass_qdp(	/* Return value is number of iterations taken */
 
 int
 KS_MULTICG_MASS(	/* Return value is number of iterations taken */
-	   field_offset f_src,	/* source vector (type su3_vector) */
-	   su3_vector **psim,	/* solution vectors */
+	   field_offset f_src,	/* source vector (type vector) */
+	   vector **psim,	/* solution vectors */
 	   Real *masses,	/* the masses */
 	   int num_masses,	/* number of masses */
 	   int niter,		/* maximal number of CG interations */
@@ -380,8 +380,8 @@ KS_MULTICG_MASS(	/* Return value is number of iterations taken */
 /* Just a wrapper for ks_multicg_mass */
 /* Offsets are 4 * mass * mass and must be positive */
 int KS_MULTICG_OFFSET(	/* Return value is number of iterations taken */
-    field_offset src,	/* source vector (type su3_vector) */
-    su3_vector **psim,	/* solution vectors */
+    field_offset src,	/* source vector (type vector) */
+    vector **psim,	/* solution vectors */
     Real *offsets,	/* the offsets */
     int num_offsets,	/* number of offsets */
     int niter,		/* maximal number of CG interations */

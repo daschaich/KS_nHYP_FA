@@ -65,7 +65,7 @@ int spectrum2(Real vmass, field_offset temp1, field_offset temp2) {
               if (node_number(x, y, z, t_src) != mynode())
                 continue;
               i = node_index(x, y, z, t_src);
-              ((su3_vector *)(F_PT(&lattice[i], temp1)))->c[icol].real = -1.0;
+              ((vector *)(F_PT(&lattice[i], temp1)))->c[icol].real = -1.0;
             }
           }
         }
@@ -74,7 +74,7 @@ int spectrum2(Real vmass, field_offset temp1, field_offset temp2) {
       else {                  // Point source at origin
         if (node_number(0, 0, 0, t_src % nt) == mynode()) {
           i = node_index(0, 0, 0, t_src % nt);
-          ((su3_vector *)(F_PT(&lattice[i], temp1)))->c[icol].real = pt_norm;
+          ((vector *)(F_PT(&lattice[i], temp1)))->c[icol].real = pt_norm;
         }
         source_type |= 2;
       }
@@ -144,8 +144,8 @@ int spectrum2(Real vmass, field_offset temp1, field_offset temp2) {
               continue;
             i = node_index(x, y, z, t_off);
 
-            // typecast trick: propmat is three su3_vectors
-            tc = det_su3((su3_matrix *)lattice[i].propmat);
+            // typecast trick: propmat is three vectors
+            tc = det_su3((matrix *)lattice[i].propmat);
 
             // Must get sign right
             // This looks to see if we have wrapped around the lattice

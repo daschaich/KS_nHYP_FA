@@ -107,26 +107,26 @@ int initial_set() {
 // Allocate all space for fields
 // Changed to mimic allocation order in v6/KS_nHYP_FA/control.c
 void make_fields() {
-  FIELD_ALLOC_VEC(gauge_field, su3_matrix, 4);
-  FIELD_ALLOC_VEC(gauge_field_thin, su3_matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field, matrix, 4);
+  FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);
 
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple1, su3_matrix, 4);
-  FIELD_ALLOC_MAT_OFFDIAG(Staple2, su3_matrix, 4);
-  FIELD_ALLOC_MAT(SigmaH2, su3_matrix, 4, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(hyplink2, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple1, matrix, 4);
+  FIELD_ALLOC_MAT_OFFDIAG(Staple2, matrix, 4);
+  FIELD_ALLOC_MAT(SigmaH2, matrix, 4, 4);
 
-  FIELD_ALLOC(tempmat, su3_matrix);
-  FIELD_ALLOC(tempmat2, su3_matrix);
-  FIELD_ALLOC_VEC(Staple3, su3_matrix, 4);
-  FIELD_ALLOC_VEC(LambdaU, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Lambda1, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Lambda2, su3_matrix, 4);
-  FIELD_ALLOC_VEC(SigmaH, su3_matrix, 4);
-  FIELD_ALLOC_VEC(Sigma, su3_matrix, 4);
+  FIELD_ALLOC(tempmat, matrix);
+  FIELD_ALLOC(tempmat2, matrix);
+  FIELD_ALLOC_VEC(Staple3, matrix, 4);
+  FIELD_ALLOC_VEC(LambdaU, matrix, 4);
+  FIELD_ALLOC_VEC(Lambda1, matrix, 4);
+  FIELD_ALLOC_VEC(Lambda2, matrix, 4);
+  FIELD_ALLOC_VEC(SigmaH, matrix, 4);
+  FIELD_ALLOC_VEC(Sigma, matrix, 4);
 
   node0_printf("Mallocing %.1f MBytes per core for fields\n",
-               (double)sites_on_node * 98 * sizeof(su3_matrix) / 1e6);
+               (double)sites_on_node * 98 * sizeof(matrix) / 1e6);
 }
 // -----------------------------------------------------------------
 
@@ -279,8 +279,8 @@ int readin(int prompt) {
 
   // Only make gauge_field_save and gauge_field_temp if needed
   if (Nsmear > 1) {
-    FIELD_ALLOC_VEC(gauge_field_save, su3_matrix, 4);
-    FIELD_ALLOC_VEC(gauge_field_temp, su3_matrix, 4);
+    FIELD_ALLOC_VEC(gauge_field_save, matrix, 4);
+    FIELD_ALLOC_VEC(gauge_field_temp, matrix, 4);
   }
   else if (Nsmear == 0) {
     node0_printf("Nsmear=0 breaks things; just set alpha=0\n");

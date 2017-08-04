@@ -23,7 +23,7 @@ static inline double pow3(double x) {return x * x * x;}
 
 
 // -----------------------------------------------------------------
-void compute_RS(su3_matrix *Q, double *R, double *S) {
+void compute_RS(matrix *Q, double *R, double *S) {
   double dtmp;
   complex ctmp;
   double e22 = Q->e[1][1].real - Q->e[0][0].real;
@@ -58,9 +58,9 @@ void compute_RS(su3_matrix *Q, double *R, double *S) {
 //   b[i][j] = d f[i] / d c[j] with c[j] = 1/(j+1) trace Q^(j+1)
 // The flag compute_b switches on/off the computation of these derivatives
 #ifndef NHYP_DEBUG
-void compute_fhb(su3_matrix *Q, Real *f, Real b[3][3], int compute_b)
+void compute_fhb(matrix *Q, Real *f, Real b[3][3], int compute_b)
 #else
-void compute_fhb(su3_matrix *Omega, su3_matrix *Q,
+void compute_fhb(matrix *Omega, matrix *Q,
                  Real *f, Real b[3][3], int compute_b)
 #endif
 {

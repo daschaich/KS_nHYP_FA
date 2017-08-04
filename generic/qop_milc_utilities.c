@@ -16,17 +16,17 @@
 #if (PRECISION == 1)
 
 static void 
-f2p_mat(su3_matrix *dest, fsu3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_matrix));
+f2p_mat(matrix *dest, fmatrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(fmatrix));
 }
 
 static void 
-p2f_mat(fsu3_matrix *dest, su3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_matrix));
+p2f_mat(fmatrix *dest, matrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(fmatrix));
 }
 
 static void 
-d2p_mat(su3_matrix *dest, dsu3_matrix *src){
+d2p_mat(matrix *dest, dmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -36,7 +36,7 @@ d2p_mat(su3_matrix *dest, dsu3_matrix *src){
 }
 
 static void 
-p2d_mat(dsu3_matrix *dest, su3_matrix *src){
+p2d_mat(dmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -46,17 +46,17 @@ p2d_mat(dsu3_matrix *dest, su3_matrix *src){
 }
 
 static void 
-f2p_vec(su3_vector *dest, fsu3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_vector));
+f2p_vec(vector *dest, fvector *src){
+  memcpy((void *)dest, (void *)src, sizeof(fvector));
 }
 
 static void 
-p2f_vec(fsu3_vector *dest, su3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(fsu3_vector));
+p2f_vec(fvector *dest, vector *src){
+  memcpy((void *)dest, (void *)src, sizeof(fvector));
 }
 
 static void 
-d2p_vec(su3_vector *dest, dsu3_vector *src){
+d2p_vec(vector *dest, dvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -66,7 +66,7 @@ d2p_vec(su3_vector *dest, dsu3_vector *src){
 }
 
 static void 
-p2d_vec(dsu3_vector *dest, su3_vector *src){
+p2d_vec(dvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -78,7 +78,7 @@ p2d_vec(dsu3_vector *dest, su3_vector *src){
 #else
 
 static void 
-f2p_mat(su3_matrix *dest, fsu3_matrix *src){
+f2p_mat(matrix *dest, fmatrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -87,9 +87,9 @@ f2p_mat(su3_matrix *dest, fsu3_matrix *src){
   }
 }
 
-/* Convert (or copy) su3_matrix from prevailing to single precision */
+/* Convert (or copy) matrix from prevailing to single precision */
 static void 
-p2f_mat(fsu3_matrix *dest, su3_matrix *src){
+p2f_mat(fmatrix *dest, matrix *src){
   int i,j;
   
   for(i = 0; i < 3; i++)for(j = 0; j < 3; j++){
@@ -99,17 +99,17 @@ p2f_mat(fsu3_matrix *dest, su3_matrix *src){
 }
 
 static void 
-d2p_mat(su3_matrix *dest, dsu3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_matrix));
+d2p_mat(matrix *dest, dmatrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(dmatrix));
 }
 
 static void 
-p2d_mat(dsu3_matrix *dest, su3_matrix *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_matrix));
+p2d_mat(dmatrix *dest, matrix *src){
+  memcpy((void *)dest, (void *)src, sizeof(dmatrix));
 }
 
 static void 
-f2p_vec(su3_vector *dest, fsu3_vector *src){
+f2p_vec(vector *dest, fvector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -118,9 +118,9 @@ f2p_vec(su3_vector *dest, fsu3_vector *src){
   }
 }
 
-/* Convert (or copy) su3_vector from prevailing to single precision */
+/* Convert (or copy) vector from prevailing to single precision */
 static void 
-p2f_vec(fsu3_vector *dest, su3_vector *src){
+p2f_vec(fvector *dest, vector *src){
   int i;
   
   for(i = 0; i < 3; i++){
@@ -130,43 +130,43 @@ p2f_vec(fsu3_vector *dest, su3_vector *src){
 }
 
 static void 
-d2p_vec(su3_vector *dest, dsu3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_vector));
+d2p_vec(vector *dest, dvector *src){
+  memcpy((void *)dest, (void *)src, sizeof(dvector));
 }
 
 static void 
-p2d_vec(dsu3_vector *dest, su3_vector *src){
-  memcpy((void *)dest, (void *)src, sizeof(dsu3_vector));
+p2d_vec(dvector *dest, vector *src){
+  memcpy((void *)dest, (void *)src, sizeof(dvector));
 }
 
 #endif
 
 /********************************************************************/
-/* su3_matrix field conversion                                      */
+/* matrix field conversion                                      */
 /********************************************************************/
 
 #if ( PRECISION == 1 )
 
 /* No copy necessary if the prevailing precision matches the input array */
 
-su3_matrix *
-create_links_from_qop_milc_F(fsu3_matrix *src)
+matrix *
+create_links_from_qop_milc_F(fmatrix *src)
 {
   return src;
 }
 
 void
-destroy_links_from_qop_milc_F(su3_matrix *g){
+destroy_links_from_qop_milc_F(matrix *g){
 }
 
-su3_matrix *
-create_links_from_qop_milc_D(dsu3_matrix *src)
+matrix *
+create_links_from_qop_milc_D(dmatrix *src)
 {
-  su3_matrix *g;
+  matrix *g;
   int i, dir;
   site *s;
 
-  g = (su3_matrix *)malloc(sizeof(su3_matrix)*sites_on_node*4);
+  g = (matrix *)malloc(sizeof(matrix)*sites_on_node*4);
   if(g == NULL){
     printf("create_links_from_qop_milc_D(%d): No room\n",this_node);
     return NULL;
@@ -180,21 +180,21 @@ create_links_from_qop_milc_D(dsu3_matrix *src)
 }
 
 void
-destroy_links_from_qop_milc_D(su3_matrix *g){
+destroy_links_from_qop_milc_D(matrix *g){
   if(g != NULL) free(g);
 }
 
 
 #else
 
-su3_matrix *
-create_links_from_qop_milc_F(fsu3_matrix *src)
+matrix *
+create_links_from_qop_milc_F(fmatrix *src)
 {
-  su3_matrix *g;
+  matrix *g;
   int i, dir;
   site *s;
 
-  g = (su3_matrix *)malloc(sizeof(su3_matrix)*sites_on_node*4);
+  g = (matrix *)malloc(sizeof(matrix)*sites_on_node*4);
   if(g == NULL){
     printf("create_links_from_qop_milc_F(%d): No room\n",this_node);
     return NULL;
@@ -208,48 +208,48 @@ create_links_from_qop_milc_F(fsu3_matrix *src)
 }
 
 void
-destroy_links_from_qop_milc_F(su3_matrix *g){
+destroy_links_from_qop_milc_F(matrix *g){
   if(g != NULL) free(g);
 }
 
-su3_matrix *
-create_links_from_qop_milc_D(dsu3_matrix *src)
+matrix *
+create_links_from_qop_milc_D(dmatrix *src)
 {
   return src;
 }
 
 void
-destroy_links_from_qop_milc_D(su3_matrix *g){
+destroy_links_from_qop_milc_D(matrix *g){
 }
 
 
 #endif
 
 /********************************************************************/
-/* su3_vector field conversion                                      */
+/* vector field conversion                                      */
 /********************************************************************/
 
 #if ( PRECISION == 1 )
 
-su3_vector *
-create_latvec_from_qop_milc_F(fsu3_vector *src)
+vector *
+create_latvec_from_qop_milc_F(fvector *src)
 {
   return src;
 }
 
 void
-destroy_latvec_from_qop_milc_F(su3_vector *v){
+destroy_latvec_from_qop_milc_F(vector *v){
   return;
 }
 
-su3_vector *
-create_latvec_from_qop_milc_D(dsu3_vector *src)
+vector *
+create_latvec_from_qop_milc_D(dvector *src)
 {
-  su3_vector *v;
+  vector *v;
   int i;
   site *s;
 
-  v = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+  v = (vector *)malloc(sizeof(vector)*sites_on_node);
   if(v == NULL){
     printf("create_latvec_from_qop_milc_D(%d): No room\n",this_node);
     return NULL;
@@ -261,21 +261,21 @@ create_latvec_from_qop_milc_D(dsu3_vector *src)
 }
 
 void
-destroy_latvec_from_qop_milc_D(su3_vector *v){
+destroy_latvec_from_qop_milc_D(vector *v){
   if(v != NULL) free(v);
 }
 
 
 #else
 
-su3_vector *
-create_latvec_from_qop_milc_F(fsu3_vector *src)
+vector *
+create_latvec_from_qop_milc_F(fvector *src)
 {
-  su3_vector *v;
+  vector *v;
   int i;
   site *s;
 
-  v = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+  v = (vector *)malloc(sizeof(vector)*sites_on_node);
   if(v == NULL){
     printf("create_latvec_from_qop_milc_F(%d): No room\n",this_node);
     return NULL;
@@ -287,38 +287,38 @@ create_latvec_from_qop_milc_F(fsu3_vector *src)
 }
 
 void
-destroy_latvec_from_qop_milc_F(su3_vector *v){
+destroy_latvec_from_qop_milc_F(vector *v){
   if(v != NULL) free(v);
 }
 
-su3_vector *
-create_latvec_from_qop_milc_D(dsu3_vector *src)
+vector *
+create_latvec_from_qop_milc_D(dvector *src)
 {
   return src;
 }
 
 void
-destroy_latvec_from_qop_milc_D(su3_vector *v){
+destroy_latvec_from_qop_milc_D(vector *v){
   return;
 }
 
 #endif
 
 /********************************************************************/
-/* su3_vector field copy from prevailing MILC precision to specific
+/* vector field copy from prevailing MILC precision to specific
    QOP precision */
 /********************************************************************/
 
 #if ( PRECISION == 1 )
 void
-copy_latvec_to_qop_milc_F( fsu3_vector *dest, su3_vector *src)
+copy_latvec_to_qop_milc_F( fvector *dest, vector *src)
 {
   if(dest != src)
-    memcpy(dest, src, sites_on_node*sizeof(fsu3_vector));
+    memcpy(dest, src, sites_on_node*sizeof(fvector));
 }
 
 void
-copy_latvec_to_qop_milc_D( dsu3_vector *dest, su3_vector *src)
+copy_latvec_to_qop_milc_D( dvector *dest, vector *src)
 {
   int i;
   site *s;
@@ -331,7 +331,7 @@ copy_latvec_to_qop_milc_D( dsu3_vector *dest, su3_vector *src)
 #else
 
 void
-copy_latvec_to_qop_milc_F(fsu3_vector *dest, su3_vector *src)
+copy_latvec_to_qop_milc_F(fvector *dest, vector *src)
 {
   int i;
   site *s;
@@ -342,10 +342,10 @@ copy_latvec_to_qop_milc_F(fsu3_vector *dest, su3_vector *src)
 }
 
 void
-copy_latvec_to_qop_milc_D(dsu3_vector *dest, su3_vector *src)
+copy_latvec_to_qop_milc_D(dvector *dest, vector *src)
 {
   if(dest != src)
-    memcpy(dest, src, sites_on_node*sizeof(dsu3_vector));
+    memcpy(dest, src, sites_on_node*sizeof(dvector));
 }
 
 #endif

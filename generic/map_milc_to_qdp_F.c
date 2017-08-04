@@ -18,10 +18,10 @@
 
 #define copy_types(macro) \
 macro(F, R, Real, Real); \
-macro(F, V, ColorVector, su3_vector); \
+macro(F, V, ColorVector, vector); \
 macro(F, H, HalfFermion, half_wilson_vector); \
 macro(F, D, DiracFermion, wilson_vector); \
-macro(F, M, ColorMatrix, su3_matrix);
+macro(F, M, ColorMatrix, matrix);
 
 #include "map_milc_to_qdp_P.c"
 
@@ -29,10 +29,10 @@ macro(F, M, ColorMatrix, su3_matrix);
 
 #define copy_types(macro) \
 macro(R, Real, Real); \
-macro(V, ColorVector, su3_vector); \
+macro(V, ColorVector, vector); \
 macro(H, HalfFermion, half_wilson_vector); \
 macro(D, DiracFermion, wilson_vector); \
-macro(M, ColorMatrix, su3_matrix);
+macro(M, ColorMatrix, matrix);
 
 #include "map_milc_to_qdp_Fd.c"
 

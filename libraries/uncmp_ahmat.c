@@ -1,7 +1,7 @@
 /************  uncmp_ahmat.c  (in su3.a) ********************************
 *									*
 * void uncompress_anti_hermitian( anti_hermitmat *mat_antihermit,	*
-*	su3_matrix *mat_su3 )						*
+*	matrix *mat_su3 )						*
 * uncompresses an anti_hermitian matrix to make a 3x3 complex matrix	*
 */
 #include "../include/config.h"
@@ -9,7 +9,7 @@
 #include "../include/su3.h"
 
 void uncompress_anti_hermitian( anti_hermitmat *mat_antihermit,
-	su3_matrix *mat_su3 ) {
+	matrix *mat_su3 ) {
 /* uncompresses an anti_hermitian su3 matrix */
         Real temp1;
 	mat_su3->e[0][0].imag=mat_antihermit->m00im;

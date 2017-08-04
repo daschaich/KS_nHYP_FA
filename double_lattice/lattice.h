@@ -20,7 +20,7 @@ typedef struct {
   int index;          // Index in the array
 
   // Doubled gauge field provides workspace
-  su3_matrix link[8];
+  matrix link[8];
 } site;
 // -----------------------------------------------------------------
 
@@ -66,7 +66,7 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *tempmat1;
-EXTERN su3_matrix *tempmat2;    // Used in Polyakov loop calculation
+EXTERN matrix *tempmat1;
+EXTERN matrix *tempmat2;    // Used in Polyakov loop calculation
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

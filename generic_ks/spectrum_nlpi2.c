@@ -58,7 +58,7 @@ void mult_pion5(field_offset src, field_offset dest) {
   register int i;
   register site *s;
   FORALLSITES(i, s)
-    *(su3_vector *)F_PT(s, dest) = *(su3_vector *)F_PT(s, src);
+    *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
 }
 
 // The second (pi_05) local pion operator (gamma_0 gamma_5)
@@ -68,10 +68,10 @@ void mult_pion05(field_offset src, field_offset dest) {
   register site *s;
   FORALLSITES(i, s) {
     if (s->parity == EVEN)
-      *(su3_vector *)F_PT(s, dest) = *(su3_vector *)F_PT(s, src);
+      *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
     else {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, src), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, src), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -90,8 +90,8 @@ void mult_pioni5(int fdir, field_offset src, field_offset dest) {
       sign = -1.0;
     if (s->parity == ODD)
       sign = -sign;     // The extra gamma_5
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), sign,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), sign,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -108,8 +108,8 @@ void mult_pionij(int fdir, field_offset src, field_offset dest) {
     if (((((short *)&(s->x))[fdir]) & 0x1) == 1)
       sign = -1.0;
     // The extra gamma_5 leaves us with nothing more to do
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), sign,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), sign,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -129,7 +129,7 @@ void mult_pioni(int fdir, field_offset src, field_offset dest) {
   }
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (d1 = 0, d2 = 1; d1 < 2; d1++, d2--) {
 //    printf("In mult_pioni: (d1, d2): (%i,%i)\n", dir[d1], dir[d2]);
@@ -147,7 +147,7 @@ void mult_pioni(int fdir, field_offset src, field_offset dest) {
         sign = -1.0;
       if (((((short *)&(s->x))[d2]) & 0x1) == 1)
         sign = -sign;
-      scalar_mult_su3_vector(&(s->tempvec[0]), sign, &(s->tempvec[0]));
+      scalar_mult_vector(&(s->tempvec[0]), sign, &(s->tempvec[0]));
     }
 
     // Apply the symmetric shift operator in dir1
@@ -162,7 +162,7 @@ void mult_pioni(int fdir, field_offset src, field_offset dest) {
       if (((((short *)&(s->x))[d1]) & 0x1) == 1)
         sign = -1.0;
       sign *= epsilon_sign;
-      scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+      scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                  &(s->tempvec[1]), sign);
     }
     epsilon_sign = -epsilon_sign;
@@ -178,8 +178,8 @@ void mult_pioni0(int fdir, field_offset src, field_offset dest) {
   mult_pioni(fdir, src, dest);
   FORALLSITES(i, s) {
     if ((s->x + s->y + s->z) % 2 == 1) {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -199,20 +199,20 @@ void mult_pions(field_offset src, field_offset dest) {
             {{0, 2, 1}, -norm}, {{1, 0, 2}, -norm}, {{2, 1, 0}, -norm}};
 
   FORALLSITES(i, s)
-    clearvec((su3_vector *)F_PT(s, dest));
+    clearvec((vector *)F_PT(s, dest));
 
   for (c = 0; c < 6; c++) {
     zeta_shift(3, p[c].d, src, F_OFFSET(tempvec[1]));
     FORALLSITES(i, s) {
-      scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
+      scalar_mult_sum_vector((vector *)F_PT(s, dest),
                                  &(s->tempvec[1]), p[c].sign);
     }
   }
 
   // Multiply by epsilon for the anti-quark
   FORODDSITES(i, s) {
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), -1.0,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
+                           (vector *)F_PT(s, dest));
   }
 }
 
@@ -225,8 +225,8 @@ void mult_pion0(field_offset src, field_offset dest) {
   mult_pions(src, dest);
   FORALLSITES(i, s) {
     if ((s->x + s->y + s->z) % 2 == 1) {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -238,10 +238,10 @@ void mult_rhoi(int pdir, field_offset src, field_offset dest) {
   register site *s;
   FORALLSITES(i, s) {
     if (((((short *)&(s->x))[pdir]) & 0x1) == 0)
-      *(su3_vector *)F_PT(s, dest) = *(su3_vector *)F_PT(s, src);
+      *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
     else {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, src), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, src), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -253,10 +253,10 @@ void mult_rhoi0(int pdir, field_offset src, field_offset dest) {
   register site *s;
   FORALLSITES(i, s) {
     if (((((short *)&(s->x))[pdir] + s->x + s->y + s->z) & 0x1) == 0)
-      *(su3_vector *)F_PT(s, dest) = *(su3_vector *)F_PT(s, src);
+      *(vector *)F_PT(s, dest) = *(vector *)F_PT(s, src);
     else {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, src), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, src), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -271,8 +271,8 @@ void mult_rhos(int fdir, field_offset src, field_offset dest) {
   sym_shift(fdir, src, dest);
   FORALLSITES(i, s) {
     if (s->parity == ODD) {   // The extra gamma_5
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -288,8 +288,8 @@ void mult_rho0(int fdir, field_offset src, field_offset dest) {
   sym_shift(fdir, src, dest);
   FORALLSITES(i, s) {
     if ((s->t) % 2 == 1) {
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), -1.0,
-                             (su3_vector *)F_PT(s, dest));
+      scalar_mult_vector((vector *)F_PT(s, dest), -1.0,
+                             (vector *)F_PT(s, dest));
     }
   }
 }
@@ -341,11 +341,11 @@ int spectrum_nlpi2(Real fmass, Real amass) {
       mult_pion5(F_OFFSET(chi), F_OFFSET(g_rand));
       mult_pioni(ZUP, F_OFFSET(chi), F_OFFSET(aprop));
       FORALLSITES(i, s)
-        sum_su3_vector(&(s->aprop), &(s->g_rand));
+        sum_vector(&(s->aprop), &(s->g_rand));
 
       mult_rhoi(ZUP, F_OFFSET(chi), F_OFFSET(aprop));
       FORALLSITES(i, s)
-        sum_su3_vector(&(s->aprop), &(s->g_rand));
+        sum_vector(&(s->aprop), &(s->g_rand));
 
       // Compute aprop <-- M^(-1) g_rand
       cgn += mat_invert_uml(F_OFFSET(g_rand), F_OFFSET(aprop),
@@ -397,11 +397,11 @@ int spectrum_nlpi2(Real fmass, Real amass) {
       mult_pion05(F_OFFSET(chi), F_OFFSET(g_rand));
       mult_pioni0(ZUP, F_OFFSET(chi), F_OFFSET(aprop));
       FORALLSITES(i, s)
-        sum_su3_vector(&(s->aprop), &(s->g_rand));
+        sum_vector(&(s->aprop), &(s->g_rand));
 
       mult_rhoi0(ZUP, F_OFFSET(chi), F_OFFSET(aprop));
       FORALLSITES(i, s)
-        sum_su3_vector(&(s->aprop), &(s->g_rand));
+        sum_vector(&(s->aprop), &(s->g_rand));
 
       // Compute aprop <-- M^(-1) g_rand
       cgn += mat_invert_uml(F_OFFSET(g_rand), F_OFFSET(aprop),

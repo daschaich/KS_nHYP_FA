@@ -11,12 +11,12 @@
 void scalar_mult_latvec(field_offset src, Real scalar, field_offset dest) {
   register int i;
   register site *s;
-  register su3_vector *spt, *dpt;
+  register vector *spt, *dpt;
 
   FORALLSITES(i, s) {
-    spt = (su3_vector *)F_PT(s, src);
-    dpt = (su3_vector *)F_PT(s, dest);
-    scalar_mult_su3_vector(spt, scalar, dpt);
+    spt = (vector *)F_PT(s, src);
+    dpt = (vector *)F_PT(s, dest);
+    scalar_mult_vector(spt, scalar, dpt);
   }
 }
 // -----------------------------------------------------------------
@@ -25,7 +25,7 @@ void scalar_mult_latvec(field_offset src, Real scalar, field_offset dest) {
 
 // -----------------------------------------------------------------
 // Apply staggered D^dag.D = -D.D, with EVEN parity hard-coded
-void Matrix_Vec_mult(su3_vector *src, su3_vector *res) {
+void Matrix_Vec_mult(vector *src, vector *res) {
   register site *s;
   register int i;
 
@@ -43,7 +43,7 @@ void Matrix_Vec_mult(su3_vector *src, su3_vector *res) {
 }
 
 // Apply just staggered D^dag, with EVEN parity hard-coded
-void MatVec(su3_vector *src, su3_vector *res) {
+void MatVec(vector *src, vector *res) {
   register site *s;
   register int i;
 
@@ -70,9 +70,9 @@ void av_ov (void *x, void *y, int *Nvecs, primme_params *primme) {
   int i, j, ivec;
   double *xx;
   Real *yy;
-  su3_vector src[even_sites_on_node], res[even_sites_on_node];
+  vector src[even_sites_on_node], res[even_sites_on_node];
 
-  // Copy double precision complex vector x to Real su3_vector src
+  // Copy double precision complex vector x to Real vector src
   for (ivec = 0; ivec < *Nvecs; ivec++) {
     xx = ((double*) x) + 6 * ivec * even_sites_on_node;
     FOREVENSITES(i, s) {
@@ -83,7 +83,7 @@ void av_ov (void *x, void *y, int *Nvecs, primme_params *primme) {
 
     Matrix_Vec_mult(src, res);
 
-    // Copy the resulting su3_vector res back to complex vector y
+    // Copy the resulting vector res back to complex vector y
     xx = ((double*) y) + 6 * ivec * even_sites_on_node;
     FOREVENSITES(i, s) {
       yy = &(res[i].c[0].real);
@@ -115,7 +115,7 @@ void par_GlobalSumDouble(void *sendBuf, void *recvBuf,
 // Function make_evs computes eigenvectors through PRIMME
 // Post-processing hits resulting eigenvectors with D^dag
 // to explore their helicity
-int make_evs(double *start, int Nvecs, su3_vector **eigVecs, double *eigVals) {
+int make_evs(double *start, int Nvecs, vector **eigVecs, double *eigVals) {
   register site *s;
   int i, ivec, iter, ret, maxn = even_sites_on_node * 3;
   double *rnorms;
@@ -203,7 +203,7 @@ int make_evs(double *start, int Nvecs, su3_vector **eigVecs, double *eigVals) {
 // Measure the chirality of a unit-normalized fermion state
 // Chirality is real since gamma_5 is hermitian
 // Hard-code EVENANDODD parity
-void measure_chirality(su3_vector *src, double *chirality) {
+void measure_chirality(vector *src, double *chirality) {
   register int i;
   register site *s;
   register double cc = 0;
@@ -228,7 +228,7 @@ void measure_chirality(su3_vector *src, double *chirality) {
 // -----------------------------------------------------------------
 // Print the density and chiral density of a normalized fermion state
 // Hard-code EVEN parity
-void print_densities(su3_vector *src, char *tag, int y, int z, int t) {
+void print_densities(vector *src, char *tag, int y, int z, int t) {
 
   register int i;
   register site *s;

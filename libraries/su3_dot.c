@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------
-// Return complex dot product of two su3_vectors : adag b
+// Return complex dot product of two vectors : adag b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-complex su3_dot(su3_vector *a, su3_vector *b) {
+complex su3_dot(vector *a, vector *b) {
 #ifndef FAST
 complex tc;
     CMULJ_(a->c[0], b->c[0], tc);

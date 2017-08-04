@@ -46,7 +46,7 @@
 void swrite_ks_fm_prop_hdr(FILE *fp, ks_prop_header *ksph)
 {
   int32type size_of_element = sizeof(float);  /* float */
-  int32type elements_per_site = sizeof(fsu3_matrix)/size_of_element; /* propagator is 3 X 3 complex */
+  int32type elements_per_site = sizeof(fmatrix)/size_of_element; /* propagator is 3 X 3 complex */
   char myname[] = "swrite_ks_fm_prop_hdr";
 
   swrite_data(fp,(void *)&ksph->magic_number,sizeof(ksph->magic_number),
@@ -124,7 +124,7 @@ void write_ks_fmprop_info_file(ks_prop_file *pf)
   ks_prop_header *ph;
   int32type natural_order = NATURAL_ORDER;
   int32type size_of_element = sizeof(float);  /* float */
-  int32type elements_per_site = sizeof(fsu3_matrix)/size_of_element; /* propagator is 3 X 3 complex */
+  int32type elements_per_site = sizeof(fmatrix)/size_of_element; /* propagator is 3 X 3 complex */
 
   ph = pf->header;
 
@@ -290,19 +290,19 @@ ks_prop_file *w_serial_ks_fm_i(char *filename)
 /*---------------------------------------------------------------------------*/
 
 void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site, 
-		    su3_vector *src_field)
+		    vector *src_field)
 {
   /* kspf  = file descriptor as opened by ks_serial_w_i 
-     src_site[3]   = field offset of an array of three su3_vector types  */
+     src_site[3]   = field offset of an array of three vector types  */
 
   FILE *fp = NULL;
   ks_prop_header *ksph;
   u_int32type *val;
   int rank29 = 0,rank31 = 0;
-  fsu3_matrix *pbuf = NULL;
+  fmatrix *pbuf = NULL;
   int fseek_return;  /* added by S.G. for large file debugging */
   struct {
-    fsu3_matrix ksv;
+    fmatrix ksv;
     char pad[PAD_SEND_BUF]; /* Introduced because some switches
 			       perform better if message lengths are longer */
   } msg;
@@ -315,7 +315,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
 
   int currentnode,newnode;
   int x,y,z,t;
-  su3_vector *proppt;
+  vector *proppt;
   FILE *info_fp = kspf->info_fp;
 
   if(this_node==0)
@@ -323,7 +323,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
       if(kspf->parallel == PARALLEL)
 	printf("w_serial_ks: Attempting serial write to file opened in parallel \n");
 
-      pbuf = (fsu3_matrix *)malloc(MAX_BUF_LENGTH*sizeof(fsu3_matrix));
+      pbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*sizeof(fmatrix));
       if(pbuf == NULL)
 	{
 	  printf("w_serial_ks: Node 0 can't malloc pbuf\n"); 
@@ -394,7 +394,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
 	      if(src_site == (field_offset)(-1))
 		proppt = src_field + 3*i;
 	      else
-		proppt = (su3_vector *)F_PT(&lattice[i],src_site);
+		proppt = (vector *)F_PT(&lattice[i],src_site);
 
 	      /* Convert precision if necessary */
 	      for(a=0; a<3; a++){
@@ -413,7 +413,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
 
 	  /* Accumulate checksums - contribution from next site */
 	  for(k = 0, val = (u_int32type *)&pbuf[buf_length]; 
-	      k < (int)sizeof(fsu3_matrix)/(int)sizeof(int32type); k++, val++)
+	      k < (int)sizeof(fmatrix)/(int)sizeof(int32type); k++, val++)
 	    {
 	      kspf->check.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
 	      kspf->check.sum31 ^= (*val)<<rank31 | (*val)>>(32-rank31);
@@ -427,7 +427,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
 	    {
 	      /* write out buffer */
 	      
-	      if( (int)fwrite(pbuf,sizeof(fsu3_matrix),buf_length,fp) 
+	      if( (int)fwrite(pbuf,sizeof(fmatrix),buf_length,fp) 
 		  != buf_length)
 		{
 		  printf("w_serial_ks: Node %d prop write error %d file %s\n",
@@ -447,7 +447,7 @@ void w_serial_ks_fm(ks_prop_file *kspf, field_offset src_site,
 		if(src_site == (field_offset)(-1))
 		  proppt = src_field + 3*i;
 		else
-		  proppt = (su3_vector *)F_PT(&lattice[i],src_site);
+		  proppt = (vector *)F_PT(&lattice[i],src_site);
 
 		/* Convert precision here if necessary */
           	for(a=0; a<3; a++){
@@ -497,7 +497,7 @@ void w_serial_ks_fm_from_site(ks_prop_file *kspf, field_offset src_site)
 }
 /*---------------------------------------------------------------------------*/
 
-void w_serial_ks_fm_from_field(ks_prop_file *kspf, su3_vector *src_field)
+void w_serial_ks_fm_from_field(ks_prop_file *kspf, vector *src_field)
 {
   w_serial_ks_fm(kspf, (field_offset)(-1), src_field);
 }
@@ -751,7 +751,7 @@ ks_prop_file *r_serial_ks_fm_i(char *filename)
 
 
 int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site, 
-		   su3_vector *dest_field)
+		   vector *dest_field)
 {
   /* 0 is normal exit code
      1 for seek, read error, or missing data error */
@@ -773,11 +773,11 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
   ks_prop_check test_kspc;
   u_int32type *val;
   int rank29 = 0,rank31 = 0;
-  fsu3_vector *pbuf = NULL;
-  su3_vector *dest;
+  fvector *pbuf = NULL;
+  vector *dest;
 
   struct {
-    fsu3_vector ksv[3];
+    fvector ksv[3];
     char pad[PAD_SEND_BUF];    /* Introduced because some switches
 				  perform better if message lengths are longer */
   } msg;
@@ -807,7 +807,7 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
      
       offset = head_size;
       /**      printf("OFFSET %d\n", offset);**/
-      pbuf = (fsu3_vector *)malloc(MAX_BUF_LENGTH*3*sizeof(fsu3_vector));
+      pbuf = (fvector *)malloc(MAX_BUF_LENGTH*3*sizeof(fvector));
       if(pbuf == NULL)
 	{
 	  printf("%s: Node %d can't malloc pbuf\n",myname,this_node);
@@ -870,7 +870,7 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
 	  rank31 = 0;
 	}
   
-      /* The node that gets the next su3_vector */
+      /* The node that gets the next vector */
 
       destnode=node_number(x,y,z,t);
       if(this_node==0){
@@ -882,8 +882,8 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
 	    buf_length = volume - rcv_rank;
 	    if(buf_length > MAX_BUF_LENGTH) buf_length = MAX_BUF_LENGTH;
 	    /* then do read */
-	    a=(int)fread(pbuf,3*sizeof(fsu3_vector),buf_length,fp);
-	    //if( (int)fread(pbuf,3*sizeof(fsu3_vector),buf_length,fp) 
+	    a=(int)fread(pbuf,3*sizeof(fvector),buf_length,fp);
+	    //if( (int)fread(pbuf,3*sizeof(fvector),buf_length,fp) 
 	    if( a	!= buf_length)
 	      {
 		printf("InSIDE: buf length %d, max_buff_length %d, read elements %d \n",
@@ -930,10 +930,10 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
 	{
 	  if(byterevflag==1)
 	    byterevn((int32type *)&msg.ksv, 
-		     3*sizeof(fsu3_vector)/sizeof(int32type));
+		     3*sizeof(fvector)/sizeof(int32type));
 	  /* Accumulate checksums */
 	  for(k = 0, val = (u_int32type *)(&msg.ksv); 
-	      k < 3*(int)sizeof(fsu3_vector)/(int)sizeof(int32type); 
+	      k < 3*(int)sizeof(fvector)/(int)sizeof(int32type); 
 	      k++, val++)
 	    {
 	      test_kspc.sum29 ^= (*val)<<rank29 | (*val)>>(32-rank29);
@@ -946,7 +946,7 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
 	  if(dest_site == (field_offset)(-1))
 	    dest = dest_field + 3*i;
 	  else
-	    dest = (su3_vector *)F_PT(lattice+i,dest_site);
+	    dest = (vector *)F_PT(lattice+i,dest_site);
 
 	  for(a=0; a<3; a++)for(b=0;b<3;b++){
 	    dest[a].c[b].real = msg.ksv[a].c[b].real;
@@ -955,8 +955,8 @@ int r_serial_ks_fm(ks_prop_file *kspf, field_offset dest_site,
 	}
       else
 	{
-	  rank29 += 3*sizeof(fsu3_vector)/sizeof(int32type);
-	  rank31 += 3*sizeof(fsu3_vector)/sizeof(int32type);
+	  rank29 += 3*sizeof(fvector)/sizeof(int32type);
+	  rank31 += 3*sizeof(fvector)/sizeof(int32type);
 	  rank29 %= 29;
 	  rank31 %= 31;
 	}
@@ -1013,7 +1013,7 @@ int r_serial_ks_fm_to_site(ks_prop_file *kspf, field_offset dest_site)
   return r_serial_ks_fm(kspf, dest_site, NULL);
 }
 
-int r_serial_ks_fm_to_field(ks_prop_file *kspf, su3_vector *dest_field)
+int r_serial_ks_fm_to_field(ks_prop_file *kspf, vector *dest_field)
 {
   return r_serial_ks_fm(kspf, (field_offset)(-1), dest_field);
 }

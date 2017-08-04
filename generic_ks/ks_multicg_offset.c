@@ -22,15 +22,15 @@
 
 #include "../include/loopend.h"
 
-static su3_vector *ttt,*cg_p;
-static su3_vector *resid;
+static vector *ttt,*cg_p;
+static vector *resid;
 static int first_multicongrad = 1;
 
 /* Interface for call with offsets = 4 * mass * mass */
 
 int ks_multicg_offset(	/* Return value is number of iterations taken */
-    field_offset src,	/* source vector (type su3_vector) */
-    su3_vector **psim,	/* solution vectors */
+    field_offset src,	/* source vector (type vector) */
+    vector **psim,	/* solution vectors */
     Real *offsets,	/* the offsets */
     int num_offsets,	/* number of offsets */
     int niter,		/* maximal number of CG interations */
@@ -41,7 +41,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
     ferm_links_t *fn    /* Storage for fat and Naik links */
     )
 {
-    /* Site su3_vector's resid, cg_p and ttt are used as temporaies */
+    /* Site vector's resid, cg_p and ttt are used as temporaies */
     register int i;
     register site *s;
     int iteration;	/* counter for iterations */
@@ -57,7 +57,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
     Real *shifts, offset_low, shift0;
     double *zeta_i, *zeta_im1, *zeta_ip1;
     double *beta_i, *beta_im1, *alpha;
-    su3_vector **pm;	/* vectors not involved in gathers */
+    vector **pm;	/* vectors not involved in gathers */
     int *finished;      /* if converged */
 #ifdef CGTIME
     static const char *milc_prec[2] = {"F", "D"};
@@ -107,7 +107,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
     beta_im1 = (double *)malloc(num_offsets*sizeof(double));
     alpha = (double *)malloc(num_offsets*sizeof(double));
 
-    pm = (su3_vector **)malloc(num_offsets*sizeof(su3_vector *));
+    pm = (vector **)malloc(num_offsets*sizeof(vector *));
     offset_low = 1.0e+20;
     j_low = -1;
     for(j=0;j<num_offsets;j++){
@@ -118,7 +118,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
 	}
     }
     for(j=0;j<num_offsets;j++) if(j!=j_low){
-	pm[j] = (su3_vector *)malloc(sites_on_node*sizeof(su3_vector));
+	pm[j] = (vector *)malloc(sites_on_node*sizeof(vector));
 	shifts[j] -= shifts[j_low];
     }
     shift0 = -shifts[j_low];
@@ -130,9 +130,9 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
     /* now we can allocate temporary variables and copy then */
     /* PAD may be used to avoid cache thrashing */
     if(first_multicongrad) {
-      ttt = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
-      cg_p = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
-      resid = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
+      ttt = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
+      cg_p = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
+      resid = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
       first_multicongrad = 0;
     }
 
@@ -153,8 +153,8 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
         num_offsets_now = num_offsets;
 	source_norm = 0.0;
 	FORSOMEPARITY(i,s,l_parity){
-	    source_norm += (double) magsq_su3vec( (su3_vector *)F_PT(s,src) );
-	    su3vec_copy((su3_vector *)F_PT(s,src), &(resid[i]));
+	    source_norm += (double) magsq_su3vec( (vector *)F_PT(s,src) );
+	    su3vec_copy((vector *)F_PT(s,src), &(resid[i]));
 	    su3vec_copy(&(resid[i]), &(cg_p[i]));
 	    clearvec(&(psim[j_low][i]));
 	    for(j=0;j<num_offsets;j++) if(j!=j_low){
@@ -203,7 +203,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
 	/* pkp  <- cg_p . ttt */
 	pkp = 0.0;
 	FORSOMEPARITY(i,s,l_parity){
-	    scalar_mult_add_su3_vector( &(ttt[i]), &(cg_p[i]), shift0, &(ttt[i]) );
+	    scalar_mult_add_vector( &(ttt[i]), &(cg_p[i]), shift0, &(ttt[i]) );
 	    pkp += (double)su3_rdot( &(cg_p[i]), &(ttt[i]) );
 	} END_LOOP
 	g_doublesum( &pkp );
@@ -245,10 +245,10 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
 
 	/* dest <- dest + beta*cg_p */
 	FORSOMEPARITY(i,s,l_parity){
-	    scalar_mult_add_su3_vector( &(psim[j_low][i]),
+	    scalar_mult_add_vector( &(psim[j_low][i]),
 		&(cg_p[i]), (Real)beta_i[j_low], &(psim[j_low][i]));
 	    for(j=0;j<num_offsets_now;j++) if(j!=j_low){
-		scalar_mult_add_su3_vector( &(psim[j][i]),
+		scalar_mult_add_vector( &(psim[j][i]),
 		    &(pm[j][i]), (Real)beta_i[j], &(psim[j][i]));
 	    }
 	} END_LOOP
@@ -256,7 +256,7 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
 	/* resid <- resid + beta*ttt */
 	rsq = 0.0;
 	FORSOMEPARITY(i,s,l_parity){
-	    scalar_mult_add_su3_vector( &(resid[i]), &(ttt[i]),
+	    scalar_mult_add_vector( &(resid[i]), &(ttt[i]),
 		(Real)beta_i[j_low], &(resid[i]));
 	    rsq += (double)magsq_su3vec( &(resid[i]) );
 	} END_LOOP
@@ -322,12 +322,12 @@ int ks_multicg_offset(	/* Return value is number of iterations taken */
 
 	/* cg_p  <- resid + alpha*cg_p */
 	FORSOMEPARITY(i,s,l_parity){
-	    scalar_mult_add_su3_vector( &(resid[i]), &(cg_p[i]),
+	    scalar_mult_add_vector( &(resid[i]), &(cg_p[i]),
 		(Real)alpha[j_low], &(cg_p[i]));
 	    for(j=0;j<num_offsets_now;j++) if(j!=j_low){
-		scalar_mult_su3_vector( &(resid[i]),
+		scalar_mult_vector( &(resid[i]),
 		    (Real)zeta_ip1[j], &(ttt[i]));
-		scalar_mult_add_su3_vector( &(ttt[i]), &(pm[j][i]),
+		scalar_mult_add_vector( &(ttt[i]), &(pm[j][i]),
 		    (Real)alpha[j], &(pm[j][i]));
 	    }
 	} END_LOOP

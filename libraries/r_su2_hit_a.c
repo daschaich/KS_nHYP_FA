@@ -6,7 +6,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void right_su2_hit_a(su2_matrix *u, int p, int q, su3_matrix *link) {
+void right_su2_hit_a(su2_matrix *u, int p, int q, matrix *link) {
   register int m;
   for (m = 0; m < 3; m++)
     mult_su2_mat_vec_elem_a(u, &(link->e[m][p]), &(link->e[m][q]));

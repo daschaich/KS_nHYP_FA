@@ -28,31 +28,31 @@ typedef struct {
 #endif
 
   // Gauge field
-  su3_matrix link[4];
+  matrix link[4];
 
   // Staggered phases, which have been absorbed into the matrices
   // Also the antiperiodic boundary conditions
   Real phase[4];
 
   // Staggered complex vectors
-  su3_vector g_rand;      // Gaussian random vector
-  su3_vector chi;         // Gaussian random source vector
-  su3_vector psi;         // Solution vector = Kinverse * chi
-  su3_vector p;           // CG change vector
-  su3_vector mp;          // CG temporary vector
-  su3_vector r;           // CG residual vector
-  su3_vector ttt;         // For ../generic_ks/mat_invert.c
-  su3_vector M_inv;
+  vector g_rand;      // Gaussian random vector
+  vector chi;         // Gaussian random source vector
+  vector psi;         // Solution vector = Kinverse * chi
+  vector p;           // CG change vector
+  vector mp;          // CG temporary vector
+  vector r;           // CG residual vector
+  vector ttt;         // For ../generic_ks/mat_invert.c
+  vector M_inv;
 
   // Vacuum polarization stuff
   // Will print warnings for any non-vanishing imaginary parts
   Real vacpol[4][4], axial[4][4];
-  su3_matrix prop;        // Propagator from source point
-  su3_matrix propnu[4];   // Propagators from source + nu
+  matrix prop;        // Propagator from source point
+  matrix propnu[4];   // Propagators from source + nu
 
   // Temporary vectors and matrices
-  su3_vector tempvec[4];  // One for each direction
-  su3_matrix tempmat1, staple;
+  vector tempvec[4];  // One for each direction
+  matrix tempmat1, staple;
 } site;
 // -----------------------------------------------------------------
 
@@ -107,21 +107,21 @@ EXTERN site *lattice;
 #define N_POINTERS 8   // Needed by ../generic/make_lattice.c
 EXTERN char **gen_pt[N_POINTERS];
 
-EXTERN su3_matrix *gauge_field[4];
-EXTERN su3_matrix *gauge_field_thin[4];
+EXTERN matrix *gauge_field[4];
+EXTERN matrix *gauge_field_thin[4];
 
 // Vacuum polarization stuff -- point source location
 EXTERN int x_src, y_src, z_src, t_src;
 
 // nHYP stuff
 EXTERN double alpha_smear[3];
-EXTERN su3_matrix *hyplink1[4][4];
-EXTERN su3_matrix *hyplink2[4][4];
+EXTERN matrix *hyplink1[4][4];
+EXTERN matrix *hyplink2[4][4];
 
-EXTERN su3_matrix *Staple1[4][4];
-EXTERN su3_matrix *Staple2[4][4];
-EXTERN su3_matrix *Staple3[4];
+EXTERN matrix *Staple1[4][4];
+EXTERN matrix *Staple2[4][4];
+EXTERN matrix *Staple3[4];
 
-EXTERN su3_matrix *tempmat;     // Used in ../generic_nhyp/block_nhyp.c
+EXTERN matrix *tempmat;     // Used in ../generic_nhyp/block_nhyp.c
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

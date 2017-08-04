@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void mult_su3_mat_vec(su3_matrix *a, su3_vector *b, su3_vector *c) {
+void mult_mat_vec(matrix *a, vector *b, vector *c) {
   register int i;
 #ifndef FAST
   register int j;

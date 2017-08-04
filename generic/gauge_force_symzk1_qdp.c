@@ -266,7 +266,7 @@ imp_gauge_force( Real eps, field_offset mom_off ){
   int i,dir;
   site *s;
   Real **loop_coeff = get_loop_coeff();
-  su3_matrix tmat;
+  matrix tmat;
   anti_hermitmat* momentum;
   QLA_Real coeff[3];
   QLA_ColorMatrix *temp;
@@ -311,7 +311,7 @@ imp_gauge_force( Real eps, field_offset mom_off ){
   FORALLUPDIR(dir){
     temp = QDP_expose_M (force[dir]);
     FORALLSITES(i,s) {
-      memcpy((void *)&tmat, (void *)&temp[i], sizeof(su3_matrix));
+      memcpy((void *)&tmat, (void *)&temp[i], sizeof(matrix));
       momentum = (anti_hermitmat *)F_PT(s,mom_off);
       make_anti_hermitian( &tmat, momentum + dir); 
     }

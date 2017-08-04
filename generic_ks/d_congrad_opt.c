@@ -7,49 +7,49 @@
 #include "../include/prefetch.h"
 #define FETCH_UP 1
 
-/* clear an su3_vector in the lattice */
+/* clear an vector in the lattice */
 void clear_latvec(field_offset v, int parity){
 register int i,j;
 register site *s;
-register su3_vector *vv;
+register vector *vv;
     switch(parity){
 	case EVEN: FOREVENSITESDOMAIN(i,s){
-		vv = (su3_vector *)F_PT(s,v);
+		vv = (vector *)F_PT(s,v);
 		for(j=0;j<3;j++){ vv->c[j].real = vv->c[j].imag = 0.0; }
 	    } break;
 	case ODD: FORODDSITESDOMAIN(i,s){
-		vv = (su3_vector *)F_PT(s,v);
+		vv = (vector *)F_PT(s,v);
 		for(j=0;j<3;j++){ vv->c[j].real = vv->c[j].imag = 0.0; }
 	    } break;
 	case EVENANDODD: FORALLSITESDOMAIN(i,s){
-		vv = (su3_vector *)F_PT(s,v);
+		vv = (vector *)F_PT(s,v);
 		for(j=0;j<3;j++){ vv->c[j].real = vv->c[j].imag = 0.0; }
 	    } break;
     } 
 }
 
-/* copy an su3_vector in the lattice */
+/* copy an vector in the lattice */
 void copy_latvec(field_offset src, field_offset dest, int parity){
 register int i;
 register site *s;
-register su3_vector *spt,*dpt;
+register vector *spt,*dpt;
     switch(parity){
 	case EVEN: FOREVENSITESDOMAIN(i,s){
 		s = &(lattice[i]);
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
 		*dpt = *spt;
 	    } break;
 	case ODD: FORODDSITESDOMAIN(i,s){
 		s = &(lattice[i]);
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
 		*dpt = *spt;
 	    } break;
 	case EVENANDODD: FORALLSITESDOMAIN(i,s){
 		s = &(lattice[i]);
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
 		*dpt = *spt;
 	    } break;
     } 
@@ -60,23 +60,23 @@ void scalar_mult_add_latvec( field_offset src1, field_offset src2,
 			     Real scalar, field_offset dest, int parity ){
 register int i;
 register site *s;
-register su3_vector *spt1,*spt2,*dpt;
+register vector *spt1,*spt2,*dpt;
 	FORSOMEPARITYDOMAIN(i,s,parity){
-               spt1 = (su3_vector *)F_PT(s,src1);
-                spt2 = (su3_vector *)F_PT(s,src2);
-                dpt = (su3_vector *)F_PT(s,dest);
+               spt1 = (vector *)F_PT(s,src1);
+                spt2 = (vector *)F_PT(s,src2);
+                dpt = (vector *)F_PT(s,dest);
 		if(i < loopend-FETCH_UP){
-		  prefetch_VVV( (su3_vector *)F_PT((s+FETCH_UP),src1), 
-				(su3_vector *)F_PT((s+FETCH_UP),src2),
-				(su3_vector *)F_PT((s+FETCH_UP),dest));
+		  prefetch_VVV( (vector *)F_PT((s+FETCH_UP),src1), 
+				(vector *)F_PT((s+FETCH_UP),src2),
+				(vector *)F_PT((s+FETCH_UP),dest));
 		}
-                scalar_mult_add_su3_vector( spt1 , spt2 , scalar , dpt);
+                scalar_mult_add_vector( spt1 , spt2 , scalar , dpt);
 	} END_LOOP
 }
 
 /* scalar multiply two SU3 vectors and add (two constants). */
-void scalar2_mult_add_su3_vector(su3_vector *a, Real s1, su3_vector *b, 
-				 Real s2, su3_vector *c){
+void scalar2_mult_add_vector(vector *a, Real s1, vector *b, 
+				 Real s2, vector *c){
 register int i;
     for(i=0;i<3;i++){
         c->c[i].real = s1*a->c[i].real + s2*b->c[i].real;
@@ -91,17 +91,17 @@ void scalar2_mult_add_latvec(field_offset src1,Real scalar1,
 {
 register int i;
 register site *s;
-register su3_vector *spt1,*spt2,*dpt;
+register vector *spt1,*spt2,*dpt;
         FORSOMEPARITY(i,s,parity){
-		spt1 = (su3_vector *)F_PT(s,src1);
-		spt2 = (su3_vector *)F_PT(s,src2);
-		dpt  = (su3_vector *)F_PT(s,dest);
+		spt1 = (vector *)F_PT(s,src1);
+		spt2 = (vector *)F_PT(s,src2);
+		dpt  = (vector *)F_PT(s,dest);
 		if( i < loopend-FETCH_UP ){
-		  prefetch_VVV((su3_vector *)F_PT((s+FETCH_UP),src1),
-			       (su3_vector *)F_PT((s+FETCH_UP),src2),
-			       (su3_vector *)F_PT((s+FETCH_UP),dest) );
+		  prefetch_VVV((vector *)F_PT((s+FETCH_UP),src1),
+			       (vector *)F_PT((s+FETCH_UP),src2),
+			       (vector *)F_PT((s+FETCH_UP),dest) );
 		}
-		scalar2_mult_add_su3_vector( spt1, scalar1, spt2, scalar2, dpt);
+		scalar2_mult_add_vector( spt1, scalar1, spt2, scalar2, dpt);
        } END_LOOP
 }
 
@@ -111,22 +111,22 @@ void scalar_mult_latvec( field_offset src, Real scalar,
 {
 register int i;
 register site *s;
-register su3_vector *spt,*dpt;
+register vector *spt,*dpt;
     switch(parity){
 	case EVEN: FOREVENSITESDOMAIN(i,s){
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
-		scalar_mult_su3_vector( spt , scalar , dpt );
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
+		scalar_mult_vector( spt , scalar , dpt );
 	    } break;
 	case ODD: FORODDSITESDOMAIN(i,s){
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
-		scalar_mult_su3_vector( spt , scalar , dpt );
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
+		scalar_mult_vector( spt , scalar , dpt );
 	    } break;
 	case EVENANDODD: FORALLSITESDOMAIN(i,s){
-		spt = (su3_vector *)F_PT(s,src);
-		dpt = (su3_vector *)F_PT(s,dest);
-		scalar_mult_su3_vector( spt , scalar , dpt );
+		spt = (vector *)F_PT(s,src);
+		dpt = (vector *)F_PT(s,dest);
+		scalar_mult_vector( spt , scalar , dpt );
 	    } break;
     } 
 }

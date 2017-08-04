@@ -17,7 +17,7 @@ int vacuum_polarization() {
   Real neg = -1.0, tol = sqrt(rsqmin);
   site* s;
   msg_tag *tag, *tag2;
-  su3_matrix tmat, tmat2, sourcelink[4];
+  matrix tmat, tmat2, sourcelink[4];
 
   // Initialize link at source point
   FORALLUPDIR(nu) {
@@ -118,9 +118,9 @@ int vacuum_polarization() {
     FORALLUPDIR(mu) {             // Sink direction   -- call sink pt x
       // gen_pt[0] is D_{x + mu; y + nu}
       // gen_pt[1] is D_{x + mu; y}
-      tag = start_gather_site(F_OFFSET(propnu[nu]), sizeof(su3_matrix),
+      tag = start_gather_site(F_OFFSET(propnu[nu]), sizeof(matrix),
                                mu, EVENANDODD, gen_pt[0]);
-      tag2 = start_gather_site(F_OFFSET(prop), sizeof(su3_matrix),
+      tag2 = start_gather_site(F_OFFSET(prop), sizeof(matrix),
                                mu, EVENANDODD, gen_pt[1]);
       wait_gather(tag);
       wait_gather(tag2);
@@ -129,7 +129,7 @@ int vacuum_polarization() {
       // NB the staggered phases and BCs are already in the links!
       FORALLSITES(i, s) {
         // [U_{mu}(x) D_{x + mu; y + nu}]^{dag} D_{x; y} U_{nu}(y)
-        mult_su3_nn(&(s->link[mu]), (su3_matrix*)gen_pt[0][i], &tmat);
+        mult_su3_nn(&(s->link[mu]), (matrix*)gen_pt[0][i], &tmat);
         mult_su3_an(&tmat, &(s->prop), &tmat2);
         mult_su3_nn(&tmat2, &(sourcelink[nu]), &tmat);
         tc = trace_su3(&tmat);
@@ -143,7 +143,7 @@ int vacuum_polarization() {
 
         // Ddag_{x; y + nu} U_{mu}(x) D_{x + mu; y} U_{nu}(y)
         mult_su3_an(&(s->propnu[nu]), &(s->link[mu]), &tmat);
-        mult_su3_nn(&tmat, (su3_matrix*)gen_pt[1][i], &tmat2);
+        mult_su3_nn(&tmat, (matrix*)gen_pt[1][i], &tmat2);
         mult_su3_nn(&tmat2, &(sourcelink[nu]), &tmat);
         tc = trace_su3(&tmat);
         // Extra (-1)^{x + y + nu} from Ddag
@@ -156,7 +156,7 @@ int vacuum_polarization() {
         CSUM(tempaxi, tc);
 
         // [U_{mu}(x) D_{x + mu; y}]^{dag} D_{x, y + nu} Udag_{nu}
-        mult_su3_nn(&(s->link[mu]), (su3_matrix*)gen_pt[1][i], &tmat);
+        mult_su3_nn(&(s->link[mu]), (matrix*)gen_pt[1][i], &tmat);
         mult_su3_an(&tmat, &(s->propnu[nu]), &tmat2);
         mult_su3_na(&tmat2, &(sourcelink[nu]), &tmat);
         tc = trace_su3(&tmat);
@@ -171,7 +171,7 @@ int vacuum_polarization() {
 
         // Ddag_{x; y} U_{mu}(x) D_{x + mu; y + nu} Udag_{nu}
         mult_su3_an(&(s->prop), &(s->link[mu]), &tmat);
-        mult_su3_nn(&tmat, (su3_matrix*)gen_pt[0][i], &tmat2);
+        mult_su3_nn(&tmat, (matrix*)gen_pt[0][i], &tmat2);
         mult_su3_na(&tmat2, &(sourcelink[nu]), &tmat);
         tc = trace_su3(&tmat);
         // Extra (-1)^{x + mu + y + nu} from Ddag

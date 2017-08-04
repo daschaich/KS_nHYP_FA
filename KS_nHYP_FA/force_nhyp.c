@@ -10,7 +10,7 @@
 
 // -----------------------------------------------------------------
 // Helper routine for Sigma_update1
-void make_2hermitian(su3_matrix *A) {
+void make_2hermitian(matrix *A) {
   int i, j;
   for (i = 0; i < 3; i++) {
     for (j = i; j < 3; j++) {
@@ -27,15 +27,15 @@ void make_2hermitian(su3_matrix *A) {
 
 // -----------------------------------------------------------------
 // Compute Gamma
-void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
-                   su3_matrix **lambda, const Real alpha1,
+void Sigma_update1(const int dir, matrix *sigma_off, matrix *stp,
+                   matrix **lambda, const Real alpha1,
                    const Real alpha2, const int sigfresh) {
 
   register int i, j;
   register site *s;
   Real f[3], bb[3][3];
   complex traces[3], tc, tc2, tc3;
-  su3_matrix Gamma, Qisqrt, Q, Q2, Omega, tmat, SigmaOmega;
+  matrix Gamma, Qisqrt, Q, Q2, Omega, tmat, SigmaOmega;
 
   FORALLSITES(i, s) {
     // Make Omega, Q, Q^2
@@ -50,8 +50,8 @@ void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
     compute_fhb(&Omega, &Q, f, bb, 1);
 #endif
 
-    scalar_mult_su3_matrix(&Q, f[1], &tmat);
-    scalar_mult_add_su3_matrix(&tmat, &Q2, f[2], &Qisqrt);
+    scalar_mult_matrix(&Q, f[1], &tmat);
+    scalar_mult_add_matrix(&tmat, &Q2, f[2], &Qisqrt);
     scalar_add_diag_su3(&Qisqrt, f[0]);
 
     // We'll need Sigma * Omega a few times
@@ -69,33 +69,33 @@ void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
     }
 
     // The contributions to A tr(B_i Sigma Omega) Q^(i)
-    c_scalar_mult_su3mat(&Q, &traces[1], &Gamma);
-    c_scalar_mult_sum_su3mat(&Q2, &traces[2], &Gamma);
+    c_scalar_mult_mat(&Q, &traces[1], &Gamma);
+    c_scalar_mult_sum_mat(&Q2, &traces[2], &Gamma);
     c_scalar_add_diag_su3(&Gamma, &traces[0]);
 
     // The terms proportional to f_i
-    scalar_mult_sum_su3_matrix(&SigmaOmega, f[1], &Gamma);
+    scalar_mult_sum_matrix(&SigmaOmega, f[1], &Gamma);
     mult_su3_nn(&SigmaOmega, &Q, &tmat);
-    scalar_mult_sum_su3_matrix(&tmat, f[2], &Gamma);
+    scalar_mult_sum_matrix(&tmat, f[2], &Gamma);
     mult_su3_nn(&Q, &SigmaOmega, &tmat);
-    scalar_mult_sum_su3_matrix(&tmat, f[2], &Gamma);
+    scalar_mult_sum_matrix(&tmat, f[2], &Gamma);
 
     // Gamma = (A + Adag)Qdag + Q^{-1/2}Sigma
     make_2hermitian(&Gamma);
     mult_su3_na(&Gamma, &Omega, &tmat);
 
     mult_su3_nn(&Qisqrt, sigma_off + i, &Gamma);
-    add_su3_matrix(&Gamma, &tmat, &Gamma);
-    scalar_mult_su3_matrix(&Gamma, alpha2, &tmat);
+    add_matrix(&Gamma, &tmat, &Gamma);
+    scalar_mult_matrix(&Gamma, alpha2, &tmat);
     su3_adjoint(&tmat, lambda[dir] + i);
 
     // The derivative which contributes to the new global Sigma
     // If this is the first level, then Sigma has to be initialized.
     // On later levels, we accumulate contributions
     if (sigfresh == 0)
-      scalar_mult_su3_matrix(&Gamma, alpha1, Sigma[dir]+i);
+      scalar_mult_matrix(&Gamma, alpha1, Sigma[dir]+i);
     else
-      scalar_mult_sum_su3_matrix(&Gamma, alpha1, Sigma[dir] + i);
+      scalar_mult_sum_matrix(&Gamma, alpha1, Sigma[dir] + i);
   }
 }
 // -----------------------------------------------------------------
@@ -107,15 +107,15 @@ void Sigma_update1(const int dir, su3_matrix *sigma_off, su3_matrix *stp,
 // lnk is the links the routine operates on
 // dir1 is the direction of the link and the 'main' direction of Sigma
 // lambda = Gamma^dag
-void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
-                     su3_matrix *lambda1, su3_matrix *lambda2,
+void compute_sigma23(matrix *sig, matrix *lnk1, matrix *lnk2,
+                     matrix *lambda1, matrix *lambda2,
                      int dir1, int dir2, int parity) {
 
   register int i;
   register site *s;
   msg_tag *tag0, *tag1, *tag2, *tag3, *tag4;
   msg_tag *tag5, *tag6, *tag7, *tag8, *tag9;
-  su3_matrix tmat, tmat2;
+  matrix tmat, tmat2;
   int disp[4] = {0, 0, 0, 0};    // Displacement vector for general gather
 
   // Loop over other directions
@@ -126,45 +126,45 @@ void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
   disp[dir2] = -1;
 
   // Get link[dir2] from displacement dir1 - dir2
-  tag4 = start_general_gather_field(lnk1, sizeof(su3_matrix), disp,
+  tag4 = start_general_gather_field(lnk1, sizeof(matrix), disp,
                                     parity, gen_pt[4]);
 
   // Get link[dir2] from direction dir1
-  tag0 = start_gather_field(lnk1, sizeof(su3_matrix), dir1,
+  tag0 = start_gather_field(lnk1, sizeof(matrix), dir1,
                             parity, gen_pt[0]);
 
   // Get link[dir1] from direction dir2
-  tag1 = start_gather_field(lnk2, sizeof(su3_matrix), dir2,
+  tag1 = start_gather_field(lnk2, sizeof(matrix), dir2,
                             parity, gen_pt[1]);
 
   // Get link[dir2] from direction -dir2
-  tag2 = start_gather_field(lnk1, sizeof(su3_matrix), OPP_DIR(dir2),
+  tag2 = start_gather_field(lnk1, sizeof(matrix), OPP_DIR(dir2),
                             parity, gen_pt[2]);
 
   // Get link[dir1] from direction -dir2
-  tag3 = start_gather_field(lnk2, sizeof(su3_matrix), OPP_DIR(dir2),
+  tag3 = start_gather_field(lnk2, sizeof(matrix), OPP_DIR(dir2),
                             parity, gen_pt[3]);
 
   // Get LambdaU[dir2] from direction dir1
-  tag5 = start_gather_field(lambda2, sizeof(su3_matrix), dir1,
+  tag5 = start_gather_field(lambda2, sizeof(matrix), dir1,
                             parity, gen_pt[5]);
 
   // Get LambdaU[dir1] from direction dir2
-  tag6 = start_gather_field(lambda1, sizeof(su3_matrix), dir2,
+  tag6 = start_gather_field(lambda1, sizeof(matrix), dir2,
                             parity, gen_pt[6]);
 
   // Get LambdaU[dir2] from direction -dir2
-  tag7 = start_gather_field(lambda2, sizeof(su3_matrix), OPP_DIR(dir2),
+  tag7 = start_gather_field(lambda2, sizeof(matrix), OPP_DIR(dir2),
                             parity, gen_pt[7]);
 
   // Get LambdaU[dir1] from direction -dir2
-  tag8 = start_gather_field(lambda1, sizeof(su3_matrix), OPP_DIR(dir2),
+  tag8 = start_gather_field(lambda1, sizeof(matrix), OPP_DIR(dir2),
                             parity, gen_pt[8]);
 
   wait_general_gather(tag4);
 
   // Get LambdaU[dir2] from displacement dir1 - dir2
-  tag9 = start_general_gather_field(lambda2, sizeof(su3_matrix), disp,
+  tag9 = start_general_gather_field(lambda2, sizeof(matrix), disp,
                                     parity, gen_pt[9]);
 
   wait_gather(tag0);
@@ -179,33 +179,33 @@ void compute_sigma23(su3_matrix *sig, su3_matrix *lnk1, su3_matrix *lnk2,
 
   FORSOMEPARITY(i, s, parity) {
     // Term 1 -- initialize sig
-    mult_su3_nn(lambda2 + i, (su3_matrix *)gen_pt[1][i], &tmat);
-    mult_su3_na((su3_matrix *)gen_pt[0][i], &tmat, sig + i);
+    mult_su3_nn(lambda2 + i, (matrix *)gen_pt[1][i], &tmat);
+    mult_su3_na((matrix *)gen_pt[0][i], &tmat, sig + i);
 
     // Term 2
-    mult_su3_nn((su3_matrix *)gen_pt[8][i],
-                (su3_matrix *)gen_pt[4][i], &tmat);
-    mult_su3_an(&tmat, (su3_matrix *)gen_pt[2][i], &tmat2);
-    add_su3_matrix(sig + i, &tmat2, sig + i);
+    mult_su3_nn((matrix *)gen_pt[8][i],
+                (matrix *)gen_pt[4][i], &tmat);
+    mult_su3_an(&tmat, (matrix *)gen_pt[2][i], &tmat2);
+    add_matrix(sig + i, &tmat2, sig + i);
 
     // Term 3
-    mult_su3_nn((su3_matrix *)gen_pt[3][i],
-                (su3_matrix *)gen_pt[9][i], &tmat);
-    mult_su3_an_sum(&tmat, (su3_matrix *)gen_pt[2][i], sig + i);
+    mult_su3_nn((matrix *)gen_pt[3][i],
+                (matrix *)gen_pt[9][i], &tmat);
+    mult_su3_an_sum(&tmat, (matrix *)gen_pt[2][i], sig + i);
 
     // Term 4
-    mult_su3_nn((su3_matrix *)gen_pt[3][i],
-                (su3_matrix *)gen_pt[4][i], &tmat);
-    mult_su3_an_sum(&tmat, (su3_matrix *)gen_pt[7][i], sig + i);
+    mult_su3_nn((matrix *)gen_pt[3][i],
+                (matrix *)gen_pt[4][i], &tmat);
+    mult_su3_an_sum(&tmat, (matrix *)gen_pt[7][i], sig + i);
 
     // Term 5
-    mult_su3_na((su3_matrix *)gen_pt[5][i],
-                (su3_matrix *)gen_pt[1][i], &tmat);
+    mult_su3_na((matrix *)gen_pt[5][i],
+                (matrix *)gen_pt[1][i], &tmat);
     mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
 
     // Term 6
-    mult_su3_na((su3_matrix *)gen_pt[0][i],
-                (su3_matrix *)gen_pt[6][i], &tmat);
+    mult_su3_na((matrix *)gen_pt[0][i],
+                (matrix *)gen_pt[6][i], &tmat);
     mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
   }
 
@@ -251,7 +251,7 @@ void nhyp_force3(int dir3, int dir2) {
                       Lambda2[dir], Lambda2[dir1], dir, dir1, EVENANDODD);
 
       FORALLSITES(i, s)
-        sum_su3_matrix(tempmat + i, Sigma[dir] + i);
+        sum_matrix(tempmat + i, Sigma[dir] + i);
     }
   }
 }
@@ -303,13 +303,13 @@ void nhyp_force2(int dir2) {
     if (dir2 < dir3) {
       FORALLSITES(i, s) {
         FORALLUPDIR(dir)
-          su3mat_copy(SigmaH[dir] + i, SigmaH2[iimap][dir] + i);
+          mat_copy(SigmaH[dir] + i, SigmaH2[iimap][dir] + i);
       }
     }
     else {
       FORALLSITES(i, s) {
         FORALLUPDIR(dir)
-          sum_su3_matrix(SigmaH2[iimap][dir] + i, SigmaH[dir] + i);
+          sum_matrix(SigmaH2[iimap][dir] + i, SigmaH[dir] + i);
       }
       nhyp_force3(dir2, dir3);
     }

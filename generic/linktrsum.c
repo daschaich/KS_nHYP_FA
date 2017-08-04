@@ -6,7 +6,7 @@
 void linktrsum(double_complex *linktr) {
   int i, dir;
   site *s;
-  su3_matrix *a;
+  matrix *a;
 
   linktr->real = 0.0;
   linktr->imag = 0.0;

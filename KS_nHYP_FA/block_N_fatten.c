@@ -11,7 +11,7 @@ void block_N_fatten(int N) {
     // Save unsmeared links in gauge_field_save
     for (dir = 0; dir < 4; dir++) {
       FORALLSITES(i, s)
-        su3mat_copy(gauge_field_thin[dir] + i, gauge_field_save[dir] + i);
+        mat_copy(gauge_field_thin[dir] + i, gauge_field_save[dir] + i);
     }
 
     // block_and_fatten starts by copying s->link into gauge_field_thin
@@ -21,7 +21,7 @@ void block_N_fatten(int N) {
     // Reset gauge_field_thin to hold unsmeared links
     for (dir = 0; dir < 4; dir++) {
       FORALLSITES(i, s)
-        su3mat_copy(gauge_field_save[dir] + i, gauge_field_thin[dir] + i);
+        mat_copy(gauge_field_save[dir] + i, gauge_field_thin[dir] + i);
     }
   }
 }

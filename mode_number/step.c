@@ -24,8 +24,8 @@ void X(field_offset src, field_offset dest) {
 
   // dest = src - 8M^2 psi
   FOREVENSITES(i, s)
-    scalar_mult_add_su3_vector((su3_vector *)F_PT(s, src), &(s->psi),
-                               MSq_x2, (su3_vector *)F_PT(s, dest));
+    scalar_mult_add_vector((vector *)F_PT(s, src), &(s->psi),
+                               MSq_x2, (vector *)F_PT(s, dest));
 }
 
 // dest = (2X^2 - 1 - epsilon) src / (1 - epsilon)
@@ -44,11 +44,11 @@ void Z(field_offset src, field_offset dest) {
   X(F_OFFSET(Xsrc), dest);
 
   FOREVENSITES(i, s) {
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), scale,
-                           (su3_vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), scale,
+                           (vector *)F_PT(s, dest));
     // !!! Note unusual order of arguments
-    scalar_mult_sum_su3_vector((su3_vector *)F_PT(s, dest),
-                               (su3_vector *)F_PT(s, src), toAdd);
+    scalar_mult_sum_vector((vector *)F_PT(s, dest),
+                               (vector *)F_PT(s, src), toAdd);
   }
 }
 // -----------------------------------------------------------------
@@ -69,12 +69,12 @@ void clenshaw(field_offset src, field_offset dest) {
     // Construct bj.src = (cj + 2Zbjp1 - bjp2).src
     // Start with bj.src = cj.src
     FOREVENSITES(i, s)
-      scalar_mult_su3_vector((su3_vector *)F_PT(s, src), coeffs[j], &(s->bj));
+      scalar_mult_vector((vector *)F_PT(s, src), coeffs[j], &(s->bj));
 
     // Now subtract bjp2.src calculated in previous iterations
     if (j < Norder - 1) {
       FOREVENSITES(i, s)
-        sub_su3_vector(&(s->bj), &(s->bjp2), &(s->bj));
+        sub_vector(&(s->bj), &(s->bjp2), &(s->bj));
     }
 
     // Finally we need 2Z(bjp1.src)
@@ -82,7 +82,7 @@ void clenshaw(field_offset src, field_offset dest) {
     if (j < Norder) {
       Z(F_OFFSET(bjp1), F_OFFSET(Zbjp1));
       FOREVENSITES(i, s)
-        scalar_mult_add_su3_vector(&(s->bj), &(s->Zbjp1), 2.0, &(s->bj));
+        scalar_mult_add_vector(&(s->bj), &(s->Zbjp1), 2.0, &(s->bj));
     }
 
     // Now move bjp1-->bjp2 and bj-->bjp1 for next iteration
@@ -95,7 +95,7 @@ void clenshaw(field_offset src, field_offset dest) {
   // We now have bj = b[0].src and Zbjp1 = Z(b[1].src)
   // We want to return (b[0].src - Z(b[1].src))
   FOREVENSITES(i, s)
-    sub_su3_vector(&(s->bj), &(s->Zbjp1), (su3_vector *)F_PT(s, dest));
+    sub_vector(&(s->bj), &(s->Zbjp1), (vector *)F_PT(s, dest));
 }
 // -----------------------------------------------------------------
 
@@ -114,10 +114,10 @@ void step(field_offset src, field_offset dest) {
   // dest = (src - X P(X^2) src) / 2
   X(dest, F_OFFSET(Xsrc));
   FOREVENSITES(i, s) {
-    sub_su3_vector((su3_vector *)F_PT(s, src), &(s->Xsrc),
-                   (su3_vector *)F_PT(s, dest));
-    scalar_mult_su3_vector((su3_vector *)F_PT(s, dest), 0.5,
-                           (su3_vector *)F_PT(s, dest));
+    sub_vector((vector *)F_PT(s, src), &(s->Xsrc),
+                   (vector *)F_PT(s, dest));
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
+                           (vector *)F_PT(s, dest));
   }
 }
 // -----------------------------------------------------------------

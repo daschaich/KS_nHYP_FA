@@ -13,7 +13,7 @@
 void exp_mult(int dir, double eps, anti_hermitmat *A) {
   register int i;
   register site *s;
-  su3_matrix *link, tmat, tmat2, htemp;
+  matrix *link, tmat, tmat2, htemp;
   register Real t2, t3, t4, t5, t6, t7, t8;
 
   // Take divisions out of site loop (can't be done by compiler)
@@ -30,30 +30,30 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
     link = &(s->link[dir]);
 
     mult_su3_nn(&htemp, link, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t8, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t8, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t7, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t7, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t6, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t6, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t5, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t5, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t4, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t4, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t3, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t3, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, t2, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, t2, &tmat2);
 
     mult_su3_nn(&htemp, &tmat2, &tmat);
-    scalar_mult_add_su3_matrix(link, &tmat, eps, &tmat2);
+    scalar_mult_add_matrix(link, &tmat, eps, &tmat2);
 
-    su3mat_copy(&tmat2, link);    // This step updates the link U[dir]
+    mat_copy(&tmat2, link);    // This step updates the link U[dir]
   }
 }
 // -----------------------------------------------------------------
@@ -97,7 +97,7 @@ void scalar_mult_sum_antiH(anti_hermitmat *b, Real s, anti_hermitmat *c) {
 void update_flow(double f1, double f2) {
   register int i, dir;
   register site *s;
-  su3_matrix tmat;
+  matrix tmat;
   anti_hermitmat tantiH;
 
   // Lie derivative of (Wilson) action

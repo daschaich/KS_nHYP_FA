@@ -235,8 +235,8 @@ void qcdhdr_destroy_hdr(QCDheader *hdr){
 }
 
 /*---------------------------------------------------------------------------*/
-/* Convert (or copy) four single precision su3_matrices to generic precision */
-void f2d_4mat(fsu3_matrix *a, su3_matrix *b) {
+/* Convert (or copy) four single precision matrices to generic precision */
+void f2d_4mat(fmatrix *a, matrix *b) {
   int dir, i, j;
 
   for(dir = 0; dir < 4; dir++){
@@ -247,8 +247,8 @@ void f2d_4mat(fsu3_matrix *a, su3_matrix *b) {
   }
 }
 
-/* Convert (or copy) four generic precision su3_matrices to single precision */
-void d2f_4mat(su3_matrix *a, fsu3_matrix *b) {
+/* Convert (or copy) four generic precision matrices to single precision */
+void d2f_4mat(matrix *a, fmatrix *b) {
   int dir, i, j;
 
   for(dir = 0; dir < 4; dir++){
@@ -1566,12 +1566,12 @@ gauge_file *parallel_open(int order, char *filename)
 /* Position gauge configuration file for writing in parallel */
 /* Returns pointer to malloc'ed write buffer */
 
-fsu3_matrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset)
+fmatrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset)
 {
   /* gf  = file descriptor as opened by w_checkpoint_i */
 
   FILE *fp;
-  fsu3_matrix *lbuf;
+  fmatrix *lbuf;
 
   off_t offset ;           /* File stream pointer */
   off_t gauge_node_size;   /* Size of a gauge configuration block for
@@ -1584,7 +1584,7 @@ fsu3_matrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset)
   if(!gf->parallel)
     printf("%s: Attempting parallel write to serial file.\n",myname);
 
-  lbuf = (fsu3_matrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fsu3_matrix));
+  lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
   if(lbuf == NULL)
     {
       printf("%s: Node %d can't malloc lbuf\n",myname,this_node);
@@ -1594,7 +1594,7 @@ fsu3_matrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset)
 
   fp = gf->fp;
 
-  gauge_node_size = sites_on_node*4*sizeof(fsu3_matrix) ;
+  gauge_node_size = sites_on_node*4*sizeof(fmatrix) ;
 
   if(gf->header->order == NATURAL_ORDER)coord_list_size = 0;
   else coord_list_size = sizeof(int32type)*volume;

@@ -31,7 +31,7 @@ static const char *prec_label[2] = {"F", "D"};
 /* The Fermilab relative residue */
 
 static Real 
-relative_residue(su3_vector *p, su3_vector *q, int parity)
+relative_residue(vector *p, vector *q, int parity)
 {
   double residue, num, den;
   int i;
@@ -53,7 +53,7 @@ relative_residue(su3_vector *p, su3_vector *q, int parity)
 }
 
 static int
-ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest, 
+ks_congrad_eo_parity( vector *t_src, vector *t_dest, 
 		      quark_invert_control *qic, Real mass,
 		      ferm_links_t *fn){
   register int i;
@@ -70,7 +70,7 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
   double source_norm;	/* squared magnitude of source vector */
   int otherparity = 0; /* the other parity */
   int nrestart;  /* Restart counter */
-  su3_vector *ttt, *cg_p, *resid;
+  vector *ttt, *cg_p, *resid;
   char myname[] = "ks_congrad_eo_parity";
 
   /* Unpack structure */
@@ -93,9 +93,9 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
   /* Allocate temporary variables */
   /* PAD may be used to avoid cache trashing */
 #define PAD 0
-  ttt = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
-  cg_p = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
-  resid = (su3_vector *) malloc((sites_on_node+PAD)*sizeof(su3_vector));
+  ttt = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
+  cg_p = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
+  resid = (vector *) malloc((sites_on_node+PAD)*sizeof(vector));
 
   if(ttt == NULL || cg_p == NULL || resid == NULL){
     printf("%s(%d): No room for temporaries\n",myname,this_node);
@@ -145,8 +145,8 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
 			   &t_src[i+FETCH_UP],
 			   &resid[i+FETCH_UP]);
 	  }
-	  scalar_mult_add_su3_vector( &ttt[i], &t_dest[i], -msq_x4, &ttt[i] );
-	  add_su3_vector( &t_src[i], &ttt[i], &resid[i] );
+	  scalar_mult_add_vector( &ttt[i], &t_dest[i], -msq_x4, &ttt[i] );
+	  add_vector( &t_src[i], &ttt[i], &resid[i] );
 	  /* remember ttt contains -M_adjoint*M*src */
 	  cg_p[i] = resid[i];
 	  rsq += (double)magsq_su3vec( &resid[i] );
@@ -216,7 +216,7 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
       if( i < loopend-FETCH_UP ){
 	prefetch_VV( &ttt[i+FETCH_UP], &cg_p[i+FETCH_UP] );
       }
-      scalar_mult_add_su3_vector( &ttt[i], &cg_p[i], -msq_x4,
+      scalar_mult_add_vector( &ttt[i], &cg_p[i], -msq_x4,
 				  &ttt[i] );
       pkp += (double)su3_rdot( &cg_p[i], &ttt[i] );
 #ifdef FEWSUMS
@@ -253,8 +253,8 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
 		       &resid[i+FETCH_UP], 
 		       &ttt[i+FETCH_UP] );
       }
-      scalar_mult_add_su3_vector( &t_dest[i], &cg_p[i], a, &t_dest[i] );
-      scalar_mult_add_su3_vector( &resid[i], &ttt[i], a, &resid[i]);
+      scalar_mult_add_vector( &t_dest[i], &cg_p[i], a, &t_dest[i] );
+      scalar_mult_add_vector( &resid[i], &ttt[i], a, &resid[i]);
 #ifdef FEWSUMS
       actual_rsq += (double)magsq_su3vec( &resid[i] );
 #else
@@ -287,7 +287,7 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
     b = (Real)rsq/oldrsq;
     /* cg_p  <- resid + b*cg_p */
     FORSOMEPARITY(i,s,parity){
-      scalar_mult_add_su3_vector( &resid[i],
+      scalar_mult_add_vector( &resid[i],
 				  &cg_p[i] , b , &cg_p[i]);
     } END_LOOP
   }
@@ -308,7 +308,7 @@ ks_congrad_eo_parity( su3_vector *t_src, su3_vector *t_dest,
 
 /* API for field arguments */
 
-int ks_congrad_field( su3_vector *src, su3_vector *dest, 
+int ks_congrad_field( vector *src, vector *dest, 
 			 quark_invert_control *qic, Real mass,
 			 ferm_links_t *fn )
 {
@@ -353,7 +353,7 @@ int ks_congrad_site( field_offset src, field_offset dest,
   int i;
   site *s;
   int iters = 0;
-  su3_vector *t_src, *t_dest;
+  vector *t_src, *t_dest;
   double dtimec;
   double nflop = 1187;
   int parity = qic->parity;
@@ -364,16 +364,16 @@ int ks_congrad_site( field_offset src, field_offset dest,
 
   /* Map src and dest from site to field of correct precision */
   
-  t_src  = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
-  t_dest = (su3_vector *)malloc(sizeof(su3_vector)*sites_on_node);
+  t_src  = (vector *)malloc(sizeof(vector)*sites_on_node);
+  t_dest = (vector *)malloc(sizeof(vector)*sites_on_node);
   if(t_src == NULL || t_dest == NULL){
     printf("ks_congrad_site(%d): No room for temporaries\n",this_node);
     terminate(1);
   }
 
   FORALLSITES(i,s){
-    t_src[i]  = *((su3_vector *)F_PT(s,src) );
-    t_dest[i] = *((su3_vector *)F_PT(s,dest));
+    t_src[i]  = *((vector *)F_PT(s,src) );
+    t_dest[i] = *((vector *)F_PT(s,dest));
   }
 
   if(parity == EVEN || parity == EVENANDODD){
@@ -390,7 +390,7 @@ int ks_congrad_site( field_offset src, field_offset dest,
   /* Map solution to site structure */
 
   FORALLSITES(i,s){
-    *((su3_vector *)F_PT(s,dest)) = t_dest[i];
+    *((vector *)F_PT(s,dest)) = t_dest[i];
   }
 
   free(t_src); free(t_dest);
