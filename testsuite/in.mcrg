@@ -1,0 +1,17 @@
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+
+alpha_hyp1 0.2
+alpha_hyp2 0.2
+
+num_alpha 5
+alpha_mcrg 0.50
+alpha_mcrg 0.55
+alpha_mcrg 0.60
+alpha_mcrg 0.65
+alpha_mcrg 0.70
+
+reload_serial config.4444

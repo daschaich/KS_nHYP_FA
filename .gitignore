@@ -7,8 +7,9 @@
 gmon.out
 localmake
 su3_hmc*
-su3_spectrum
-su3_vacpol
 su3_Wflow
+su3_vacpol
+su3_mcrg
 su3_mode*
+su3_spectrum
 approx_for_modenumber

@@ -1,0 +1,98 @@
+SU(3) MCRG-blocked measurements
+Machine = Scalar processor, with 1 nodes
+Twice-HYP smeared links, smearing parameters from infile
+  IR_STAB = 1e-06
+  EPS_SQ = 1e-05
+NHYP_DEBUG turned on
+start: Fri Aug  4 19:14:41 2017
+
+type 0 for no prompts or 1 for prompts
+nx 4
+ny 4
+nz 4
+nt 4
+LAYOUT = Hypercubes, options = with fixed node_geometry
+ON EACH NODE 4 x 4 x 4 x 4
+Mallocing 1.4 MBytes per core for lattice
+
+
+alpha_hyp1 0.2
+alpha_hyp2 0.2
+num_alpha 5
+alpha_mcrg 0.5
+alpha_mcrg 0.55
+alpha_mcrg 0.6
+alpha_mcrg 0.65
+alpha_mcrg 0.7
+reload_serial config.4444
+Restored binary gauge configuration serially from file config.4444
+Time stamp Wed Dec 31 14:07:26 1997
+Checksums 38abcb08 70225d93 OK
+Time to reload gauge configuration = 0.0001709 seconds
+CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
+Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
+Time to check unitarity = 0.0003889 seconds
+Loop coefficients: nloop, rep, loop_coeff, multiplicity
+0 0 1 6
+1 0 -0.07225 12
+2 0 -0.008145 16
+3 0 1 48
+4 0 1 12
+5 0 1 6
+
+Simple blocking from twice-nHYP smeared links
+LOOPS 0 0 0 0 1.9039334
+LOOPS 1 0 0 0 1.3674974
+LOOPS 2 0 0 0 1.3458055
+LOOPS 3 0 0 0 1.4437833
+LOOPS 4 0 0 0 1.2629149
+LOOPS 5 0 0 0 0.89669158
+POLYA ORIG 1.3938 0.0382589 1.5464 0.0107286
+Alpha 0.5 0.2 0.2
+Alpha 0.5 0.2 0.2
+LOOPS 0 0 1 0.5 2.5935747
+LOOPS 1 0 1 0.5 2.3580482
+LOOPS 2 0 1 0.5 2.2801275
+LOOPS 3 0 1 0.5 2.3639684
+LOOPS 4 0 1 0.5 2.6214276
+LOOPS 5 0 1 0.5 2.779031
+POLYA NHYP 1 0.5 2.60738 0.014732 2.55732 0.00254285
+Alpha 0.55 0.2 0.2
+Alpha 0.55 0.2 0.2
+LOOPS 0 0 1 0.55 2.6759232
+LOOPS 1 0 1 0.55 2.4685069
+LOOPS 2 0 1 0.55 2.3977268
+LOOPS 3 0 1 0.55 2.4808735
+LOOPS 4 0 1 0.55 2.729862
+LOOPS 5 0 1 0.55 2.8310563
+POLYA NHYP 1 0.55 2.66608 0.0142192 2.60944 0.00278685
+Alpha 0.6 0.2 0.2
+Alpha 0.6 0.2 0.2
+LOOPS 0 0 1 0.6 2.7415147
+LOOPS 1 0 1 0.6 2.5613651
+LOOPS 2 0 1 0.6 2.4957497
+LOOPS 3 0 1 0.6 2.5764229
+LOOPS 4 0 1 0.6 2.8092597
+LOOPS 5 0 1 0.6 2.870022
+POLYA NHYP 1 0.6 2.71429 0.0140337 2.65307 0.00305573
+Alpha 0.65 0.2 0.2
+Alpha 0.65 0.2 0.2
+LOOPS 0 0 1 0.65 2.7933023
+LOOPS 1 0 1 0.65 2.638419
+LOOPS 2 0 1 0.65 2.5769744
+LOOPS 3 0 1 0.65 2.653752
+LOOPS 4 0 1 0.65 2.8660718
+LOOPS 5 0 1 0.65 2.8990114
+POLYA NHYP 1 0.65 2.75371 0.0141124 2.68943 0.00333013
+Alpha 0.7 0.2 0.2
+Alpha 0.7 0.2 0.2
+LOOPS 0 0 1 0.7 2.8338537
+LOOPS 1 0 1 0.7 2.7017925
+LOOPS 2 0 1 0.7 2.6437889
+LOOPS 3 0 1 0.7 2.7157476
+LOOPS 4 0 1 0.7 2.905411
+LOOPS 5 0 1 0.7 2.9205415
+POLYA NHYP 1 0.7 2.7859 0.0143754 2.71963 0.00358737
+RUNNING COMPLETED
+Time = 0.239 seconds
