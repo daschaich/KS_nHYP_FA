@@ -1,11 +1,11 @@
 SU(3) with Kogut--Susskind fermions
 S4b phase order parameter measurement
-Machine = Scalar processor, with 1 nodes
+Machine = MPI (portable), with 2 nodes
 nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Sat Aug  5 12:50:52 2017
+start: Sat Aug  5 13:56:59 2017
 
 type 0 for no prompts or 1 for prompts
 nflavors 12
@@ -14,10 +14,11 @@ ny 4
 nz 4
 nt 4
 iseed 41
-LAYOUT = Hypercubes, options = with fixed node_geometry
-ON EACH NODE 4 x 4 x 4 x 4
-Mallocing 0.3 MBytes per core for lattice
-Mallocing 2.3 MBytes per core for fields
+LAYOUT = Hypercubes, options = hyper_prime,
+MPI with automatic hyper_prime layout
+ON EACH NODE 2 x 4 x 4 x 4
+Mallocing 0.2 MBytes per core for lattice
+Mallocing 1.1 MBytes per core for fields
 
 
 beta 6
@@ -34,11 +35,11 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.002294 seconds
-CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+Time to reload gauge configuration = 0.001868 seconds
+CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.00033 seconds
+Time to check unitarity = 9.799e-05 seconds
 GMES 1.3937999 0.038258851 0 1.9094453 1.8984215
 POLYA 1.3937999 0.038258851 1.5463969 0.010728566
 ACT 1.5784475
@@ -99,6 +100,6 @@ pbpy: mass 0.01, 43.714719 44.010516 -1.6985681 2.7051211 ( ave over 5 )
 pbpz: mass 0.01, 44.513151 41.665639 2.2409453 -1.9280205 ( ave over 5 )
 susc: -0.0040462681 1.3798883
 RUNNING COMPLETED
-Time = 0.02653 seconds
+Time = 0.01452 seconds
 total_iters = 118
 

@@ -1,19 +1,20 @@
 SU(3) MCRG-blocked measurements
-Machine = Scalar processor, with 1 nodes
+Machine = MPI (portable), with 2 nodes
 Twice-HYP smeared links, smearing parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Sat Aug  5 12:50:46 2017
+start: Sat Aug  5 13:57:05 2017
 
 type 0 for no prompts or 1 for prompts
 nx 4
 ny 4
 nz 4
 nt 4
-LAYOUT = Hypercubes, options = with fixed node_geometry
-ON EACH NODE 4 x 4 x 4 x 4
-Mallocing 1.3 MBytes per core for lattice
+LAYOUT = Hypercubes, options = hyper_prime,
+MPI with automatic hyper_prime layout
+ON EACH NODE 2 x 4 x 4 x 4
+Mallocing 0.7 MBytes per core for lattice
 
 
 alpha_hyp1 0.2
@@ -28,11 +29,11 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.002165 seconds
-CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+Time to reload gauge configuration = 0.001978 seconds
+CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.00036 seconds
+Time to check unitarity = 8.392e-05 seconds
 Loop coefficients: nloop, rep, loop_coeff, multiplicity
 0 0 1 6
 1 0 -0.07225 12
@@ -95,4 +96,4 @@ LOOPS 4 0 1 0.7 2.905411
 LOOPS 5 0 1 0.7 2.9205415
 POLYA NHYP 1 0.7 2.7859 0.0143754 2.71963 0.00358737
 RUNNING COMPLETED
-Time = 0.1162 seconds
+Time = 0.07947 seconds
