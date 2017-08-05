@@ -40,7 +40,7 @@ MY_OBJECTS = control.o    \
              setup.o      \
              gauge_info.o
 
-# Basic set from generic directory (alphabetically)
+# Basic set from generic directory
 G_OBJECTS = check_unitarity.o \
             gaugefix.o       \
             io_helpers.o      \
@@ -139,7 +139,7 @@ DARCH = ${DHAVE_QMP} ${DHAVE_QIO} ${DHAVE_QDP} ${DHAVE_QOP}
 
 ##### Targets:
 su3_spectrum::
-	${MAKE} -f ${MAKEFILE} target "MYTARGET= $@"
+	${MAKE} -f ${MAKEFILE} target "MYTARGET = $@"
 
 clean:
 	-/bin/rm -f *.o

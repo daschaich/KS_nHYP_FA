@@ -46,10 +46,10 @@ MY_OBJECTS = control.o         \
              blocked_ploops.o  \
              blocked_gauge_loops.o
 
-# Basic set from generic directory (alphabetically)
+# Basic set from generic directory
 G_OBJECTS = check_unitarity.o \
             io_helpers.o      \
-            io_lat4.o         \
+            io_lat.o          \
             io_lat_utils.o    \
             linktrsum.o       \
             make_lattice.o    \

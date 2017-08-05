@@ -5,61 +5,55 @@
 // The vectors psi1 and psi2 contain (M^dag.M)^(-1) chi
 #include "S4b_includes.h"
 
-// Adds adjoint plaquette term
+// Add adjoint plaquette term
+// Use tempmat for temporary storage
 void plaquette_a(double *ss_plaq, double *st_plaq) {
-  register int i, dir1, dir2;
+  register int i, dir, dir2;
   register site *s;
   register matrix *m1, *m4;
-  matrix mtmp, *mat;   // mat is scratch space
-  double ss_sum, st_sum;
-  complex ctt;
-  msg_tag *mtag0, *mtag1;
+  double ss_sum = 0.0, st_sum = 0.0;
+  complex tc;
+  msg_tag *mtag, *mtag2;
+  matrix tmat;
 
-  ss_sum = 0;
-  st_sum = 0;
-  mat = (matrix *)malloc(sizeof(matrix) * sites_on_node);
-  if (mat == NULL) {
-    printf("plaquette_a: can't malloc mat\n");
-    fflush(stdout);
-    terminate(1);
-  }
-
-  for(dir1 = YUP; dir1 <= TUP; dir1++) {
-    for(dir2 = XUP; dir2 < dir1; dir2++) {
-      mtag0 = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
-                                dir1, EVENANDODD, gen_pt[0]);
-      mtag1 = start_gather_site(F_OFFSET(link[dir1]), sizeof(matrix),
+  // We can exploit a symmetry under dir<-->dir2
+  for (dir = YUP; dir <= TUP; dir++) {
+    for (dir2 = XUP; dir2 < dir; dir2++) {
+      // gen_pt[0] is U_b(x+a), gen_pt[1] is U_a(x+b)
+      mtag = start_gather_site(F_OFFSET(link[dir2]), sizeof(matrix),
+                                dir, EVENANDODD, gen_pt[0]);
+      mtag2 = start_gather_site(F_OFFSET(link[dir]), sizeof(matrix),
                                 dir2, EVENANDODD, gen_pt[1]);
 
+      // tempmat = Udag_b(x) U_a(x)
       FORALLSITES(i, s) {
-        m1 = &(s->link[dir1]);
+        m1 = &(s->link[dir]);
         m4 = &(s->link[dir2]);
-        mult_su3_an(m4, m1, &mat[i]);
+        mult_su3_an(m4, m1, &(tempmat[i]));
       }
-      wait_gather(mtag0);
-      wait_gather(mtag1);
-      FORALLSITES(i, s) {
-        mult_su3_nn(&mat[i], (matrix *)(gen_pt[0][i]), &mtmp);
+      wait_gather(mtag);
+      wait_gather(mtag2);
 
-        if (dir1 == TUP) {
-          ctt = complextrace_su3((matrix *)(gen_pt[1][i]), &mtmp);
-          st_sum += (ctt.real / 3)
-                  + beta_a * (ctt.real * ctt.real + ctt.imag * ctt.imag) / 9;
-        }
-        else {
-          ctt = complextrace_su3((matrix *)(gen_pt[1][i]), &mtmp);
-          ss_sum += (ctt.real / 3)
-                  + beta_a * (ctt.real * ctt.real + ctt.imag * ctt.imag) / 9;
-        }
+      // Compute tc = tr[Udag_a(x+b) Udag_b(x) U_a(x) U_b(x+a)] / 3
+      // and combine tc.real + beta_A * |tc|^2
+      FORALLSITES(i, s) {
+        m1 = (matrix *)(gen_pt[0][i]);
+        m4 = (matrix *)(gen_pt[1][i]);
+        mult_su3_nn(&(tempmat[i]), m1, &tmat);
+        tc = complextrace_su3(m4, &tmat);
+
+        if (dir == TUP)
+          st_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
+        else
+          ss_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
       }
-      cleanup_gather(mtag0);
-      cleanup_gather(mtag1);
+      cleanup_gather(mtag);
+      cleanup_gather(mtag2);
     }
   }
   g_doublesum(&ss_sum);
   g_doublesum(&st_sum);
-  *ss_plaq = ss_sum / ((double)(nx * ny * nz * nt));
-  *st_plaq = st_sum / ((double)(nx * ny * nz * nt));
-  free(mat);
+  *ss_plaq = ss_sum / ((double)volume);
+  *st_plaq = st_sum / ((double)volume);
 }
 // -----------------------------------------------------------------

@@ -3,11 +3,7 @@
 // For benchmarking, define CGTIME in defines.h
 #define CONTROL
 #include "ks_dyn_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 int main(int argc, char *argv[]) {
   int Nmeas = 0, traj_done, prompt;
   int s_iters = 0, avm_iters = 0, avs_iters = 0;
@@ -24,7 +20,7 @@ int main(int argc, char *argv[]) {
 
   prompt = setup();
 
-  // Load input and run (loop removed)
+  // Load input and run
   // readin does a rephase(ON) on the read-in lattice
   if (readin(prompt) != 0) {
     node0_printf("ERROR in readin, aborting\n");

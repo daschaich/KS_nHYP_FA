@@ -6,7 +6,7 @@
 void ranmom() {
   register int i, dir;
   register site *s;
-  FORALLSITES(i,s) {
+  FORALLSITES(i, s) {
     FORALLUPDIR(dir) {
 #ifdef SITERAND
       random_anti_hermitian((anti_hermitmat *)&(s->mom[dir]), &(s->site_prn));

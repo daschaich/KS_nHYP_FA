@@ -36,41 +36,6 @@ gauge_file *save_lattice(int flag, char *filename, char *stringLFN) {
     case SAVE_CHECKPOINT:
       gf = save_checkpoint(filename);
       break;
-    case SAVE_SERIAL_FM:
-      printf("Save serial FNAL format not implemented\n");
-      break;
-    case SAVE_SERIAL_ILDG:
-#ifdef HAVE_QIO
-      gf = save_serial_ildg(filename,stringLFN);
-#else
-      node0_printf("save_serial_ildg requires QIO compilation\n");
-      terminate(1);
-#endif
-      break;
-    case SAVE_PARALLEL_ILDG:
-#ifdef HAVE_QIO
-      gf = save_parallel_ildg(filename,stringLFN);
-#else
-      node0_printf("save_parallel_ildg requires QIO compilation\n");
-      terminate(1);
-#endif
-      break;
-    case SAVE_PARTFILE_ILDG:
-#ifdef HAVE_QIO
-      gf = save_partfile_ildg(filename,stringLFN);
-#else
-      node0_printf("save_partfile_ildg requires QIO compilation\n");
-      terminate(1);
-#endif
-      break;
-    case SAVE_MULTIFILE_ILDG:
-#ifdef HAVE_QIO
-      gf = save_multifile_ildg(filename,stringLFN);
-#else
-      node0_printf("save_multifile_ildg requires QIO compilation\n");
-      terminate(1);
-#endif
-      break;
     case SAVE_SERIAL_SCIDAC:
 #ifdef HAVE_QIO
       gf = save_serial_scidac(filename);
@@ -102,9 +67,6 @@ gauge_file *save_lattice(int flag, char *filename, char *stringLFN) {
       node0_printf("save_partfile_scidac requires QIO compilation\n");
       terminate(1);
 #endif
-      break;
-    case SAVE_SERIAL_ARCHIVE:
-      gf = save_serial_archive(filename);
       break;
     default:
       node0_printf("\nsave_lattice: ERROR: unknown type for saving lattice\n");
@@ -222,7 +184,7 @@ gauge_file *reload_lattice(int flag, char *filename) {
   nersc_checksum = nersc_cksum();
 #endif
 #if PRECISION == 1
-    node0_printf("CHECK PLAQ: %e %e\n",g_ssplaq, g_stplaq);
+    node0_printf("CHECK PLAQ: %e %e\n", g_ssplaq, g_stplaq);
     node0_printf("CHECK NERSC LINKTR: %e CKSUM: %x\n",
                  linktr.real / 3.0, nersc_checksum);
 #else     // Double precision
@@ -286,7 +248,6 @@ char *get_next_tag(FILE *fp, char *tag, char *myname) {
 /* Read and echo the next tag.  Echo any intervening comments */
 /* Comments begin with # and apply to the rest of the line */
 /* Verify that the input tag agrees with the expected tag */
-
 int get_check_tag(FILE *fp, char *tag, char *myname) {
   char *checktag;
 
@@ -340,17 +301,17 @@ int ask_starting_lattice(FILE *fp, int prompt, int *flag, char *filename) {
     *flag = FRESH;
     printf("\n");
   }
-  else if (strcmp("continue",savebuf) == 0) {
+  else if (strcmp("continue", savebuf) == 0) {
     *flag = CONTINUE;
     printf("\n");
   }
-  else if (strcmp("reload_ascii",savebuf) == 0) {
+  else if (strcmp("reload_ascii", savebuf) == 0) {
     *flag = RELOAD_ASCII;
   }
-  else if (strcmp("reload_serial",savebuf) == 0) {
+  else if (strcmp("reload_serial", savebuf) == 0) {
     *flag = RELOAD_SERIAL;
   }
-  else if (strcmp("reload_parallel",savebuf) == 0) {
+  else if (strcmp("reload_parallel", savebuf) == 0) {
     *flag = RELOAD_PARALLEL;
   }
   else {
@@ -392,75 +353,39 @@ int ask_ending_lattice(FILE *fp, int prompt, int *flag, char *filename) {
     *flag = SAVE_ASCII;
   else if (strcmp("save_serial", savebuf) == 0)
     *flag = SAVE_SERIAL;
-  else if (strcmp("save_parallel",savebuf) == 0)
+  else if (strcmp("save_parallel", savebuf) == 0)
     *flag = SAVE_PARALLEL;
-  else if (strcmp("save_checkpoint",savebuf) == 0)
+  else if (strcmp("save_checkpoint", savebuf) == 0)
     *flag = SAVE_CHECKPOINT;
-  else if (strcmp("save_serial_fm",savebuf) == 0)
-    *flag = SAVE_SERIAL_FM;
-  else if (strcmp("save_serial_scidac",savebuf) == 0) {
+  else if (strcmp("save_serial_scidac", savebuf) == 0) {
     *flag = SAVE_SERIAL_SCIDAC;
 #ifndef HAVE_QIO
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_parallel_scidac",savebuf) == 0) {
+  else if (strcmp("save_parallel_scidac", savebuf) == 0) {
     *flag = SAVE_PARALLEL_SCIDAC;
 #ifndef HAVE_QIO
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_multifile_scidac",savebuf) == 0) {
+  else if (strcmp("save_multifile_scidac", savebuf) == 0) {
     *flag = SAVE_MULTIFILE_SCIDAC;
 #ifndef HAVE_QIO
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_partfile_scidac",savebuf) == 0) {
+  else if (strcmp("save_partfile_scidac", savebuf) == 0) {
     *flag = SAVE_PARTFILE_SCIDAC;
 #ifndef HAVE_QIO
     node0_printf("requires QIO compilation!\n");
     terminate(1);
 #endif
   }
-  else if (strcmp("save_serial_archive",savebuf) == 0) {
-    *flag = SAVE_SERIAL_ARCHIVE;
-  }
-  else if (strcmp("save_serial_ildg",savebuf) == 0) {
-#ifdef HAVE_QIO
-    *flag = SAVE_SERIAL_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_parallel_ildg",savebuf) == 0) {
-#ifdef HAVE_QIO
-    *flag = SAVE_PARALLEL_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_partfile_ildg",savebuf) == 0) {
-#ifdef HAVE_QIO
-    *flag = SAVE_PARTFILE_ILDG;
-#else
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("save_multifile_ildg",savebuf) == 0) {
-    *flag = SAVE_MULTIFILE_ILDG;
-#ifndef HAVE_QIO
-    node0_printf("requires QIO compilation!\n");
-    terminate(1);
-#endif
-  }
-  else if (strcmp("forget",savebuf) == 0) {
+  else if (strcmp("forget", savebuf) == 0) {
     *flag = FORGET;
     printf("\n");
   }
@@ -522,61 +447,6 @@ int ask_gauge_fix(FILE *fp, int prompt, int *flag) {
 
 /*--------------------------------------------------------------------*/
 
-/* For FNAL formatted ASCII correlator files */
-int ask_corr_file(FILE *fp, int prompt, int *flag, char* filename) {
-  char *savebuf;
-  int status;
-  char myname[] = "ask_corr_file";
-
-  if (prompt!=0)
-    printf("'forget_corr', 'save_corr_fnal' for correlator file type\n");
-
-  savebuf = get_next_tag(fp, "output correlator file command", myname);
-  if (savebuf == NULL)
-    return 1;
-
-  printf("%s ",savebuf);
-
-  if (strcmp("forget_corr", savebuf) == 0) {
-    *flag = FORGET;
-  }
-  else if (strcmp("save_corr_fnal",savebuf) == 0) {
-    *flag = SAVE_ASCII;  /* Lazy borrowing of lattice flags! */
-  }
-  else {
-    printf("is not a save correlator command. INPUT ERROR\n");
-    return 1;
-  }
-
-  if (*flag == FORGET)
-    printf("\n");
-  else {
-    if (prompt != 0)
-      printf("enter filename\n");
-    status = fscanf(fp,"%s",filename);
-    if (status != 1) {
-      printf("\n%s: ERROR reading filename\n", myname);
-      return 1;
-    }
-    printf("%s\n", filename);
-  }
-  return 0;
-}
-
-int ask_ildg_LFN(FILE *fp, int prompt, int flag, char *stringLFN) {
-  int status = 0;
-
-  /* For ILDG output formats we require a logical file name next */
-  if (flag == SAVE_SERIAL_ILDG ||
-      flag == SAVE_PARALLEL_ILDG ||
-      flag == SAVE_PARTFILE_ILDG ||
-      flag == SAVE_MULTIFILE_ILDG) {
-    status = get_s(fp, prompt, "ILDG_LFN", stringLFN);
-  }
-  else
-    stringLFN[0] = '\0';
-  return status;
-}
 
 /* get_f is used to get a floating point number.  If prompt is non-zero,
 it will prompt for the input value with the variable_name_string.  If

@@ -55,8 +55,8 @@ typedef struct {
 #endif
   vector M_inv;
 
-  // Temporary vectors and matrices
-  vector tempvec[4];  // One for each direction
+  // Temporary vectors -- one for each direction
+  vector tempvec[4];
 } site;
 // -----------------------------------------------------------------
 
@@ -127,6 +127,9 @@ EXTERN matrix *gauge_field_thin[4];
 EXTERN matrix *gauge_field_save[4];
 EXTERN matrix *gauge_field_temp[4];
 
+// Temporary matrices
+EXTERN matrix *tempmat, *tempmat2;
+
 // nHYP stuff
 EXTERN int Nsmear;
 EXTERN Real alpha_smear[3];
@@ -143,9 +146,6 @@ EXTERN matrix *Staple3[4];
 EXTERN matrix *LambdaU[4];
 EXTERN matrix *Lambda1[4];
 EXTERN matrix *Lambda2[4];
-
-// Temporary matrices
-EXTERN matrix *tempmat, *tempmat2;
 
 // Up to 20 concurrent timers for timing
 #ifdef TIMING

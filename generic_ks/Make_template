@@ -10,7 +10,6 @@
 G_KS_ALL = congrad.o         \
            congrad_helpers.o \
            f_meas.o          \
-           ff_opt.o          \
            flavor_ops.o      \
            fpi_2.o           \
            mat_invert.o      \
@@ -54,8 +53,6 @@ f_meas.o: ../generic_ks/f_meas.c
 fpi_2.o: ../generic_ks/fpi_2.c
 	${CC} -c ${CFLAGS} $<
 flavor_ops.o: ../generic_ks/flavor_ops.c
-	${CC} -c ${CFLAGS} $<
-ff_opt.o: ../generic_ks/ff_opt.c
 	${CC} -c ${CFLAGS} $<
 mat_invert.o: ../generic_ks/mat_invert.c
 	${CC} -c ${CFLAGS} $<

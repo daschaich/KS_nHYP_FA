@@ -43,9 +43,8 @@ typedef struct {
   vector ttt;               // For ../generic_ks/mat_invert.c
   vector M_inv;
 
-  // Temporary vectors and matrices
-  vector tempvec[4];  // One for each direction
-  matrix tempmat1, tempmat2, staple;
+  // Temporary vectors -- one for each direction
+  vector tempvec[4];
 } site;
 // -----------------------------------------------------------------
 
@@ -82,8 +81,8 @@ EXTERN int odd_sites_on_node;   // Number of odd sites on this node
 EXTERN int number_of_nodes;     // Number of nodes in use
 EXTERN int this_node;           // Node number of this node
 
-// Each node maintains a structure with the pseudorandom number
-// generator state
+// Each node maintains a structure
+// with the pseudorandom number generator state
 EXTERN double_prn node_prn;
 
 EXTERN gauge_file *startlat_p;
@@ -100,7 +99,7 @@ EXTERN char **gen_pt[N_POINTERS];
 EXTERN matrix *gauge_field[4];
 EXTERN matrix *gauge_field_thin[4];
 
-// Temporary fields
+// Temporary matrices
 EXTERN matrix *tempmat, *tempmat2;
 
 // nHYP stuff

@@ -173,9 +173,8 @@ int readin(int prompt) {
   // Do whatever is needed to get lattice
   if (startflag == CONTINUE)
     rephase(OFF);
-  else
-    startlat_p = reload_lattice(startflag, startfile);
 
+  startlat_p = reload_lattice(startflag, startfile);
   // If a lattice was read in, put in staggered phase factors
   // and antiperiodic boundary condition
   phases_in = OFF;
@@ -188,7 +187,6 @@ int readin(int prompt) {
 
 // -----------------------------------------------------------------
 // Allocate all space for fields
-// Amount Malloced is pure guesswork/imagination
 void make_fields() {
   FIELD_ALLOC_VEC(gauge_field, matrix, 4);
   FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);

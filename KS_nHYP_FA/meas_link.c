@@ -77,14 +77,10 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
     wait_gather(tag3);
 
     FORALLSITES(i, s) {
-      mult_mat_vec(&(s->link[TUP]),
-                       (vector *)gen_pt[0][i], &(s->tempvec[0]));
-      mult_mat_vec(&(s->link[XUP]),
-                       (vector *)gen_pt[1][i], &(s->tempvec[1]));
-      mult_mat_vec(&(s->link[YUP]),
-                       (vector *)gen_pt[2][i], &(s->tempvec[2]));
-      mult_mat_vec(&(s->link[ZUP]),
-                       (vector *)gen_pt[3][i], &(s->tempvec[3]));
+      mult_mat_vec(&(s->link[TUP]), (vector *)gen_pt[0][i], &(s->tempvec[0]));
+      mult_mat_vec(&(s->link[XUP]), (vector *)gen_pt[1][i], &(s->tempvec[1]));
+      mult_mat_vec(&(s->link[YUP]), (vector *)gen_pt[2][i], &(s->tempvec[2]));
+      mult_mat_vec(&(s->link[ZUP]), (vector *)gen_pt[3][i], &(s->tempvec[3]));
     }
 
     FORALLSITES(i, s) {

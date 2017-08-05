@@ -108,17 +108,7 @@ void free_lattice();
 /* nersc_cksum.c */
 u_int32type nersc_cksum();
 
-/* make_global_fields.c */
-void make_global_fields();
-
-/* path_product.c */
-void path_product(const int *dir, const int length, matrix *tempmat1);
-void path_product_fields(matrix *src[4], const int *dir,
-                         const int length, matrix *tempmat1);
-void path_prod_subl(const int *dir, const int length, const int subl,
-                    matrix *tempmat1);
-
-/* ploop.c */
+// ploop.c
 complex ploop(int dir);
 
 /* project_su3_hit.c */
@@ -136,34 +126,15 @@ void project_su3(
 /* rand_gauge.c */
 void rand_gauge(field_offset G);
 
-/* ranmom.c */
+// ranmom.c
 void ranmom();
 
-/* remap standard I/O */
+// remap standard I/O
 int remap_stdio_from_args(int argc, char *argv[]);
 
 /* ranstuff.c */
 void initialize_prn(double_prn *prn_pt, int seed, int index);
 Real myrand(double_prn *prn_pt);
-
-/* restrict_fourier.c */
-void setup_restrict_fourier(int *key, int *slice);
-void restrict_fourier_site(
-     field_offset src,   /* src is field to be transformed */
-     int size,     /* Size of field in bytes.  The field must
-          consist of size/sizeof(complex) consecutive
-          complex numbers.  For example, an vector
-          is 3 complex numbers. */
-     int isign);   /* 1 for x -> k, -1 for k -> x */
-
-void restrict_fourier_field(
-     complex *src,       /* src is field to be transformed */
-     int size,     /* Size of field in bytes.  The field must
-          consist of size/sizeof(complex) consecutive
-          complex numbers.  For example, an vector
-          is 3 complex numbers. */
-     int isign);   /* 1 for x -> k, -1 for k -> x */
-void cleanup_restrict_fourier();
 
 /* For quark source and sink routines - both Wilson and KS */
 /* The Weyl representation types are included for w_source_h */

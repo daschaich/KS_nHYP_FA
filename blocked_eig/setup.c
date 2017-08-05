@@ -66,7 +66,6 @@ int initial_set() {
 
 // -----------------------------------------------------------------
 // Allocate all space for fields
-// Amount reported is pure guesswork/imagination because I don't really care
 void make_fields() {
   FIELD_ALLOC_VEC(gauge_field, matrix, 4);
   FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);
@@ -81,7 +80,7 @@ void make_fields() {
 
   // Check the total number of matrices; this may not be accurate
   node0_printf("Mallocing %.1f MBytes per core for fields\n",
-               (double)sites_on_node * 98 * sizeof(matrix) / 1e6);
+               (double)sites_on_node * 62 * sizeof(matrix) / 1e6);
 }
 // -----------------------------------------------------------------
 

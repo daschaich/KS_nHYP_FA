@@ -50,9 +50,8 @@ typedef struct {
   matrix prop;        // Propagator from source point
   matrix propnu[4];   // Propagators from source + nu
 
-  // Temporary vectors and matrices
-  vector tempvec[4];  // One for each direction
-  matrix tempmat1, staple;
+  // Temporary vectors -- one for each direction
+  vector tempvec[4];
 } site;
 // -----------------------------------------------------------------
 
@@ -80,9 +79,9 @@ EXTERN double g_ssplaq, g_stplaq;
 EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char startfile[MAXFILENAME], outpat[MAXFILENAME];
-EXTERN int startflag; // Beginning lattice: CONTINUE, RELOAD, FRESH
+EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH
 EXTERN int total_iters;
-EXTERN int phases_in; // 1 if KS and BC phases absorbed into matrices
+EXTERN int phases_in;   // 1 if KS and BC phases absorbed into links
 
 // Some of these global variables are node dependent
 // They are set in "make_lattice()"
@@ -92,8 +91,8 @@ EXTERN int odd_sites_on_node;   // Number of odd sites on this node
 EXTERN int number_of_nodes;     // Number of nodes in use
 EXTERN int this_node;           // Node number of this node
 
-// Each node maintains a structure with the pseudorandom number
-// generator state
+// Each node maintains a structure
+// with the pseudorandom number generator state
 EXTERN double_prn node_prn;
 
 EXTERN gauge_file *startlat_p;
@@ -110,6 +109,9 @@ EXTERN char **gen_pt[N_POINTERS];
 EXTERN matrix *gauge_field[4];
 EXTERN matrix *gauge_field_thin[4];
 
+// Temporary matrix
+EXTERN matrix *tempmat;
+
 // Vacuum polarization stuff -- point source location
 EXTERN int x_src, y_src, z_src, t_src;
 
@@ -121,7 +123,5 @@ EXTERN matrix *hyplink2[4][4];
 EXTERN matrix *Staple1[4][4];
 EXTERN matrix *Staple2[4][4];
 EXTERN matrix *Staple3[4];
-
-EXTERN matrix *tempmat;     // Used in ../generic_nhyp/block_nhyp.c
-#endif // _LATTICE_H
+#endif
 // -----------------------------------------------------------------

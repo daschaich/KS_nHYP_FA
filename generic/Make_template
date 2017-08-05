@@ -9,17 +9,12 @@
 
 G_ALL = \
  ax_gauge.o \
- ape_smear.o \
  byterevn.o \
  check_unitarity.o \
  com_mpi.o \
  com_qmp.o \
  com_vanilla.o \
- discretize_wf.o \
  field_strength.o \
- field_translation.o \
- field_utilities.o \
- file_types_milc_usqcd.o \
  gaugefix.o \
  gauge_stuff.o \
  glueball_op.o \
@@ -37,10 +32,8 @@ G_ALL = \
  io_scidac.o \
  io_scidac_types.o \
  layout_hyper_prime.o \
- layout_hyper_2or3.o \
- layout_timeslices.o \
- layout_squares.o \
  layout_hyper_sl32.o \
+ layout_timeslices.o \
  linktrsum.o \
  map_milc_to_qopmilc.o \
  map_milc_to_qopqdp.o \
@@ -48,7 +41,6 @@ G_ALL = \
  milc_to_quda_utilities.o \
  make_lattice.o \
  nersc_cksum.o \
- path_product.o \
  plaq.o \
  ploop.o \
  project_su3_hit.o \
@@ -61,7 +53,6 @@ G_ALL = \
  ranstuff.o \
  remap_fftw_fourier.o \
  remap_stdio_from_args.o \
- restrict_fourier.o \
  reunitarize.o
 
 # Must match our headers in generic_includes.h
@@ -90,12 +81,6 @@ ${G_ALL} : ${G_ALL_DEPEND}
 
 ax_gauge.o: ../generic/ax_gauge.c
 	${CC} -c ${CFLAGS} $<
-ape_smear.o: ../generic/ape_smear.c
-	${CC} -c ${CFLAGS} $<
-ax_gauge.o: ../generic/ax_gauge.c
-	${CC} -c ${CFLAGS} $<
-bsd_sum.o: ../generic/bsd_sum.c
-	${CC} -c ${CFLAGS} $<
 check_unitarity.o: ../generic/check_unitarity.c
 	${CC} -c ${CFLAGS} $<
 com_mpi.o: ../generic/com_mpi.c
@@ -104,15 +89,7 @@ com_qmp.o: ../generic/com_qmp.c
 	${CC} -c ${CFLAGS} $<
 com_vanilla.o: ../generic/com_vanilla.c
 	${CC} -c ${CFLAGS} $<
-discretize_wf.o: ../generic/discretize_wf.c
-	${CC} -c ${CFLAGS} $<
 field_strength.o: ../generic/field_strength.c
-	${CC} -c ${CFLAGS} $<
-field_translation.o: ../generic/field_translation.c
-	${CC} -c ${CFLAGS} $<
-file_types_milc_usqcd.o: ../generic/file_types_milc_usqcd.c
-	${CC} -c ${CFLAGS} $<
-field_utilities.o: ../generic/field_utilities.c
 	${CC} -c ${CFLAGS} $<
 gaugefix.o: ../generic/gaugefix.c
 	${CC} -c ${CFLAGS} $<
@@ -150,13 +127,9 @@ io_scidac_types.o: ../generic/io_scidac_types.c
 	${CC} -c ${CFLAGS} $<
 layout_hyper_prime.o: ../generic/layout_hyper_prime.c
 	${CC} -c ${CFLAGS} $<
-layout_hyper_2or3.o: ../generic/layout_hyper_2or3.c
-	${CC} -c ${CFLAGS} $<
 layout_hyper_sl32.o: ../generic/layout_hyper_sl32.c
 	${CC} -c ${CFLAGS} $<
 layout_timeslices.o: ../generic/layout_timeslices.c
-	${CC} -c ${CFLAGS} $<
-layout_squares.o: ../generic/layout_squares.c
 	${CC} -c ${CFLAGS} $<
 linktrsum.o: ../generic/linktrsum.c
 	${CC} -c ${CFLAGS} $<
@@ -171,8 +144,6 @@ milc_to_qop_utilities.o: ../generic/milc_to_qop_utilities.c
 milc_to_quda_utilities.o: ../generic/milc_to_quda_utilities.c
 	${CC} -c ${CFLAGS} $<
 nersc_cksum.o: ../generic/nersc_cksum.c
-	${CC} -c ${CFLAGS} $<
-path_product.o: ../generic/path_product.c
 	${CC} -c ${CFLAGS} $<
 plaq.o: ../generic/plaq.c
 	${CC} -c ${CFLAGS} $<
@@ -197,8 +168,6 @@ ranstuff.o: ../generic/ranstuff.c
 remap_fftw_fourier.o: ../generic/remap_fftw_fourier.c
 	${CC} -c ${CFLAGS} $<
 remap_stdio_from_args.o: ../generic/remap_stdio_from_args.c
-	${CC} -c ${CFLAGS} $<
-restrict_fourier.o: ../generic/restrict_fourier.c
 	${CC} -c ${CFLAGS} $<
 reunitarize.o: ../generic/reunitarize.c
 	${CC} -c ${CFLAGS} $<

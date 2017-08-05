@@ -71,8 +71,7 @@ int mat_invert_uml(field_offset src, field_offset dest,
                    field_offset temp, Real mass);
 
 // nl_spectrum.c
-int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
-                field_offset tempmat1, field_offset tempmat2);
+int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2);
 
 // rephase.c
 void rephase(int flag);

@@ -177,7 +177,6 @@ int readin(int prompt) {
 
 // -----------------------------------------------------------------
 // Allocate all space for fields
-// Amount Malloced is pure guesswork/imagination
 void make_fields() {
   FIELD_ALLOC_VEC(gauge_field, matrix, 4);
   FIELD_ALLOC_VEC(gauge_field_thin, matrix, 4);
@@ -191,6 +190,6 @@ void make_fields() {
   FIELD_ALLOC(tempmat2, matrix);
 
   node0_printf("Mallocing %.1f MBytes per core for fields\n",
-               (double)sites_on_node * 61 * sizeof(matrix) / 1e6);
+               (double)sites_on_node * 62 * sizeof(matrix) / 1e6);
 }
 // -----------------------------------------------------------------

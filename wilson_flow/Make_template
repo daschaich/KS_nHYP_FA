@@ -49,11 +49,11 @@ MY_OBJECTS = control.o         \
              stout_step_rk.o   \
              blocked_gauge_loops.o
 
-# Basic set from generic directory (alphabetically)
+# Basic set from generic directory
 G_OBJECTS = check_unitarity.o \
             field_strength.o  \
             io_helpers.o      \
-            io_lat4.o         \
+            io_lat.o          \
             io_lat_utils.o    \
             linktrsum.o       \
             make_lattice.o    \
@@ -73,7 +73,7 @@ G_NHYP_OBJECTS = nhyp.o
 ifeq ($(strip ${HAVEQDP}),true)
   LAYOUT = layout_qdp.o # Required
 else
-  LAYOUT = layout_hyper_prime.o # (layout_squares.o doesn't compile)
+  LAYOUT = layout_hyper_prime.o
 endif
 
 ADD_OBJECTS = ${MACHINE_DEP_IO} ${COMMPKG} ${QDP_OBJECTS} ${SCIDAC_OBJECTS}

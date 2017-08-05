@@ -2,11 +2,7 @@
 // Main procedure for SU(3) Kogut--Susskind spectrum
 #define CONTROL
 #include "spectrum_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 int main(int argc, char **argv) {
   int iters, prompt;
   double dtime;
@@ -36,7 +32,7 @@ int main(int argc, char **argv) {
 //  node0_printf("GFIX SKIPPED\n");
   rephase(OFF);
   gaugefix(TUP, 1.8, 500, GAUGE_FIX_TOL,
-           F_OFFSET(tempmat1), F_OFFSET(tempvec[0]), 0, NULL, NULL,
+           F_OFFSET(gfix_scratch), F_OFFSET(tempvec[0]), 0, NULL, NULL,
            0, NULL, NULL);
 
   rephase(ON);
@@ -50,8 +46,7 @@ int main(int argc, char **argv) {
   block_and_fatten();
   iters = fpi_2(&mass);
   iters += spectrum2(mass, F_OFFSET(chi), F_OFFSET(psi));
-  iters += nl_spectrum(mass, F_OFFSET(chi), F_OFFSET(psi),
-                       F_OFFSET(tempmat1), F_OFFSET(tempmat2));
+  iters += nl_spectrum(mass, F_OFFSET(chi), F_OFFSET(psi));
 
   // More pseudoscalar tastes...
   iters += spectrum_nlpi2(mass, mass);
