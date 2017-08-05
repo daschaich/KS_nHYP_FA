@@ -41,8 +41,8 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
     clear_latvec(psi_off, EVENANDODD);
 //    miters = mat_invert_uml(F_OFFSET(g_rand), psi_off, chi_off, mass);
     // Adapted from mat_invert.c "preconditioning": chi <- M^dag * g_rand
-    dslash(F_OFFSET(g_rand), F_OFFSET(ttt1[0]), EVENANDODD);
-    scalar_mult_add_latvec(F_OFFSET(ttt1[0]), F_OFFSET(g_rand),
+    dslash(F_OFFSET(g_rand), F_OFFSET(ttt), EVENANDODD);
+    scalar_mult_add_latvec(F_OFFSET(ttt), F_OFFSET(g_rand),
                            -2.0 * mass, chi_off, EVENANDODD);
     scalar_mult_latvec(chi_off, -1.0, chi_off, EVENANDODD);
     miters = ks_congrad(chi_off, psi_off, mass, EVENANDODD);
@@ -156,8 +156,8 @@ int meas_link(field_offset chi_off, field_offset psi_off, Real mass) {
       clear_latvec(psi_off, EVENANDODD);
 //      mat_invert_uml(F_OFFSET(M_inv), psi_off, chi_off, mass);
       // Adapted from mat_invert.c "preconditioning": temp <- M^dag * M_inv
-      dslash(F_OFFSET(M_inv), F_OFFSET(ttt1[0]), EVENANDODD);
-      scalar_mult_add_latvec(F_OFFSET(ttt1[0]), F_OFFSET(M_inv),
+      dslash(F_OFFSET(M_inv), F_OFFSET(ttt), EVENANDODD);
+      scalar_mult_add_latvec(F_OFFSET(ttt), F_OFFSET(M_inv),
                              -2.0 * mass, chi_off, EVENANDODD);
       scalar_mult_latvec(chi_off, -1.0, chi_off, EVENANDODD);
       ks_congrad(chi_off, psi_off, mass, EVENANDODD);

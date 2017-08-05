@@ -43,7 +43,7 @@ typedef struct {
   vector mp;                // CG temporary vector
   vector r;                 // CG residual vector
   vector ttt;               // For ../generic_ks/mat_invert.c
-                                // and ../generic_ks/flavor_ops.c
+                            // and ../generic_ks/flavor_ops.c
   vector M_inv;
 
   // Spectrum stuff

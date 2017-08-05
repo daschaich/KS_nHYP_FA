@@ -25,31 +25,9 @@
 int setup();
 int readin(int prompt);
 void grsource_imp();
-void dslash(field_offset chi, field_offset psi, int parity);
 
-// CG stuff
-int CG_wrapper(field_offset src, vector **props, Real M, int parity);
-int ks_congrad(field_offset src, field_offset dest, Real M, int parity);
-
-// Dslash stuff and associated helper functions
-// (latter were in v6/generic_ks/d_congrad5.c for some reason)
-void dslash_wrapper(vector *src, vector *dest, int parity);
-void dslash(field_offset chi, field_offset psi, int parity);
-void dslash_special(field_offset chi, field_offset psi, int parity,
-                    msg_tag **tag, int start);
-void clear_latvec(field_offset v, int parity);
-void copy_latvec(field_offset src, field_offset dest, int parity);
-void scalar_mult_latvec(field_offset src, Real scalar,
-                        field_offset dest, int parity);
-void scalar_mult_add_latvec(field_offset src1, field_offset src2,
-                            Real scalar, field_offset dest, int parity);
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
 // Order parameter routines
-void d_plaquette_a(double *ss_plaq, double *st_plaq);
+void plaquette_a(double *ss_plaq, double *st_plaq);
 void meas_plaq();
 int meas_link(field_offset chi, field_offset psi, Real mass);
 // -----------------------------------------------------------------

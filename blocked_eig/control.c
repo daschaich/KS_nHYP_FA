@@ -1,12 +1,8 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) MCRG-blocked measuremenst
+// Main procedure for MCRG-blocked measuremenst
 #define CONTROL
 #include "block_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 int main(int argc, char *argv[])  {
   register int i, dir, ismear, ivec;
   register site *s;
@@ -47,11 +43,11 @@ int main(int argc, char *argv[])  {
                  (double)xplp.real, (double)xplp.imag);
 
     // Allocate fields used by integrator -- must not be used after blocking
-    FIELD_ALLOC(tempmat1, matrix);
+    FIELD_ALLOC(tempmat, matrix);
     FIELD_ALLOC(tempmat2, matrix);
-    for (dir = 0; dir < 4; dir++) {
-      S[dir] = (matrix *)malloc(sites_on_node * sizeof(matrix));
-      A[dir] = (anti_hermitmat *)malloc(sites_on_node * sizeof(anti_hermitmat));
+    FORALLUPDIR(dir) {
+      S[dir] = malloc(sites_on_node * sizeof(matrix));
+      A[dir] = malloc(sites_on_node * sizeof(anti_hermitmat));
     }
 
     // Wilson flow!
@@ -61,7 +57,7 @@ int main(int argc, char *argv[])  {
     else
       node0_printf("No Wilson flow\n");
 
-    for (istep = 0; fabs(t) <  fabs(tmax) - fabs(epsilon) / 2; istep++) {
+    for (istep = 0; fabs(t) < 0.5 * (fabs(tmax) - fabs(epsilon)); istep++) {
       stout_step_rk(S, A);
       t += epsilon;
 
@@ -108,14 +104,14 @@ int main(int argc, char *argv[])  {
       topo /= (volume * 64 * 0.02533029591058444286); // 1/4pi^2
 
       // Check with plaquette
-      d_plaquette(&ssplaq, &stplaq);
+      plaquette(&ssplaq, &stplaq);
       td = (ssplaq + stplaq) / 2;
       check = 12 * t * t * (3 - td);
       node0_printf("WFLOW %g %g %g %g %g %g %g\n",
                    t, td, E, new_value, der_value, check, topo);
     }
     // Free fields used by integrator
-    free(tempmat1);
+    free(tempmat);
     free(tempmat2);
     for (dir = 0; dir < 4; dir++) {
       free(S[dir]);
@@ -252,7 +248,7 @@ int main(int argc, char *argv[])  {
           gauge_field_thin[dir][i] = gauge_field[dir][i];
       }
       rephase(OFF);
-      d_plaquette(&ssplaq, &stplaq);
+      plaquette(&ssplaq, &stplaq);
       node0_printf("Plaquettes after smearing %d: %.8g %.8g\n",
                    ismear + 1, ssplaq, stplaq);
       rephase(ON);
@@ -260,11 +256,11 @@ int main(int argc, char *argv[])  {
       fflush(stdout);
     }
 
-    // Allocate eigenvectors
-    eigVal = (double *)malloc(Nvecs * sizeof(double));
-    eigVec = (vector **)malloc(Nvecs * sizeof(vector *));
+    // Allocate eigenvectors now that we know Nvecs
+    eigVal = malloc(Nvecs * sizeof(double));
+    eigVec = malloc(Nvecs * sizeof(vector *));
     for (i = 0; i < Nvecs; i++)
-      eigVec[i] = (vector *)malloc(sites_on_node * sizeof(vector));
+      eigVec[i] = malloc(sites_on_node * sizeof(vector));
 
     // Hard-code EVEN parity in Kalkreuter
     total_iters = Kalkreuter(eigVec, eigVal, eig_tol, error_decr,

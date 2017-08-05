@@ -1,9 +1,8 @@
 // -----------------------------------------------------------------
-// SU(3) MCRG-blocked measurements setup
-#include "block_includes.h"
+// Blocked measurements setup
 #include <string.h>
+#include "block_includes.h"
 
-int initial_set();
 #define IF_OK if (status == 0)
 
 // Each node has a params structure for passing simulation parameters
@@ -16,7 +15,7 @@ params par_buf;
 // -----------------------------------------------------------------
 // On node zero, read lattice size, seed, and send to others
 int initial_set() {
-  int prompt, status;
+  int prompt = 0, status = 0;
   if (mynode() == 0) {
     // Print banner
     printf("SU(3) Kogut--Susskind blocked eigenvalues\n");
@@ -39,7 +38,7 @@ int initial_set() {
     IF_OK status += get_i(stdin, prompt, "nt", &par_buf.nt);
     IF_OK status += get_i(stdin, prompt, "iseed", &par_buf.iseed);
 
-    if(status > 0)
+    if (status > 0)
       par_buf.stopflag = 1;
     else
       par_buf.stopflag = 0;
@@ -77,7 +76,7 @@ void make_fields() {
   FIELD_ALLOC_MAT_OFFDIAG(Staple1, matrix, 4);
   FIELD_ALLOC_MAT_OFFDIAG(Staple2, matrix, 4);
   FIELD_ALLOC_VEC(Staple3, matrix, 4);
-  FIELD_ALLOC(tempmat1, matrix);
+  FIELD_ALLOC(tempmat, matrix);
   FIELD_ALLOC(tempmat2, matrix);
 
   // Check the total number of matrices; this may not be accurate
@@ -92,21 +91,21 @@ void make_fields() {
 // Free all fields allocated by make_fields
 void free_fields() {
   register int dir, dir2;
-  for (dir = 0; dir < 4; dir++) {
+  FORALLUPDIR(dir) {
     free(gauge_field[dir]);
     free(gauge_field_thin[dir]);
     free(Staple3[dir]);
 
-    for (dir2 = 0; dir2 < 4; dir2++) {
-      if(dir != dir2) {
-        free(hyplink1[dir][dir2]);
-        free(hyplink2[dir][dir2]);
-        free(Staple1[dir][dir2]);
-        free(Staple2[dir][dir2]);
-      }
+    FORALLUPDIR(dir2) {
+      if (dir == dir2)
+        continue;
+      free(hyplink1[dir][dir2]);
+      free(hyplink2[dir][dir2]);
+      free(Staple1[dir][dir2]);
+      free(Staple2[dir][dir2]);
     }
   }
-  free(tempmat1);
+  free(tempmat);
   free(tempmat2);
 }
 // -----------------------------------------------------------------

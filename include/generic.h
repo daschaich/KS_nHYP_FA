@@ -19,12 +19,6 @@
 
 
 // -----------------------------------------------------------------
-/* ax_gauge.c */
-void ax_gauge();
-
-/* bsd_sum.c */
-int32type bsd_sum (char *data, int32type total_bytes);
-
 // check_unitarity.c
 Real check_unitarity();
 
@@ -43,14 +37,11 @@ void plaquette(double *ss_plaq, double *st_plaq);
 // field_dest is offset for matrix fieldstrength[6] in site struct
 void make_field_strength(field_offset link_src, field_offset field_dest);
 
-/* gaugefix.c and gaugefix2.c */
+// gaugefix.c
 void gaugefix(int gauge_dir,Real relax_boost,int max_gauge_iter,
-        Real gauge_fix_tol, field_offset diffmat, field_offset sumvec,
-        int nvector, field_offset vector_offset[], int vector_parity[],
-        int nantiherm, field_offset antiherm_offset[], int antiherm_parity[]);
-
-/* gauge_force_imp.c and gauge_force_symzk1_qop.c */
-void imp_gauge_force(Real eps, field_offset mom_off );
+              Real gauge_fix_tol, field_offset diffmat, field_offset sumvec,
+              int nvector, field_offset vec_offset[], int vec_parity[],
+              int nantiherm, field_offset ah_offset[], int ah_parity[]);
 
 /* gauge_stuff.c */
 double imp_gauge_action();
@@ -99,12 +90,6 @@ int get_s(FILE *fp, int prompt, char *variable_name_string, char *value );
 int get_sn(FILE *fp, int prompt, char *variable_name_string, char *value );
 int get_vs(FILE *fp, int prompt, char *tag, char *value[], int nvalues );
 int get_prompt(FILE *fp, int *value );
-
-/* io_source_cmplx_fm.c */
-void r_source_cmplx_fm_to_site(char *filename, field_offset dest_site,
-             int t0, int source_type);
-void r_source_cmplx_fm_to_field(char *filename, complex *dest_field,
-        int t0, int source_type);
 
 /* layout_*.c */
 int io_node(const int node);
@@ -179,13 +164,6 @@ void restrict_fourier_field(
           is 3 complex numbers. */
      int isign);   /* 1 for x -> k, -1 for k -> x */
 void cleanup_restrict_fourier();
-
-/* show_generic_opts.c */
-void show_generic_opts();
-
-/* Do Morninstar-Peardon stout smearing to construct unitary W from
-   smeared link V and unsmeared link U */
-void stout_smear(matrix *W, matrix *V, matrix *U);
 
 /* For quark source and sink routines - both Wilson and KS */
 /* The Weyl representation types are included for w_source_h */

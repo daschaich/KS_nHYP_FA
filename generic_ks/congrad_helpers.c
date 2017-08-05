@@ -1,12 +1,10 @@
 // -----------------------------------------------------------------
-// Helper functions copied from generic_ks/d_congrad5.c and
-// generic_ks/dslash.c
-
-#include "ks_dyn_includes.h"
+// Helper functions for CG
 #include "../include/prefetch.h"
 #define FETCH_UP 1
 #define LOOPEND   // For loopend.h
 #include "../include/loopend.h"
+#include "generic_ks_includes.h"
 // -----------------------------------------------------------------
 
 

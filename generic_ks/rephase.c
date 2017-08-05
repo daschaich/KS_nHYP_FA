@@ -76,7 +76,7 @@ void rephase(int flag) {
   }
 
   FORALLSITES(i, s) {
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       for (j = 0; j < 3; j++) {
         for (k = 0; k < 3; k++) {
           s->link[dir].e[j][k].real *= s->phase[dir];

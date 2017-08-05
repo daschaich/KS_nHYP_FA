@@ -48,7 +48,7 @@ void scalar_mult_add_latvec(field_offset src1, field_offset src2,
 
 // -----------------------------------------------------------------
 // Order parameter routines
-void d_plaquette_a(double *ss_plaq, double *st_plaq);
+void plaquette_a(double *ss_plaq, double *st_plaq);
 void meas_plaq();
 int meas_link(field_offset chi, field_offset psi, Real mass);
 // -----------------------------------------------------------------

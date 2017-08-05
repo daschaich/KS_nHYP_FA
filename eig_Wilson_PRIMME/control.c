@@ -1,6 +1,5 @@
 // -----------------------------------------------------------------
 // Main procedure for calculating hermitian-Wilson eigenvalues
-// Includes and definitions
 #define CONTROL
 #include "eig_includes.h"
 // -----------------------------------------------------------------
@@ -35,12 +34,12 @@ int main(int argc, char *argv[]) {
   // Print out plaquette each time (unsmeared plaquette printed by setup)
   for (ismear = 0; ismear < nsmear; ismear++) {
     unphased_block_and_fatten();   // Smears gauge_field_thin into gauge_field
-    for (dir = XUP; dir <= TUP; dir++) {
+    FORALLUPDIR(dir) {
       FORALLSITES(i, s)
         gauge_field_thin[dir][i] = gauge_field[dir][i];
     }
 
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     node0_printf("Plaquettes after smearing %d: %.8g %.8g\n",
         ismear + 1, ssplaq, stplaq);
   }
@@ -49,13 +48,12 @@ int main(int argc, char *argv[]) {
   // Turn on anti-periodic boundary conditions
   boundary_flip_nhyp(MINUS);
 
-  // Allocate eigenvectors
-  eigVal = (double *)malloc(Nvecs * sizeof(double));
-  eigVec = (wilson_vector **)malloc(Nvecs * sizeof(wilson_vector *));
+  // Allocate eigenvectors now that we know Nvecs
+  eigVal = malloc(Nvecs * sizeof(double));
+  eigVec = malloc(Nvecs * sizeof(wilson_vector *));
   for (ivec = 0; ivec < Nvecs; ivec++)
-    eigVec[ivec] = (wilson_vector *)
-      malloc(sites_on_node * sizeof(wilson_vector));
-  tmpvec = (wilson_vector *) malloc(sites_on_node * sizeof(wilson_vector));
+    eigVec[ivec] = malloc(sites_on_node * sizeof(wilson_vector));
+  tmpvec = malloc(sites_on_node * sizeof(wilson_vector));
 
   // Compute the eigenvectors
   total_iters = make_evs(Nvecs, eigVec, eigVal);

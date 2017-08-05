@@ -22,6 +22,22 @@
 
 
 // -----------------------------------------------------------------
+// congrad.c
+void dslash(field_offset chi, field_offset psi, int parity);
+void dslash_special(field_offset chi, field_offset psi, int parity,
+                    msg_tag **tag, int start);
+int ks_congrad(field_offset src, field_offset dest, Real M, int parity);
+
+// congrad_helpers.c
+void cleanup_one_gather_set(msg_tag *tags[]);
+void cleanup_gathers(msg_tag *tags1[], msg_tag *tags2[]);
+void clear_latvec(field_offset v, int parity);
+void copy_latvec(field_offset src, field_offset dest, int parity);
+void scalar_mult_latvec(field_offset src, Real scalar,
+                        field_offset dest, int parity);
+void scalar_mult_add_latvec(field_offset a, field_offset b,
+                            Real scalar, field_offset c, int parity);
+
 // rephase.c
 void phaseset();
 void rephase(int flag);
@@ -58,8 +74,8 @@ int mat_invert_uml(field_offset src, field_offset dest,
 int nl_spectrum(Real vmass, field_offset tempvec1, field_offset tempvec2,
                 field_offset tempmat1, field_offset tempmat2);
 
-/* show_generic_ks_opts.c */
-void show_generic_ks_opts();
+// rephase.c
+void rephase(int flag);
 
 // spectrum2.c
 int spectrum2(Real vmass, field_offset temp1, field_offset temp2);

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// SU(3) MCRG-blocked measurements setup
+// MCRG-blocked measurements setup
 #include <string.h>
 #include "mcrg_includes.h"
 

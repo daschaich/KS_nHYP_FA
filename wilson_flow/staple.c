@@ -46,8 +46,7 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
 
   // Calculate upper staple, add it
   FORALLSITES(i, s) {
-    mult_su3_nn((matrix *)F_PT(s, lnk2), (matrix *)gen_pt[1][i],
-                &tmat);
+    mult_su3_nn((matrix *)F_PT(s, lnk2), (matrix *)gen_pt[1][i], &tmat);
     mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
     sum_matrix(&tmat2, &(stp[i]));
   }
@@ -66,7 +65,7 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
 
 
 // -----------------------------------------------------------------
-// Sums staples for direction dir over all other directions
+// Sum staples for direction dir over all other directions
 void staple(matrix *stp[NDIMS]) {
   register int i;
   register site *s;
@@ -77,9 +76,10 @@ void staple(matrix *stp[NDIMS]) {
       clear_mat(&(stp[dir][i]));
 
     FORALLUPDIR(dir2) {
-      if (dir != dir2)
-        directional_staple(dir, dir2, F_OFFSET(link[dir]),
-                           F_OFFSET(link[dir2]), stp[dir]);
+      if (dir == dir2)
+        continue;
+      directional_staple(dir, dir2, F_OFFSET(link[dir]),
+                         F_OFFSET(link[dir2]), stp[dir]);
     }
   }
 }

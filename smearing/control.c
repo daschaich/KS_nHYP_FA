@@ -3,11 +3,7 @@
 // Includes and definitions
 #define CONTROL
 #include "smearing_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 int main(int argc, char *argv[]) {
   int ismear, prompt;
   double ssplaq, stplaq, dtime;
@@ -29,11 +25,11 @@ int main(int argc, char *argv[]) {
   dtime = -dclock();
 
   // Smear however many times requested, monitoring plaquette
-  d_plaquette(&ssplaq, &stplaq);
+  plaquette(&ssplaq, &stplaq);
   node0_printf("Plaquettes before smearing:  %.8g %.8g\n", ssplaq, stplaq);
   for (ismear = 0; ismear < nsmear; ismear++) {
     unphased_block_and_fatten();
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     node0_printf("Plaquettes after smearing %d: %.8g %.8g\n",
                  ismear + 1, ssplaq, stplaq);
   }
@@ -46,7 +42,7 @@ int main(int argc, char *argv[]) {
     gtime += dclock();
     node0_printf("GFIX time = %.4g seconds\n", gtime);
 
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     node0_printf("Plaquettes after gauge fix:  %.8g %.8g\n", ssplaq, stplaq);
   }
   else if (fixflag == NO_GAUGE_FIX) { // Braces suppress compiler warning

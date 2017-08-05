@@ -38,15 +38,13 @@ HEADERS = ${GLOBAL_HEADERS} ${MY_HEADERS}
 # Basic set from current directory
 MY_OBJECTS = control.o    \
              setup.o      \
-             gauge_info.o \
-             congrad.o    \
-             congrad_helpers.o
+             gauge_info.o
 
 # Basic set from generic directory (alphabetically)
 G_OBJECTS = check_unitarity.o \
-            gaugefix2.o       \
+            gaugefix.o       \
             io_helpers.o      \
-            io_lat4.o         \
+            io_lat.o          \
             io_lat_utils.o    \
             linktrsum.o       \
             make_lattice.o    \
@@ -61,18 +59,20 @@ ifeq ($(strip ${HAVEQIO}),true)
 endif
 
 # Basic set from generic_ks directory
-G_KS_OBJECTS = fpi_2.o       \
-               nl_spectrum.o \
-               rephase.o     \
-               spectrum2.o   \
-               mat_invert.o  \
-               flavor_ops.o  \
+G_KS_OBJECTS = congrad.o         \
+               congrad_helpers.o \
+               flavor_ops.o      \
+               fpi_2.o           \
+               mat_invert.o      \
+               nl_spectrum.o     \
+               rephase.o         \
+               spectrum2.o       \
                spectrum_nlpi2.o
 
 # Basic set from generic_nhyp directory
-G_NHYP_OBJECTS = nhyp.o       \
-                 block_nhyp.o \
-                 switch.o
+G_NHYP_OBJECTS = nhyp.o   \
+                 switch.o \
+                 block_nhyp.o
 
 # Selection of layout
 ifeq ($(strip ${HAVEQDP}),true)

@@ -1,0 +1,21 @@
+prompt 0
+nflavors 12
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+beta 6
+beta_a -0.25
+mass 0.01
+
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+npbp 5
+max_cg_iterations 500
+max_cg_restarts 1
+error_per_site 1e-5
+reload_serial config.4444

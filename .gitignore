@@ -6,10 +6,12 @@
 .lastmake*
 gmon.out
 localmake
+su3_block
 su3_hmc*
 su3_Wflow
 su3_vacpol
 su3_mcrg
 su3_mode*
+su3_S4b
 su3_spectrum
 approx_for_modenumber

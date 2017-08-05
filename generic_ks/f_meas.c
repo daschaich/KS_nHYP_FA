@@ -5,7 +5,6 @@
 // ferm_links_t, DM_DU0 and CHEM_POT stuff stripped out
 
 // Stuck CG helpers in this directory
-#include "../KS_nHYP_FA/ks_dyn_includes.h"
 #include "generic_ks_includes.h"
 // -----------------------------------------------------------------
 
@@ -19,7 +18,7 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
   int jpbp_reps, tot_iters = 0, miters, npbp_reps = 1;
   Real r_pbp_even, i_pbp_even, r_pbp_odd, i_pbp_odd, r_ferm_action;
   double rfaction;
-  complex cc;
+  complex tc;
   double_complex pbp_e, pbp_o;
 
 #ifdef NPBP_REPS
@@ -44,17 +43,17 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
     // Fermion action = chi.psi
     // pbp on even sites = g_rand.psi
     FOREVENSITES(i, s) {
-      cc = su3_dot((vector *)F_PT(s, chi_off),
+      tc = su3_dot((vector *)F_PT(s, chi_off),
                    (vector *)F_PT(s, psi_off));
-      rfaction += cc.real;
-      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
-      CSUM(pbp_e, cc);
+      rfaction += tc.real;
+      tc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
+      CSUM(pbp_e, tc);
     }
 
     // pbp on odd sites
     FORODDSITES(i, s) {
-      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
-      CSUM(pbp_o, cc);
+      tc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
+      CSUM(pbp_o, tc);
     }
     g_dcomplexsum(&pbp_o);
     g_dcomplexsum(&pbp_e);
@@ -79,8 +78,8 @@ int f_meas_imp(field_offset chi_off, field_offset psi_off, Real mass) {
     clear_latvec(psi_off, EVENANDODD);
     mat_invert_uml(F_OFFSET(M_inv), psi_off, chi_off, mass);
     FORALLSITES(i, s) {
-      cc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
-      pbp_pbp += cc.real;
+      tc = su3_dot(&(s->g_rand), (vector *)F_PT(s, psi_off));
+      pbp_pbp += tc.real;
     }
     g_doublesum(&pbp_pbp);
     pbp_pbp /= (double)volume;

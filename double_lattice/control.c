@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) MCRG-blocked measuremenst
+// Main procedure for lattice doubling
 #define CONTROL
 #include "double_includes.h"
 // -----------------------------------------------------------------
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])  {
     dtime = -dclock();
 
     // Check initial plaquette
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     node0_printf("Initial plaquettes: %.8g %.8g\n", ssplaq, stplaq);
 
     // Allocate backup space and save links along with corresponding index
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])  {
     }
 
     // Check final plaquette
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     node0_printf("Final plaquettes: %.8g %.8g\n", ssplaq, stplaq);
 
     // Save lattice

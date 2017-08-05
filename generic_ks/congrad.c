@@ -27,12 +27,12 @@
 // parity = EVENANDODD: do all sites
 
 // Includes and definitions
-#include "mode_includes.h"
 #include "../generic_ks/generic_ks_includes.h"
 #include "../include/prefetch.h"
 #define FETCH_UP 1
 #define LOOPEND   // For loopend.h
 #include "../include/loopend.h"
+#include "generic_ks_includes.h"
 // -----------------------------------------------------------------
 
 
@@ -140,10 +140,6 @@ void dslash(field_offset chi, field_offset psi, int parity) {
 
   // Free buffers
   cleanup_one_gather_set(tag);
-//  for (dir = XUP; dir <= TUP; dir++) {
-//    cleanup_gather(tag[dir]);
-//    cleanup_gather(tag[OPP_DIR(dir)]);
-//  }
 }
 // -----------------------------------------------------------------
 

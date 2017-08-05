@@ -26,37 +26,24 @@
 int setup();
 int readin(int prompt);
 
-void rephase(int flag);
+// action.c
+double action();
 void gauge_field_copy(field_offset src, field_offset dest);
 
-// CG stuff
-int ks_congrad(field_offset src, field_offset dest, Real M, int parity);
+// CG wrapper
 void doCG(int level, Real M, int *iters);
-int update_step(Real *old_cg_time, Real *cg_time, Real *next_cg_time,
-                double *fnorm, double *gnorm);
-
-// Dslash stuff and associated helper functions
-void dslash(field_offset chi, field_offset psi, int parity);
-void dslash_special(field_offset chi, field_offset psi, int parity,
-                    msg_tag **tag, int start);
-void cleanup_one_gather_set(msg_tag *tags[]);
-void clear_latvec(field_offset v, int parity);
-void copy_latvec(field_offset src, field_offset dest, int parity);
-void scalar_mult_latvec(field_offset src, Real scalar,
-                        field_offset dest, int parity);
-void scalar_mult_add_latvec(field_offset a, field_offset b,
-                            Real scalar, field_offset c, int parity);
 
 // Evolution stuff
 void grsource_imp(field_offset dest, Real mass, int parity);
 void grsource_Hasen(field_offset dest, int *iters, int parity);
-double action();
 void plaquette_a(double *ss_plaq, double *st_plaq);
 void meas_plaq();
 int meas_link(field_offset chi, field_offset psi, Real mass);
 int update();
 void update_h(Real eps);
 void update_u(Real eps);
+int update_step(Real *old_cg_time, Real *cg_time, Real *next_cg_time,
+                double *fnorm, double *gnorm);
 double gauge_force(Real eps);
 double fermion_force(int level, Real eps);
 

@@ -46,7 +46,7 @@ EXTERN char startfile[MAXFILENAME];
 EXTERN int startflag;   // Beginning lattice: CONTINUE, RELOAD, FRESH
 
 // Some of these global variables are node dependent
-// They are set in "make_lattice()"
+// They are set in make_lattice
 EXTERN int sites_on_node;       // Number of sites on this node
 EXTERN int even_sites_on_node;  // Number of even sites on this node
 EXTERN int odd_sites_on_node;   // Number of odd sites on this node
@@ -88,6 +88,5 @@ EXTERN matrix *tempmat, *tempmat2;
 EXTERN int num_alpha;
 EXTERN Real alpha_smear[3];
 EXTERN Real alpha_mcrg[100];    // Probably overkill
-
 #endif
 // -----------------------------------------------------------------

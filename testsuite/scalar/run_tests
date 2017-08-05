@@ -9,6 +9,7 @@ if [ $# -lt 2 ]; then
   echo "./run_tests wilson_flow Wflow"
   echo "./run_tests ks_vacpol vacpol && rm -f ../*TEST"
   echo "./run_tests mcrg_blocking mcrg"
+  echo "./run_tests S4b_params S4b"
   echo "./run_tests mode_number mode"
   echo "./run_tests mode_number mode_APBC"
   echo "./run_tests ks_spectrum spectrum"

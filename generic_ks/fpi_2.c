@@ -13,8 +13,6 @@
 // Sources normalized by a factor of 2 (twice the usual convention)
 // since ks_congrad inverts matrix with 2m on diagonal,
 
-// Stuck CG wrappers in this directory
-#include "../ks_spectrum/spectrum_includes.h"
 #include "generic_ks_includes.h"
 #include <string.h>
 
@@ -34,7 +32,36 @@ enum prop_name {
 
 
 // -----------------------------------------------------------------
-// Stripped ferm_links_t
+// Wrappers for dslash and CG
+// Just call dslash on src and copy result into dest
+// Use psi in site for temporary storage
+void dslash_wrapper(vector *src, vector *dest, int parity) {
+  register int i;
+  register site *s;
+
+  FORALLSITES(i, s)
+    vec_copy(&(src[i]), &(s->chi));
+  dslash(F_OFFSET(chi), F_OFFSET(psi), parity);
+  FORALLSITES(i, s)
+    vec_copy(&(s->psi), &(dest[i]));
+}
+
+// Just call CG on chi and copy result into props[0]
+// Use psi in site for temporary storage
+int CG_wrapper(field_offset chi, vector **props, Real m, int parity) {
+  register int i, iter;
+  register site *s;
+
+  iter = ks_congrad(chi, F_OFFSET(psi), m, parity);
+  FORALLSITES(i, s)
+    vec_copy(&(s->psi), &(props[0][i]));
+  return iter;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
 // Single mass hard-coded at the moment
 // n_src, src_start and src_inc need to be set by each application's setup.c
 // In general only propagators with m1 <= m2 are printed

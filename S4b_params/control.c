@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) S4b order parameters
+// Main procedure for S4b order parameters
 #define CONTROL
 #include "S4b_includes.h"
 // -----------------------------------------------------------------
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
     // Take out the staggered phases to measure gauge observables
     rephase(OFF);
-    d_plaquette(&ssplaq, &stplaq);
+    plaquette(&ssplaq, &stplaq);
     plp = ploop(TUP);
     xplp = ploop(XUP);
     node0_printf("GMES %.8g %.8g 0 %.8g %.8g\n",    // No update step
@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
                  plp.real, plp.imag, xplp.real, xplp.imag);
 
-    // Action adds adjoint plaquette term
-    d_plaquette_a(&ssplaq, &stplaq);
+    // Add adjoint plaquette term to action
+    plaquette_a(&ssplaq, &stplaq);
     act = (ssplaq + stplaq) / 2;
     node0_printf("ACT %.8g\n", act);
     rephase(ON);
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     // Even and odd plaquettes and links in various directions
     block_and_fatten();
     rephase(OFF);
-    d_plaquette(&ssplaq, &stplaq);    // To check meas_plaq()
+    plaquette(&ssplaq, &stplaq);    // To check meas_plaq()
     node0_printf("Plaquettes after smearing: %.8g %.8g\n", ssplaq, stplaq);
     meas_plaq();
     rephase(ON);

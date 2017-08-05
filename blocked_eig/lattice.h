@@ -4,9 +4,9 @@
 #define _LATTICE_H
 
 #include "defines.h"
-#include "../include/macros.h"  // For MAXFILENAME
+#include "../include/macros.h"    // For MAXFILENAME
 #include "../include/generic_quark_types.h"
-#include "../include/io_lat.h"  // For gauge_file
+#include "../include/io_lat.h"    // For gauge_file
 #include "../include/su3.h"
 #include "../include/random.h"    // For double_prn
 
@@ -49,16 +49,18 @@ typedef struct {
   vector p;                 // CG change vector
   vector mp;                // CG temporary vector
   vector r;                 // CG residual vector
-  vector ttt1[1];           // For ../generic_ks/mat_invert.c
+  vector ttt;               // For ../generic_ks/mat_invert.c
+                            // and ../generic_ks/flavor_ops.c
   vector M_inv;
 
   // Temporary vectors and matrices
   vector temp;                  // For Matrix_Vec_mult
   vector tempvec[4];            // For dslash
+  matrix tempmat1, tempmat2, staple;
   matrix fieldstrength[6];      // For Wilson flow
 
-  // Accumulators for Wilson and Polyakov loops
-  matrix hyplink1[12], hyplink2[12], tempmat1, tempmat2, staple;
+  // HYP stuff
+  matrix hyplink1[12], hyplink2[12];
 } site;
 // -----------------------------------------------------------------
 
@@ -82,7 +84,7 @@ EXTERN Real mass, rsqmin;
 
 EXTERN int total_iters;
 EXTERN int phases_in;   // Flag if KS and BC phases absorbed into matrices
-EXTERN double g_ssplaq, g_stplaq;
+EXTERN double g_ssplaq, g_stplaq;   // Global plaqs for I/O
 EXTERN double_complex linktr;
 EXTERN u_int32type nersc_checksum;
 EXTERN char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
@@ -100,7 +102,7 @@ EXTERN int maxIter;       // max  Rayleigh iterations
 EXTERN int restart;       // Restart  Rayleigh every so many iterations
 EXTERN int kiters;        // Kalkreuter iterations
 // Some of these global variables are node dependent
-// They are set in "setup_layout()"
+// They are set in make_lattice
 EXTERN int sites_on_node;       // Number of sites on this node
 EXTERN int even_sites_on_node;  // Number of even sites on this node
 EXTERN int odd_sites_on_node;   // Number of odd sites on this node
@@ -141,21 +143,21 @@ EXTERN char **gen_pt[N_POINTERS];
 EXTERN matrix *gauge_field[4];
 EXTERN matrix *gauge_field_thin[4];
 
+// Temporary fields
+EXTERN matrix *tempmat, *tempmat2;
+
 // nHYP stuff
 EXTERN double alpha_store[3];
 EXTERN int nsmear;
 EXTERN double alpha_smear[3];
 EXTERN matrix *hyplink1[4][4];
 EXTERN matrix *hyplink2[4][4];
+
 EXTERN matrix *Staple1[4][4];
 EXTERN matrix *Staple2[4][4];
 EXTERN matrix *Staple3[4];
 
-// Used and freed in Wilson flow calculation
-EXTERN matrix *tempmat1;
-EXTERN matrix *tempmat2;    // Used in Polyakov loop calculation
-
 // Wilson flow stuff
 EXTERN double epsilon, tmax;
-#endif // _LATTICE_H
+#endif
 // -----------------------------------------------------------------

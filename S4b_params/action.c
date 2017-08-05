@@ -3,15 +3,10 @@
 // When this routine is called the conjugate gradient should already
 // have been run on both even and odd sites, depending on Nf
 // The vectors psi1 and psi2 contain (M^dag.M)^(-1) chi
-
 #include "S4b_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 // Adds adjoint plaquette term
-void d_plaquette_a(double *ss_plaq, double *st_plaq) {
+void plaquette_a(double *ss_plaq, double *st_plaq) {
   register int i, dir1, dir2;
   register site *s;
   register matrix *m1, *m4;
@@ -24,7 +19,7 @@ void d_plaquette_a(double *ss_plaq, double *st_plaq) {
   st_sum = 0;
   mat = (matrix *)malloc(sizeof(matrix) * sites_on_node);
   if (mat == NULL) {
-    printf("d_plaquette_a: can't malloc mat\n");
+    printf("plaquette_a: can't malloc mat\n");
     fflush(stdout);
     terminate(1);
   }

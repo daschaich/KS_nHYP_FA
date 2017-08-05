@@ -1,12 +1,8 @@
 // -----------------------------------------------------------------
-// Main procedure for SU(3) Wilson flow
+// Main procedure for Wilson flow
 #define CONTROL
 #include "wflow_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 int main(int argc, char *argv[])  {
   int prompt;
   double dtime;
