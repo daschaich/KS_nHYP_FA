@@ -554,7 +554,7 @@ void hop_w_field( wilson_vector *src, wilson_vector *dest,
      to dest */
   wait_gather(tag[0]);
 
-  FORSOMEPARITYDOMAIN(i,s,parity){
+  FORSOMEPARITY(i,s,parity){
     mult_mat_hwvec( &(s->link[dir]), 
 			(half_wilson_vector * )(gen_pt[0][i]), &hwv ); 
     wp_grow( &hwv, &dest[i], dir, isign);

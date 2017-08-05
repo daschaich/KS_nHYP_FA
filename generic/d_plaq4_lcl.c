@@ -116,7 +116,7 @@ double *plaq_perp,*plaq_prll;
             }
 /* SF: space-space plaquettes only for t>0  */
             else {
-               FORALLSITESDOMAIN(i,s){
+               FORALLSITES(i,s){
 		  mult_su3_nn_f( &(mat[i]), (matrix_f *)(gen_pt[0][i]),
 			&mtmp);
                   cur_plaq = (double)
@@ -317,7 +317,7 @@ double *plaq_perp,*plaq_prll;
             }
 /* SF: space-space plaquettes only for t>0  */
             else {
-               FORALLSITESDOMAIN(i,s){
+               FORALLSITES(i,s){
 		  mult_su3_nn( &(mat[i]), (matrix *)(gen_pt[0][i]),
 			&mtmp);
                   cur_plaq = (double)

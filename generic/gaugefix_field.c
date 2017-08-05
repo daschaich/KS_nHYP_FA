@@ -78,7 +78,7 @@ void accum_gauge_hit(int gauge_dir,int parity)
 
   /* Subtract upward link contributions */
 
-  FORSOMEPARITYDOMAIN(i,s,parity)
+  FORSOMEPARITY(i,s,parity)
     {
       FORALLUPDIRBUT(gauge_dir,dir)
         {
@@ -91,7 +91,7 @@ void accum_gauge_hit(int gauge_dir,int parity)
 
   /* Add downward link contributions */
 
-  FORSOMEPARITYDOMAIN(i,s,parity)
+  FORSOMEPARITY(i,s,parity)
     {
       FORALLUPDIRBUT(gauge_dir,dir)
         {
@@ -118,7 +118,7 @@ void do_hit(int gauge_dir, int parity, int p, int q, Real relax_boost)
 
   accum_gauge_hit(gauge_dir,parity);
 
-  FORSOMEPARITYDOMAIN(i,s,parity)
+  FORSOMEPARITY(i,s,parity)
     {
       /* The SU(2) hit matrix is represented as a0 + i * Sum j (sigma j * aj)*/
       /* The locally optimum unnormalized components a0, aj are determined */
@@ -193,7 +193,7 @@ double get_gauge_fix_action(int gauge_dir,int parity)
 
   gauge_fix_action = 0.0;
 
-  FORSOMEPARITYDOMAIN(i,s,parity)
+  FORSOMEPARITY(i,s,parity)
     {
       FORALLUPDIRBUT(gauge_dir,dir)
 	{

@@ -38,7 +38,235 @@
 
 
 // -----------------------------------------------------------------
-// Stripped final_rsq and global variables from argument list
+// Dslash routine
+// Set psi on each site to sum of sources parallel transported to site,
+// with minus sign for transport from negative directions
+void dslash(field_offset chi, field_offset psi, int parity) {
+  register int i, dir, otherparity = EVEN;
+  register site *s;
+  register vector *a, *b1, *b2, *b3, *b4;
+  msg_tag *tag[8];
+
+  switch(parity) {
+    case EVEN:
+      otherparity = ODD;
+      break;
+    case ODD:
+      otherparity = EVEN;
+      break;
+    case EVENANDODD:
+      otherparity = EVENANDODD;
+      break;
+  }
+
+  // Start gathers from positive directions
+  FORALLUPDIR(dir) {
+    tag[dir] = start_gather_site(chi, sizeof(vector), dir, parity,
+                                 gen_pt[dir]);
+  }
+
+  // Multiply by adjoint matrix at other sites
+  FORSOMEPARITY(i, s, otherparity) {
+    if (i < loopend - FETCH_UP) {
+      prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
+                     (vector *)F_PT((s + FETCH_UP), chi),
+                     (s + FETCH_UP)->tempvec);
+    }
+    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
+  } END_LOOP
+
+  // Start gathers from negative directions
+  FORALLUPDIR(dir) {
+    tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
+                                          sizeof(vector), OPP_DIR(dir),
+                                          parity, gen_pt[OPP_DIR(dir)]);
+  }
+
+  // Wait gathers from positive directions
+  FORALLUPDIR(dir)
+    wait_gather(tag[dir]);
+
+  // Multiply by matrix and accumulate
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend - FETCH_UP) {
+      prefetch_V((vector *)F_PT(s + FETCH_UP, psi));
+      prefetch_4MVVVV(&((s + FETCH_UP)->link[XUP]),
+                      (vector *)gen_pt[XUP][i + FETCH_UP],
+                      (vector *)gen_pt[YUP][i + FETCH_UP],
+                      (vector *)gen_pt[ZUP][i + FETCH_UP],
+                      (vector *)gen_pt[TUP][i + FETCH_UP]);
+    }
+    mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
+                          (vector *)gen_pt[YUP][i],
+                          (vector *)gen_pt[ZUP][i],
+                          (vector *)gen_pt[TUP][i],
+                          (vector *)F_PT(s, psi));
+  } END_LOOP
+
+  // Wait gathers from negative directions
+  FORALLUPDIR(dir)
+    wait_gather(tag[OPP_DIR(dir)]);
+
+  // Accumulate (negative), with manually inlined subtractions
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend - FETCH_UP) {
+      prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[YDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[ZDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[TDOWN][i + FETCH_UP]);
+    }
+    a  = (vector *)F_PT(s, psi);
+    b1 = (vector *)(gen_pt[XDOWN][i]);
+    b2 = (vector *)(gen_pt[YDOWN][i]);
+    b3 = (vector *)(gen_pt[ZDOWN][i]);
+    b4 = (vector *)(gen_pt[TDOWN][i]);
+
+    CDIF(a->c[0], b1->c[0]);
+    CDIF(a->c[1], b1->c[1]);
+    CDIF(a->c[2], b1->c[2]);
+
+    CDIF(a->c[0], b2->c[0]);
+    CDIF(a->c[1], b2->c[1]);
+    CDIF(a->c[2], b2->c[2]);
+
+    CDIF(a->c[0], b3->c[0]);
+    CDIF(a->c[1], b3->c[1]);
+    CDIF(a->c[2], b3->c[2]);
+
+    CDIF(a->c[0], b4->c[0]);
+    CDIF(a->c[1], b4->c[1]);
+    CDIF(a->c[2], b4->c[2]);
+  } END_LOOP
+
+  // Free buffers
+  cleanup_one_gather_set(tag);
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Special dslash for use by CG
+// Uses restart_gather() when possible
+// Last argument is an array of message tags,
+// to be set if this is the first use, otherwise reused
+// If start = 1, use start_gather, otherwise use restart_gather
+// The calling program must clean up the gathers!
+void dslash_special(field_offset chi, field_offset psi, int parity,
+                    msg_tag **tag, int start) {
+
+  register int i, dir, otherparity = EVEN;
+  register site *s;
+  register vector *a, *b1, *b2, *b3, *b4;
+
+  switch(parity) {
+    case EVEN:
+      otherparity = ODD;
+      break;
+    case ODD:
+      otherparity = EVEN;
+      break;
+    case EVENANDODD:
+      otherparity = EVENANDODD;
+      break;
+  }
+
+  // Start gathers from positive directions
+  FORALLUPDIR(dir) {
+    if (start == 1)
+      tag[dir] = start_gather_site(chi, sizeof(vector), dir,
+                                   parity, gen_pt[dir]);
+    else
+      restart_gather_site(chi, sizeof(vector), dir,
+                          parity, gen_pt[dir], tag[dir]);
+  }
+
+  // Multiply by adjoint matrix at other sites
+  FORSOMEPARITY(i, s, otherparity) {
+    if (i < loopend - FETCH_UP) {
+      prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
+                     (vector *)F_PT((s + FETCH_UP), chi),
+                     (s + FETCH_UP)->tempvec);
+    }
+    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
+  } END_LOOP
+
+  // Start gathers from negative directions
+  FORALLUPDIR(dir) {
+    if (start == 1) {
+      tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
+                                            sizeof(vector), OPP_DIR(dir),
+                                            parity, gen_pt[OPP_DIR(dir)]);
+    }
+    else {
+      restart_gather_site(F_OFFSET(tempvec[dir]), sizeof(vector),
+                          OPP_DIR(dir), parity, gen_pt[OPP_DIR(dir)],
+                          tag[OPP_DIR(dir)]);
+    }
+  }
+
+  // Wait gathers from positive directions
+  FORALLUPDIR(dir)
+    wait_gather(tag[dir]);
+
+  // Multiply by matrix and accumulate
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend - FETCH_UP) {
+      prefetch_4MVVVV(&((s + FETCH_UP)->link[XUP]),
+                      (vector *)gen_pt[XUP][i + FETCH_UP],
+                      (vector *)gen_pt[YUP][i + FETCH_UP],
+                      (vector *)gen_pt[ZUP][i + FETCH_UP],
+                      (vector *)gen_pt[TUP][i + FETCH_UP]);
+    }
+    mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
+                          (vector *)gen_pt[YUP][i],
+                          (vector *)gen_pt[ZUP][i],
+                          (vector *)gen_pt[TUP][i],
+                          (vector *)F_PT(s, psi));
+  } END_LOOP
+
+  // Wait gathers from negative directions
+  FORALLUPDIR(dir)
+    wait_gather(tag[OPP_DIR(dir)]);
+
+  // Accumulate (negative), with manually inlined subtractions
+  FORSOMEPARITY(i, s, parity) {
+    if (i < loopend-FETCH_UP) {
+      prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[YDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[ZDOWN][i + FETCH_UP],
+                    (vector *)gen_pt[TDOWN][i + FETCH_UP]);
+    }
+    a  = (vector *)F_PT(s, psi);
+    b1 = (vector *)(gen_pt[XDOWN][i]);
+    b2 = (vector *)(gen_pt[YDOWN][i]);
+    b3 = (vector *)(gen_pt[ZDOWN][i]);
+    b4 = (vector *)(gen_pt[TDOWN][i]);
+
+    CDIF(a->c[0], b1->c[0]);
+    CDIF(a->c[1], b1->c[1]);
+    CDIF(a->c[2], b1->c[2]);
+
+    CDIF(a->c[0], b2->c[0]);
+    CDIF(a->c[1], b2->c[1]);
+    CDIF(a->c[2], b2->c[2]);
+
+    CDIF(a->c[0], b3->c[0]);
+    CDIF(a->c[1], b3->c[1]);
+    CDIF(a->c[2], b3->c[2]);
+
+    CDIF(a->c[0], b4->c[0]);
+    CDIF(a->c[1], b4->c[1]);
+    CDIF(a->c[2], b4->c[2]);
+  } END_LOOP
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// (M^dag.M) psi = chi
+// chi is source, psi is result
 int ks_congrad(field_offset chi, field_offset psi, Real m, int parity) {
   register int i;
   register site *s;
@@ -199,7 +427,7 @@ start:
     FORSOMEPARITY(i, s, l_parity) {
       if (i < loopend - FETCH_UP)
         prefetch_VVVV((vector *)F_PT(s + FETCH_UP, psi),
-                      &((s + FETCH_UP)->p), &((s+FETCH_UP)->r),
+                      &((s + FETCH_UP)->p), &((s + FETCH_UP)->r),
                       &((s + FETCH_UP)->mp));
 
       scalar_mult_sum_vector(&(s->p), a, (vector *)F_PT(s, psi));
@@ -273,232 +501,5 @@ start:
                rsq / source_norm, rsqmin);
   fflush(stdout);
   return iteration;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Dslash routine
-// Set psi on each site to sum of sources parallel transported to site,
-// with minus sign for transport from negative directions
-void dslash(field_offset chi, field_offset psi, int parity) {
-  register int i, dir, otherparity = EVEN;
-  register site *s;
-  register vector *a, *b1, *b2, *b3, *b4;
-  msg_tag *tag[8];
-
-  switch(parity) {
-    case EVEN:
-      otherparity = ODD;
-      break;
-    case ODD:
-      otherparity = EVEN;
-      break;
-    case EVENANDODD:
-      otherparity = EVENANDODD;
-      break;
-  }
-
-  // Start gathers from positive directions
-  FORALLUPDIR(dir) {
-    tag[dir] = start_gather_site(chi, sizeof(vector), dir, parity,
-                                 gen_pt[dir]);
-  }
-
-  // Multiply by adjoint matrix at other sites
-  FORSOMEPARITY(i, s, otherparity) {
-    if (i < loopend - FETCH_UP)
-      prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
-                     (vector *)F_PT((s + FETCH_UP), chi),
-                     (s + FETCH_UP)->tempvec);
-
-    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
-  } END_LOOP
-
-  // Start gathers from negative directions
-  FORALLUPDIR(dir) {
-    tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
-                                          sizeof(vector), OPP_DIR(dir),
-                                          parity, gen_pt[OPP_DIR(dir)]);
-  }
-
-  // Wait gathers from positive directions
-  FORALLUPDIR(dir)
-    wait_gather(tag[dir]);
-
-  // Multiply by matrix and accumulate
-  FORSOMEPARITY(i, s, parity) {
-    if (i < loopend - FETCH_UP) {
-      prefetch_V((vector *)F_PT(s + FETCH_UP, psi));
-      prefetch_4MVVVV(&((s + FETCH_UP)->link[XUP]),
-                      (vector *)gen_pt[XUP][i + FETCH_UP],
-                      (vector *)gen_pt[YUP][i + FETCH_UP],
-                      (vector *)gen_pt[ZUP][i + FETCH_UP],
-                      (vector *)gen_pt[TUP][i + FETCH_UP]);
-    }
-    mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
-                          (vector *)gen_pt[YUP][i],
-                          (vector *)gen_pt[ZUP][i],
-                          (vector *)gen_pt[TUP][i],
-                          (vector *)F_PT(s, psi));
-  } END_LOOP
-
-  // Wait gathers from negative directions
-  FORALLUPDIR(dir)
-    wait_gather(tag[OPP_DIR(dir)]);
-
-  // Accumulate (negative), with manually inlined subtractions
-  FORSOMEPARITY(i, s, parity) {
-    if (i < loopend - FETCH_UP) {
-      prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[YDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[ZDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[TDOWN][i + FETCH_UP]);
-    }
-    a  = (vector *)F_PT(s, psi);
-    b1 = (vector *)(gen_pt[XDOWN][i]);
-    b2 = (vector *)(gen_pt[YDOWN][i]);
-    b3 = (vector *)(gen_pt[ZDOWN][i]);
-    b4 = (vector *)(gen_pt[TDOWN][i]);
-
-    CDIF(a->c[0], b1->c[0]);
-    CDIF(a->c[1], b1->c[1]);
-    CDIF(a->c[2], b1->c[2]);
-
-    CDIF(a->c[0], b2->c[0]);
-    CDIF(a->c[1], b2->c[1]);
-    CDIF(a->c[2], b2->c[2]);
-
-    CDIF(a->c[0], b3->c[0]);
-    CDIF(a->c[1], b3->c[1]);
-    CDIF(a->c[2], b3->c[2]);
-
-    CDIF(a->c[0], b4->c[0]);
-    CDIF(a->c[1], b4->c[1]);
-    CDIF(a->c[2], b4->c[2]);
-  } END_LOOP
-
-  // Free buffers
-  FORALLUPDIR(dir) {
-    cleanup_gather(tag[dir]);
-    cleanup_gather(tag[OPP_DIR(dir)]);
-  }
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Special dslash for use by CG
-// Uses restart_gather() when possible
-// Last argument is an array of message tags,
-// to be set if this is the first use, otherwise reused
-// If start = 1, use start_gather, otherwise use restart_gather
-// The calling program must clean up the gathers!
-void dslash_special(field_offset chi, field_offset psi, int parity,
-                    msg_tag **tag, int start) {
-
-  register int i, dir, otherparity = EVEN;
-  register site *s;
-  register vector *a, *b1, *b2, *b3, *b4;
-
-  switch(parity) {
-    case EVEN:
-      otherparity = ODD;
-      break;
-    case ODD:
-      otherparity = EVEN;
-      break;
-    case EVENANDODD:
-      otherparity = EVENANDODD;
-      break;
-  }
-
-  // Start gathers from positive directions
-  FORALLUPDIR(dir) {
-    if (start == 1)
-      tag[dir] = start_gather_site(chi, sizeof(vector), dir,
-                                   parity, gen_pt[dir]);
-    else
-      restart_gather_site(chi, sizeof(vector), dir,
-                          parity, gen_pt[dir], tag[dir]);
-  }
-
-  // Multiply by adjoint matrix at other sites
-  FORSOMEPARITY(i, s, otherparity) {
-    if (i < loopend - FETCH_UP)
-      prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
-                     (vector *)F_PT((s + FETCH_UP), chi),
-                     (s + FETCH_UP)->tempvec);
-
-    mult_adj_mat_vec_4dir(s->link, (vector *)F_PT(s, chi), s->tempvec);
-  } END_LOOP
-
-  // Start gathers from negative directions
-  FORALLUPDIR(dir) {
-    if (start == 1)
-      tag[OPP_DIR(dir)] = start_gather_site(F_OFFSET(tempvec[dir]),
-                                            sizeof(vector), OPP_DIR(dir),
-                                            parity, gen_pt[OPP_DIR(dir)]);
-    else
-      restart_gather_site(F_OFFSET(tempvec[dir]), sizeof(vector),
-                          OPP_DIR(dir), parity, gen_pt[OPP_DIR(dir)],
-                          tag[OPP_DIR(dir)]);
-    }
-
-  // Wait gathers from positive directions
-  FORALLUPDIR(dir)
-    wait_gather(tag[dir]);
-
-  // Multiply by matrix and accumulate
-  FORSOMEPARITY(i, s, parity) {
-    if (i < loopend - FETCH_UP)
-      prefetch_VVVV((vector *)gen_pt[XUP][i + FETCH_UP],
-                    (vector *)gen_pt[YUP][i + FETCH_UP],
-                    (vector *)gen_pt[ZUP][i + FETCH_UP],
-                    (vector *)gen_pt[TUP][i + FETCH_UP]);
-
-    mult_mat_vec_sum_4dir(s->link, (vector *)gen_pt[XUP][i],
-                          (vector *)gen_pt[YUP][i],
-                          (vector *)gen_pt[ZUP][i],
-                          (vector *)gen_pt[TUP][i],
-                          (vector *)F_PT(s, psi));
-  } END_LOOP
-
-  // Wait gathers from negative directions
-  FORALLUPDIR(dir)
-    wait_gather(tag[OPP_DIR(dir)]);
-
-  // Accumulate (negative), with manually inlined subtractions
-  FORSOMEPARITY(i, s, parity) {
-    if (i < loopend-FETCH_UP) {
-      prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[YDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[ZDOWN][i + FETCH_UP],
-                    (vector *)gen_pt[TDOWN][i + FETCH_UP]);
-    }
-    a  = (vector *)F_PT(s, psi);
-    b1 = (vector *)(gen_pt[XDOWN][i]);
-    b2 = (vector *)(gen_pt[YDOWN][i]);
-    b3 = (vector *)(gen_pt[ZDOWN][i]);
-    b4 = (vector *)(gen_pt[TDOWN][i]);
-
-    CDIF(a->c[0], b1->c[0]);
-    CDIF(a->c[1], b1->c[1]);
-    CDIF(a->c[2], b1->c[2]);
-
-    CDIF(a->c[0], b2->c[0]);
-    CDIF(a->c[1], b2->c[1]);
-    CDIF(a->c[2], b2->c[2]);
-
-    CDIF(a->c[0], b3->c[0]);
-    CDIF(a->c[1], b3->c[1]);
-    CDIF(a->c[2], b3->c[2]);
-
-    CDIF(a->c[0], b4->c[0]);
-    CDIF(a->c[1], b4->c[1]);
-    CDIF(a->c[2], b4->c[2]);
-  } END_LOOP
 }
 // -----------------------------------------------------------------

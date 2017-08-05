@@ -63,7 +63,7 @@ void copy_latvec(field_offset src, field_offset dest, int parity) {
 
   switch(parity) {
     case EVEN:
-      FOREVENSITESDOMAIN(i, s) {
+      FOREVENSITES(i, s) {
         s = &(lattice[i]);
         spt = (vector *)F_PT(s, src);
         dpt = (vector *)F_PT(s, dest);
@@ -71,7 +71,7 @@ void copy_latvec(field_offset src, field_offset dest, int parity) {
       }
       break;
     case ODD:
-      FORODDSITESDOMAIN(i, s) {
+      FORODDSITES(i, s) {
         s = &(lattice[i]);
         spt = (vector *)F_PT(s, src);
         dpt = (vector *)F_PT(s, dest);
@@ -79,7 +79,7 @@ void copy_latvec(field_offset src, field_offset dest, int parity) {
       }
       break;
     case EVENANDODD:
-      FORALLSITESDOMAIN(i, s) {
+      FORALLSITES(i, s) {
         s = &(lattice[i]);
         spt = (vector *)F_PT(s, src);
         dpt = (vector *)F_PT(s, dest);

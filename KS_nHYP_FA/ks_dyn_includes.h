@@ -36,10 +36,10 @@ int update_step(Real *old_cg_time, Real *cg_time, Real *next_cg_time,
                 double *fnorm, double *gnorm);
 
 // Dslash stuff and associated helper functions
-// (latter were in v6/generic_ks/d_congrad5.c for some reason)
 void dslash(field_offset chi, field_offset psi, int parity);
 void dslash_special(field_offset chi, field_offset psi, int parity,
                     msg_tag **tag, int start);
+void cleanup_one_gather_set(msg_tag *tags[]);
 void clear_latvec(field_offset v, int parity);
 void copy_latvec(field_offset src, field_offset dest, int parity);
 void scalar_mult_latvec(field_offset src, Real scalar,

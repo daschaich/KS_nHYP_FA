@@ -19,7 +19,7 @@ i<loopend; i++,s++)
 #define END_LOOP 	/* define it to be nothing */
 #endif
 
-/* NOTE FORSOMEPARITYDOMAIN is still defined in terms of FORSOMEPARITY
+/* NOTE FORSOMEPARITY is still defined in terms of FORSOMEPARITY
    so this change gets applied to it as well */
 
 #endif /* _LOOPEND_H */

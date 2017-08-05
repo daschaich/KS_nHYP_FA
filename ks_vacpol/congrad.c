@@ -117,7 +117,7 @@ start:
   dslash(F_OFFSET(mp), F_OFFSET(mp), l_parity);
 
   // mp  <- mp - msq_x4 * psi
-  FORSOMEPARITYDOMAIN(i, s, l_parity) {
+  FORSOMEPARITY(i, s, l_parity) {
     scalar_mult_add_vector(&(s->mp), (vector *)F_PT(s, psi),
                                -msq_x4, &(s->mp));
 
@@ -193,7 +193,7 @@ start:
     // mp <- mp - msq_x4 * p
     // pkp <- p.mp
     pkp = 0;
-    FORSOMEPARITYDOMAIN(i, s, l_parity) {
+    FORSOMEPARITY(i, s, l_parity) {
       if (i < loopend - FETCH_UP)
         prefetch_VV(&((s + FETCH_UP)->mp), &((s + FETCH_UP)->p));
 
@@ -210,7 +210,7 @@ start:
     // psi <- psi - a * p
     // r <- r - a * mp
     rsq = 0;
-    FORSOMEPARITYDOMAIN(i, s, l_parity) {
+    FORSOMEPARITY(i, s, l_parity) {
       if (i < loopend - FETCH_UP)
         prefetch_VVVV((vector *)F_PT(s + FETCH_UP, psi),
                       &((s+FETCH_UP)->p), &((s+FETCH_UP)->r),
@@ -340,7 +340,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
                                    gen_pt[dir]);
 
   // Multiply by adjoint matrix at other sites
-  FORSOMEPARITYDOMAIN(i, s, otherparity) {
+  FORSOMEPARITY(i, s, otherparity) {
     if (i < loopend - FETCH_UP)
       prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
                      (vector *)F_PT((s + FETCH_UP), chi),
@@ -382,7 +382,7 @@ void dslash(field_offset chi, field_offset psi, int parity) {
     wait_gather(tag[OPP_DIR(dir)]);
 
   // Accumulate (negative)
-  FORSOMEPARITYDOMAIN(i, s, parity) {
+  FORSOMEPARITY(i, s, parity) {
     if (i < loopend - FETCH_UP)
       prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
                     (vector *)gen_pt[YDOWN][i + FETCH_UP],
@@ -471,7 +471,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
   }
 
   // Multiply by adjoint matrix at other sites
-  FORSOMEPARITYDOMAIN(i, s, otherparity) {
+  FORSOMEPARITY(i, s, otherparity) {
     if (i < loopend-FETCH_UP)
       prefetch_4MV4V(&((s + FETCH_UP)->link[XUP]),
                      (vector *)F_PT((s + FETCH_UP), chi),
@@ -518,7 +518,7 @@ void dslash_special(field_offset chi, field_offset psi, int parity,
       wait_gather(tag[OPP_DIR(dir)]);
 
   // Accumulate (negative)
-  FORSOMEPARITYDOMAIN(i, s, parity) {
+  FORSOMEPARITY(i, s, parity) {
     if (i < loopend-FETCH_UP)
       prefetch_VVVV((vector *)gen_pt[XDOWN][i + FETCH_UP],
                     (vector *)gen_pt[YDOWN][i + FETCH_UP],

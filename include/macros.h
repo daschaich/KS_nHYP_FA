@@ -95,11 +95,6 @@ typedef int field_offset;
     i++,s++)
 #define FORALLSITES(i,s) \
     for(i=0,s=lattice;i<sites_on_node;i++,s++)
-
-#define FOREVENSITESDOMAIN FOREVENSITES
-#define FORODDSITESDOMAIN FORODDSITES
-#define FORALLSITESDOMAIN FORALLSITES
-#define FORSOMEPARITYDOMAIN FORSOMEPARITY
 // -----------------------------------------------------------------
 
 
