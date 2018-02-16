@@ -45,7 +45,7 @@ double update_gauge_step(Real eps) {
   rephase(OFF);
   reunitarize();
   rephase(ON);
-  return norm / n;
+  return (norm / n);
 }
 // -----------------------------------------------------------------
 

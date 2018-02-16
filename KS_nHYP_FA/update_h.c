@@ -90,8 +90,7 @@ double gauge_force(Real eps) {
         tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
         tc.imag *= -2.0 * beta_a / 3.0;
 
-        c_scalar_mult_sum_mat((matrix *)gen_pt[1][i], &tc,
-                                 &(tempmat2[i]));
+        c_scalar_mult_sum_mat((matrix *)gen_pt[1][i], &tc, &(tempmat2[i]));
       }
       cleanup_gather(tag0);
       cleanup_gather(tag1);
