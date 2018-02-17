@@ -16,7 +16,7 @@
 
 #else
 
-#if ! defined PREFETCH
+#ifndef PREFETCH
 
 /***************************************************************************/
 /*              Ignore Cache Manipulation Macros                           */
@@ -38,14 +38,14 @@
 /*                Prefetch via subroutine calls                            */
 /***************************************************************************/
 
-void _prefetch_M(matrix *);
-void _prefetch_V(vector *);
-void _prefetch_VV(vector *, vector *);
-void _prefetch_VVV(vector *, vector *, vector *);
-void _prefetch_VVVV(vector *, vector *, vector *, vector *);
-void _prefetch_VVVVV(vector *, vector *, vector *, vector *, vector *);
-void _prefetch_4MVVVV(matrix *, vector *, vector *, vector *, vector *);
-void _prefetch_4MV4V(matrix *, vector *, vector *);
+void _prefetch_M(matrix *m);
+void _prefetch_V(vector *v);
+void _prefetch_VV(vector *v, vector *v);
+void _prefetch_VVV(vector *v, vector *v, vector *v);
+void _prefetch_VVVV(vector *v, vector *v, vector *v, vector *v);
+void _prefetch_VVVVV(vector *v, vector *v, vector *v, vector *v, vector *v);
+void _prefetch_4MVVVV(matrix *m, vector *v, vector *v, vector *v, vector *v);
+void _prefetch_4MV4V(matrix *m, vector *v, vector *v);
 
 #define prefetch_M(a0)                    _prefetch_M(a0)
 #define prefetch_V(a0)                    _prefetch_V(a0)
