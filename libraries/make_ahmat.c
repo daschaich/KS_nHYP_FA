@@ -6,7 +6,7 @@
 #include "../include/su3.h"
 
 void make_anti_hermitian(matrix *src, anti_hermitmat *dest) {
-  Real tr= src->e[0][0].imag + src->e[1][1].imag + src->e[2][2].imag;
+  Real tr = src->e[0][0].imag + src->e[1][1].imag + src->e[2][2].imag;
   tr *= 0.33333333333333333;
 
   dest->m00im = src->e[0][0].imag - tr;

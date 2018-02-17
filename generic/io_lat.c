@@ -728,8 +728,8 @@ static void w_checkpoint(gauge_file *gf) {
   /* counts 32-bit words mod 29 and mod 31 in order of appearance on file */
   /* Here all nodes use these values */
   k = 4 * sizeof(fmatrix) / sizeof(int32type) * sites_on_node * this_node;
-  rank29 = i % 29;
-  rank31 = i % 31;
+  rank29 = k % 29;
+  rank31 = k % 31;
 
   buf_length = 0;
   FORALLSITES(i, s) {

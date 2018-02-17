@@ -573,39 +573,31 @@ void write_gauge_info_file(gauge_file *gf)
 
   printf("Wrote info file %s\n", info_filename);
 }
+// -----------------------------------------------------------------
 
-/*----------------------------------------------------------------------*/
 
-/* Set up the input gauge file and gauge header structures */
 
-gauge_file *setup_input_gauge_file(char *filename)
-{
+// -----------------------------------------------------------------
+// Set up the input gauge file and gauge header structures
+gauge_file *setup_input_gauge_file(char *filename) {
   char myname[] = "setup_input_gauge_file";
-  gauge_file *gf;
-  gauge_header *gh;
+  gauge_file *gf = malloc(sizeof *gf);
+  gauge_header *gh = malloc(sizeof *gh);
 
-  /* Allocate space for the file structure */
-
-  gf = (gauge_file *)malloc(sizeof(gauge_file));
-  if (gf == NULL)
-    {
-      printf("%s: Can't malloc gf\n", myname);
-      terminate(1);
-    }
+  // Check that memory allocations succeeded
+  if (gf == NULL) {
+    printf("%s: Can't malloc gf\n", myname);
+    terminate(1);
+  }
+  if (gh == NULL) {
+    printf("%s: Can't malloc gh\n", myname);
+    terminate(1);
+  }
 
   gf->filename = filename;
 
-  /* Allocate space for the header */
-
-  /* Make sure compilation gave us a 32 bit integer type */
+  // Make sure compilation gave us a 32 bit integer type
   assert(sizeof(int32type) == 4);
-
-  gh = (gauge_header *)malloc(sizeof(gauge_header));
-  if (gh == NULL)
-    {
-      printf("%s: Can't malloc gh\n", myname);
-      terminate(1);
-    }
 
   gf->header = gh;
   gf->rank2rcv = NULL;
@@ -614,39 +606,31 @@ gauge_file *setup_input_gauge_file(char *filename)
 
   return gf;
 }
+// -----------------------------------------------------------------
 
-/*----------------------------------------------------------------------*/
 
-/* Set up the output gauge file an gauge header structure */
 
-gauge_file *setup_output_gauge_file()
-{
+// -----------------------------------------------------------------
+// Set up the output gauge file and gauge header structure
+gauge_file *setup_output_gauge_file() {
   char myname[] = "setup_output_gauge_file";
-  gauge_file *gf;
-  gauge_header *gh;
+  gauge_file *gf = malloc(sizeof(*gf));;
+  gauge_header *gh = malloc(sizeof(*gh));
   time_t time_stamp;
   int i;
 
-  /* Allocate space for a new file structure */
+  // Check that memory allocations succeeded
+  if (gf == NULL) {
+    printf("%s: Can't malloc gf\n", myname);
+    terminate(1);
+  }
+  if (gh == NULL) {
+    printf("%s: Can't malloc gh\n", myname);
+    terminate(1);
+  }
 
-  gf = (gauge_file *)malloc(sizeof(gauge_file));
-  if (gf == NULL)
-    {
-      printf("%s: Can't malloc gf\n", myname);
-      terminate(1);
-    }
-
-  /* Allocate space for a new header structure */
-
-  /* Make sure compilation gave us a 32 bit integer type */
+  // Make sure compilation gave us a 32 bit integer type
   assert(sizeof(int32type) == 4);
-
-  gh = (gauge_header *)malloc(sizeof(gauge_header));
-  if (gh == NULL)
-    {
-      printf("%s: Can't malloc gh\n", myname);
-      terminate(1);
-    }
 
   /* Load header pointer and file name */
   gf->header = gh;
@@ -656,7 +640,6 @@ gauge_file *setup_output_gauge_file()
   gf->check.sum31 = 0;
 
   /* Load header values */
-
   gh->magic_number = GAUGE_VERSION_NUMBER;
 
   gh->dims[0] = nx;
@@ -664,10 +647,8 @@ gauge_file *setup_output_gauge_file()
   gh->dims[2] = nz;
   gh->dims[3] = nt;
 
-  /* Get date and time stamp. (We use local time on node 0) */
-
-  if (this_node == 0)
-    {
+  // Get date and time stamp using local time on node 0
+  if (this_node == 0) {
       time(&time_stamp);
       strcpy(gh->time_stamp, ctime(&time_stamp));
       /* For aesthetic reasons, don't leave trailing junk bytes here to be
@@ -696,21 +677,21 @@ void read_checksum(int parallel, gauge_file *gf, gauge_check *test_gc) {
 
   /* Read checksums with byte reversal */
   if (psread_byteorder(gf->byterevflag, parallel, gf->fp,
-   &gf->check.sum29, sizeof(gf->check.sum29), myname, "checksum")!=0)
+      &gf->check.sum29, sizeof(gf->check.sum29), myname, "checksum")!=0)
     terminate(1);
   if (psread_byteorder(gf->byterevflag, parallel, gf->fp,
-   &gf->check.sum31, sizeof(gf->check.sum31), myname, "checksum")!=0)
+      &gf->check.sum31, sizeof(gf->check.sum31), myname, "checksum")!=0)
     terminate(1);
 
   if (gf->check.sum29 != test_gc->sum29 ||
-     gf->check.sum31 != test_gc->sum31)
+      gf->check.sum31 != test_gc->sum31)
     printf("%s: Checksum violation. Computed %x %x.  Read %x %x.\n",
-      myname, test_gc->sum29, test_gc->sum31,
-     gf->check.sum29, gf->check.sum31);
+        myname, test_gc->sum29, test_gc->sum31,
+        gf->check.sum29, gf->check.sum31);
   else {
-      printf("Checksums %x %x OK\n", gf->check.sum29, gf->check.sum31);
-      fflush(stdout);
-    }
+    printf("Checksums %x %x OK\n", gf->check.sum29, gf->check.sum31);
+    fflush(stdout);
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -727,54 +708,52 @@ void write_checksum(int parallel, gauge_file *gf) {
                myname, "checksum");
   printf("Checksums %x %x\n", gf->check.sum29, gf->check.sum31);
 }
+// -----------------------------------------------------------------
 
-/*---------------------------------------------------------------------------*/
 
+
+// -----------------------------------------------------------------
 /* Subroutine for reading site list from gauge configuration file */
 /* Only node 0 reads this list, so same for parallel and serial reading */
 void read_site_list(int parallel, gauge_file *gf) {
   /* All nodes allocate space for site list table, if file is not in
      natural order */
 
-  if (gf->header->order != NATURAL_ORDER)
-    {
-      gf->rank2rcv = (int32type *)malloc(volume*sizeof(int32type));
-      if (gf->rank2rcv == NULL)
-  {
-    printf("read_site_list: Can't malloc rank2rcv table\n");
-    terminate(1);
-  }
-
-      /* Only node 0 reads the site list */
-      if (this_node == 0) {
-
-        /* Reads receiving site coordinate if file is not in natural order */
-        if (parallel) {
-          if ((int)g_read(gf->rank2rcv, sizeof(int32type), volume, gf->fp) != volume) {
-            int errsv = errno;
-            printf("read_site_list: Node %d site list read error %d %s\n",
-                this_node, errsv, strerror(errsv));
-            terminate(1);
-          }
-        }
-        else {
-          if ((int)g_read(gf->rank2rcv, sizeof(int32type), volume, gf->fp) != volume) {
-            int errsv = errno;
-            printf("read_site_list: Node %d site list read error %d %s\n",
-                this_node, errno, strerror(errsv));
-            terminate(1);
-          }
-        }
-
-        if (gf->byterevflag==1)byterevn(gf->rank2rcv, volume);
-      }
-
-      /* Broadcast result to all nodes */
-
-      broadcast_bytes((char *)gf->rank2rcv, volume * sizeof(int32type));
+  if (gf->header->order != NATURAL_ORDER) {
+    gf->rank2rcv = (int32type *)malloc(volume*sizeof(int32type));
+    if (gf->rank2rcv == NULL) {
+      printf("read_site_list: Can't malloc rank2rcv table\n");
+      terminate(1);
     }
 
-  else gf->rank2rcv = NULL;  /* If no site list */
+    // Only node 0 reads the site list
+    if (this_node == 0) {
+      /* Reads receiving site coordinate if file is not in natural order */
+      if (parallel) {
+        if ((int)g_read(gf->rank2rcv, sizeof(int32type), volume, gf->fp) != volume) {
+          int errsv = errno;
+          printf("read_site_list: Node %d site list read error %d %s\n",
+              this_node, errsv, strerror(errsv));
+          terminate(1);
+        }
+      }
+      else {
+        if ((int)g_read(gf->rank2rcv, sizeof(int32type), volume, gf->fp) != volume) {
+          int errsv = errno;
+          printf("read_site_list: Node %d site list read error %d %s\n",
+                 this_node, errno, strerror(errsv));
+          terminate(1);
+        }
+      }
+
+      if (gf->byterevflag==1)byterevn(gf->rank2rcv, volume);
+    }
+
+    // Broadcast result to all nodes
+    broadcast_bytes((char *)gf->rank2rcv, volume * sizeof(int32type));
+  }
+  else
+    gf->rank2rcv = NULL;  /* If no site list */
 }
 
 int read_gauge_hdr(gauge_file *gf, int parallel) {
@@ -784,12 +763,8 @@ int read_gauge_hdr(gauge_file *gf, int parallel) {
   FILE *fp = gf->fp;
   gauge_header *gh = gf->header;
   int32type tmp, btmp;
-  int i, j, byterevflag = 0;
+  int byterevflag = 0;
   char myname[] = "read_gauge_hdr";
-  QCDheader *hdr = NULL;
-  int dims[4];
-  u_int32type chksum = 0;
-  char *datatype, *floatpt;
 
   // Read header, do byte reversal if necessary, and check consistency
   // Read and verify magic number
@@ -847,10 +822,8 @@ int read_gauge_hdr(gauge_file *gf, int parallel) {
        we provide that if nx = ny = nz = nt = -1 initially
        we don't die */
     if (nx != -1 || ny != -1 || nz != -1 || nt != -1) {
-      printf("%s: Incorrect lattice dimensions ", myname);
-      for (j=0;j<4;j++)
-        printf("%d ", gh->dims[j]);
-      printf("\n");
+      printf("%s: Incorrect lattice dimensions %d %d %d %d\n",
+             myname, gh->dims[0], gh->dims[1], gh->dims[2], gh->dims[3]);
       fflush(stdout);
       terminate(1);
     }

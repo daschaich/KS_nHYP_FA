@@ -57,7 +57,7 @@ double fermion_action() {
 
 
 // -----------------------------------------------------------------
-// Magnitude squared of an antihermition matrix
+// Magnitude squared of an anti-hermitian matrix
 Real ahmat_mag_sq(anti_hermitmat *pt) {
   register Real x, sum;
 

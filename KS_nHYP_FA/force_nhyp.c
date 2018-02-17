@@ -234,11 +234,11 @@ void nhyp_force3(int dir3, int dir2) {
     if (dir == dir2 || dir == dir3)
       continue;
     FORALLUPDIR(dir4) {
-      if (dir4 != dir && dir4 != dir3 && dir4 != dir2)
-        break;
+      if (dir4 == dir || dir4 == dir3 || dir4 == dir2)
+        continue;
+      Sigma_update1(dir, SigmaH[dir], Staple1[dir4][dir], Lambda2,
+                    1.0 - alpha_smear[2], alpha_smear[2] / 2.0, 1);
     }
-    Sigma_update1(dir, SigmaH[dir], Staple1[dir4][dir], Lambda2,
-                  1.0 - alpha_smear[2], alpha_smear[2] / 2.0, 1);
   }
 
   FORALLUPDIR(dir) {
@@ -251,7 +251,7 @@ void nhyp_force3(int dir3, int dir2) {
                       Lambda2[dir], Lambda2[dir1], dir, dir1, EVENANDODD);
 
       FORALLSITES(i, s)
-        sum_matrix(tempmat + i, Sigma[dir] + i);
+        sum_matrix(&(tempmat[i]), &(Sigma[dir][i]));
     }
   }
 }
@@ -285,11 +285,11 @@ void nhyp_force2(int dir2) {
       if (dir3 == dir || dir == dir2)
         continue;
       FORALLUPDIR(dir4) {
-        if (dir4 != dir && dir4 != dir2 && dir4 != dir3)
-          break;
+        if (dir4 == dir || dir4 == dir2 || dir4 == dir3)
+          continue;
+        compute_sigma23(SigmaH[dir], hyplink1[dir4][dir3], hyplink1[dir4][dir],
+                        Lambda1[dir], Lambda1[dir3], dir, dir3, EVENANDODD);
       }
-      compute_sigma23(SigmaH[dir], hyplink1[dir4][dir3], hyplink1[dir4][dir],
-                      Lambda1[dir], Lambda1[dir3], dir, dir3, EVENANDODD);
     }
 
     // This part is really awkward
@@ -303,13 +303,13 @@ void nhyp_force2(int dir2) {
     if (dir2 < dir3) {
       FORALLSITES(i, s) {
         FORALLUPDIR(dir)
-          mat_copy(SigmaH[dir] + i, SigmaH2[iimap][dir] + i);
+          mat_copy(&(SigmaH[dir][i]), &(SigmaH2[iimap][dir][i]));
       }
     }
     else {
       FORALLSITES(i, s) {
         FORALLUPDIR(dir)
-          sum_matrix(SigmaH2[iimap][dir] + i, SigmaH[dir] + i);
+          sum_matrix(&(SigmaH2[iimap][dir][i]), &(SigmaH[dir][i]));
       }
       nhyp_force3(dir2, dir3);
     }
