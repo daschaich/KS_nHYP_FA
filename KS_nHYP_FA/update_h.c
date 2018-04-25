@@ -42,8 +42,8 @@ double gauge_force(Real eps) {
       // We will later gather the intermediate result "to the home point"
       wait_gather(tag0);
       FORALLSITES(i, s) {
-        mult_su3_an(&(s->link[dir2]), &(s->link[dir]), &tmat);
-        mult_su3_nn(&tmat, (matrix *)gen_pt[0][i],
+        mult_an(&(s->link[dir2]), &(s->link[dir]), &tmat);
+        mult_nn(&tmat, (matrix *)gen_pt[0][i],
                     (matrix *)&(tempmat[i]));
       }
 
@@ -58,10 +58,10 @@ double gauge_force(Real eps) {
       wait_gather(tag2);
       if (start) {  // Initialize staple sum in tempmat2
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
-          mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
-          mult_su3_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
-          tc = trace_su3(&tmat);
+          mult_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
+          mult_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
+          mult_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
+          tc = trace(&tmat);
           tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
           tc.imag = -2.0 * beta_a / 3.0 * tc.imag;
 
@@ -72,10 +72,10 @@ double gauge_force(Real eps) {
       }
       else {
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
-          mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
-          mult_su3_na(&(s->link[dir]), &tmat2, &tmat);
-          tc = trace_su3(&tmat);
+          mult_nn(&(s->link[dir2]), (matrix *)gen_pt[2][i], &tmat);
+          mult_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
+          mult_na(&(s->link[dir]), &tmat2, &tmat);
+          tc = trace(&tmat);
           tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
           tc.imag *= -2.0 * beta_a / 3.0;
 
@@ -85,8 +85,8 @@ double gauge_force(Real eps) {
 
       wait_gather(tag1);
       FORALLSITES(i, s) {
-        mult_su3_na(&(s->link[dir]), (matrix *)gen_pt[1][i], &tmat);
-        tc = trace_su3(&tmat);
+        mult_na(&(s->link[dir]), (matrix *)gen_pt[1][i], &tmat);
+        tc = trace(&tmat);
         tc.real = 1.0 - 2.0 * beta_a / 3.0 * tc.real;
         tc.imag *= -2.0 * beta_a / 3.0;
 
@@ -99,11 +99,11 @@ double gauge_force(Real eps) {
 
     // Now multiply the staple sum by the link, then update momentum
     FORALLSITES(i, s) {
-      mult_su3_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
+      mult_na(&(s->link[dir]), &(tempmat2[i]), &tmat);
       uncompress_anti_hermitian(&(s->mom[dir]), &tmat2);
       scalar_mult_add_matrix(&tmat2, &tmat, eb3, &(tempmat2[i]));
       make_anti_hermitian(&(tempmat2[i]), &(s->mom[dir]));
-      norm += (double)realtrace_su3(&tmat, &tmat);
+      norm += (double)realtrace(&tmat, &tmat);
     }
   }
 
@@ -220,7 +220,7 @@ double fermion_force(int level, Real eps) {
   // Multiply a HYP field dagger from the left on the force
   FORALLUPDIR(dir) {
     FORALLSITES(i, s) {
-      mult_su3_an(&(gauge_field[dir][i]), &(Sigma[dir][i]), &tmat);
+      mult_an(&(gauge_field[dir][i]), &(Sigma[dir][i]), &tmat);
       mat_copy(&tmat, &(Sigma[dir][i]));
     }
   }
@@ -267,14 +267,14 @@ double fermion_force(int level, Real eps) {
   FORALLUPDIR(dir) {
     FORALLSITES(i, s) {
       uncompress_anti_hermitian(&(s->mom[dir]), &tmat2);
-      mult_su3_nn(&(gauge_field_thin[dir][i]), &(Sigma[dir][i]), &tmat);
+      mult_nn(&(gauge_field_thin[dir][i]), &(Sigma[dir][i]), &tmat);
       make_anti_hermitian(&tmat, &ahtmp);
 
       uncompress_anti_hermitian(&ahtmp, &tmat);
       // tmat2 += ferm_epsilon * tmat
       scalar_mult_sum_matrix(&tmat, ferm_epsilon, &tmat2);
       make_anti_hermitian(&tmat2, &(s->mom[dir]));
-      norm += (double)realtrace_su3(&tmat, &tmat);
+      norm += (double)realtrace(&tmat, &tmat);
     }
   }
   g_doublesum(&norm);

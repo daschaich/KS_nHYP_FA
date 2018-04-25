@@ -335,7 +335,7 @@ void measure_glueball_ops() {
 	  glueball_op[iloop].loop[orientation].trace[t] = dcmplx(0.,0.);
 	
 	FORALLSITES(i,s){
-	  trace=trace_su3( &s->tempmat1 );
+	  trace=trace( &s->tempmat1 );
 	  CSUM(glueball_op[iloop].loop[orientation].trace[s->t],trace);
 	} END_LOOP /* sites */
     } /* iloop */

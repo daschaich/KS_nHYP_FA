@@ -57,10 +57,10 @@ void block_nhyp3() {
 
       scalar_mult_matrix(&Q, ftmp2, &Omega);
       Staple3[dir][i] = Omega;     // Save for force
-      mult_su3_an(&Omega, &Omega, &Q);
+      mult_an(&Omega, &Omega, &Q);
 
       // IR stabilization regulator set in defines.h
-      scalar_add_diag_su3(&Q, IR_STAB);
+      scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
       compute_fhb(&Q, f, NULL, 0);
 #else
@@ -68,15 +68,15 @@ void block_nhyp3() {
 #endif
 
       // Compute Q^2
-      mult_su3_nn(&Q, &Q, &Q2);
+      mult_nn(&Q, &Q, &Q2);
 
       // Compute Q^(-1/2) via Eq. (3.8)
       scalar_mult_matrix(&Q, f[1], &tmat);
       scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
-      scalar_add_diag_su3(&eQ, f[0]);
+      scalar_add_diag(&eQ, f[0]);
 
       // Multiply Omega by eQ = (Omega^\dagger Omega)^(-1/2)
-      mult_su3_nn(&Omega, &eQ, gauge_field[dir] + i);
+      mult_nn(&Omega, &eQ, gauge_field[dir] + i);
     }
   }
 }
@@ -121,8 +121,8 @@ void block_nhyp2() {
           scalar_mult_matrix(&Q, ftmp2, &Omega);
           Staple2[dir2][dir][i] = Omega;     // Save for force
 
-          mult_su3_an(&Omega, &Omega, &Q);
-          scalar_add_diag_su3(&Q, IR_STAB);
+          mult_an(&Omega, &Omega, &Q);
+          scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
           compute_fhb(&Q, f, NULL, 0);
 #else
@@ -130,15 +130,15 @@ void block_nhyp2() {
 #endif
 
           // Compute Q^2
-          mult_su3_nn(&Q, &Q, &Q2);
+          mult_nn(&Q, &Q, &Q2);
 
           // Compute Q^(-1/2) via Eq. (3.8)
           scalar_mult_matrix(&Q, f[1], &tmat);
           scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
-          scalar_add_diag_su3(&eQ, f[0]);
+          scalar_add_diag(&eQ, f[0]);
 
           // Multiply Omega by eQ = (Omega^\dagger Omega)^(-1/2) 
-          mult_su3_nn(&Omega, &eQ, hyplink2[dir2][dir] + i);
+          mult_nn(&Omega, &eQ, hyplink2[dir2][dir] + i);
         }
       }
     } // Loop over dir2
@@ -178,8 +178,8 @@ void block_nhyp1() {
           scalar_mult_matrix(&Q, ftmp2, &Omega);
           Staple1[dir2][dir1][i] = Omega;     // Save for force
 
-          mult_su3_an(&Omega, &Omega, &Q);
-          scalar_add_diag_su3(&Q, IR_STAB);
+          mult_an(&Omega, &Omega, &Q);
+          scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
           compute_fhb(&Q, f, NULL, 0);
 #else
@@ -187,15 +187,15 @@ void block_nhyp1() {
 #endif
 
           // Compute Q^2
-          mult_su3_nn(&Q, &Q, &Q2);
+          mult_nn(&Q, &Q, &Q2);
 
           // Compute Q^(-1/2) via Eq. (3.8)
           scalar_mult_matrix(&Q, f[1], &tmat);
           scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
-          scalar_add_diag_su3(&eQ, f[0]);
+          scalar_add_diag(&eQ, f[0]);
 
           // Multiply Omega by eQ = (Omega^dag Omega)^(-1/2)
-          mult_su3_nn(&Omega, &eQ, hyplink1[dir2][dir1] + i);
+          mult_nn(&Omega, &eQ, hyplink1[dir2][dir1] + i);
         }
       }
     } // Loop over dir2
@@ -229,14 +229,14 @@ void staple_nhyp(int dir1, int dir2, matrix *lnk1,
   // The lower staple is prepared at x-dir2 and stored in tempmat,
   // then gathered to x
   FORALLSITES(i, s)
-    mult_su3_an(lnk2 + i, lnk1 + i, tempmat + i);
+    mult_an(lnk2 + i, lnk1 + i, tempmat + i);
 
   wait_gather(tag0);
   wait_gather(tag1);
 
   // Finish lower staple
   FORALLSITES(i, s) {
-    mult_su3_nn(tempmat + i, (matrix *)gen_pt[0][i], &tmat1);
+    mult_nn(tempmat + i, (matrix *)gen_pt[0][i], &tmat1);
     mat_copy(&tmat1, tempmat + i);
   }
 
@@ -246,8 +246,8 @@ void staple_nhyp(int dir1, int dir2, matrix *lnk1,
 
   // Calculate upper staple, add it
   FORALLSITES(i, s) {
-    mult_su3_nn(lnk2 + i, (matrix *)gen_pt[1][i], &tmat1);
-    mult_su3_na(&tmat1, (matrix *)gen_pt[0][i], &tmat2);
+    mult_nn(lnk2 + i, (matrix *)gen_pt[1][i], &tmat1);
+    mult_na(&tmat1, (matrix *)gen_pt[0][i], &tmat2);
     add_matrix(stp + i, &tmat2, stp + i);
   }
 

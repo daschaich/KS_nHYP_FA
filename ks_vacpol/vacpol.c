@@ -129,10 +129,10 @@ int vacuum_polarization() {
       // NB the staggered phases and BCs are already in the links!
       FORALLSITES(i, s) {
         // [U_{mu}(x) D_{x + mu; y + nu}]^{dag} D_{x; y} U_{nu}(y)
-        mult_su3_nn(&(s->link[mu]), (matrix*)gen_pt[0][i], &tmat);
-        mult_su3_an(&tmat, &(s->prop), &tmat2);
-        mult_su3_nn(&tmat2, &(sourcelink[nu]), &tmat);
-        tc = trace_su3(&tmat);
+        mult_nn(&(s->link[mu]), (matrix*)gen_pt[0][i], &tmat);
+        mult_an(&tmat, &(s->prop), &tmat2);
+        mult_nn(&tmat2, &(sourcelink[nu]), &tmat);
+        tc = trace(&tmat);
         // Extra (-1)^{x + y} from Ddag
         // Axial correlator has additional (-1)^{x + y} -- cancels negative
         // Fixing sign in D&D negates axial correlator again
@@ -142,10 +142,10 @@ int vacuum_polarization() {
         tempvec = tc;
 
         // Ddag_{x; y + nu} U_{mu}(x) D_{x + mu; y} U_{nu}(y)
-        mult_su3_an(&(s->propnu[nu]), &(s->link[mu]), &tmat);
-        mult_su3_nn(&tmat, (matrix*)gen_pt[1][i], &tmat2);
-        mult_su3_nn(&tmat2, &(sourcelink[nu]), &tmat);
-        tc = trace_su3(&tmat);
+        mult_an(&(s->propnu[nu]), &(s->link[mu]), &tmat);
+        mult_nn(&tmat, (matrix*)gen_pt[1][i], &tmat2);
+        mult_nn(&tmat2, &(sourcelink[nu]), &tmat);
+        tc = trace(&tmat);
         // Extra (-1)^{x + y + nu} from Ddag
         if (s->parity == src_parity)
           CMULREAL(tc, neg, tc);
@@ -156,10 +156,10 @@ int vacuum_polarization() {
         CSUM(tempaxi, tc);
 
         // [U_{mu}(x) D_{x + mu; y}]^{dag} D_{x, y + nu} Udag_{nu}
-        mult_su3_nn(&(s->link[mu]), (matrix*)gen_pt[1][i], &tmat);
-        mult_su3_an(&tmat, &(s->propnu[nu]), &tmat2);
-        mult_su3_na(&tmat2, &(sourcelink[nu]), &tmat);
-        tc = trace_su3(&tmat);
+        mult_nn(&(s->link[mu]), (matrix*)gen_pt[1][i], &tmat);
+        mult_an(&tmat, &(s->propnu[nu]), &tmat2);
+        mult_na(&tmat2, &(sourcelink[nu]), &tmat);
+        tc = trace(&tmat);
         // Extra (-1)^{x + mu + y} from Ddag
         if (s->parity == src_parity)
           CMULREAL(tc, neg, tc);
@@ -170,10 +170,10 @@ int vacuum_polarization() {
         CSUM(tempaxi, tc);
 
         // Ddag_{x; y} U_{mu}(x) D_{x + mu; y + nu} Udag_{nu}
-        mult_su3_an(&(s->prop), &(s->link[mu]), &tmat);
-        mult_su3_nn(&tmat, (matrix*)gen_pt[0][i], &tmat2);
-        mult_su3_na(&tmat2, &(sourcelink[nu]), &tmat);
-        tc = trace_su3(&tmat);
+        mult_an(&(s->prop), &(s->link[mu]), &tmat);
+        mult_nn(&tmat, (matrix*)gen_pt[0][i], &tmat2);
+        mult_na(&tmat2, &(sourcelink[nu]), &tmat);
+        tc = trace(&tmat);
         // Extra (-1)^{x + mu + y + nu} from Ddag
         // Axial correlator has additional (-1)^{x + y} -- cancels negative
         // Fixing sign in D&D negates axial correlator again
@@ -215,8 +215,8 @@ int vacuum_polarization() {
     contact[nu] = cmplx(0.0, 0.0);
     if (node_number(x, y, z, t) == mynode()) {
       i = node_index(x, y, z, t);
-      mult_su3_nn(&(lattice[i].prop), &(sourcelink[nu]), &tmat);
-      contact[nu] = trace_su3(&tmat);
+      mult_nn(&(lattice[i].prop), &(sourcelink[nu]), &tmat);
+      contact[nu] = trace(&tmat);
       // Factor of 2 for each propagator from MILC conventions
       // Factor of 1/2 for each current, so do nothing
     }
@@ -226,8 +226,8 @@ int vacuum_polarization() {
     // Second contact term: x = src
     if (node_number(x_src, y_src, z_src, t_src) == mynode()) {
       i = node_index(x_src, y_src, z_src, t_src);
-      mult_su3_na(&(lattice[i].propnu[nu]), &(lattice[i].link[nu]), &tmat);
-      tc = trace_su3(&tmat);
+      mult_na(&(lattice[i].propnu[nu]), &(lattice[i].link[nu]), &tmat);
+      tc = trace(&tmat);
       // Factor of 2 for each prop from MILC conventions
       // Factor of 1/2 for current, so do nothing
       CSUB(contact[nu], tc, contact[nu]);

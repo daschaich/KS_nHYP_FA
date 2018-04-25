@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void c_scalar_add_diag_su3(matrix *a, complex *s) {
+void c_scalar_add_diag(matrix *a, complex *s) {
   register int i;
 
   for (i = 0; i < 3; i++) {

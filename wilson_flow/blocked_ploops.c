@@ -54,7 +54,7 @@ complex blocked_ploop(int block, int dir) {
         case ZUP: if (s->z >= bl) continue; break;
         case TUP: if (s->t >= bl) continue; break;
       }
-      mult_su3_nn(&(tempmat[i]), (matrix *)gen_pt[0][i],
+      mult_nn(&(tempmat[i]), (matrix *)gen_pt[0][i],
                   &(tempmat2[i]));
       mat_copy(&(tempmat2[i]), &(tempmat[i]));
     }
@@ -67,7 +67,7 @@ complex blocked_ploop(int block, int dir) {
       case ZUP: if (s->z >= bl) continue; break;
       case TUP: if (s->t >= bl) continue; break;
     }
-    plp = trace_su3(&(tempmat[i]));
+    plp = trace(&(tempmat[i]));
     CSUM(sum, plp);   // Running complex sum
   }
 

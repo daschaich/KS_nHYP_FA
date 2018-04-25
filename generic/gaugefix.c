@@ -273,7 +273,7 @@ double get_gauge_fix_action(int gauge_dir,int parity) {
   register site *s;
   register matrix *m1, *m2;
   double gauge_fix_action;
-  complex trace;
+  complex tc;
 
   gauge_fix_action = 0.0;
 
@@ -282,11 +282,11 @@ double get_gauge_fix_action(int gauge_dir,int parity) {
       m1 = &(s->link[dir]);
       m2 = (matrix *)gen_pt[dir][i];
 
-      trace = trace_su3(m1);
-      gauge_fix_action += (double)trace.real;
+      tc = trace(m1);
+      gauge_fix_action += (double)tc.real;
 
-      trace = trace_su3(m2);
-      gauge_fix_action += (double)trace.real;
+      tc = trace(m2);
+      gauge_fix_action += (double)tc.real;
     }
   }
 

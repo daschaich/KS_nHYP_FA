@@ -5,7 +5,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void scalar_add_diag_su3(matrix *a, Real s) {
+void scalar_add_diag(matrix *a, Real s) {
   register int i;
 
   for (i = 0; i < 3; i++)

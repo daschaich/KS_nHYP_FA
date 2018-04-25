@@ -25,13 +25,13 @@ void path(int *dir, int *sign, int length, matrix *resmat) {
 
   if (sign[0] < 0) {
     FORALLSITES(i, s)
-      su3_adjoint(&(s->link[dir[0]]), &(s->tempmat2));
+      adjoint(&(s->link[dir[0]]), &(s->tempmat2));
   }
 
   for (j = 1; j < length; j++) {
     if (sign[j] > 0) {
       FORALLSITES(i, s)
-        mult_su3_nn(&(s->tempmat2), &(s->link[dir[j]]), &(s->tempmat1));
+        mult_nn(&(s->tempmat2), &(s->link[dir[j]]), &(s->tempmat1));
 
       mtag = start_gather_site(F_OFFSET(tempmat1), sizeof(matrix),
                                OPP_DIR(dir[j]), EVENANDODD, gen_pt[0]);
@@ -47,7 +47,7 @@ void path(int *dir, int *sign, int length, matrix *resmat) {
                                dir[j], EVENANDODD, gen_pt[1]);
       wait_gather(mtag);
       FORALLSITES(i, s)
-        mult_su3_na((matrix *)(gen_pt[1][i]),
+        mult_na((matrix *)(gen_pt[1][i]),
                     &(s->link[dir[j]]), &(s->tempmat1));
 
       FORALLSITES(i, s)

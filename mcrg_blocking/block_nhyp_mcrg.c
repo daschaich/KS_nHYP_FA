@@ -104,17 +104,17 @@ void staple1_mcrg(int dir, int dir3, int dir4, int block) {
 
     // Upper staple
     FORALLSITES(i, s) {
-      mult_su3_nn(&(s->link[dir2]), (matrix *)gen_pt[1][i], &tmat);
-      mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
+      mult_nn(&(s->link[dir2]), (matrix *)gen_pt[1][i], &tmat);
+      mult_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
     }
     cleanup_general_gather(tag0);
     cleanup_general_gather(tag1);
 
     // Lower staple
     FORALLSITES(i, s) {
-      mult_su3_an((matrix *)gen_pt[2][i],
+      mult_an((matrix *)gen_pt[2][i],
                   (matrix *)gen_pt[3][i], &tmat);
-      mult_su3_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
+      mult_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
       sum_matrix(&tmat2, &(tempmat2[i]));
     }
     cleanup_general_gather(tag2);
@@ -187,17 +187,17 @@ void staple2_mcrg(int dir, int dir4, int block) {
     // Upper staple
     if (start) {        // The first contribution to the staple
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->hyplink1[hyp1ind[dir][dir4][dir2]]),
+        mult_nn(&(s->hyplink1[hyp1ind[dir][dir4][dir2]]),
                     (matrix *)gen_pt[1][i], &tmat);
-        mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
+        mult_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
       }
       start = 0;
     }
     else {
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->hyplink1[hyp1ind[dir][dir4][dir2]]),
+        mult_nn(&(s->hyplink1[hyp1ind[dir][dir4][dir2]]),
                     (matrix *)gen_pt[1][i], &tmat);
-        mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
+        mult_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
         sum_matrix(&tmat2, &(tempmat2[i]));
       }
     }
@@ -206,9 +206,9 @@ void staple2_mcrg(int dir, int dir4, int block) {
 
     // Lower staple
     FORALLSITES(i, s) {
-      mult_su3_an((matrix *)gen_pt[2][i], (matrix *)gen_pt[3][i],
+      mult_an((matrix *)gen_pt[2][i], (matrix *)gen_pt[3][i],
                   &tmat);
-      mult_su3_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
+      mult_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
       sum_matrix(&tmat2, &(tempmat2[i]));
     }
     cleanup_general_gather(tag2);
@@ -283,17 +283,17 @@ void staple3_mcrg(int dir, int block) {
     // Upper staple
     if (start) {          // The first contribution to the staple
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->hyplink2[hyp2ind[dir][dir2]]),
+        mult_nn(&(s->hyplink2[hyp2ind[dir][dir2]]),
                     (matrix *)gen_pt[1][i], &tmat);
-        mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
+        mult_na(&tmat, (matrix *)gen_pt[0][i], &(tempmat2[i]));
       }
       start = 0;
     }
     else {
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->hyplink2[hyp2ind[dir][dir2]]),
+        mult_nn(&(s->hyplink2[hyp2ind[dir][dir2]]),
                     (matrix *)gen_pt[1][i], &tmat);
-        mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
+        mult_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
         sum_matrix(&tmat2, &(tempmat2[i]));
       }
     }
@@ -302,9 +302,9 @@ void staple3_mcrg(int dir, int block) {
 
     // Lower staple
     FORALLSITES(i, s) {
-      mult_su3_an((matrix *)gen_pt[2][i], (matrix *)gen_pt[3][i],
+      mult_an((matrix *)gen_pt[2][i], (matrix *)gen_pt[3][i],
                   &tmat);
-      mult_su3_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
+      mult_nn(&tmat, (matrix *)gen_pt[4][i], &tmat2);
       sum_matrix(&tmat2, &(tempmat2[i]));
     }
     cleanup_general_gather(tag2);
@@ -343,8 +343,8 @@ void block_nhyp1_mcrg(int num, int block) {
           // Make Omega
           scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
           scalar_mult_matrix(&Q, ftmp2, &Omega);
-          mult_su3_an(&Omega, &Omega, &Q);
-          scalar_add_diag_su3(&Q, IR_STAB);
+          mult_an(&Omega, &Omega, &Q);
+          scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
           compute_fhb(&Q, f, NULL, 0);
 #else
@@ -352,7 +352,7 @@ void block_nhyp1_mcrg(int num, int block) {
 #endif
 
           // Compute Q**2
-          mult_su3_nn(&Q, &Q, &Q2);
+          mult_nn(&Q, &Q, &Q2);
 
           // Compute Q^(-1/2) via Eq. (3.8)
           tc = cmplx(f[0],0.);
@@ -361,7 +361,7 @@ void block_nhyp1_mcrg(int num, int block) {
           scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
 
           // Multiply Omega by eQ = (Omega^dag Omega)^(-1/2)
-          mult_su3_nn(&Omega, &eQ, &(s-> hyplink1[hyp1ind[dir2][dir3][dir]]));
+          mult_nn(&Omega, &eQ, &(s-> hyplink1[hyp1ind[dir2][dir3][dir]]));
         }
       }
     }
@@ -394,8 +394,8 @@ void block_nhyp2_mcrg(int num, int block) {
         // Make Omega
         scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
         scalar_mult_matrix(&Q, ftmp2, &Omega);
-        mult_su3_an(&Omega,&Omega,&Q);
-        scalar_add_diag_su3(&Q, IR_STAB);
+        mult_an(&Omega,&Omega,&Q);
+        scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
         compute_fhb(&Q, f, NULL, 0);
 #else
@@ -403,7 +403,7 @@ void block_nhyp2_mcrg(int num, int block) {
 #endif
 
         // Compute Q**2
-        mult_su3_nn(&Q, &Q, &Q2);
+        mult_nn(&Q, &Q, &Q2);
 
         // Compute Q^(-1/2) via Eq. (3.8)
         tc=cmplx(f[0], 0);
@@ -412,7 +412,7 @@ void block_nhyp2_mcrg(int num, int block) {
         scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
 
         // Multiply Omega by eQ = (Omega^dag Omega)^(-1/2)
-        mult_su3_nn(&Omega, &eQ, &(s->hyplink2[hyp2ind[dir2][dir]]));
+        mult_nn(&Omega, &eQ, &(s->hyplink2[hyp2ind[dir2][dir]]));
       }
     }
   }
@@ -440,8 +440,8 @@ void block_nhyp3_mcrg(int num, int block) {
       // Make Omega
       scalar_mult_add_matrix(&(s->link[dir]), &(tempmat2[i]), ftmp1, &Q);
       scalar_mult_matrix(&Q, ftmp2, &Omega);
-      mult_su3_an(&Omega, &Omega, &Q);
-      scalar_add_diag_su3(&Q, IR_STAB);
+      mult_an(&Omega, &Omega, &Q);
+      scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
       compute_fhb(&Q, f, NULL, 0);
 #else
@@ -449,7 +449,7 @@ void block_nhyp3_mcrg(int num, int block) {
 #endif
 
       // Compute Q**2
-      mult_su3_nn(&Q, &Q, &Q2);
+      mult_nn(&Q, &Q, &Q2);
 
       // compute Q^(-1/2) via Eq. (3.8)
       tc = cmplx(f[0], 0.0);
@@ -458,7 +458,7 @@ void block_nhyp3_mcrg(int num, int block) {
       scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
 
       // Multiply Omega by eQ = (Omega^dag Omega)^(-1/2)
-      mult_su3_nn(&Omega, &eQ, &(s->link[dir]));
+      mult_nn(&Omega, &eQ, &(s->link[dir]));
     }
   }
 }

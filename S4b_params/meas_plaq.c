@@ -36,60 +36,60 @@ void meas_plaq() {
       FORALLSITES(i, s) {
         m1 = &(s->link[dir1]);
         m4 = &(s->link[dir2]);
-        mult_su3_an(m4, m1, &tmat[i]);
+        mult_an(m4, m1, &tmat[i]);
       }
       wait_gather(mtag0);
       wait_gather(mtag1);
       FORALLSITES(i, s) {
-        mult_su3_nn(&tmat[i], (matrix *)(gen_pt[0][i]), &mtmp);
+        mult_nn(&tmat[i], (matrix *)(gen_pt[0][i]), &mtmp);
 
         if (dir1 == TUP) {
           if ((s->t) % 2 == 0)
-            plaq_e[0] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_e[0] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[0] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_o[0] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
         else    // Check
-          plaq_ss += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+          plaq_ss += (double)realtrace((matrix *)(gen_pt[1][i]),
                                            &mtmp);
 
         if (dir1 == XUP || dir2 == XUP) {
           if ((s->x) % 2 == 0)
-            plaq_e[1] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_e[1] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[1] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_o[1] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         if (dir1 == YUP || dir2 == YUP) {
           if ((s->y) % 2 == 0)
-            plaq_e[2] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_e[2] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[2] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_o[2] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         if (dir1 == ZUP || dir2 == ZUP) {
           if ((s->z) % 2 == 0)
-            plaq_e[3] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_e[3] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
           else
-            plaq_o[3] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+            plaq_o[3] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                                &mtmp);
         }
 
         // "a" is not really even/odd, but leave the labels for consistency
         if ((s->t) % 2 == 1 && (s->x) % 2 == 1
                             && (s->y) % 2 == 1 && (s->z) % 2 == 1)
-          plaq_e[4] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+          plaq_e[4] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                              &mtmp);
         if ((s->t) % 2 == 0 && (s->x) % 2 == 0
                             && (s->y) % 2 == 0 && (s->z) % 2 == 0)
-          plaq_o[4] += (double)realtrace_su3((matrix *)(gen_pt[1][i]),
+          plaq_o[4] += (double)realtrace((matrix *)(gen_pt[1][i]),
                                              &mtmp);
       }
       cleanup_gather(mtag0);

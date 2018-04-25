@@ -12,7 +12,7 @@ void linktrsum(double_complex *linktr) {
   linktr->imag = 0.0;
   FORALLSITES(i, s) {
     FORALLUPDIR(dir) {
-      a = &s->link[dir];
+      a = &(s->link[dir]);
       CSUM(*linktr, a->e[0][0]);
       CSUM(*linktr, a->e[1][1]);
       CSUM(*linktr, a->e[2][2]);

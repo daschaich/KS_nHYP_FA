@@ -8,7 +8,6 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 #include "../include/macros.h"
-#include "defines.h"
 #include "lattice.h"
 #include "../include/comdefs.h"
 #include "../include/io_lat.h"

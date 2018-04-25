@@ -28,7 +28,7 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
   // The lower staple is prepared at x-dir2 and stored in tempmat,
   // then gathered to x
   FORALLSITES(i, s) {
-    mult_su3_an((matrix*)F_PT(s, lnk2), (matrix*)F_PT(s, lnk1),
+    mult_an((matrix*)F_PT(s, lnk2), (matrix*)F_PT(s, lnk1),
                 &(tempmat[i]));
   }
 
@@ -36,7 +36,7 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
   wait_gather(tag0);
   wait_gather(tag1);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &tmat);
+    mult_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &tmat);
     mat_copy(&tmat, &(tempmat[i]));       // Initialize tempmat
   }
 
@@ -46,8 +46,8 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
 
   // Calculate upper staple, add it
   FORALLSITES(i, s) {
-    mult_su3_nn((matrix *)F_PT(s, lnk2), (matrix *)gen_pt[1][i], &tmat);
-    mult_su3_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
+    mult_nn((matrix *)F_PT(s, lnk2), (matrix *)gen_pt[1][i], &tmat);
+    mult_na(&tmat, (matrix *)gen_pt[0][i], &tmat2);
     sum_matrix(&tmat2, &(stp[i]));
   }
 

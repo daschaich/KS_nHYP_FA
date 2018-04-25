@@ -39,13 +39,13 @@ void blocked_path(int block, int *dir, int *sign, int length) {
 
   if (sign[0] < 0) {
     FORALLSITES(i, s)
-      su3_adjoint(&(s->link[dir[0]]), &(tempmat2[i]));
+      adjoint(&(s->link[dir[0]]), &(tempmat2[i]));
   }
 
   for (j = 1; j < length; j++) {
     if (sign[j] > 0) {
       FORALLSITES(i, s)
-        mult_su3_nn(&(tempmat2[i]), &(s->link[dir[j]]), &(tempmat[i]));
+        mult_nn(&(tempmat2[i]), &(s->link[dir[j]]), &(tempmat[i]));
 
       // Shift block times
       for (k = 0; k < bl; k++) {
@@ -90,7 +90,7 @@ void blocked_path(int block, int *dir, int *sign, int length) {
         mat_copy(&(tempmat2[i]), &(tempmat[i]));
 
       FORALLSITES(i, s)
-        mult_su3_na(&(tempmat[i]), &(s->link[dir[j]]), &(tempmat2[i]));
+        mult_na(&(tempmat[i]), &(s->link[dir[j]]), &(tempmat2[i]));
     }
   }
 }

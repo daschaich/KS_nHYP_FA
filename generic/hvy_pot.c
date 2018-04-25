@@ -37,7 +37,7 @@ void hvy_pot( field_offset links ) {
 	        TUP, EVENANDODD, gen_pt[0] );
 	    wait_gather(mtag0);
 	    FORALLSITES(i,s){
-	 	mult_su3_nn( &(((matrix *)(F_PT(s,links)))[TUP]),
+	 	mult_nn( &(((matrix *)(F_PT(s,links)))[TUP]),
 		    (matrix *)gen_pt[0][i], &(s->staple) );
 	    }
 	    cleanup_gather( mtag0 );
@@ -68,7 +68,7 @@ void hvy_pot( field_offset links ) {
 		    /* evaluate potential at this separation */
 		    wloop = 0.0;
 		    FORALLSITES(i,s){
-			wloop += (double)realtrace_su3( &(s->tempmat1),
+			wloop += (double)realtrace( &(s->tempmat1),
 			    (matrix *)F_PT(s,oldmat) );
 		    }
 		    g_doublesum( &wloop );

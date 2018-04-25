@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-complex complextrace_su3( matrix *a, matrix *b ) {
+complex complextrace( matrix *a, matrix *b ) {
   register int i, j;
   register Real sumr = 0.0, sumi = 0.0;
   complex sum;

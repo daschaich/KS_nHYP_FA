@@ -67,10 +67,10 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     wait_gather(mtag);
     wait_gather(mtag2);
     FORALLSITES(i, s) {
-      mult_su3_nn(&LINK(dir), (matrix *)(gen_pt[1][i]), &tmat);
-      mult_su3_na(&tmat, (matrix *)(gen_pt[0][i]), &tmat2);
-      mult_su3_na(&tmat2, &LINK(dir2), &tmat);
-      su3_adjoint(&tmat, &tmat2);
+      mult_nn(&LINK(dir), (matrix *)(gen_pt[1][i]), &tmat);
+      mult_na(&tmat, (matrix *)(gen_pt[0][i]), &tmat2);
+      mult_na(&tmat2, &LINK(dir2), &tmat);
+      adjoint(&tmat, &tmat2);
       sub_matrix(&tmat, &tmat2, &FS(component));
     }
     cleanup_gather(mtag2);
@@ -78,16 +78,16 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     // -dir +dir2 plaquette
     // Reuse link[dir] gather from dir2 corresponding to mtag
     FORALLSITES(i, s) {
-      mult_su3_an(&LINK(dir2), &LINK(dir), &tmat);
-      mult_su3_an((matrix *)(gen_pt[0][i]), &tmat, &(tempmat[i]));
+      mult_an(&LINK(dir2), &LINK(dir), &tmat);
+      mult_an((matrix *)(gen_pt[0][i]), &tmat, &(tempmat[i]));
     }
     mtag2 = start_gather_field(tempmat, sizeof(matrix),
                                OPP_DIR(dir), EVENANDODD, gen_pt[1]);
 
     wait_gather(mtag2);
     FORALLSITES(i, s) {
-      mult_su3_nn(&LINK(dir2), (matrix *)(gen_pt[1][i]), &tmat);
-      su3_adjoint(&tmat, &tmat2);
+      mult_nn(&LINK(dir2), (matrix *)(gen_pt[1][i]), &tmat);
+      adjoint(&tmat, &tmat2);
       add_matrix(&FS(component), &tmat, &FS(component));
       sub_matrix(&FS(component), &tmat2, &FS(component));
     }
@@ -103,8 +103,8 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     wait_gather(mtag);
     wait_gather(mtag2);
     FORALLSITES(i,s){
-      mult_su3_nn((matrix *)(gen_pt[0][i]), &LINK(dir2), &(tempmat[i]));
-      mult_su3_nn((matrix *)(gen_pt[1][i]), &LINK(dir), &(tempmat2[i]));
+      mult_nn((matrix *)(gen_pt[0][i]), &LINK(dir2), &(tempmat[i]));
+      mult_nn((matrix *)(gen_pt[1][i]), &LINK(dir), &(tempmat2[i]));
     }
     cleanup_gather(mtag);
     cleanup_gather(mtag2);
@@ -117,9 +117,9 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     wait_gather(mtag);
     wait_gather(mtag2);
     FORALLSITES(i,s){
-      mult_su3_an((matrix *)(gen_pt[1][i]),
+      mult_an((matrix *)(gen_pt[1][i]),
                   (matrix *)(gen_pt[0][i]), &tmat);
-      su3_adjoint(&tmat, &tmat2);
+      adjoint(&tmat, &tmat2);
       add_matrix(&FS(component), &tmat, &FS(component));
       sub_matrix(&FS(component), &tmat2, &FS(component));
     }
@@ -132,8 +132,8 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
 
     wait_gather(mtag2);
     FORALLSITES(i, s) {
-      mult_su3_an(&LINK(dir2), &LINK(dir), &tmat);
-      mult_su3_nn(&tmat, (matrix *)(gen_pt[1][i]), &tempmat[i]);
+      mult_an(&LINK(dir2), &LINK(dir), &tmat);
+      mult_nn(&tmat, (matrix *)(gen_pt[1][i]), &tempmat[i]);
     }
     cleanup_gather(mtag2);
 
@@ -141,8 +141,8 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
                               OPP_DIR(dir2), EVENANDODD, gen_pt[0]);
     wait_gather(mtag);
     FORALLSITES(i,s){
-      mult_su3_na((matrix *)(gen_pt[0][i]), &LINK(dir), &tmat);
-      su3_adjoint(&tmat, &tmat2);
+      mult_na((matrix *)(gen_pt[0][i]), &LINK(dir), &tmat);
+      adjoint(&tmat, &tmat2);
       add_matrix(&FS(component), &tmat, &FS(component));
       sub_matrix(&FS(component), &tmat2, &FS(component));
     }
@@ -150,7 +150,7 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
 
     // Make traceless
     FORALLSITES(i, s) {
-      cc = trace_su3(&FS(component));
+      cc = trace(&FS(component));
       CDIVREAL(cc, 3.0, cc);
       for(j = 0; j < 3; j++)
         CSUB(FS(component).e[j][j], cc, FS(component).e[j][j]);

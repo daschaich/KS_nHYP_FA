@@ -29,28 +29,28 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
     uncompress_anti_hermitian(&(A[i]), &htemp);
     link = &(s->link[dir]);
 
-    mult_su3_nn(&htemp, link, &tmat);
+    mult_nn(&htemp, link, &tmat);
     scalar_mult_add_matrix(link, &tmat, t8, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t7, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t6, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t5, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t4, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t3, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, t2, &tmat2);
 
-    mult_su3_nn(&htemp, &tmat2, &tmat);
+    mult_nn(&htemp, &tmat2, &tmat);
     scalar_mult_add_matrix(link, &tmat, eps, &tmat2);
 
     mat_copy(&tmat2, link);    // This step updates the link U[dir]
@@ -108,7 +108,7 @@ void update_flow(double f1, double f2) {
   FORALLUPDIR(dir) {
     FORALLSITES(i, s) {
       // Project_antihermitian_traceless(U.Sdag)
-      mult_su3_na(&(s->link[dir]), &(S[dir][i]), &tmat);
+      mult_na(&(s->link[dir]), &(S[dir][i]), &tmat);
       make_anti_hermitian(&tmat, &tantiH);
       // A += f1 * U.S
       scalar_mult_sum_antiH(&tantiH, (Real)f1, &(A[dir][i]));

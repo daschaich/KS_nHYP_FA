@@ -85,17 +85,17 @@ void staple_mcrg(int dir1, int block) {
       // Upper staple
       if (start) {          // The first contribution to the staple
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (matrix *)(gen_pt[2][i]), &tmat2);
-          mult_su3_na(&tmat2, (matrix *)(gen_pt[0][i]), &(s->tempmat2));
+          mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
+          mult_nn(&tmat1, (matrix *)(gen_pt[2][i]), &tmat2);
+          mult_na(&tmat2, (matrix *)(gen_pt[0][i]), &(s->tempmat2));
         }
         start = 0;
       }
       else {
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
-          mult_su3_nn(&tmat1, (matrix *)(gen_pt[2][i]), &tmat2);
-          mult_su3_na(&tmat2, (matrix *)(gen_pt[0][i]), &tmat1);
+          mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
+          mult_nn(&tmat1, (matrix *)(gen_pt[2][i]), &tmat2);
+          mult_na(&tmat2, (matrix *)(gen_pt[0][i]), &tmat1);
           add_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
         }
       }
@@ -105,10 +105,10 @@ void staple_mcrg(int dir1, int block) {
 
       // Lower staple
       FORALLSITES(i, s) {
-        mult_su3_an((matrix *)(gen_pt[3][i]),
+        mult_an((matrix *)(gen_pt[3][i]),
                     (matrix *)(gen_pt[4][i]), &tmat1);
-        mult_su3_nn(&tmat1, (matrix *)(gen_pt[5][i]), &tmat2);
-        mult_su3_nn(&tmat2, (matrix *)(gen_pt[6][i]), &tmat1);
+        mult_nn(&tmat1, (matrix *)(gen_pt[5][i]), &tmat2);
+        mult_nn(&tmat2, (matrix *)(gen_pt[6][i]), &tmat1);
         add_matrix(&(s->tempmat2), &tmat1, &(s->tempmat2));
       }
       cleanup_general_gather(tag3);
@@ -147,7 +147,7 @@ void block_mcrg(int num, int block) {
     wait_general_gather(tag0);
 
     FORALLSITES(i, s)
-      mult_su3_nn(&(s->link[dir]), (matrix *)(gen_pt[0][i]),
+      mult_nn(&(s->link[dir]), (matrix *)(gen_pt[0][i]),
                   &(s->staple));
 
     if (num == 0) {               // Do only center link
@@ -162,10 +162,10 @@ void block_mcrg(int num, int block) {
         scalar_mult_matrix(&(s->staple), 1 - alpha_smear[num], &Q);
         scalar_mult_add_matrix(&Q, &(s->tempmat2),
                                    alpha_smear[num] / 6.0, &Omega);
-        mult_su3_an(&Omega, &Omega, &Q);
+        mult_an(&Omega, &Omega, &Q);
 
         // IR stabilization regulator set in defines.h
-        scalar_add_diag_su3(&Q, IR_STAB);
+        scalar_add_diag(&Q, IR_STAB);
 #ifndef NHYP_DEBUG
         compute_fhb(&Q, f, NULL, 0);
 #else
@@ -173,7 +173,7 @@ void block_mcrg(int num, int block) {
 #endif
 
         // Compute Q**2
-        mult_su3_nn(&Q, &Q, &Q2);
+        mult_nn(&Q, &Q, &Q2);
 
         // Compute Q^(-1/2) via Eq. (3.8)
         ctmp = cmplx(f[0], 0);
@@ -182,7 +182,7 @@ void block_mcrg(int num, int block) {
         scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
 
         // Multiply Omega by eQ = (Omega^\dagger Omega)^(-1/2)
-        mult_su3_nn(&Omega, &eQ, &tmat);
+        mult_nn(&Omega, &eQ, &tmat);
         mat_copy(&tmat, &(s->link[dir + 4]));
       }
     } // End of staple

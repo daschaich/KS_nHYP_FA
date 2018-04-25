@@ -139,9 +139,9 @@ void ape_smear_dir(
     /* dest += w_staple * upper staple */ 
     FORALLSITES(i,s)
       {
-	mult_su3_na( (matrix *)gen_pt[1][i],
+	mult_na( (matrix *)gen_pt[1][i],
 		     (matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_nn( &(((matrix *)F_PT(s,src))[dir2]), 
+	mult_nn( &(((matrix *)F_PT(s,src))[dir2]), 
 		     &tmat1, &tmat2 );
 	scalar_mult_add_matrix( 
 			   (matrix *)F_PT(s,dest),
@@ -158,9 +158,9 @@ void ape_smear_dir(
     wait_gather(mtag0);
     FORALLSITES(i,s)
       {
-	mult_su3_nn( &(((matrix *)F_PT(s,src))[dir1]),
+	mult_nn( &(((matrix *)F_PT(s,src))[dir1]),
 		     (matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_an( &(((matrix *)F_PT(s,src))[dir2]),
+	mult_an( &(((matrix *)F_PT(s,src))[dir2]),
 		     &tmat1, &temp[i] );
       }
     cleanup_gather(mtag0);
@@ -300,9 +300,9 @@ void ape_smear_field_dir(
     /* dest += w_staple * upper staple */ 
     FORALLSITES(i,s)
       {
-	mult_su3_na( (matrix *)gen_pt[1][i],
+	mult_na( (matrix *)gen_pt[1][i],
 		     (matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_nn( &src[4*i+dir2], &tmat1, &tmat2 );
+	mult_nn( &src[4*i+dir2], &tmat1, &tmat2 );
 	scalar_mult_add_matrix( &dest[4*i+dir1], &tmat2, w_staple,
 				    &dest[4*i+dir1] );
       }
@@ -319,8 +319,8 @@ void ape_smear_field_dir(
     wait_gather(mtag0);
     FORALLSITES(i,s)
       {
-	mult_su3_nn( &src[4*i+dir1], (matrix *)gen_pt[0][i], &tmat1 );
-	mult_su3_an( &src[4*i+dir2], &tmat1, &temp[i] );
+	mult_nn( &src[4*i+dir1], (matrix *)gen_pt[0][i], &tmat1 );
+	mult_an( &src[4*i+dir2], &tmat1, &temp[i] );
       }
     cleanup_gather(mtag0);
     mtag1 = start_gather_field( temp, sizeof(matrix),

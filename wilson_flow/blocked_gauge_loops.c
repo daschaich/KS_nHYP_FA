@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Use ordinary gathers, accumulate in staple.e[0][0]
-#include "wflow_includes.h"
+#include "local_includes.h"
 // -----------------------------------------------------------------
 
 
@@ -12,7 +12,7 @@ void blocked_gauge_loops(int block, double *result) {
   int rep, dirs[10], sign[10], length;
   int ln, iloop;      // For loop_table
   double g_action = 0, action, act2, total_action;
-  complex trace;
+  complex tc;
 
   // Gauge action
   for (iloop = 0; iloop < nloop; iloop++) {
@@ -45,10 +45,10 @@ void blocked_gauge_loops(int block, double *result) {
         path(dirs, sign, length);
 
       FORALLSITES(i, s) {
-        trace = trace_su3(&(tempmat2[i]));
         // Avoid excessively large numbers
         // Measure relative to some reasonable value of the loops
-        action = (double)trace.real;
+        tc = trace(&(tempmat2[i]));
+        action = (double)tc.real;
         total_action = (double)loop_coeff[iloop][0] * action;
         act2 = action;
         result[iloop] += act2;

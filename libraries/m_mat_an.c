@@ -6,7 +6,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-void mult_su3_an_sum(matrix *a, matrix *b, matrix *c) {
+void mult_an_sum(matrix *a, matrix *b, matrix *c) {
   register int i, j, k;
 
   for (i = 0; i < 3; i++) {
@@ -21,7 +21,7 @@ void mult_su3_an_sum(matrix *a, matrix *b, matrix *c) {
   }
 }
 
-void mult_su3_an(matrix *a, matrix *b, matrix *c) {
+void mult_an(matrix *a, matrix *b, matrix *c) {
   register int j;
 #ifndef FAST
   register int i, k;

@@ -4,7 +4,7 @@
 #include "../include/complex.h"
 #include "../include/su3.h"
 
-Real realtrace_su3_nn(matrix *a, matrix *b) {
+Real realtrace_nn(matrix *a, matrix *b) {
   register int i, j;
   register Real sum = 0.0;
 
@@ -17,7 +17,7 @@ Real realtrace_su3_nn(matrix *a, matrix *b) {
   return sum;
 }
 
-Real realtrace_su3(matrix *a, matrix *b) {
+Real realtrace(matrix *a, matrix *b) {
   register int i, j;
   register Real sum = 0.0;
 

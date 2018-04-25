@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // An arbitrary path walker using ordinary gathers
-#include "wflow_includes.h"
+#include "local_includes.h"
 
 // Put result in tempmat2
 // Use tempmat for temporary storage
@@ -22,13 +22,13 @@ void path(int *dir, int *sign, int length) {
 
   if (sign[0] < 0) {
     FORALLSITES(i, s)
-      su3_adjoint(&(s->link[dir[0]]), &(tempmat2[i]));
+      adjoint(&(s->link[dir[0]]), &(tempmat2[i]));
   }
 
   for (j = 1; j < length; j++) {
     if (sign[j] > 0) {
       FORALLSITES(i, s)
-        mult_su3_nn(&(tempmat2[i]), &(s->link[dir[j]]), &(tempmat[i]));
+        mult_nn(&(tempmat2[i]), &(s->link[dir[j]]), &(tempmat[i]));
 
       mtag = start_gather_field(tempmat, sizeof(matrix),
                                 OPP_DIR(dir[j]), EVENANDODD, gen_pt[0]);
@@ -44,7 +44,7 @@ void path(int *dir, int *sign, int length) {
                                 dir[j], EVENANDODD, gen_pt[1]);
       wait_gather(mtag);
       FORALLSITES(i, s)
-        mult_su3_na((matrix *)(gen_pt[1][i]),
+        mult_na((matrix *)(gen_pt[1][i]),
                     &(s->link[dir[j]]), &(tempmat[i]));
 
       FORALLSITES(i, s)

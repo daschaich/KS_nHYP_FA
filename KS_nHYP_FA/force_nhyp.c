@@ -40,8 +40,8 @@ void Sigma_update1(const int dir, matrix *sigma_off, matrix *stp,
   FORALLSITES(i, s) {
     // Make Omega, Q, Q^2
     Omega = stp[i];
-    mult_su3_an(&Omega, &Omega, &Q);
-    mult_su3_nn(&Q, &Q, &Q2);
+    mult_an(&Omega, &Omega, &Q);
+    mult_nn(&Q, &Q, &Q2);
 
     // Compute inverse sqrt
 #ifndef NHYP_DEBUG
@@ -52,15 +52,15 @@ void Sigma_update1(const int dir, matrix *sigma_off, matrix *stp,
 
     scalar_mult_matrix(&Q, f[1], &tmat);
     scalar_mult_add_matrix(&tmat, &Q2, f[2], &Qisqrt);
-    scalar_add_diag_su3(&Qisqrt, f[0]);
+    scalar_add_diag(&Qisqrt, f[0]);
 
     // We'll need Sigma * Omega a few times
-    mult_su3_nn(sigma_off + i, &Omega, &SigmaOmega);
+    mult_nn(sigma_off + i, &Omega, &SigmaOmega);
 
     // Now the B matrices and their traces with Sigma*Omega
-    tc = trace_su3(&SigmaOmega);
-    tc2 = complextrace_su3(&Q, &SigmaOmega);
-    tc3 = complextrace_su3(&Q2, &SigmaOmega);
+    tc = trace(&SigmaOmega);
+    tc2 = complextrace(&Q, &SigmaOmega);
+    tc3 = complextrace(&Q2, &SigmaOmega);
     for (j = 0; j < 3; j++) {
       traces[j].real = tc.real * bb[j][0] + tc2.real * bb[j][1]
                                           + tc3.real * bb[j][2];
@@ -71,23 +71,23 @@ void Sigma_update1(const int dir, matrix *sigma_off, matrix *stp,
     // The contributions to A tr(B_i Sigma Omega) Q^(i)
     c_scalar_mult_mat(&Q, &traces[1], &Gamma);
     c_scalar_mult_sum_mat(&Q2, &traces[2], &Gamma);
-    c_scalar_add_diag_su3(&Gamma, &traces[0]);
+    c_scalar_add_diag(&Gamma, &traces[0]);
 
     // The terms proportional to f_i
     scalar_mult_sum_matrix(&SigmaOmega, f[1], &Gamma);
-    mult_su3_nn(&SigmaOmega, &Q, &tmat);
+    mult_nn(&SigmaOmega, &Q, &tmat);
     scalar_mult_sum_matrix(&tmat, f[2], &Gamma);
-    mult_su3_nn(&Q, &SigmaOmega, &tmat);
+    mult_nn(&Q, &SigmaOmega, &tmat);
     scalar_mult_sum_matrix(&tmat, f[2], &Gamma);
 
     // Gamma = (A + Adag)Qdag + Q^{-1/2}Sigma
     make_2hermitian(&Gamma);
-    mult_su3_na(&Gamma, &Omega, &tmat);
+    mult_na(&Gamma, &Omega, &tmat);
 
-    mult_su3_nn(&Qisqrt, sigma_off + i, &Gamma);
+    mult_nn(&Qisqrt, sigma_off + i, &Gamma);
     add_matrix(&Gamma, &tmat, &Gamma);
     scalar_mult_matrix(&Gamma, alpha2, &tmat);
-    su3_adjoint(&tmat, lambda[dir] + i);
+    adjoint(&tmat, lambda[dir] + i);
 
     // The derivative which contributes to the new global Sigma
     // If this is the first level, then Sigma has to be initialized.
@@ -179,34 +179,34 @@ void compute_sigma23(matrix *sig, matrix *lnk1, matrix *lnk2,
 
   FORSOMEPARITY(i, s, parity) {
     // Term 1 -- initialize sig
-    mult_su3_nn(lambda2 + i, (matrix *)gen_pt[1][i], &tmat);
-    mult_su3_na((matrix *)gen_pt[0][i], &tmat, sig + i);
+    mult_nn(lambda2 + i, (matrix *)gen_pt[1][i], &tmat);
+    mult_na((matrix *)gen_pt[0][i], &tmat, sig + i);
 
     // Term 2
-    mult_su3_nn((matrix *)gen_pt[8][i],
+    mult_nn((matrix *)gen_pt[8][i],
                 (matrix *)gen_pt[4][i], &tmat);
-    mult_su3_an(&tmat, (matrix *)gen_pt[2][i], &tmat2);
+    mult_an(&tmat, (matrix *)gen_pt[2][i], &tmat2);
     add_matrix(sig + i, &tmat2, sig + i);
 
     // Term 3
-    mult_su3_nn((matrix *)gen_pt[3][i],
+    mult_nn((matrix *)gen_pt[3][i],
                 (matrix *)gen_pt[9][i], &tmat);
-    mult_su3_an_sum(&tmat, (matrix *)gen_pt[2][i], sig + i);
+    mult_an_sum(&tmat, (matrix *)gen_pt[2][i], sig + i);
 
     // Term 4
-    mult_su3_nn((matrix *)gen_pt[3][i],
+    mult_nn((matrix *)gen_pt[3][i],
                 (matrix *)gen_pt[4][i], &tmat);
-    mult_su3_an_sum(&tmat, (matrix *)gen_pt[7][i], sig + i);
+    mult_an_sum(&tmat, (matrix *)gen_pt[7][i], sig + i);
 
     // Term 5
-    mult_su3_na((matrix *)gen_pt[5][i],
+    mult_na((matrix *)gen_pt[5][i],
                 (matrix *)gen_pt[1][i], &tmat);
-    mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
+    mult_na_sum(&tmat, lnk1 + i, sig + i);
 
     // Term 6
-    mult_su3_na((matrix *)gen_pt[0][i],
+    mult_na((matrix *)gen_pt[0][i],
                 (matrix *)gen_pt[6][i], &tmat);
-    mult_su3_na_sum(&tmat, lnk1 + i, sig + i);
+    mult_na_sum(&tmat, lnk1 + i, sig + i);
   }
 
   cleanup_gather(tag0);

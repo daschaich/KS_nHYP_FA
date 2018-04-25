@@ -70,9 +70,9 @@ int main(int argc, char *argv[])  {
       E = 0;
       FORALLSITES(i, s) {
         for (dir = 0; dir < 6; dir++) {
-          mult_su3_nn(&(s->fieldstrength[dir]),
+          mult_nn(&(s->fieldstrength[dir]),
                       &(s->fieldstrength[dir]), &t_mat);
-          tc = trace_su3(&t_mat);
+          tc = trace(&t_mat);
           E -= (double)tc.real;
         }
       }
@@ -84,19 +84,19 @@ int main(int argc, char *argv[])  {
       // Might as well extract topology
       topo = 0;
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->fieldstrength[0]), // XYZT
+        mult_nn(&(s->fieldstrength[0]), // XYZT
                     &(s->fieldstrength[5]), &t_mat);
-        tc = trace_su3(&t_mat);
+        tc = trace(&t_mat);
         topo -= (double)tc.real;
 
-        mult_su3_nn(&(s->fieldstrength[3]), // XTYZ
+        mult_nn(&(s->fieldstrength[3]), // XTYZ
                     &(s->fieldstrength[2]), &t_mat);
-        tc = trace_su3(&t_mat);
+        tc = trace(&t_mat);
         topo -= (double)tc.real;
 
-        mult_su3_na(&(s->fieldstrength[1]), // XZTY
+        mult_na(&(s->fieldstrength[1]), // XZTY
                     &(s->fieldstrength[4]), &t_mat);
-        tc = trace_su3(&t_mat);
+        tc = trace(&t_mat);
         topo -= (double)tc.real;
       }
       g_doublesum(&topo);

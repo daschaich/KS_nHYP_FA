@@ -52,16 +52,16 @@ typedef struct { complex e[2][2]; } su2_matrix;
 /*
 * ROUTINES FOR SU(3) MATRIX OPERATIONS
 *
-* void mult_su3_nn(matrix *a, matrix *b, matrix *c)
+* void mult_nn(matrix *a, matrix *b, matrix *c)
 * matrix multiply, no adjoints
 * files "m_mat_nn.c"
-* void mult_su3_na(matrix *a, matrix *b, matrix *c)
+* void mult_na(matrix *a, matrix *b, matrix *c)
 * matrix multiply, second matrix is adjoint
 * files "m_mat_na.c"
-* void mult_su3_an(matrix *a, matrix *b, matrix *c)
+* void mult_an(matrix *a, matrix *b, matrix *c)
 * matrix multiply, first matrix is adjoint
 * files "m_mat_an.c"
-* complex complextrace_su3(matrix *a, matrix *b)
+* complex complextrace(matrix *a, matrix *b)
 * (Tr(A_adjoint*B))
 * file "complextr.c"
 * complex det_su3(matrix *a)
@@ -83,8 +83,8 @@ typedef struct { complex e[2][2]; } su2_matrix;
 * void c_scalar_mult_add_mat(matrix *m1, matrix *m2,
 * complex *phase, matrix *m3)
 * file "cs_m_a_mat.c"
-* void su3_adjoint(matrix *a, matrix *b)
-* file "su3_adjoint.c"
+* void adjoint(matrix *a, matrix *b)
+* file "adjoint.c"
 * void make_anti_hermitian(matrix *m3,  anti_hermitmat *ah3)
 * file "make_ahmat.c"
 * void random_anti_hermitian(anti_hermitmat *mat_antihermit, double_prn *prn_pt)
@@ -227,9 +227,9 @@ typedef struct { complex e[2][2]; } su2_matrix;
 
 // Our available double-precision SSE macros */
 
-#define mult_su3_nn(...) _inline_sse_mult_su3_nn(__VA_ARGS__)
-#define mult_su3_na(...) _inline_sse_mult_su3_na(__VA_ARGS__)
-#define mult_su3_an(...) _inline_sse_mult_su3_an(__VA_ARGS__)
+#define mult_nn(...) _inline_sse_mult_nn(__VA_ARGS__)
+#define mult_na(...) _inline_sse_mult_na(__VA_ARGS__)
+#define mult_an(...) _inline_sse_mult_an(__VA_ARGS__)
 #define mult_mat_vec(...) _inline_sse_mult_mat_vec(__VA_ARGS__)
 #define mult_adj_mat_vec(...) _inline_sse_mult_adj_mat_vec(__VA_ARGS__)
 #define mult_adj_mat_vec_4dir(...) _inline_sse_mult_adj_mat_vec_4dir(__VA_ARGS__)
@@ -245,13 +245,13 @@ typedef struct { complex e[2][2]; } su2_matrix;
 // -----------------------------------------------------------------
 // Matrix operations
 // In file realtr.c
-Real realtrace_su3_nn(matrix *a, matrix *b);
-Real realtrace_su3(matrix *a, matrix *b);
+Real realtrace_nn(matrix *a, matrix *b);
+Real realtrace(matrix *a, matrix *b);
 
-// In file trace_su3.c
-complex trace_su3(matrix *a);
+// In file trace.c
+complex trace(matrix *a);
 
-complex complextrace_su3(matrix *a, matrix *b);
+complex complextrace(matrix *a, matrix *b);
 complex det_su3(matrix *a);
 
 // In file addmat.c
@@ -265,8 +265,8 @@ void scalar_mult_matrix(matrix *b, Real s, matrix *c);
 void scalar_mult_sub_matrix(matrix *a, matrix *b, Real s, matrix *c);
 
 void c_scalar_mult_mat(matrix *b, complex *s, matrix *c);
-void scalar_add_diag_su3(matrix *a, Real s);
-void c_scalar_add_diag_su3(matrix *a, complex *s);
+void scalar_add_diag(matrix *a, Real s);
+void c_scalar_add_diag(matrix *a, complex *s);
 
 // In file s_m_a_mat.c
 void scalar_mult_sum_matrix(matrix *b, Real s, matrix *c);
@@ -276,7 +276,7 @@ void scalar_mult_add_matrix(matrix *a, matrix *b, Real scalar, matrix *c);
 void c_scalar_mult_sum_mat(matrix *b, complex *s, matrix *c);
 void c_scalar_mult_add_mat(matrix *a, matrix *b, complex *s, matrix *c);
 
-void su3_adjoint(matrix *a, matrix *b);
+void adjoint(matrix *a, matrix *b);
 
 void make_anti_hermitian(matrix *m3, anti_hermitmat *ah3);
 void random_anti_hermitian(anti_hermitmat *mat_antihermit, double_prn *prn_pt);
@@ -330,20 +330,20 @@ void byterevn64(int32type w[], int n);
 Real magsq_vec(vector *a);
 
 // In file m_mat_nn.c
-#ifndef mult_su3_nn
-void mult_su3_nn(matrix *a, matrix *b, matrix *c);
+#ifndef mult_nn
+void mult_nn(matrix *a, matrix *b, matrix *c);
 #endif
 
 // In file m_mat_na.c
-void mult_su3_na_sum(matrix *a, matrix *b, matrix *c);
-#ifndef mult_su3_na
-void mult_su3_na(matrix *a, matrix *b, matrix *c);
+void mult_na_sum(matrix *a, matrix *b, matrix *c);
+#ifndef mult_na
+void mult_na(matrix *a, matrix *b, matrix *c);
 #endif
 
 // In file m_mat_an.c
-void mult_su3_an_sum(matrix *a, matrix *b, matrix *c);
-#ifndef mult_su3_an
-void mult_su3_an(matrix *a, matrix *b, matrix *c);
+void mult_an_sum(matrix *a, matrix *b, matrix *c);
+#ifndef mult_an
+void mult_an(matrix *a, matrix *b, matrix *c);
 #endif
 
 #ifndef mult_mat_vec
@@ -359,8 +359,8 @@ void mult_adj_mat_vec_4dir(matrix *a, vector *b, vector *c);
 #endif
 
 #ifndef mult_mat_vec_sum_4dir
-void mult_mat_vec_sum_4dir(matrix *a, vector *b0,
-  vector *b1, vector *b2, vector *b3, vector *c);
+void mult_mat_vec_sum_4dir(matrix *a, vector *b0, vector *b1,
+                           vector *b2, vector *b3, vector *c);
 #endif
 
 // In file s_m_a_vec.c

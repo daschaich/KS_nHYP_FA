@@ -51,7 +51,7 @@ void w_loop1(int tot_smear) {
           mat_copy((matrix *)(gen_pt[1][i]), &(s->staple));
 
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->link[dir]), &(s->staple), &(s->s_link));
+          mult_nn(&(s->link[dir]), &(s->staple), &(s->s_link));
       }
 
       FORALLSITES(i, s)
@@ -99,13 +99,13 @@ void w_loop1(int tot_smear) {
         // Finally, compute the Wilson loops
         FORALLSITES(i, s) {
           if ((s->t) + t + 1 >= nt) {
-            mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-            mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
-            wils_loop1[r + nxh * t] += (double)realtrace_su3(&tmat2,
+            mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+            mult_na(&tmat1, &(s->t_link_f), &tmat2);
+            wils_loop1[r + nxh * t] += (double)realtrace(&tmat2,
                                                              &(s->s_link));
           }
           else {
-            wils_loop1[r + nxh * t] += (double)realtrace_su3(&(s->s_link_f),
+            wils_loop1[r + nxh * t] += (double)realtrace(&(s->s_link_f),
                                                              &(s->s_link));
           }
         }

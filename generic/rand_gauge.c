@@ -49,8 +49,8 @@ void gauge_trans(field_offset G)
     wait_gather(tag[mu]);
     FORALLSITES(i,s) {
 
-       mult_su3_an((matrix *)F_PT(s,G), &(s->link[mu]), &tmp);
-       mult_su3_nn(&tmp, (matrix *)gen_pt[mu][i],
+       mult_an((matrix *)F_PT(s,G), &(s->link[mu]), &tmp);
+       mult_nn(&tmp, (matrix *)gen_pt[mu][i],
 		       &(s->link[mu]));
 
     }

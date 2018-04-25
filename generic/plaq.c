@@ -30,7 +30,7 @@ void plaquette(double *ss_plaq, double *st_plaq) {
       FORALLSITES(i, s) {
         m1 = &(s->link[dir]);
         m4 = &(s->link[dir2]);
-        mult_su3_an(m4, m1, &(tempmat[i]));
+        mult_an(m4, m1, &(tempmat[i]));
       }
       wait_gather(mtag0);
       wait_gather(mtag1);
@@ -39,12 +39,12 @@ void plaquette(double *ss_plaq, double *st_plaq) {
       FORALLSITES(i, s) {
         m1 = (matrix *)(gen_pt[0][i]);
         m4 = (matrix *)(gen_pt[1][i]);
-        mult_su3_nn(&(tempmat[i]), m1, &tmat);
+        mult_nn(&(tempmat[i]), m1, &tmat);
 
         if (dir == TUP)
-          st_sum += (double)realtrace_su3(m4, &tmat);
+          st_sum += (double)realtrace(m4, &tmat);
         else
-          ss_sum += (double)realtrace_su3(m4, &tmat);
+          ss_sum += (double)realtrace(m4, &tmat);
       }
       cleanup_gather(mtag0);
       cleanup_gather(mtag1);

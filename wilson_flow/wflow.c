@@ -54,7 +54,7 @@ void wflow() {
     E = 0.0;
     FORALLSITES(i, s) {
       for (dir = 0; dir < 6; dir++)
-        E -= (double)realtrace_su3_nn(&(s->FS[dir]), &(s->FS[dir]));
+        E -= (double)realtrace_nn(&(s->FS[dir]), &(s->FS[dir]));
     }
     g_doublesum(&E);
     E /= (volume * 64.0); // Normalization factor of 1/8 for each F_munu
@@ -66,9 +66,9 @@ void wflow() {
     // Normalization is 1/(64*4pi^2) again with 1/8 for each F_munu
     topo = 0.0;
     FORALLSITES(i, s) {
-      topo -= (double)realtrace_su3_nn(&(s->FS[0]), &(s->FS[5])); // XYZT
-      topo -= (double)realtrace_su3_nn(&(s->FS[3]), &(s->FS[2])); // XTYZ
-      topo -= (double)realtrace_su3(&(s->FS[1]), &(s->FS[4]));    // XZ(YT)^dag
+      topo -= (double)realtrace_nn(&(s->FS[0]), &(s->FS[5])); // XYZT
+      topo -= (double)realtrace_nn(&(s->FS[3]), &(s->FS[2])); // XTYZ
+      topo -= (double)realtrace(&(s->FS[1]), &(s->FS[4]));    // XZ(YT)^dag
     }
     g_doublesum(&topo);
     topo *= 0.000395785873603;

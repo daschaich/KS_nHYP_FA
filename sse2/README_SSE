@@ -8,24 +8,24 @@ November 2004 C. DeTar: names of sse/libraries/*.nas files
 This tar file contains SSE versions of a number of the C-language
 matrix-vector and matrix-matrix routines:
 
-	mult_su3_nn
-	mult_su3_na
-	mult_su3_an
-	mult_su3_mat_vec
-	mult_adj_su3_mat_vec
-	mult_su3_mat_vec_sum_4dir
-	mult_adj_su3_mat_vec_4dir
-	mult_adj_su3_mat_4vec
+	mult_nn
+	mult_na
+	mult_an
+	mult_mat_vec
+	mult_adj_mat_vec
+	mult_mat_vec_sum_4dir
+	mult_adj_mat_vec_4dir
+	mult_adj_mat_4vec
 	su3_projector
-	mult_su3_mat_hwvec
-	mult_adj_su3_mat_hwvec
+	mult_mat_hwvec
+	mult_adj_mat_hwvec
 
 The following are unavailable for now:
 
-	sub_four_su3_vecs
-	add_su3_vector
-	scalar_mult_add_su3_vector
-	scalar_mult_add_su3_matrix
+	sub_four_vecs
+	add_vector
+	scalar_mult_add_vector
+	scalar_mult_add_matrix
 
 These have all been implemented using the NASM assembler (see
 http://nasm.2y.net).  However, using this assembler implies that these
@@ -47,7 +47,7 @@ To use these inline routines, do the following:
 Note that in step 3, the SSE_INLINE macro will enable macros similar to the
 following:
 
-   #define mult_su3_nn(...) _inline_mult_su3_nn(__VA_ARGS__)
+   #define mult_nn(...) _inline_mult_nn(__VA_ARGS__)
 
 The effect of these macros is to transparently substitute the inline
 macros for the original C invocations.  If you prefer, do not define

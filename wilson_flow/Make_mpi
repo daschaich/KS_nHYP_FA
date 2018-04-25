@@ -54,19 +54,19 @@ MAKELIBRARIES  = Make_mpi
 # Stuff below shouldn't change
 ifeq ($(strip ${MPP}),true)
   ifeq ($(strip ${HAVEQMP}),true)
-     COMMTYPE = QMP
-     COMMPKG = com_qmp.o
+    COMMTYPE = QMP
+    COMMPKG = com_qmp.o
   else
-     COMMTYPE = MPI
-     COMMPKG = com_mpi.o
+    COMMTYPE = MPI
+    COMMPKG = com_mpi.o
   endif
 else
   ifeq ($(strip ${HAVEQMP}),true)
-     COMMTYPE = SINGLE
-     COMMPKG = com_qmp.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_qmp.o
   else
-     COMMTYPE = SINGLE
-     COMMPKG = com_vanilla.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_vanilla.o
   endif
 endif
 

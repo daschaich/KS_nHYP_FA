@@ -29,28 +29,28 @@ void exp_mult(int dir, double eps, anti_hermitmat *A) {
     uncompress_anti_hermitian(&(A[i]), &htemp);
     link = &(s->link[dir]);
 
-    mult_su3_nn(&htemp, link, &temp1);
+    mult_nn(&htemp, link, &temp1);
     scalar_mult_add_matrix(link, &temp1, t8, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t7, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t6, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t5, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t4, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t3, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, t2, &temp2);
 
-    mult_su3_nn(&htemp, &temp2, &temp1);
+    mult_nn(&htemp, &temp2, &temp1);
     scalar_mult_add_matrix(link, &temp1, eps, &temp2);
 
     mat_copy(&temp2, link);    // This step updates the link U[dir]
@@ -67,9 +67,9 @@ void proj_traceless_antiH(matrix *in, anti_hermitmat *out) {
   complex tc;
   matrix tmat;
 
-  su3_adjoint(in, &tmat);
+  adjoint(in, &tmat);
   sub_matrix(in, &tmat, in);
-  tc = trace_su3(in);
+  tc = trace(in);
   CMULREAL(tc, 1 / 3.0, tc);
   for (i = 0; i < 3; i++)
     CSUB(in->e[i][i], tc, in->e[i][i]);
@@ -126,8 +126,8 @@ void update_flow(int dir, anti_hermitmat *A, matrix *S,
   anti_hermitmat tantiH;
 
   FORALLSITES(i, s) {
-    mult_su3_na(&(S[i]), &(s->link[dir]), &tmat); // S.Udag
-//    tc = trace_su3(&tmat);
+    mult_na(&(S[i]), &(s->link[dir]), &tmat); // S.Udag
+//    tc = trace(&tmat);
 //    td += (double)tc.real;
     proj_traceless_antiH(&tmat, &tantiH);         // Projection
     scalar_mult_add_antiH(&tantiH, &tantiH, -0.5, &tantiH);

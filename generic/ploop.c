@@ -30,7 +30,7 @@ complex ploop(int dir) {
 
   wait_gather(tag);
   FOREVENSITES(i, s)
-    mult_su3_nn(&(s->link[dir]), (matrix *)gen_pt[0][i], &(tempmat[i]));
+    mult_nn(&(s->link[dir]), (matrix *)gen_pt[0][i], &(tempmat[i]));
 
   cleanup_gather(tag);
 
@@ -48,7 +48,7 @@ complex ploop(int dir) {
         case ZUP: if (s->z > 1) continue; break;
         case TUP: if (s->t > 1) continue; break;
       }
-      mult_su3_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &(tempmat2[i]));
+      mult_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &(tempmat2[i]));
       mat_copy(&(tempmat2[i]), &(tempmat[i]));
     }
     cleanup_general_gather(tag);
@@ -60,7 +60,7 @@ complex ploop(int dir) {
       case ZUP: if (s->z > 1) continue; break;
       case TUP: if (s->t > 1) continue; break;
     }
-    plp = trace_su3(&(tempmat[i]));
+    plp = trace(&(tempmat[i]));
     CSUM(sum, plp);   // Running complex sum
   }
 

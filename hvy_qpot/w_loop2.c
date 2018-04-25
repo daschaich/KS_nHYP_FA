@@ -60,9 +60,9 @@ void w_loop2(int tot_smear) {
       wait_gather(mtag[dir2]);
       dt = 0.5;
       FORALLSITES(i, s) {
-        mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
+        mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                     &(s->diag));
-        mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
+        mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
                     &tmat1);
         add_matrix(&(s->diag), &tmat1, &(s->diag));
         scalar_mult_matrix(&(s->diag), dt, &(s->diag));
@@ -90,7 +90,7 @@ void w_loop2(int tot_smear) {
                                             EVENANDODD, gen_pt[4]);
 
           FORALLSITES(i, s)
-            mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+            mult_nn(&(s->diag), &(s->staple), &(s->s_link));
         }
         FORALLSITES(i, s)
           mat_copy(&(s->s_link), &(s->s_link_f));
@@ -136,14 +136,14 @@ void w_loop2(int tot_smear) {
           // Finally, compute the Wilson loops
           FORALLSITES(i, s) {
             if ((s->t) + t + 1 >= nt) {
-              mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-              mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+              mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+              mult_na(&tmat1, &(s->t_link_f), &tmat2);
               wils_loop2[r + nrmax * t]
-                += (double)realtrace_su3(&tmat2, &(s->s_link));
+                += (double)realtrace(&tmat2, &(s->s_link));
             }
             else
               wils_loop2[r + nrmax * t]
-                += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+                += (double)realtrace(&(s->s_link_f), &(s->s_link));
           }
         } // End loop over t
       } // End loop over r
@@ -161,7 +161,7 @@ void w_loop2(int tot_smear) {
 
       // Multiply one corner and then gather it
       FORALLSITES(i, s)
-        mult_su3_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
+        mult_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
 
       mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                                      OPP_DIR(dir2), EVENANDODD, gen_pt[dir2]);
@@ -172,7 +172,7 @@ void w_loop2(int tot_smear) {
       // Make second corner
       wait_general_gather(gmtag);
       FORALLSITES(i, s)
-        mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
+        mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                     &(s->diag));
 
       cleanup_general_gather(gmtag);
@@ -211,7 +211,7 @@ void w_loop2(int tot_smear) {
                                             EVENANDODD, gen_pt[4]);
 
           FORALLSITES(i, s)
-            mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+            mult_nn(&(s->diag), &(s->staple), &(s->s_link));
         }
         FORALLSITES(i, s)
           mat_copy(&(s->s_link), &(s->s_link_f));
@@ -257,13 +257,13 @@ void w_loop2(int tot_smear) {
           // Finally, compute the Wilson loops
           FORALLSITES(i, s) {
             if ((s->t) + t + 1 >= nt) {
-              mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-              mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
-              wils_loop2[r + nrmax * t] += (double)realtrace_su3(&tmat2,
+              mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+              mult_na(&tmat1, &(s->t_link_f), &tmat2);
+              wils_loop2[r + nrmax * t] += (double)realtrace(&tmat2,
                                                                  &(s->s_link));
             }
             else
-              wils_loop2[r + nrmax * t] += (double)realtrace_su3(&(s->s_link_f),
+              wils_loop2[r + nrmax * t] += (double)realtrace(&(s->s_link_f),
                                                                  &(s->s_link));
           }
         } // End loop over t
@@ -298,7 +298,7 @@ void w_loop2(int tot_smear) {
         // Make double links in dir1 direction
         wait_gather(mtag[dir1]);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
+          mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                       &(s->s_link));
 
         cleanup_gather(mtag[dir1]);
@@ -310,7 +310,7 @@ void w_loop2(int tot_smear) {
         // Make first corner
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->s_link), (matrix *)(gen_pt[4][i]),
+          mult_nn(&(s->s_link), (matrix *)(gen_pt[4][i]),
                       &(s->diag));
 
         cleanup_general_gather(gmtag);
@@ -319,7 +319,7 @@ void w_loop2(int tot_smear) {
         wait_gather(mtag[dir2]);
         dt = 0.5;
         FORALLSITES(i, s) {
-          mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
+          mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[dir2][i]),
                       &tmat1);
           add_matrix(&(s->diag), &tmat1, &(s->diag));
           scalar_mult_matrix(&(s->diag), dt, &(s->diag));
@@ -356,7 +356,7 @@ void w_loop2(int tot_smear) {
                                               EVENANDODD, gen_pt[4]);
 
             FORALLSITES(i, s)
-              mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+              mult_nn(&(s->diag), &(s->staple), &(s->s_link));
           }
           FORALLSITES(i, s)
             mat_copy(&(s->s_link), &(s->s_link_f));
@@ -402,14 +402,14 @@ void w_loop2(int tot_smear) {
             // Finally, compute the Wilson loops
             FORALLSITES(i, s) {
               if ((s->t) + t + 1 >= nt) {
-                mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-                mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+                mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+                mult_na(&tmat1, &(s->t_link_f), &tmat2);
                 wils_loop2[r + r_off + nrmax * t]
-                  += (double)realtrace_su3(&tmat2, &(s->s_link));
+                  += (double)realtrace(&tmat2, &(s->s_link));
               }
               else
                 wils_loop2[r + r_off + nrmax * t]
-                  += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+                  += (double)realtrace(&(s->s_link_f), &(s->s_link));
             }
           } // End loop over t
         } // End loop over r
@@ -435,14 +435,14 @@ void w_loop2(int tot_smear) {
         // Make double links in dir1 direction
         wait_gather(mtag[dir1]);
         FORALLSITES(i, s)
-          mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
+          mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[dir1][i]),
                       &(s->s_link));
 
         cleanup_gather(mtag[dir1]);
 
         // Make one corner and then gather it
         FORALLSITES(i, s)
-        mult_su3_an(&(s->link[dir2]), &(s->s_link), &(s->staple));
+        mult_an(&(s->link[dir2]), &(s->s_link), &(s->staple));
 
         mtag[dir2] = start_gather_site(F_OFFSET(staple), sizeof(matrix),
                                        OPP_DIR(dir2), EVENANDODD, gen_pt[dir2]);
@@ -450,7 +450,7 @@ void w_loop2(int tot_smear) {
         // Make second corner
         wait_general_gather(gmtag);
         FORALLSITES(i, s)
-          mult_su3_na(&(s->s_link), (matrix *)(gen_pt[4][i]),
+          mult_na(&(s->s_link), (matrix *)(gen_pt[4][i]),
                       &(s->diag));
 
         cleanup_general_gather(gmtag);
@@ -490,7 +490,7 @@ void w_loop2(int tot_smear) {
                                               EVENANDODD, gen_pt[4]);
 
             FORALLSITES(i, s)
-              mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+              mult_nn(&(s->diag), &(s->staple), &(s->s_link));
           }
           FORALLSITES(i, s)
             mat_copy(&(s->s_link), &(s->s_link_f));
@@ -536,14 +536,14 @@ void w_loop2(int tot_smear) {
             // Finally, compute the Wilson loops
             FORALLSITES(i, s) {
               if ((s->t) + t + 1 >= nt) {
-                mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-                mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+                mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+                mult_na(&tmat1, &(s->t_link_f), &tmat2);
                 wils_loop2[r + r_off + nrmax * t]
-                  += (double)realtrace_su3(&tmat2, &(s->s_link));
+                  += (double)realtrace(&tmat2, &(s->s_link));
               }
               else
                 wils_loop2[r + r_off + nrmax * t]
-                  += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+                  += (double)realtrace(&(s->s_link_f), &(s->s_link));
             }
           } // End loop over t
         } // End loop over r
@@ -578,9 +578,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   wait_gather(mtag[1]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]),
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat1);
     add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
@@ -598,9 +598,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[7]);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[7][i]),
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[7][i]),
                 &(s->s_link_f));
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &tmat1);
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &tmat1);
     add_matrix(&(s->s_link_f), &tmat1, &(s->s_link_f));
   }
   cleanup_gather(mtag[7]);
@@ -611,7 +611,7 @@ void w_loop2(int tot_smear) {
   // Make first body diagonal
   wait_gather(mtag[2]);
   FORALLSITES(i, s)
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &(s->diag));
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &(s->diag));
 
   cleanup_gather(mtag[2]);
 
@@ -619,9 +619,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[1]);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[3][i]), &tmat1);
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[3][i]), &tmat1);
     add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[1]);
@@ -632,7 +632,7 @@ void w_loop2(int tot_smear) {
   // Make second body diagonal and add to first
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &tmat1);
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &tmat1);
     add_matrix(&(s->diag), &tmat1, &(s->diag));
   }
   cleanup_gather(mtag[6]);
@@ -641,7 +641,7 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
     add_matrix(&(s->diag), &tmat1, &(s->diag));
     scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
@@ -675,7 +675,7 @@ void w_loop2(int tot_smear) {
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
-        mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+        mult_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
       mat_copy(&(s->s_link), &(s->s_link_f));
@@ -721,14 +721,14 @@ void w_loop2(int tot_smear) {
       // Finally, compute the Wilson loops
       FORALLSITES(i, s) {
         if ((s->t) + t + 1 >= nt) {
-          mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-          mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+          mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+          mult_na(&tmat1, &(s->t_link_f), &tmat2);
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&tmat2, &(s->s_link));
+            += (double)realtrace(&tmat2, &(s->s_link));
         }
         else
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+            += (double)realtrace(&(s->s_link_f), &(s->s_link));
       }
     } // End loop over t
   } // End loop over r
@@ -743,7 +743,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for second "plaquette" and gather
   FORALLSITES(i, s)
-      mult_su3_an(&(s->link[dir3]), &(s->link[dir1]), &(s->staple));
+      mult_an(&(s->link[dir3]), &(s->link[dir1]), &(s->staple));
 
   for (i = XUP; i <= TUP; i++)
     disp[i] = 0;
@@ -760,10 +760,10 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   wait_gather(mtag[1]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat2);
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat2);
     add_matrix(&tmat1, &tmat2, &tmat1);
-    mult_su3_an(&(s->link[dir3]), &tmat1, &(s->s_link));
+    mult_an(&(s->link[dir3]), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
   cleanup_gather(mtag[1]);
@@ -774,7 +774,7 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
+    mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                 &(s->s_link_f));
     add_matrix(&(s->s_link_f), (matrix *)(gen_pt[5][i]),
                    &(s->s_link_f));
@@ -786,7 +786,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for third "plaquette" and gather
   FORALLSITES(i, s)
-    mult_su3_an(&(s->link[dir3]), &(s->link[dir2]), &(s->diag));
+    mult_an(&(s->link[dir3]), &(s->link[dir2]), &(s->diag));
 
   for (i = XUP; i <= TUP; i++)
     disp[i] = 0;
@@ -805,7 +805,7 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir2]), (matrix *)(gen_pt[4][i]),
+    mult_na(&(s->link[dir2]), (matrix *)(gen_pt[4][i]),
                 &(s->staple));
     add_matrix(&(s->staple), (matrix *)(gen_pt[3][i]),
                    &(s->staple));
@@ -819,7 +819,7 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[2]);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &(s->diag));
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[6][i]), &(s->diag));
     add_matrix(&(s->diag), (matrix *)(gen_pt[2][i]), &(s->diag));
   }
   cleanup_gather(mtag[2]);
@@ -829,7 +829,7 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
     add_matrix(&(s->diag), &tmat1, &(s->diag));
     scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
@@ -863,7 +863,7 @@ void w_loop2(int tot_smear) {
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
-        mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+        mult_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
       mat_copy(&(s->s_link), &(s->s_link_f));
@@ -909,14 +909,14 @@ void w_loop2(int tot_smear) {
       // Finally, compute the Wilson loops
       FORALLSITES(i, s) {
         if ((s->t) + t + 1 >= nt) {
-          mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-          mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+          mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+          mult_na(&tmat1, &(s->t_link_f), &tmat2);
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&tmat2, &(s->s_link));
+            += (double)realtrace(&tmat2, &(s->s_link));
         }
         else
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+            += (double)realtrace(&(s->s_link_f), &(s->s_link));
       }
     } // End loop over t
   } // End loop over r
@@ -931,7 +931,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for second "plaquette" and gather
   FORALLSITES(i, s)
-    mult_su3_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
+    mult_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
 
   for (i = XUP; i <= TUP; i++)
     disp[i]=0;
@@ -948,10 +948,10 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   wait_gather(mtag[2]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat2);
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat2);
     add_matrix(&tmat1, &tmat2, &tmat1);
-    mult_su3_an(&(s->link[dir2]), &tmat1, &(s->s_link));
+    mult_an(&(s->link[dir2]), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[0]);
   cleanup_gather(mtag[2]);
@@ -962,7 +962,7 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
+    mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]),
                 &(s->s_link_f));
     add_matrix(&(s->s_link_f), (matrix *)(gen_pt[6][i]),
                    &(s->s_link_f));
@@ -974,7 +974,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for third "plaquette" and gather
   FORALLSITES(i, s)
-    mult_su3_an(&(s->link[dir2]), &(s->link[dir3]), &(s->diag));
+    mult_an(&(s->link[dir2]), &(s->link[dir3]), &(s->diag));
 
   for (i = XUP; i <= TUP; i++)
     disp[i] = 0;
@@ -993,7 +993,7 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir3]), (matrix *)(gen_pt[4][i]),
+    mult_na(&(s->link[dir3]), (matrix *)(gen_pt[4][i]),
                 &(s->staple));
     add_matrix(&(s->staple), (matrix *)(gen_pt[3][i]),
                    &(s->staple));
@@ -1007,7 +1007,7 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[1]);
   wait_gather(mtag[5]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &(s->diag));
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[5][i]), &(s->diag));
     add_matrix(&(s->diag), (matrix *)(gen_pt[1][i]), &(s->diag));
   }
   cleanup_gather(mtag[1]);
@@ -1017,7 +1017,7 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[0]);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
+    mult_nn(&(s->link[dir1]), (matrix *)(gen_pt[0][i]), &tmat1);
     add_matrix(&(s->diag), &tmat1, &(s->diag));
     scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
@@ -1051,7 +1051,7 @@ void w_loop2(int tot_smear) {
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
-        mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+        mult_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
       mat_copy(&(s->s_link), &(s->s_link_f));
@@ -1097,14 +1097,14 @@ void w_loop2(int tot_smear) {
       // Finally, compute the Wilson loops
       FORALLSITES(i, s) {
         if ((s->t) + t + 1 >= nt) {
-          mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-          mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+          mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+          mult_na(&tmat1, &(s->t_link_f), &tmat2);
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&tmat2, &(s->s_link));
+            += (double)realtrace(&tmat2, &(s->s_link));
         }
         else
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+            += (double)realtrace(&(s->s_link_f), &(s->s_link));
       }
     } // End loop over t
   } // End loop over r
@@ -1119,7 +1119,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for second "plaquette" and gather
   FORALLSITES(i, s)
-    mult_su3_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
+    mult_an(&(s->link[dir2]), &(s->link[dir1]), &(s->staple));
 
   for (i = XUP; i <= TUP; i++)
     disp[i] = 0;
@@ -1135,9 +1135,9 @@ void w_loop2(int tot_smear) {
   wait_gather(mtag[1]);
   wait_gather(mtag[2]);
   FORALLSITES(i, s) {
-    mult_su3_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
+    mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]),
                 &(s->s_link));
-    mult_su3_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat1);
+    mult_nn(&(s->link[dir3]), (matrix *)(gen_pt[2][i]), &tmat1);
     add_matrix(&(s->s_link), &tmat1, &(s->s_link));
   }
   cleanup_gather(mtag[1]);
@@ -1148,9 +1148,9 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[6]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
     add_matrix(&tmat1, (matrix *)(gen_pt[6][i]), &tmat1);
-    mult_su3_an(&(s->link[dir3]), &tmat1, &(s->s_link_f));
+    mult_an(&(s->link[dir3]), &tmat1, &(s->s_link_f));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[6]);
@@ -1159,7 +1159,7 @@ void w_loop2(int tot_smear) {
 
   // Start one corner for third "plaquette" and gather
   FORALLSITES(i, s)
-      mult_su3_an(&(s->link[dir3]), &(s->link[dir1]), &(s->diag));
+      mult_an(&(s->link[dir3]), &(s->link[dir1]), &(s->diag));
 
   for (i = XUP; i <= TUP; i++)
     disp[i] = 0;
@@ -1179,9 +1179,9 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   wait_gather(mtag[3]);
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
     add_matrix(&tmat1, (matrix *)(gen_pt[3][i]), &tmat1);
-    mult_su3_an(&(s->link[dir2]), &tmat1, &(s->staple));
+    mult_an(&(s->link[dir2]), &tmat1, &(s->staple));
   }
   cleanup_general_gather(gmtag);
   cleanup_gather(mtag[3]);
@@ -1210,7 +1210,7 @@ void w_loop2(int tot_smear) {
   wait_general_gather(gmtag);
   dt = 1.0 / 6.0;
   FORALLSITES(i, s) {
-    mult_su3_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
+    mult_na(&(s->link[dir1]), (matrix *)(gen_pt[4][i]), &tmat1);
     add_matrix(&(s->diag), &tmat1, &(s->diag));
     scalar_mult_matrix(&(s->diag), dt, &(s->diag));
   }
@@ -1240,7 +1240,7 @@ void w_loop2(int tot_smear) {
                                         EVENANDODD, gen_pt[4]);
 
       FORALLSITES(i, s)
-        mult_su3_nn(&(s->diag), &(s->staple), &(s->s_link));
+        mult_nn(&(s->diag), &(s->staple), &(s->s_link));
     }
     FORALLSITES(i, s)
       mat_copy(&(s->s_link), &(s->s_link_f));
@@ -1286,14 +1286,14 @@ void w_loop2(int tot_smear) {
       // Finally, compute the Wilson loops
       FORALLSITES(i, s) {
         if ((s->t) + t + 1 >= nt) {
-          mult_su3_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
-          mult_su3_na(&tmat1, &(s->t_link_f), &tmat2);
+          mult_nn(&(s->link[TUP]), &(s->s_link_f), &tmat1);
+          mult_na(&tmat1, &(s->t_link_f), &tmat2);
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&tmat2, &(s->s_link));
+            += (double)realtrace(&tmat2, &(s->s_link));
         }
         else
           wils_loop2[r + r_off + nrmax * t]
-            += (double)realtrace_su3(&(s->s_link_f), &(s->s_link));
+            += (double)realtrace(&(s->s_link_f), &(s->s_link));
       }
     } // End loop over t
   } // End loop over r

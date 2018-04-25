@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // How does this relate to ../generic/gauge_stuff.c?
-#include "wflow_includes.h"
+#include "local_includes.h"
 // -----------------------------------------------------------------
 
 

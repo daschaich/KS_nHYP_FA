@@ -29,7 +29,7 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
       FORALLSITES(i, s) {
         m1 = &(s->link[dir]);
         m4 = &(s->link[dir2]);
-        mult_su3_an(m4, m1, &(tempmat[i]));
+        mult_an(m4, m1, &(tempmat[i]));
       }
       wait_gather(mtag);
       wait_gather(mtag2);
@@ -39,8 +39,8 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
       FORALLSITES(i, s) {
         m1 = (matrix *)(gen_pt[0][i]);
         m4 = (matrix *)(gen_pt[1][i]);
-        mult_su3_nn(&(tempmat[i]), m1, &tmat);
-        tc = complextrace_su3(m4, &tmat);
+        mult_nn(&(tempmat[i]), m1, &tmat);
+        tc = complextrace(m4, &tmat);
 
         if (dir == TUP)
           st_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
