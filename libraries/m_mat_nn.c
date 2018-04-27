@@ -1,9 +1,25 @@
 // -----------------------------------------------------------------
 // Matrix multiplication with no adjoints
+// c <-- c + a * b
 // c <-- a * b
 #include "../include/config.h"
 #include "../include/complex.h"
 #include "../include/su3.h"
+
+void mult_nn_sum(matrix *a, matrix *b, matrix *c) {
+  register int i, j, k;
+
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      for (k = 0; k < 3; k++) {
+        c->e[i][j].real += a->e[i][k].real * b->e[k][j].real
+                         - a->e[i][k].imag * b->e[k][j].imag;
+        c->e[i][j].imag += a->e[i][k].imag * b->e[k][j].real
+                         + a->e[i][k].real * b->e[k][j].imag;
+      }
+    }
+  }
+}
 
 void mult_nn(matrix *a, matrix *b, matrix *c) {
   register int i, j;

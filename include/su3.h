@@ -249,16 +249,18 @@ Real realtrace_nn(matrix *a, matrix *b);
 Real realtrace(matrix *a, matrix *b);
 
 // In file trace.c
-complex trace(matrix *a);
+complex trace(matrix *m);
+void trace_sum(matrix *m, complex *c);
 
 complex complextrace(matrix *a, matrix *b);
-complex det_su3(matrix *a);
+complex det_su3(matrix *m);
 
 // In file addmat.c
 void sum_matrix(matrix *b, matrix *c);
 void add_matrix(matrix *a, matrix *b, matrix *c);
 
 // In file submat.c
+void dif_matrix(matrix *b, matrix *c);
 void sub_matrix(matrix *a, matrix *b, matrix *c);
 
 void scalar_mult_matrix(matrix *b, Real s, matrix *c);
@@ -330,6 +332,7 @@ void byterevn64(int32type w[], int n);
 Real magsq_vec(vector *a);
 
 // In file m_mat_nn.c
+void mult_nn_sum(matrix *a, matrix *b, matrix *c);
 #ifndef mult_nn
 void mult_nn(matrix *a, matrix *b, matrix *c);
 #endif

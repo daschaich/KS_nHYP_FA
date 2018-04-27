@@ -48,7 +48,7 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
   matrix tmat, tmat2;
   msg_tag *mtag, *mtag2;
 
-  for(component = FS_XY; component <= FS_ZT; component++) {
+  for (component = FS_XY; component <= FS_ZT; component++) {
     switch(component) {
       case FS_XY: dir = XUP; dir2 = YUP; break;
       case FS_XZ: dir = XUP; dir2 = ZUP; break;
@@ -88,8 +88,8 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     FORALLSITES(i, s) {
       mult_nn(&LINK(dir2), (matrix *)(gen_pt[1][i]), &tmat);
       adjoint(&tmat, &tmat2);
-      add_matrix(&FS(component), &tmat, &FS(component));
-      sub_matrix(&FS(component), &tmat2, &FS(component));
+      sum_matrix(&tmat, &FS(component));
+      dif_matrix(&tmat2, &FS(component));
     }
     cleanup_gather(mtag);
     cleanup_gather(mtag2);
@@ -117,11 +117,10 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     wait_gather(mtag);
     wait_gather(mtag2);
     FORALLSITES(i,s){
-      mult_an((matrix *)(gen_pt[1][i]),
-                  (matrix *)(gen_pt[0][i]), &tmat);
+      mult_an((matrix *)(gen_pt[1][i]), (matrix *)(gen_pt[0][i]), &tmat);
       adjoint(&tmat, &tmat2);
-      add_matrix(&FS(component), &tmat, &FS(component));
-      sub_matrix(&FS(component), &tmat2, &FS(component));
+      sum_matrix(&tmat, &FS(component));
+      dif_matrix(&tmat2, &FS(component));
     }
     cleanup_gather(mtag);
     cleanup_gather(mtag2);
@@ -143,8 +142,8 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     FORALLSITES(i,s){
       mult_na((matrix *)(gen_pt[0][i]), &LINK(dir), &tmat);
       adjoint(&tmat, &tmat2);
-      add_matrix(&FS(component), &tmat, &FS(component));
-      sub_matrix(&FS(component), &tmat2, &FS(component));
+      sum_matrix(&tmat, &FS(component));
+      dif_matrix(&tmat2, &FS(component));
     }
     cleanup_gather(mtag);
 
@@ -152,7 +151,7 @@ void make_field_strength(field_offset link_src, field_offset field_dest) {
     FORALLSITES(i, s) {
       cc = trace(&FS(component));
       CDIVREAL(cc, 3.0, cc);
-      for(j = 0; j < 3; j++)
+      for (j = 0; j < 3; j++)
         CSUB(FS(component).e[j][j], cc, FS(component).e[j][j]);
     }
   }

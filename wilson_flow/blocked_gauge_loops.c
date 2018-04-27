@@ -1,11 +1,7 @@
 // -----------------------------------------------------------------
 // Use ordinary gathers, accumulate in staple.e[0][0]
 #include "local_includes.h"
-// -----------------------------------------------------------------
 
-
-
-// -----------------------------------------------------------------
 void blocked_gauge_loops(int block, double *result) {
   register int i, k;
   register site *s;

@@ -99,8 +99,7 @@ void staple_mcrg(int dir, int block) {
       FORALLSITES(i, s) {
         mult_nn(&(s->link[dir2]), (matrix *)(gen_pt[1][i]), &tmat);
         mult_nn(&tmat, (matrix *)(gen_pt[2][i]), &tmat2);
-        mult_na(&tmat2, (matrix *)(gen_pt[0][i]), &tmat);
-        sum_matrix(&tmat, &(tempmat2[i]));
+        mult_na_sum(&tmat2, (matrix *)(gen_pt[0][i]), &(tempmat2[i]));
       }
     }
     cleanup_general_gather(tag0);
@@ -109,11 +108,9 @@ void staple_mcrg(int dir, int block) {
 
     // Lower staple
     FORALLSITES(i, s) {
-      mult_an((matrix *)(gen_pt[3][i]),
-                  (matrix *)(gen_pt[4][i]), &tmat);
+      mult_an((matrix *)(gen_pt[3][i]), (matrix *)(gen_pt[4][i]), &tmat);
       mult_nn(&tmat, (matrix *)(gen_pt[5][i]), &tmat2);
-      mult_nn(&tmat2, (matrix *)(gen_pt[6][i]), &tmat);
-      sum_matrix(&tmat, &(tempmat2[i]));
+      mult_nn_sum(&tmat2, (matrix *)(gen_pt[6][i]), &(tempmat2[i]));
     }
     cleanup_general_gather(tag3);
     cleanup_general_gather(tag4);
@@ -132,8 +129,8 @@ void block_mcrg(int num, int block) {
   register int dir, i;
   register site *s;
   int disp[4], j;
-  Real f[3];
-  complex ctmp;
+  Real f[3], tr, tr2;
+  complex tc;
   msg_tag *tag0;
   matrix tmat, Omega, eQ, Id, Q, Q2;
 
@@ -149,10 +146,8 @@ void block_mcrg(int num, int block) {
                                      EVENANDODD, gen_pt[0]);
     wait_general_gather(tag0);
 
-    FORALLSITES(i, s) {
-      mult_nn(&(s->link[dir]), (matrix *)(gen_pt[0][i]),
-                  &(tempmat[i]));
-    }
+    FORALLSITES(i, s)
+      mult_nn(&(s->link[dir]), (matrix *)(gen_pt[0][i]), &(tempmat[i]));
 
     if (num == 0) {               // Do only center link
       FORALLSITES(i, s)
@@ -161,11 +156,12 @@ void block_mcrg(int num, int block) {
     else {                        // Do the full staple
       staple_mcrg(dir, block);    // Puts result into tempmat2
 
+      tr = 1.0 - alpha_smear[num];
+      tr2 = alpha_smear[num] / 6.0;
       FORALLSITES(i, s) {
         // Make Omega
-        scalar_mult_matrix(&(tempmat[i]), 1.0 - alpha_smear[num], &Q);
-        scalar_mult_add_matrix(&Q, &(tempmat2[i]),
-                                   alpha_smear[num] / 6.0, &Omega);
+        scalar_mult_matrix(&(tempmat[i]), tr, &Q);
+        scalar_mult_add_matrix(&Q, &(tempmat2[i]), tr2, &Omega);
         mult_an(&Omega, &Omega, &Q);
 
         // IR stabilization regulator set in defines.h
@@ -180,8 +176,8 @@ void block_mcrg(int num, int block) {
         mult_nn(&Q, &Q, &Q2);
 
         // Compute Q^(-1/2) via Eq. (3.8)
-        ctmp = cmplx(f[0], 0);
-        diag_su3(&Id, &ctmp);
+        tc = cmplx(f[0], 0);
+        diag_su3(&Id, &tc);
         scalar_mult_add_matrix(&Id, &Q, f[1], &tmat);
         scalar_mult_add_matrix(&tmat, &Q2, f[2], &eQ);
 

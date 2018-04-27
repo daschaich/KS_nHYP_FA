@@ -9,7 +9,7 @@ complex blocked_ploop(int block, int dir) {
   register int i, k;
   register site *s;
   int bl = 2, d[4], N = nt;
-  complex sum = cmplx(0.0, 0.0), plp;
+  complex plp = cmplx(0.0, 0.0);
   msg_tag *tag;
 
   // Sanity check: reproduce ploop(dir) with this routine
@@ -54,8 +54,7 @@ complex blocked_ploop(int block, int dir) {
         case ZUP: if (s->z >= bl) continue; break;
         case TUP: if (s->t >= bl) continue; break;
       }
-      mult_nn(&(tempmat[i]), (matrix *)gen_pt[0][i],
-                  &(tempmat2[i]));
+      mult_nn(&(tempmat[i]), (matrix *)gen_pt[0][i], &(tempmat2[i]));
       mat_copy(&(tempmat2[i]), &(tempmat[i]));
     }
     cleanup_general_gather(tag);
@@ -67,14 +66,13 @@ complex blocked_ploop(int block, int dir) {
       case ZUP: if (s->z >= bl) continue; break;
       case TUP: if (s->t >= bl) continue; break;
     }
-    plp = trace(&(tempmat[i]));
-    CSUM(sum, plp);   // Running complex sum
+    trace_sum(&(tempmat[i]), &plp);     // Running complex sum
   }
 
   // Average all the loops we just calculated
-  g_complexsum(&sum);
-  plp.real = sum.real * N / ((double)(volume * bl));
-  plp.imag = sum.imag * N / ((double)(volume * bl));
+  g_complexsum(&plp);
+  plp.real *= N / ((double)(volume * bl));
+  plp.imag *= N / ((double)(volume * bl));
   return plp;
 }
 // -----------------------------------------------------------------

@@ -14,7 +14,7 @@ void directional_staple(int dir, int dir2, field_offset lnk1,
   register int i;
   register site *s;
   msg_tag *tag0, *tag1, *tag2;
-  matrix tmat, tmat2;
+  matrix tmat;
 
   // Get blocked_link[dir2] from direction dir
   tag0 = start_gather_site(lnk2, sizeof(matrix), dir,
