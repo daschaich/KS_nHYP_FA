@@ -21,6 +21,10 @@ int main(int argc, char *argv[])  {
   }
   dtime = -dclock();
 
+  // Set up loop tables
+  if (num_block > 0)
+    make_loop_table();
+
   // Run Wilson flow!
   // Adaptive step size stuff all handled in this routine
   wflow(S, A);

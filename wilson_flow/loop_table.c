@@ -98,11 +98,10 @@ void make_loop_term() {
 
 
 // -----------------------------------------------------------------
-void make_loop_table2() {
+void make_loop_table() {
   int perm[8], pp[8], ir[4], vec[10];
   int length, iloop, i, j, chr, count, flag;
   Real u0;
-  void make_loop_term();
 
   static int loop_length_in[nloop] = {4, 6, 6, 6, 8, 8};
   static int loop_ind[nloop][10] = {{0, 1, 7, 6, 0, 0, 0, 0, 0, 0},

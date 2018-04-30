@@ -19,7 +19,6 @@ typedef struct {
   char parity;        // Is it even or odd?
   int index;          // Index in the array
 
-  // No random numbers
   // HYP stuff needed for MCRG measurements
   // Tripled gauge field provides workspace and backup storage
   matrix link[12];
@@ -48,6 +47,7 @@ typedef struct {
 
 EXTERN int nx, ny, nz, nt;  // Lattice dimensions
 EXTERN int volume;          // Volume of lattice
+EXTERN Real one_ov_vol;
 
 EXTERN double g_ssplaq, g_stplaq;   // Global plaqs for I/O
 EXTERN double_complex linktr;

@@ -15,7 +15,7 @@ Parameters:
     HYP smearing parameters for the twice-HYP smeared blocking transformation
 
   num_block, tblock
-    The number MCRG-blocked observable measurements to do, at the times
+    The number MCRG-blocked observable measurements to do, and the times
     at which to do them.
 
 Output:

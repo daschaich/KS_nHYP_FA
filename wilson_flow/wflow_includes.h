@@ -35,7 +35,7 @@ void block_nhyp_mcrg(int num, int block);
 void block_mcrg(int num, int block);
 
 // Wilson loop stuff
-void make_loop_table2();
+void make_loop_table();
 void blocked_gauge_loops(int block, double *result);
 void path(int *dir, int *sign, int length);
 void blocked_path(int block, int *dir, int *sign, int length);

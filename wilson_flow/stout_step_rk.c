@@ -98,7 +98,7 @@ void update_flow(double f1, double f2) {
   register int i, dir;
   register site *s;
   matrix tmat;
-  anti_hermitmat tantiH;
+  anti_hermitmat tah;
 
   // Lie derivative of (Wilson) action
   // Need to compute all four before we start updating U
@@ -109,9 +109,9 @@ void update_flow(double f1, double f2) {
     FORALLSITES(i, s) {
       // Project_antihermitian_traceless(U.Sdag)
       mult_na(&(s->link[dir]), &(S[dir][i]), &tmat);
-      make_anti_hermitian(&tmat, &tantiH);
+      make_anti_hermitian(&tmat, &tah);
       // A += f1 * U.S
-      scalar_mult_sum_antiH(&tantiH, (Real)f1, &(A[dir][i]));
+      scalar_mult_sum_antiH(&tah, (Real)f1, &(A[dir][i]));
     }
     exp_mult(dir, f2, A[dir]);                  // U = exp(f2 * A).U
   }

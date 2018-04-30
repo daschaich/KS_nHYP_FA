@@ -7,7 +7,7 @@ void mcrg_block(Real t, int blmax) {
   register int i, dir;
   register site *s;
   int j, k, bl;
-  double dtime, rr[10];
+  double dtime, norm, rr[10];
   complex plp, xplp;
   dtime = -dclock();
 
@@ -17,15 +17,13 @@ void mcrg_block(Real t, int blmax) {
       mat_copy(&(s->link[dir]), &(s->link[dir + 8]));
   }
 
-  // Set up loop tables
-  make_loop_table2();
-
   node0_printf("Simple blocking from twice-nHYP smeared links\n");
   blocked_gauge_loops(0, rr);
   for (j = 0; j < nloop; j++) {
+    norm = one_ov_vol / (double)(loop_num[j]);
     for (k = 0; k < nreps; k++)
      node0_printf("LOOPS %g %d %d 0 0 %.8g\n",
-                  t, j, k, rr[j + k * nloop] / volume / loop_num[j]);
+                  t, j, k, rr[j + k * nloop] * norm);
   }
 
   // Checked that this reproduces the original ploop() result
@@ -46,13 +44,12 @@ void mcrg_block(Real t, int blmax) {
 
     blocked_gauge_loops(bl, rr);
     for (j = 0; j < nloop; j++) {
-      for (k = 0; k < nreps; k++)
-        rr[j + k * nloop] /= (volume * loop_num[j]);
-    }
-    for (j = 0; j < nloop; j++) {
-      for (k = 0; k < nreps; k++)
+      norm = one_ov_vol / (double)(loop_num[j]);
+      for (k = 0; k < nreps; k++) {
+        rr[j + k * nloop] *= norm;
         node0_printf("LOOPS %g %d %d %d %.4g %.8g\n",
                      t, j, k, bl, alpha_smear[0], rr[j + k * nloop]);
+      }
     }
     // Calculate and print blocked Polyakov loops
     plp = blocked_ploop(bl, TUP);
