@@ -2,7 +2,7 @@
 // Communications routines for single processor machines
 // Trivial version: there is only one node, every site is on node
 /* Exported Functions:
-   initialize_machine()   Do machine dependent setup at the very beginning
+   initialize_machine()   Do machine-dependent setup at the very beginning
    normal_exit()          Close communications and exit
    terminate()            Halt program abruptly and exit
    machine_type()         Return string describing communications architecture
@@ -13,19 +13,19 @@
    g_vecfloatsum()        Sum a vector of Reals over all nodes
    g_doublesum()          Sum a double over all nodes
    g_vecdoublesum()       Sum a vector of doubles over all nodes
-   g_complexsum()         Sum a generic precision complex number over all nodes
-   g_veccomplexsum()      Sum a vector of generic precision complex numbers
+   g_complexsum()         Sum a generic-precision complex number over all nodes
+   g_veccomplexsum()      Sum a vector of generic-precision complex numbers
                             over all nodes
    g_dcomplexsum()        Sum a double precision complex number over all nodes
    g_vecdcomplexsum()     Sum a vector of double_complex over all nodes
    g_xor32()              Find global exclusive or of 32-bit word
    g_floatmax()           Find maximum Real over all nodes
    g_doublemax()          Find maximum double over all nodes
-   broadcast_float()      Broadcast a generic precision number from
+   broadcast_float()      Broadcast a generic-precision number from
                             node 0 to all nodes
-   broadcast_double()     Broadcast a double precision number
-   broadcast_complex()    Broadcast a generic precision complex number
-   broadcast_dcomplex()   Broadcast a double precision complex number
+   broadcast_double()     Broadcast a double-precision number
+   broadcast_complex()    Broadcast a generic-precision complex number
+   broadcast_dcomplex()   Broadcast a double-precision complex number
    broadcast_bytes()      Broadcast a number of bytes
    send_integer()         Send an integer to one other node
    receive_integer()      Receive an integer
@@ -59,11 +59,11 @@
    declare_accumulate_gather_field()  Do declare_gather_field() and
                                       accumulate_gather() in single step
    start_gather_site()    Older function which does declare/prepare/do_gather
-                           in a single step
+                            in a single step
    start_gather_field()   Older function which does
                                declare/prepare/do_gather_field
    restart_gather_site()      older function which is obsoleted by do_gather()
-   restart_gather_field() older function which is obsoleted by do_gather() 
+   restart_gather_field() older function which is obsoleted by do_gather()
    start_general_gather_site()  starts asynchronous sends and receives required
                              to gather fields at arbitrary displacement.
    start_general_gather_field() starts asynchronous sends and receives
@@ -737,7 +737,7 @@ msg_tag* declare_gather_site(
          index, parity, dest);
 }
 
-// Old style gather routine: declare and start in one call
+// Old-style gather routine: declare and start in one call
 msg_tag* start_gather_site(
   field_offset field, /* which field? Some member of structure "site" */
   int size,   /* size in bytes of the field (eg sizeof(vector))*/
@@ -794,7 +794,7 @@ msg_tag* declare_gather_field(
   return declare_strided_gather(field, size, size, index, parity, dest);
 }
 
-// Old style gather routine: declare and start in one call
+// Old-style gather routine: declare and start in one call
 msg_tag* start_gather_field(
   void *field,   /* which field? Pointer returned by malloc() */
   int size,   /* size in bytes of the field (eg sizeof(vector))*/
@@ -846,7 +846,6 @@ void restart_gather_field(
  example:
 
    msg_tag *tag1, *tag2, *mtag;
-
    tag1 = declare_gather_site(F_OFFSET(phi), sizeof(vector), XUP,
                               EVEN, gen_pt1);
    tag2 = declare_gather_site(F_OFFSET(phi), sizeof(vector), XDOWN,
@@ -965,7 +964,7 @@ void declare_accumulate_gather_field(
    usage: tag = start_general_gather_site(source, size, displacement, parity, dest)
    example:
   msg_tag *tag;
-  int disp[4]; 
+  int disp[4];
         disp[XUP]=1; disp[YUP]= -1; disp[ZUP] = disp[TUP] = 0;
   tag = start_general_gather_site(F_OFFSET(phi), sizeof(vector), disp,
       EVEN, gen_pt[0]);

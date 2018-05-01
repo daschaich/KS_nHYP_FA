@@ -63,7 +63,7 @@ EXTERN int volume;          // Volume of lattice
 EXTERN int iseed;           // Random number seed
 EXTERN int npbp;            // Number of stochastic sources
 EXTERN int niter, nrestart;
-EXTERN Real beta, beta_a, mass, rsqmin;
+EXTERN Real beta, beta_a, mass, rsqmin, one_ov_vol;
 
 EXTERN double g_ssplaq, g_stplaq;
 EXTERN double_complex linktr;

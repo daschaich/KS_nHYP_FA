@@ -67,8 +67,6 @@ EXTERN int this_node;           // Node number of this node
 
 EXTERN gauge_file *startlat_p;
 
-// No random numbers
-
 // Loop stuff
 #define nloop 6
 #define nreps 1
@@ -105,6 +103,5 @@ EXTERN anti_hermitmat *A[NDIMS];
 EXTERN Real alpha_smear[3];
 EXTERN int num_block;
 EXTERN Real tblock[100];
-
 #endif
 // -----------------------------------------------------------------

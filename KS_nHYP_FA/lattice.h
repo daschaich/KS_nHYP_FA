@@ -76,7 +76,7 @@ EXTERN int iseed;           // Random number seed
 EXTERN int npbp;            // Number of stochastic sources
 EXTERN int warms, trajecs, niter, nrestart, propinterval, nflavors;
 EXTERN int full_fields, half_fields;    // Derived from nflavors
-EXTERN Real traj_length;
+EXTERN Real traj_length, one_ov_vol;
 
 // Global Hasenbusch variables
 EXTERN int num_masses;    // Maximum number of masses, <= MAX_MASSES

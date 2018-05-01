@@ -26,7 +26,7 @@ int main(int argc, char *argv[])  {
 
   // Run MCRG blocking!
   // Set up loop tables
-  make_loop_table2();
+  make_loop_table();
 
   // Maximum number of blockings determined by smallest dimension
   if (nx < nt)

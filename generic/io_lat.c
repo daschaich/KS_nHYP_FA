@@ -63,7 +63,7 @@
 
 
 // -----------------------------------------------------------------
-// Open a binary file for serial writing by node 0
+// Open a binary file for serial writing by node0
 // Return a file structure describing the opened file
 static gauge_file *w_serial_i(char *filename) {
   FILE *fp;
@@ -77,7 +77,7 @@ static gauge_file *w_serial_i(char *filename) {
   // Set number of nodes to zero to indicate coordinate natural ordering
   gh->order = NATURAL_ORDER;
 
-  // Only node 0 opens the requested file
+  // Only node0 opens the requested file
   if (this_node == 0) {
     fp = fopen(filename, "wb");
     if (fp == NULL) {
@@ -179,14 +179,14 @@ static void send_buf_to_node0(fmatrix *tbuf, int tbuf_length,
   if (this_node == currentnode)
     send_field((char *)tbuf, 4 * tbuf_length * sizeof(fmatrix), 0);
   else if (this_node == 0)
-    get_field((char *)tbuf, 4 * tbuf_length*sizeof(fmatrix), currentnode);
+    get_field((char *)tbuf, 4 * tbuf_length * sizeof(fmatrix), currentnode);
 }
 // -----------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------
-// Only node 0 writes the gauge configuration to a binary file gf
+// Only node0 writes the gauge configuration to a binary file gf
 static void w_serial(gauge_file *gf) {
   register int i, j;
   int rank29, rank31, buf_length, tbuf_length;
@@ -513,7 +513,8 @@ static void r_serial(gauge_file *gf) {
       if (g_seek(fp,checksum_offset, SEEK_SET) < 0) {
         printf("r_serial: node0 g_seek %lld failed error %d file %s\n",
                (long long)offset, errno, filename);
-        fflush(stdout);terminate(1);
+        fflush(stdout);
+        terminate(1);
       }
       read_checksum(SERIAL, gf,&test_gc);
     }
@@ -580,7 +581,7 @@ static void w_parallel(gauge_file *gf) {
   for (ksite = 0; ksite < sites_on_node; ksite += site_block) {
     for (destnode = 0; destnode < number_of_nodes; destnode++) {
       for (isite = ksite;
-          isite < sites_on_node && isite < ksite + site_block; isite++) {
+           isite < sites_on_node && isite < ksite + site_block; isite++) {
         /* This is the coordinate natural (typewriter) rank
            of the site the destnode needs next */
 
@@ -599,19 +600,19 @@ static void w_parallel(gauge_file *gf) {
         sendnode = node_number(x, y, z, t);
 
         /* Node sendnode sends site value to destnode */
-        if (this_node==sendnode && destnode!=sendnode) {
+        if (this_node == sendnode && destnode != sendnode) {
           /* Message consists of site coordinates and 4 link matrices */
           msg.x = x; msg.y = y; msg.z = z; msg.t = t;
           i = node_index(x, y, z, t);
           /* Copy 4 matrices and convert to single precision msg
              structure */
-          d2f_4mat(&lattice[i].link[0],&msg.link[0]);
+          d2f_4mat(&lattice[i].link[0], &msg.link[0]);
 
-          send_field((char *)&msg, sizeof(msg),destnode);
+          send_field((char *)&msg, sizeof(msg), destnode);
         }
         /* Node destnode copies or receives a message */
-        else if (this_node==destnode) {
-          if (destnode==sendnode) {
+        else if (this_node == destnode) {
+          if (destnode == sendnode) {
             /* just copy links to write buffer */
             i = node_index(x, y, z, t);
             where_in_buf = buf_length;
@@ -659,7 +660,7 @@ static void w_parallel(gauge_file *gf) {
               (isite == sites_on_node -1)) {
             /* write out buffer */
 
-            if ((int)g_write(lbuf, 4 * sizeof(fmatrix),buf_length, fp)
+            if ((int)g_write(lbuf, 4 * sizeof(fmatrix), buf_length, fp)
                 != buf_length) {
               printf("w_parallel: Node %d gauge configuration write error %d file %s\n",
                      this_node, errno, gf->filename);
@@ -692,7 +693,7 @@ static void w_parallel(gauge_file *gf) {
   /* Position file for writing checksum */
   // Only node0 writes checksum data
   if (this_node == 0) {
-    if (g_seek(fp,checksum_offset, SEEK_SET) < 0) {
+    if (g_seek(fp, checksum_offset, SEEK_SET) < 0) {
       printf("w_parallel: Node %d g_seek %ld for checksum failed error %d file %s\n",
              this_node, (long)checksum_offset, errno, gf->filename);
       fflush(stdout);
@@ -720,7 +721,7 @@ static void w_checkpoint(gauge_file *gf) {
   off_t checksum_offset;
   fmatrix *lbuf = w_parallel_setup(gf, &checksum_offset);
   u_int32type *val;
-  int k, rank29, rank31, buf_length, stat;
+  int k, rank29, rank31, buf_length = 0, stat;
 
   // Initialize checksums
   gf->check.sum31 = 0;
@@ -731,7 +732,6 @@ static void w_checkpoint(gauge_file *gf) {
   rank29 = k % 29;
   rank31 = k % 31;
 
-  buf_length = 0;
   FORALLSITES(i, s) {
     /* load the gauge configuration into the buffer */
     /* convert (copy) generic to single precision */
@@ -756,7 +756,7 @@ static void w_checkpoint(gauge_file *gf) {
 
       // Write out buffer
       fflush(stdout);
-      stat = (int)g_write(lbuf, 4*sizeof(fmatrix),buf_length, fp);
+      stat = (int)g_write(lbuf, 4*sizeof(fmatrix), buf_length, fp);
       if (stat != buf_length) {
         printf("w_checkpoint: Node %d gauge configuration write error %d file %s\n",
                this_node, errno, gf->filename);
@@ -776,7 +776,7 @@ static void w_checkpoint(gauge_file *gf) {
   /* Position file for writing checksum */
   /* Only node0 writes checksum data */
   if (this_node == 0) {
-    if (g_seek(fp,checksum_offset, SEEK_SET) < 0) {
+    if (g_seek(fp, checksum_offset, SEEK_SET) < 0) {
       printf("w_checkpoint: node%d g_seek %ld for checksum failed error %d file %s\n",
              this_node, (long)checksum_offset, errno, gf->filename);
       fflush(stdout);
@@ -810,17 +810,18 @@ static gauge_file *r_parallel_i(char *filename) {
   /* All nodes open a file */
 
   fp = g_open(filename, "rb");
-  if (fp == NULL)
-    {
-      printf("r_parallel_i: Node %d can't open file %s, error %d\n",
-       this_node, filename, errno);fflush(stdout);terminate(1);
-    }
+  if (fp == NULL) {
+    printf("r_parallel_i: Node %d can't open file %s, error %d\n",
+           this_node, filename, errno);
+    fflush(stdout);
+    terminate(1);
+  }
 
   gf->fp = fp;
 
   // node0 reads header
   if (this_node == 0)
-    byterevflag = read_gauge_hdr(gf,PARALLEL);
+    byterevflag = read_gauge_hdr(gf, PARALLEL);
 
   /* Broadcast the byterevflag from node 0 to all nodes */
   broadcast_bytes((char *)&byterevflag, sizeof(byterevflag));
@@ -854,7 +855,7 @@ static void r_parallel(gauge_file *gf) {
     fmatrix link[4];
   } msg;
 
-  int buf_length,where_in_buf;
+  int buf_length, where_in_buf;
   gauge_check test_gc;
   u_int32type *val;
   int rank29, rank31;
@@ -880,7 +881,7 @@ static void r_parallel(gauge_file *gf) {
     printf("%s: Attempting parallel read from serial file.\n", myname);
 
   /* Allocate single precision read buffer */
-  lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
+  lbuf = malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
   if (lbuf == NULL) {
     printf("%s: Node %d can't malloc lbuf\n", myname, this_node);
     fflush(stdout);
@@ -980,7 +981,7 @@ static void r_parallel(gauge_file *gf) {
             /* then do read */
             /* each node reads its sites */
 
-            if (g_read(lbuf,buf_length*4*sizeof(fmatrix),1, fp) != 1) {
+            if (g_read(lbuf, buf_length*4*sizeof(fmatrix), 1, fp) != 1) {
               printf("%s: node %d gauge configuration read error %d file %s\n",
                      myname, this_node, errno, filename);
               fflush(stdout); terminate(1);
