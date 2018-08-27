@@ -1,6 +1,8 @@
 #ifndef _PREFETCH_H
 #define _PREFETCH_H
 
+#include "../include/su3.h"  // Define vector and matrix
+
 /***************************************************************************/
 /*          Cache manipulation for a variety of architectures              */
 /***************************************************************************/

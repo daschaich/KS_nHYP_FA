@@ -68,8 +68,8 @@
 int qcdhdr_get_str(char *s, QCDheader *hdr, char **q) {
   /* find a token and return the value */
   int i;
-  for (i=0; i<(char)(*hdr).ntoken; i++) {
-    if (strcmp(s,(char *)(*hdr).token[i]) == 0) {
+  for (i = 0; i<(char)(*hdr).ntoken; i++) {
+    if (strcmp(s, (char *)(*hdr).token[i]) == 0) {
       *q = (*hdr).value[i];
       return(SUCCESS);
     }
@@ -268,7 +268,7 @@ int sread_data(FILE* fp, void *src, size_t size, char *myname, char *descrip) {
   if (g_read(src, size, 1, fp) != 1) {
     int errsv = errno;
     printf("%s: Node %d %s read error %d %s\n",
-        myname, this_node, descrip, errsv, strerror(errsv));
+           myname, this_node, descrip, errsv, strerror(errsv));
     fflush(stdout);
     return 1;
   }
@@ -280,8 +280,8 @@ int sread_data(FILE* fp, void *src, size_t size, char *myname, char *descrip) {
 int pread_data(FILE* fp, void *src, size_t size, char *myname, char *descrip) {
   if (g_read(src, size, 1, fp) != 1) {
     int errsv = errno;
-    printf("%s: Node %d %s read error %d %s\n", myname,
-           this_node, descrip, errsv, strerror(errsv));
+    printf("%s: Node %d %s read error %d %s\n",
+           myname, this_node, descrip, errsv, strerror(errsv));
     fflush(stdout);
     return 1;
   }
@@ -337,11 +337,11 @@ void pwrite_gauge_hdr(FILE *fp, gauge_header *gh)
 
   char myname[] = "pwrite_gauge_hdr";
 
-  pwrite_data(fp,(void *)&gh->magic_number, sizeof(gh->magic_number),
+  pwrite_data(fp, (void *)&gh->magic_number, sizeof(gh->magic_number),
         myname, "magic_number");
-  pwrite_data(fp,(void *)gh->dims, sizeof(gh->dims),
+  pwrite_data(fp, (void *)gh->dims, sizeof(gh->dims),
         myname, "dimensions");
-  pwrite_data(fp,(void *)gh->time_stamp, sizeof(gh->time_stamp),
+  pwrite_data(fp, (void *)gh->time_stamp, sizeof(gh->time_stamp),
         myname, "time_stamp");
   pwrite_data(fp,&gh->order, sizeof(gh->order),
         myname, "order");
@@ -392,21 +392,20 @@ int write_gauge_info_item(FILE *fpout,    /* ascii file pointer */
                                            count > 1 */
 {
 
-  int i,k, n;
+  int i, k, n;
   char *data;
   float tt;
 
   /* Check for valid keyword */
-
-  for (i=0;strlen(gauge_info_keyword[i])>0 &&
-      strcmp(gauge_info_keyword[i],keyword) != 0; i++);
+  for (i = 0; strlen(gauge_info_keyword[i])>0 &&
+      strcmp(gauge_info_keyword[i], keyword) != 0; i++);
   if (strlen(gauge_info_keyword[i]) == 0)
     printf("write_gauge_info_item: WARNING: keyword %s not in table\n",
       keyword);
 
   /* Write keyword */
 
-  fprintf(fpout, "%s =",keyword);
+  fprintf(fpout, "%s =", keyword);
 
   /* Write count if more than one item */
   if (count > 1)
@@ -415,28 +414,25 @@ int write_gauge_info_item(FILE *fpout,    /* ascii file pointer */
   n = count; if (n == 0)n = 1;
 
   /* Write data */
-  for (k = 0, data = (char *)src; k < n; k++, data += stride)
-    {
-      fprintf(fpout, " ");
-      if (strstr(fmt, "s") != NULL)
-  fprintf(fpout, fmt, data);
-      else if (strstr(fmt, "d") != NULL)
-  fprintf(fpout, fmt,*(int *)data);
-      else if (strstr(fmt, "lu") != NULL)
-  fprintf(fpout, fmt,*(unsigned long *)data);
-      else if (strstr(fmt, "e") != NULL ||
+  for (k = 0, data = (char *)src; k < n; k++, data += stride) {
+    fprintf(fpout, " ");
+    if (strstr(fmt, "s") != NULL)
+      fprintf(fpout, fmt, data);
+    else if (strstr(fmt, "d") != NULL)
+      fprintf(fpout, fmt,*(int *)data);
+    else if (strstr(fmt, "lu") != NULL)
+      fprintf(fpout, fmt,*(unsigned long *)data);
+    else if (strstr(fmt, "e") != NULL ||
         strstr(fmt, "f") != NULL ||
-        strstr(fmt, "g") != NULL)
-  {
-    tt = *(Real *)data;
-    fprintf(fpout, fmt, tt);
-  }
-      else
-  {
-    printf("write_gauge_info_item: Unrecognized data type %s\n", fmt);
-    return 1;
-  }
+        strstr(fmt, "g") != NULL) {
+      tt = *(Real *)data;
+      fprintf(fpout, fmt, tt);
     }
+    else {
+      printf("write_gauge_info_item: Unrecognized data type %s\n", fmt);
+      return 1;
+    }
+  }
   fprintf(fpout, "\n");
   return 0;
 }
@@ -458,15 +454,15 @@ int sprint_gauge_info_item(
           count > 1 */
 {
 
-  int i,k, n;
+  int i, k, n;
   size_t bytes;
   char *data;
   float tt;
 
   /* Check for valid keyword */
 
-  for (i=0;strlen(gauge_info_keyword[i])>0 &&
-      strcmp(gauge_info_keyword[i],keyword) != 0; i++);
+  for (i = 0; strlen(gauge_info_keyword[i]) > 0 &&
+      strcmp(gauge_info_keyword[i], keyword) != 0; i++);
   if (strlen(gauge_info_keyword[i]) == 0)
     printf("sprint_gauge_info_item: WARNING: keyword %s not in table\n",
       keyword);
@@ -474,7 +470,7 @@ int sprint_gauge_info_item(
   /* Write keyword */
   bytes = 0;
 
-  snprintf(string, nstring-bytes, "%s =",keyword);
+  snprintf(string, nstring-bytes, "%s =", keyword);
   bytes = strlen(string);
   if (bytes >= nstring)return 1;
 
@@ -535,9 +531,7 @@ int sprint_gauge_info_item(
 
 /*----------------------------------------------------------------------*/
 /* Open, write, and close the ASCII info file */
-
-void write_gauge_info_file(gauge_file *gf)
-{
+void write_gauge_info_file(gauge_file *gf) {
   FILE *info_fp;
   gauge_header *gh;
   char info_filename[256];
@@ -558,14 +552,14 @@ void write_gauge_info_file(gauge_file *gf)
     }
 
   // Write required information
-  write_gauge_info_item(info_fp, "magic_number", "%d",(char *)&gh->magic_number, 0, 0);
+  write_gauge_info_item(info_fp, "magic_number", "%d", (char *)&gh->magic_number, 0, 0);
   write_gauge_info_item(info_fp, "time_stamp", "\"%s\"", gh->time_stamp, 0, 0);
   sprintf(sums, "%x %x", gf->check.sum29, gf->check.sum31);
   write_gauge_info_item(info_fp, "checksums", "\"%s\"", sums, 0, 0);
-  write_gauge_info_item(info_fp, "nx", "%d",(char *)&nx, 0, 0);
-  write_gauge_info_item(info_fp, "ny", "%d",(char *)&ny, 0, 0);
-  write_gauge_info_item(info_fp, "nz", "%d",(char *)&nz, 0, 0);
-  write_gauge_info_item(info_fp, "nt", "%d",(char *)&nt, 0, 0);
+  write_gauge_info_item(info_fp, "nx", "%d", (char *)&nx, 0, 0);
+  write_gauge_info_item(info_fp, "ny", "%d", (char *)&ny, 0, 0);
+  write_gauge_info_item(info_fp, "nz", "%d", (char *)&nz, 0, 0);
+  write_gauge_info_item(info_fp, "nt", "%d", (char *)&nt, 0, 0);
 
   write_appl_gauge_info(info_fp);
 
@@ -614,8 +608,8 @@ gauge_file *setup_input_gauge_file(char *filename) {
 // Set up the output gauge file and gauge header structure
 gauge_file *setup_output_gauge_file() {
   char myname[] = "setup_output_gauge_file";
-  gauge_file *gf = malloc(sizeof(*gf));;
-  gauge_header *gh = malloc(sizeof(*gh));
+  gauge_file *gf = malloc(sizeof *gf);
+  gauge_header *gh = malloc(sizeof *gh);
   time_t time_stamp;
   int i;
 
@@ -649,19 +643,19 @@ gauge_file *setup_output_gauge_file() {
 
   // Get date and time stamp using local time on node 0
   if (this_node == 0) {
-      time(&time_stamp);
-      strcpy(gh->time_stamp, ctime(&time_stamp));
-      /* For aesthetic reasons, don't leave trailing junk bytes here to be
-   written to the file */
-      for (i = strlen(gh->time_stamp) + 1; i < (int)sizeof(gh->time_stamp); i++)
-  gh->time_stamp[i] = '\0';
+    time(&time_stamp);
+    strcpy(gh->time_stamp, ctime(&time_stamp));
+    /* For aesthetic reasons, don't leave trailing junk bytes here to be
+       written to the file */
+    for (i = strlen(gh->time_stamp) + 1; i < (int)sizeof(gh->time_stamp); i++)
+      gh->time_stamp[i] = '\0';
 
-      /* Remove trailing end-of-line character */
-      if (gh->time_stamp[strlen(gh->time_stamp) - 1] == '\n')
-  gh->time_stamp[strlen(gh->time_stamp) - 1] = '\0';
-    }
+    // Remove trailing end-of-line character
+    if (gh->time_stamp[strlen(gh->time_stamp) - 1] == '\n')
+      gh->time_stamp[strlen(gh->time_stamp) - 1] = '\0';
+  }
 
-  /* Broadcast to all nodes */
+  // Broadcast to all nodes
   broadcast_bytes(gh->time_stamp, sizeof(gh->time_stamp));
 
   return gf;
@@ -686,8 +680,8 @@ void read_checksum(int parallel, gauge_file *gf, gauge_check *test_gc) {
   if (gf->check.sum29 != test_gc->sum29 ||
       gf->check.sum31 != test_gc->sum31)
     printf("%s: Checksum violation. Computed %x %x.  Read %x %x.\n",
-        myname, test_gc->sum29, test_gc->sum31,
-        gf->check.sum29, gf->check.sum31);
+           myname, test_gc->sum29, test_gc->sum31,
+           gf->check.sum29, gf->check.sum31);
   else {
     printf("Checksums %x %x OK\n", gf->check.sum29, gf->check.sum31);
     fflush(stdout);
@@ -746,7 +740,8 @@ void read_site_list(int parallel, gauge_file *gf) {
         }
       }
 
-      if (gf->byterevflag==1)byterevn(gf->rank2rcv, volume);
+      if (gf->byterevflag == 1)
+        byterevn(gf->rank2rcv, volume);
     }
 
     // Broadcast result to all nodes
@@ -763,13 +758,14 @@ int read_gauge_hdr(gauge_file *gf, int parallel) {
   FILE *fp = gf->fp;
   gauge_header *gh = gf->header;
   int32type tmp, btmp;
-  int byterevflag = 0;
+  int stat, byterevflag = 0;
   char myname[] = "read_gauge_hdr";
 
   // Read header, do byte reversal if necessary, and check consistency
   // Read and verify magic number
-  if (psread_data(parallel, fp,&gh->magic_number, sizeof(gh->magic_number),
-                  myname, "magic number") != 0)
+  stat = psread_data(parallel, fp,&gh->magic_number, sizeof(gh->magic_number),
+                     myname, "magic number");
+  if (stat != 0)
     terminate(1);
 
   tmp = gh->magic_number;
@@ -880,7 +876,7 @@ void write_site_list(FILE *fp, gauge_header *gh) {
 
   if (g_seek(fp, offset, SEEK_SET) < 0) {
     printf("write_site_list: node %d g_seek %ld failed errno %d\n",
-        this_node,(long)offset, errno);
+        this_node, (long)offset, errno);
     fflush(stdout);terminate(1);
   }
 
@@ -922,13 +918,12 @@ gauge_file *parallel_open(int order, char *filename) {
   gh->order = order;
 
   /* All nodes open the requested file */
-
   fp = g_open(filename, "wb");
-  g_sync(); /* Make sure everyone has opened before attempting to write */
+  g_sync();     // Make sure everyone has opened before attempting to write
   if (fp == NULL) {
-      printf("parallel_open: Node %d can't open file %s, error %d\n",
-       this_node, filename, errno);fflush(stdout);terminate(1);
-    }
+    printf("parallel_open: Node %d can't open file %s, error %d\n",
+           this_node, filename, errno);fflush(stdout);terminate(1);
+  }
 
   /* Node 0 writes the header */
   if (this_node == 0)
@@ -937,29 +932,26 @@ gauge_file *parallel_open(int order, char *filename) {
   broadcast_bytes((char *)&gh->header_bytes, sizeof(gh->header_bytes));
 
   /* All nodes write site list to file if order is not natural */
-
-  if (order != NATURAL_ORDER)write_site_list(fp, gh);
+  if (order != NATURAL_ORDER)
+    write_site_list(fp, gh);
 
   /* Assign values to file structure */
-
-  gf->fp            = fp;
-  gf->filename       = filename;
-  gf->byterevflag   = 0;            /* Not used for writing */
-  gf->parallel      = 1;            /* File opened in parallel */
+  gf->fp          = fp;
+  gf->filename    = filename;
+  gf->byterevflag = 0;            /* Not used for writing */
+  gf->parallel    = 1;            /* File opened in parallel */
 
   return gf;
-} /* parallel_open */
+}
 
 /*---------------------------------------------------------------------------*/
 
 /* Position gauge configuration file for writing in parallel */
 /* Returns pointer to malloc'ed write buffer */
-
+/* gf = file descriptor as opened by w_checkpoint_i */
 fmatrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset) {
-  /* gf = file descriptor as opened by w_checkpoint_i */
-
   FILE *fp;
-  fmatrix *lbuf;
+  fmatrix *lbuf = malloc(MAX_BUF_LENGTH * 4 * sizeof(*lbuf));
 
   off_t offset ;           /* File stream pointer */
   off_t gauge_node_size;   /* Size of a gauge configuration block for
@@ -972,17 +964,15 @@ fmatrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset) {
   if (!gf->parallel)
     printf("%s: Attempting parallel write to serial file.\n", myname);
 
-  lbuf = (fmatrix *)malloc(MAX_BUF_LENGTH*4*sizeof(fmatrix));
-  if (lbuf == NULL)
-    {
-      printf("%s: Node %d can't malloc lbuf\n", myname, this_node);
-      fflush(stdout);
-      terminate(1);
-    }
+  if (lbuf == NULL) {
+    printf("%s: Node %d can't malloc lbuf\n", myname, this_node);
+    fflush(stdout);
+    terminate(1);
+  }
 
   fp = gf->fp;
 
-  gauge_node_size = sites_on_node*4*sizeof(fmatrix) ;
+  gauge_node_size = sites_on_node*4*sizeof(fmatrix);
 
   if (gf->header->order == NATURAL_ORDER)coord_list_size = 0;
   else coord_list_size = sizeof(int32type)*volume;
@@ -998,7 +988,7 @@ fmatrix *w_parallel_setup(gauge_file *gf, off_t *checksum_offset) {
 
   if (g_seek(fp, offset, SEEK_SET) < 0) {
       printf("%s: Node %d g_seek %ld failed error %d file %s\n",
-       myname, this_node,(long)offset, errno, gf->filename);
+       myname, this_node, (long)offset, errno, gf->filename);
       fflush(stdout);terminate(1);
     }
 
@@ -1038,17 +1028,15 @@ void w_serial_f(gauge_file *gf) {
   }
 
   /* Node 0 writes ascii info file */
-
-  if (this_node == 0)write_gauge_info_file(gf);
+  if (this_node == 0)
+    write_gauge_info_file(gf);
 
   /* Do not free gf and gf->header so calling program can use them */
-
-} /* w_serial_f */
+}
 
 /*---------------------------------------------------------------------------*/
 
-gauge_file *r_serial_i(char *filename)
-{
+gauge_file *r_serial_i(char *filename) {
   /* Returns file descriptor for opened file */
 
   gauge_header *gh;
@@ -1069,30 +1057,30 @@ gauge_file *r_serial_i(char *filename)
   g_sync();
 
   if (this_node == 0) {
-      fp = g_open(filename, "rb");
-      if (fp == NULL)
-  {
-    /* If this is a partition format SciDAC file the node 0 name
-       has an extension ".vol0000".  So try again. */
-    printf("r_serial_i: Node %d can't open file %s, error %d\n",
-     this_node, filename, errno);fflush(stdout);
-    strncpy(editfilename, filename, 504);
-    editfilename[504] = '\0';  /* Just in case of truncation */
-    strcat(editfilename, ".vol0000");
-    printf("r_serial_i: Trying SciDAC partition volume %s\n", editfilename);
-    fp = g_open(editfilename, "rb");
+    fp = g_open(filename, "rb");
     if (fp == NULL) {
+      /* If this is a partition format SciDAC file the node 0 name
+         has an extension ".vol0000".  So try again. */
+      printf("r_serial_i: Node %d can't open file %s, error %d\n",
+          this_node, filename, errno);fflush(stdout);
+      strncpy(editfilename, filename, 504);
+      editfilename[504] = '\0';  /* Just in case of truncation */
+      strcat(editfilename, ".vol0000");
+      printf("r_serial_i: Trying SciDAC partition volume %s\n", editfilename);
+      fp = g_open(editfilename, "rb");
+      if (fp == NULL) {
         printf("r_serial_i: Node %d can't open file %s, error %d\n",
-         this_node, editfilename, errno);fflush(stdout);terminate(1);
+               this_node, editfilename, errno);
+        fflush(stdout);
+        terminate(1);
       }
-    printf("r_serial_i: Open succeeded\n");
-  }
-
-      gf->fp = fp;
-
-      byterevflag = read_gauge_hdr(gf, SERIAL);
-
+      printf("r_serial_i: Open succeeded\n");
     }
+
+    gf->fp = fp;
+
+    byterevflag = read_gauge_hdr(gf, SERIAL);
+  }
 
   else gf->fp = NULL;  /* The other nodes don't know about this file */
 
@@ -1142,8 +1130,7 @@ void r_serial_f(gauge_file *gf) {
 void w_parallel_f(gauge_file *gf) {
 
   g_sync();
-  if (gf->fp != NULL)
-  {
+  if (gf->fp != NULL) {
     if (!gf->parallel)
       printf("w_parallel_f: Attempting parallel close on serial file.\n");
 

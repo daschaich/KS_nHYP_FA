@@ -301,12 +301,10 @@ static void remove_from_args(int *argc, char ***argv, int first, int last) {
 }
 
 static int lex_rank(const int coords[], int dim, int size[]) {
-  int d;
-  int rank = coords[dim-1];
+  int d, rank = coords[dim - 1];
 
-  for (d = dim-2; d >= 0; d--) {
+  for (d = dim - 2; d >= 0; d--)
     rank = rank * size[d] + coords[d];
-  }
   return rank;
 }
 
@@ -323,11 +321,11 @@ static void repartition_switch_machine() {
   /* localgeom gives the number of nodes in the job partition */
   if (num_nodes % num_jobs != 0) {
     printf("num_jobs %i must divide number of nodes %i\n",
-     num_jobs, num_nodes);
+           num_jobs, num_nodes);
     terminate(1);
   }
-  localgeom = num_nodes/num_jobs;
-  jobid = nodeid/localgeom;
+  localgeom = num_nodes / num_jobs;
+  jobid = nodeid / localgeom;
 
   /* Split the communicator */
   flag = MPI_Comm_split(MPI_COMM_THISJOB, jobid, 0, &jobcomm);
@@ -382,12 +380,13 @@ repartition_mesh_machine() {
 
   jobid = lex_rank(jobcoord, nd, jobgeomvals);
 
-  /* Split the communicator */
-
+  // Split the communicator
   flag = MPI_Comm_split(MPI_COMM_THISJOB, jobid, 0, &jobcomm);
-  if (flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
+  if (flag != MPI_SUCCESS)
+    err_func(&MPI_COMM_THISJOB, &flag);
   flag = MPI_Comm_rank(jobcomm, &localnodeid);
-  if (flag != MPI_SUCCESS) err_func(&MPI_COMM_THISJOB, &flag);
+  if (flag != MPI_SUCCESS)
+    err_func(&MPI_COMM_THISJOB, &flag);
 
   //printf("node %d jobid %d\n", localnodeid, jobid); fflush(stdout);
 

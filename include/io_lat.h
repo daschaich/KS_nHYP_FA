@@ -4,7 +4,7 @@
 #define _IO_LAT_H
 
 // Definitions of restore and save lattice flags used in io_helpers.c
-/* Some are also used for Wilson propagators */
+// Some are also used for Wilson propagators
 #define CONTINUE              10
 #define FRESH                 11
 #define RELOAD_ASCII          12
@@ -29,11 +29,11 @@
 #define SAVE_MULTIDUMP        55
 #define SAVE_SERIAL_ARCHIVE   56
 
-/* Format for NERSC archive files */
+// Format for NERSC archive files
 #define ARCHIVE_3x2   0
 #define ARCHIVE_3x3   1
 
-/* For KS propagators */
+// For KS propagators
 #define SAVE_SERIAL_TSLICE 932
 #define SAVE_ASCII_TSLICE 933
 
@@ -98,7 +98,6 @@ typedef struct {
       in the order of appearance.  The number of coordinates must
       be exactly nx*ny*nz*nt.  The site coordinate is encoded
       as nx*(ny*(nz*t + z) + y) + x in a 32-bit integer.
-
       */
 
 /* 3. Next, the gauge field link matrices appear */
@@ -438,5 +437,5 @@ void r_parallel_f(gauge_file *gf);
 
 void byterevn(int32type w[], int n);
 
-#endif /* _IO_LAT_H */
+#endif
 // -----------------------------------------------------------------
