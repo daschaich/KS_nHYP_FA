@@ -135,12 +135,12 @@ void gauge_field_copy(field_offset src, field_offset dest) {
 
 // -----------------------------------------------------------------
 // Add adjoint plaquette term
+// Remove factors of 3 and 9 from loop over plaquettes
 // Use tempmat for temporary storage
 void plaquette_a(double *ss_plaq, double *st_plaq) {
   register int i, dir, dir2;
   register site *s;
-  register matrix *m1, *m4;
-  double ss_sum = 0.0, st_sum = 0.0;
+  double ss_sum = 0.0, st_sum = 0.0, td = beta_a / 3.0;
   complex tc;
   msg_tag *mtag, *mtag2;
   matrix tmat;
@@ -155,26 +155,22 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
                                 dir2, EVENANDODD, gen_pt[1]);
 
       // tempmat = Udag_b(x) U_a(x)
-      FORALLSITES(i, s) {
-        m1 = &(s->link[dir]);
-        m4 = &(s->link[dir2]);
-        mult_an(m4, m1, &(tempmat[i]));
-      }
+      FORALLSITES(i, s)
+        mult_an(&(s->link[dir2]), &(s->link[dir]), &(tempmat[i]));
       wait_gather(mtag);
       wait_gather(mtag2);
 
       // Compute tc = tr[Udag_a(x+b) Udag_b(x) U_a(x) U_b(x+a)] / 3
       // and combine tc.real + beta_A * |tc|^2
+      // Factors of 3 removed from loop over plaquettes
       FORALLSITES(i, s) {
-        m1 = (matrix *)(gen_pt[0][i]);
-        m4 = (matrix *)(gen_pt[1][i]);
-        mult_nn(&(tempmat[i]), m1, &tmat);
-        tc = complextrace(m4, &tmat);
+        mult_nn(&(tempmat[i]), (matrix *)(gen_pt[0][i]), &tmat);
+        tc = complextrace((matrix *)(gen_pt[1][i]), &tmat);
 
         if (dir == TUP)
-          st_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
+          st_sum += tc.real + td * cabs_sq(&tc);
         else
-          ss_sum += tc.real / 3.0 + beta_a * cabs_sq(&tc) / 9.0;
+          ss_sum += tc.real + td * cabs_sq(&tc);
       }
       cleanup_gather(mtag);
       cleanup_gather(mtag2);
@@ -182,7 +178,7 @@ void plaquette_a(double *ss_plaq, double *st_plaq) {
   }
   g_doublesum(&ss_sum);
   g_doublesum(&st_sum);
-  *ss_plaq = ss_sum / ((double)volume);
-  *st_plaq = st_sum / ((double)volume);
+  *ss_plaq = ss_sum / (3.0 * (double)volume);
+  *st_plaq = st_sum / (3.0 * (double)volume);
 }
 // -----------------------------------------------------------------

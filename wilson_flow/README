@@ -19,7 +19,7 @@ Parameters:
     at which to do them.
 
 Output:
-  WFLOW  t  plaq  E  t^2*E  t*d(t^2*E)/dt  12t^2*(3-plaq)  top.charge
+  WFLOW  t  plaq  E  t^2*E  t*d(t^2*E)/dt  12t^2*(3-plaq)  top.charge  t^2*E_ss  t^2*E_st
   E and the topological charge are calculated from the clover term
   The alternative based on the plaquette should approach t^2*E for t>~1
 
