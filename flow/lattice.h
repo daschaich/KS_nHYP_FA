@@ -92,7 +92,9 @@ EXTERN site *lattice;
 EXTERN char **gen_pt[N_POINTERS];
 
 // Temporary fields
-EXTERN matrix *tempmat, *tempmat2;
+// tempsym will only be malloc'd for Symanzik flow 2-hop staples
+#define N_TEMPSYM 5   // Needed by ../generic/make_lattice.c
+EXTERN matrix *tempmat, *tempmat2, *tempsym[N_TEMPSYM];
 
 // Wilson and Symanzik flow stuff
 EXTERN Real tmax, start_eps, max_eps, epsilon;

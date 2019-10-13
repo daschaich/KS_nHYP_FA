@@ -13,72 +13,6 @@ params par_buf;
 
 
 // -----------------------------------------------------------------
-// On node zero, read lattice size and send to others
-int initial_set() {
-  int prompt = 0, status = 0;
-  if (mynode() == 0) {
-    // Print banner
-    printf("SU(3) flow with optional MCRG blocking\n");
-    printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
-    time_stamp("start");
-
-    status = get_prompt(stdin, &prompt);
-    IF_OK status += get_i(stdin, prompt, "nx", &par_buf.nx);
-    IF_OK status += get_i(stdin, prompt, "ny", &par_buf.ny);
-    IF_OK status += get_i(stdin, prompt, "nz", &par_buf.nz);
-    IF_OK status += get_i(stdin, prompt, "nt", &par_buf.nt);
-
-    if (status > 0)
-      par_buf.stopflag = 1;
-    else
-      par_buf.stopflag = 0;
-  }
-
-  // Broadcast parameter buffer from node 0 to all other nodes
-  broadcast_bytes((char *)&par_buf, sizeof(par_buf));
-  if (par_buf.stopflag != 0)
-    normal_exit(0);
-
-  nx = par_buf.nx;
-  ny = par_buf.ny;
-  nz = par_buf.nz;
-  nt = par_buf.nt;
-
-  this_node = mynode();
-  number_of_nodes = numnodes();
-  volume = nx * ny * nz * nt;
-  one_ov_vol = 1.0 / (Real)volume;
-  return prompt;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-int setup() {
-  int prompt;
-
-  // Print banner, get volume
-  prompt = initial_set();
-  // Initialize the layout functions, which decide where sites live
-  setup_layout();
-  // Allocate space for lattice, set up coordinate fields
-  make_lattice();
-  // Set up neighbor pointers and comlink structures
-  make_nn_gathers();
-  // Allocate temporary fields and Wilson/Symanzik flow stuff
-  FIELD_ALLOC(tempmat, matrix);
-  FIELD_ALLOC(tempmat2, matrix);
-  FIELD_ALLOC_VEC(S, matrix, NDIMS);
-  FIELD_ALLOC_VEC(A, anti_hermitmat, NDIMS);
-
-  return prompt;
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
 // Find out what flow to use
 int ask_flow_type(FILE *fp, int prompt, int *flag) {
   int status = 0;
@@ -114,6 +48,106 @@ int ask_flow_type(FILE *fp, int prompt, int *flag) {
 
 
 // -----------------------------------------------------------------
+// On node zero, read lattice size and send to others
+int initial_set() {
+  int prompt = 0, status = 0;
+
+  if (mynode() == 0) {
+    // Print banner
+    printf("SU(3) flow with optional MCRG blocking\n");
+    printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
+    time_stamp("start");
+
+    status = get_prompt(stdin, &prompt);
+    IF_OK status += get_i(stdin, prompt, "nx", &par_buf.nx);
+    IF_OK status += get_i(stdin, prompt, "ny", &par_buf.ny);
+    IF_OK status += get_i(stdin, prompt, "nz", &par_buf.nz);
+    IF_OK status += get_i(stdin, prompt, "nt", &par_buf.nt);
+
+    // Find out which flow we're doing here,
+    // so make_fields() can print out mallocing info for fields
+    IF_OK status += ask_flow_type(stdin, prompt, &par_buf.flowflag);
+
+    if (status > 0)
+      par_buf.stopflag = 1;
+    else
+      par_buf.stopflag = 0;
+  }
+
+  // Broadcast parameter buffer from node 0 to all other nodes
+  broadcast_bytes((char *)&par_buf, sizeof(par_buf));
+  if (par_buf.stopflag != 0)
+    normal_exit(0);
+
+  nx = par_buf.nx;
+  ny = par_buf.ny;
+  nz = par_buf.nz;
+  nt = par_buf.nt;
+  flowflag = par_buf.flowflag;
+
+  this_node = mynode();
+  number_of_nodes = numnodes();
+  volume = nx * ny * nz * nt;
+  one_ov_vol = 1.0 / (Real)volume;
+  return prompt;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Allocate space for fields
+void make_fields() {
+  Real size = (Real)((2.0 + NDIMS) * sizeof(matrix));
+  size += (Real)(NDIMS * sizeof(anti_hermitmat));
+  size *= sites_on_node;
+  FIELD_ALLOC(tempmat, matrix);
+  FIELD_ALLOC(tempmat2, matrix);
+  FIELD_ALLOC_VEC(S, matrix, NDIMS);
+  FIELD_ALLOC_VEC(A, anti_hermitmat, NDIMS);
+
+  // Number of temporaries depends on which flow we're doing...
+  if (flowflag == WILSON) {
+    node0_printf("Running Wilson flow\n");
+    node0_printf("Mallocing %.1f MBytes per core for fields\n", size / 1e6);
+  }         // Braces suppress compiler complaint
+  else if (flowflag == SYMANZIK) {
+    size += (Real)(N_TEMPSYM * sites_on_node * sizeof(matrix));
+    FIELD_ALLOC_VEC(tempsym, matrix, N_TEMPSYM);
+    node0_printf("Running Symanzik flow\n");
+    node0_printf("Mallocing %.1f MBytes per core for fields\n", size / 1e6);
+  }         // Braces suppress compiler complaint
+  else {    // This should have been caught above
+    node0_printf("Error: Unrecognized flow type %d, aborting\n", flowflag);
+    terminate(1);
+  }
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+int setup() {
+  int prompt;
+
+  // Print banner, get volume and flow type
+  prompt = initial_set();
+  // Initialize the layout functions, which decide where sites live
+  setup_layout();
+  // Allocate space for lattice, set up coordinate fields
+  make_lattice();
+  // Set up neighbor pointers and comlink structures
+  make_nn_gathers();
+  // Allocate space for fields
+  make_fields();
+
+  return prompt;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
 // Read in parameters for SU(3) Wilson or Symanzik flow measurements
 // prompt=1 indicates prompts are to be given for input
 int readin(int prompt) {
@@ -125,7 +159,6 @@ int readin(int prompt) {
     status = 0;
 
     // Flow parameters
-    IF_OK status += ask_flow_type(stdin, prompt, &par_buf.flowflag);
     IF_OK status += get_f(stdin, prompt, "start_eps", &par_buf.start_eps);
     IF_OK status += get_f(stdin, prompt, "max_eps", &par_buf.max_eps);
     if (par_buf.start_eps == 0) {
@@ -196,17 +229,6 @@ int readin(int prompt) {
   alpha_smear[1] = par_buf.alpha_hyp1;
   alpha_smear[2] = par_buf.alpha_hyp2;
 
-  flowflag = par_buf.flowflag;
-  if (flowflag == WILSON) {
-    node0_printf("Running Wilson flow\n");
-  }         // Braces suppress compiler complaint
-  else if (flowflag == SYMANZIK) {
-    node0_printf("Running Symanzik flow\n");
-  }         // Braces suppress compiler complaint
-  else {    // This should have been caught above
-    node0_printf("Error: Unrecognized flow type %d, aborting\n", flowflag);
-    terminate(1);
-  }
   startflag = par_buf.startflag;
   saveflag = par_buf.saveflag;
   strcpy(startfile, par_buf.startfile);
