@@ -123,7 +123,7 @@ void make_loop_table() {
   }
 
   // Plaquette
-  loop_coeff[0][0]= 1;
+  loop_coeff[0][0] = 1;
 
   // a**2 improved Symanzik with funny couplings
   u0 = 0.868;
@@ -133,59 +133,57 @@ void make_loop_table() {
 
   for (iloop = 0; iloop < nloop; iloop++) {
     length = loop_length[iloop];
-    count=0;
+    count = 0;
     // Permutations
     for (perm[0] = 0; perm[0] < 4; perm[0]++) {
       for (perm[1] = 0; perm[1] < 4; perm[1]++) {
+        if (perm[1] == perm[0])
+          continue;
         for (perm[2] = 0; perm[2] < 4; perm[2]++) {
+          if (perm[2] == perm[1] || perm[2] == perm[0])
+            continue;
           for (perm[3] = 0; perm[3] < 4; perm[3]++) {
-            if (perm[0] != perm[1]
-                && perm[0] != perm[2]
-                && perm[0] != perm[3]
-                && perm[1] != perm[2]
-                && perm[1] != perm[3]
-                && perm[2] != perm[3]) {
+            if (perm[3] == perm[2] || perm[3] == perm[1] || perm[3] == perm[0])
+              continue;
 
-              // Reflections
+            // Reflections
+            for (ir[0] = 0; ir[0] < 2; ir[0]++) {
+              for (ir[1] = 0; ir[1] < 2; ir[1]++) {
+                for (ir[2] = 0; ir[2] < 2; ir[2]++) {
+                  for (ir[3] = 0; ir[3] < 2; ir[3]++) {
+                    for (j = 0; j < 4; j++) {
+                      pp[j] = perm[j];
+                      if (ir[j] == 1)
+                        pp[j] = 7 - pp[j];
 
-              for (ir[0] = 0; ir[0] < 2; ir[0]++) {
-                for (ir[1] = 0; ir[1] < 2; ir[1]++) {
-                  for (ir[2] = 0; ir[2] < 2; ir[2]++) {
-                    for (ir[3] = 0; ir[3] < 2; ir[3]++) {
-                      for (j = 0; j < 4; j++) {
-                        pp[j] = perm[j];
-                        if (ir[j] == 1)
-                          pp[j] = 7 - pp[j];
+                      pp[7 - j] = 7 - pp[j];
+                    }
 
-                        pp[7 - j] = 7 - pp[j];
-                      }
+                    // Create new vector
+                    for (j = 0; j < length; j++)
+                      vec[j] = pp[loop_ind[iloop][j]];
 
-                      // Create new vector
+                    char_num(vec, &chr, &ch, length);
+                    flag = 0;
+
+                    // Check if it's a new set
+                    for (j = 0; j < count; j++) {
+                      if (chr == loop_char[j])
+                        flag = 1;
+                    }
+                    if (flag == 0) {
+                      loop_char[count] = chr;
+                      loop_ch[iloop][count] = ch;
                       for (j = 0; j < length; j++)
-                        vec[j] = pp[loop_ind[iloop][j]];
+                        loop_table[iloop][count][j] = vec[j];
 
-                      char_num(vec,&chr,&ch,length);
-                      flag = 0;
-
-                      // Check if it's a new set
-                      for (j = 0; j < count; j++) {
-                        if (chr == loop_char[j])
-                          flag = 1;
-                      }
-                      if (flag == 0) {
-                        loop_char[count] = chr;
-                        loop_ch[iloop][count] = ch;
-                        for (j = 0; j < length; j++)
-                          loop_table[iloop][count][j] = vec[j];
-
-                        count++;
-                      }
-                      loop_num[iloop] = count;
-                    } // End loop over ir[3] reflections
-                  } // End loop over ir[2] reflections
-                } // End loop over ir[1] reflections
-              } // End loop over ir[0] reflection
-            }
+                      count++;
+                    }
+                    loop_num[iloop] = count;
+                  } // End loop over ir[3] reflections
+                } // End loop over ir[2] reflections
+              } // End loop over ir[1] reflections
+            } // End loop over ir[0] reflection
           } // End loop over perm[3] permutations
         } // End loop over perm[2] permutations
       } // End loop over perm[1] permutations

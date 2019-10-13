@@ -28,9 +28,6 @@ int main(int argc, char *argv[]) {
   }
   dtime = -dclock();
 
-  if (beta < 0)
-    exit(1);
-
   node0_printf("\nFUNDAMENTAL--ADJOINT GAUGE ACTION ");
   node0_printf("WITH beta_a/beta_f COEFFICIENT %2.3f\n", beta_a);
 

@@ -177,7 +177,7 @@ int readin(int prompt) {
     // Number of pseudo_fermions, note restrictions
     IF_OK status += get_i(stdin, prompt, "number_of_PF", &par_buf.num_masses);
     if (par_buf.num_masses > MAX_MASSES || par_buf.num_masses < 1) {
-      printf("num_masses = %d must be <= %d and > 0!\n",
+      printf("Error: num_masses = %d must be <= %d and > 0!\n",
              par_buf.num_masses, MAX_MASSES);
       status++;
     }
@@ -197,6 +197,10 @@ int readin(int prompt) {
 
     // beta, adjoint ratio, mass and Hasenbusch mass
     IF_OK status += get_f(stdin, prompt, "beta", &par_buf.beta);
+    if (beta < 0) {
+      printf("Error: negative beta %.4g not allowed\n", beta);
+      status++;
+    }
     IF_OK status += get_f(stdin, prompt, "beta_a", &par_buf.beta_a);
     IF_OK status += get_f(stdin, prompt, "mass", &par_buf.mass);
     IF_OK status += get_f(stdin, prompt, "Hasenbusch_mass", &par_buf.MH);

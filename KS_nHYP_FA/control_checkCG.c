@@ -56,10 +56,6 @@ int main(int argc, char *argv[]) {
   // readin does a rephase(ON) on the read-in lattice
   if (readin(prompt) == 0) {
     dtime = -dclock();
-
-    if (beta < 0)
-      exit(1);
-
     node0_printf("\nFUNDAMENTAL--ADJOINT GAUGE ACTION ");
     node0_printf("WITH beta_a/beta_f COEFFICIENT %2.3f\n", beta_a);
     clear_latvec(F_OFFSET(ttt[0][0]), EVENANDODD);

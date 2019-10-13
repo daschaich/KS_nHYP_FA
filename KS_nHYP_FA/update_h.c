@@ -34,9 +34,9 @@ double gauge_force(Real eps) {
                                dir, EVENANDODD, gen_pt[0]);
 
       // Start gather for the "upper staple"
-     tag2 = start_gather_site(F_OFFSET(link[dir]),
-                              sizeof(matrix),
-                              dir2, EVENANDODD, gen_pt[2]);
+      tag2 = start_gather_site(F_OFFSET(link[dir]),
+                               sizeof(matrix),
+                               dir2, EVENANDODD, gen_pt[2]);
 
       // Begin the computation "at the dir2DOWN point"
       // We will later gather the intermediate result "to the home point"

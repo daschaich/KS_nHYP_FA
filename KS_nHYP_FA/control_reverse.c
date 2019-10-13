@@ -12,7 +12,7 @@
 // A copy of update(), reversing instead of refreshing the momenta
 // and not generating a new pseudofermion configuration
 int reverse() {
-  register int i,dir;
+  register int i, dir;
   register site *s;
   int iters = 0;
   Real cg_time[2], old_cg_time[2], next_cg_time[2];
@@ -26,18 +26,18 @@ int reverse() {
   cg_time[0] = -1e6;
   cg_time[1] = -1e6;
 
-  // Reverse the momenta (anti_hermitmat defined in libraries/su3.h)
+  // Reverse the momenta (anti_hermitmat defined in include/su3.h)
   FORALLSITES(i, s) {
     for (dir = XUP; dir <= TUP; dir++) {
-      s->mom[dir].m01.real *= -1;
-      s->mom[dir].m02.real *= -1;
-      s->mom[dir].m12.real *= -1;
-      s->mom[dir].m01.imag *= -1;
-      s->mom[dir].m02.imag *= -1;
-      s->mom[dir].m12.imag *= -1;
-      s->mom[dir].m00im *= -1;
-      s->mom[dir].m11im *= -1;
-      s->mom[dir].m22im *= -1;
+      s->mom[dir].m01.real *= -1.0;
+      s->mom[dir].m02.real *= -1.0;
+      s->mom[dir].m12.real *= -1.0;
+      s->mom[dir].m01.imag *= -1.0;
+      s->mom[dir].m02.imag *= -1.0;
+      s->mom[dir].m12.imag *= -1.0;
+      s->mom[dir].m00im *= -1.0;
+      s->mom[dir].m11im *= -1.0;
+      s->mom[dir].m22im *= -1.0;
     }
   }
 
@@ -125,85 +125,86 @@ int main(int argc, char *argv[]){
 
   // Load input and run (NB loop removed)
   // readin does a rephase(ON) on the read-in lattice
-  if (readin(prompt) == 0) {
-    dtime = -dclock();
+  if (readin(prompt) != 0) {
+    node0_printf("ERROR in readin, aborting\n");
+    terminate(1);
+  }
+  dtime = -dclock();
 
-    if (beta < 0)
-      exit(1);
+  node0_printf("\nFUNDAMENTAL--ADJOINT GAUGE ACTION ");
+  node0_printf("WITH beta_a/beta_f COEFFICIENT %2.3f\n", beta_a);
 
-    node0_printf("\nFUNDAMENTAL--ADJOINT GAUGE ACTION ");
-    node0_printf("WITH beta_a/beta_f COEFFICIENT %2.3f\n", beta_a);
+  // Gauge observables at start of trajectory
+  plaquette(&ssplaq, &stplaq);
+  plp = ploop(TUP);
+  xplp = ploop(XUP);
+  // Flip signs to account for KS phases
+  ssplaq *= -1;       stplaq *= -1;
+  plp.real *= -1;     plp.imag *= -1;
+  xplp.real *= -1;    xplp.imag *= -1;
+  node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
+               plp.real, plp.imag, s_iters, ssplaq, stplaq);
+  node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
+               plp.real, plp.imag, xplp.real, xplp.imag);
 
-    // Gauge observables at start of trajectory
-    plaquette(&ssplaq, &stplaq);
-    plp = ploop(TUP);
-    xplp = ploop(XUP);
-    // Flip signs to account for KS phases
-    ssplaq *= -1;       stplaq *= -1;
-    plp.real *= -1;     plp.imag *= -1;
-    xplp.real *= -1;    xplp.imag *= -1;
-    node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
-                 plp.real, plp.imag, s_iters, ssplaq, stplaq);
-    node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
-                 plp.real, plp.imag, xplp.real, xplp.imag);
+  // Action at start of trajectory
+  plaquette_a(&ssplaq, &stplaq);
+  startAct = 0.5 * (ssplaq + stplaq);
+  node0_printf("ACT %.8g\n", startAct);
 
-    // Action at start of trajectory
-    plaquette_a(&ssplaq, &stplaq);
-    startAct = (ssplaq + stplaq) / 2;
-    node0_printf("ACT %.8g\n", startAct);
+  // Evolve forward for one trajectory
+  s_iters = update();
+  total_iters = s_iters;
 
-    // Evolve forward for one trajectory
-    s_iters = update();
+  // Gauge observables at end of trajectory
+  plaquette(&ssplaq, &stplaq);
+  plp = ploop(TUP);
+  xplp = ploop(XUP);
+  // Flip signs to account for KS phases
+  ssplaq *= -1;       stplaq *= -1;
+  plp.real *= -1;     plp.imag *= -1;
+  xplp.real *= -1;    xplp.imag *= -1;
+  node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
+               plp.real, plp.imag, s_iters, ssplaq, stplaq);
+  node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
+               plp.real, plp.imag, xplp.real, xplp.imag);
 
-    // Gauge observables at end of trajectory
-    plaquette(&ssplaq, &stplaq);
-    plp = ploop(TUP);
-    xplp = ploop(XUP);
-    // Flip signs to account for KS phases
-    ssplaq *= -1;       stplaq *= -1;
-    plp.real *= -1;     plp.imag *= -1;
-    xplp.real *= -1;    xplp.imag *= -1;
-    node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
-                 plp.real, plp.imag, s_iters, ssplaq, stplaq);
-    node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
-                 plp.real, plp.imag, xplp.real, xplp.imag);
+  // Action at end of trajectory
+  plaquette_a(&ssplaq, &stplaq);
+  endAct = (ssplaq + stplaq) / 2;
+  node0_printf("ACT %.8g\n", endAct);
 
-    // Action at end of trajectory
-    plaquette_a(&ssplaq, &stplaq);
-    endAct = (ssplaq + stplaq) / 2;
-    node0_printf("ACT %.8g\n", endAct);
+  // Reverse momenta and evolve backwards for one trajectory
+  s_iters = reverse();
+  total_iters += s_iters;
 
-    // Reverse momenta and evolve backwards for one trajectory
-    s_iters += reverse();
+  // Gauge observables hopefully back at the start of the trajectory
+  plaquette(&ssplaq, &stplaq);
+  plp = ploop(TUP);
+  xplp = ploop(XUP);
+  // Flip signs to account for KS phases
+  ssplaq *= -1;       stplaq *= -1;
+  plp.real *= -1;     plp.imag *= -1;
+  xplp.real *= -1;    xplp.imag *= -1;
+  node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
+               plp.real, plp.imag, s_iters, ssplaq, stplaq);
+  node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
+               plp.real, plp.imag, xplp.real, xplp.imag);
 
-    // Gauge observables hopefully back at the start of the trajectory
-    plaquette(&ssplaq, &stplaq);
-    plp = ploop(TUP);
-    xplp = ploop(XUP);
-    // Flip signs to account for KS phases
-    ssplaq *= -1;       stplaq *= -1;
-    plp.real *= -1;     plp.imag *= -1;
-    xplp.real *= -1;    xplp.imag *= -1;
-    node0_printf("GMES %.8g %.8g %d %.8g %.8g\n",
-                 plp.real, plp.imag, s_iters, ssplaq, stplaq);
-    node0_printf("POLYA %.8g %.8g %.8g %.8g\n",
-                 plp.real, plp.imag, xplp.real, xplp.imag);
+  // Action hopefully back at the start of the trajectory
+  plaquette_a(&ssplaq, &stplaq);
+  endAct = 0.5 * (ssplaq + stplaq);
+  node0_printf("ACT %.8g\n", endAct);
 
-    // Action hopefully back at the start of the trajectory
-    plaquette_a(&ssplaq, &stplaq);
-    endAct = (ssplaq + stplaq) / 2;
-    node0_printf("ACT %.8g\n", endAct);
-
-    // Done
-    node0_printf("RUNNING COMPLETED\n");
-    node0_printf("Initial action: %.8g\n", startAct);
-    node0_printf("Final action:   %.8g\n", endAct);
-    node0_printf("Difference:     %.4g\n", fabs(endAct - startAct));
-    dtime += dclock();
-    node0_printf("Time = %.4g seconds\n", dtime);
-    node0_printf("total_iters = %d\n", total_iters);
-    fflush(stdout);
-  } // readin(prompt) == 0
+  // Done
+  node0_printf("RUNNING COMPLETED\n");
+  node0_printf("Initial action: %.8g\n", startAct);
+  node0_printf("Final action:   %.8g\n", endAct);
+  node0_printf("Difference:     %.4g\n", fabs(endAct - startAct));
+  dtime += dclock();
+  node0_printf("Time = %.4g seconds\n", dtime);
+  node0_printf("total_iters = %d\n", total_iters);
+  fflush(stdout);
   return 0;
 }
 // -----------------------------------------------------------------

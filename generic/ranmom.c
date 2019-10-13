@@ -9,9 +9,9 @@ void ranmom() {
   FORALLSITES(i, s) {
     FORALLUPDIR(dir) {
 #ifdef SITERAND
-      random_anti_hermitian((anti_hermitmat *)&(s->mom[dir]), &(s->site_prn));
+      random_anti_hermitian(&(s->mom[dir]), &(s->site_prn));
 #else
-      random_anti_hermitian((anti_hermitmat *)&(s->mom[dir]), &node_prn);
+      random_anti_hermitian(&(s->mom[dir]), &node_prn);
 #endif
     }
   }
