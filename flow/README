@@ -1,9 +1,11 @@
-Measure Wilson flow using Runge--Kutta integration
+Measure Wilson or Symanzik flow using Runge--Kutta integration
 Can specify points in the flow at which to measure MCRG-blocked observables
 Can allow code to increase step size up to max_eps for large t > 5
 Option to save the Wilson-flowed lattice at the end of the calculation
 
 Parameters:
+  flow choice: 'wilson' or 'symanzik'
+
   epsilon (initialized to start_eps)
     Runge--Kutta step size, 0.02 should be safe
     For t>5 code can choose larger safe values based on Delta_plaq
@@ -19,34 +21,10 @@ Parameters:
     at which to do them.
 
 Output:
-  WFLOW  t  plaq  E  t^2*E  t*d(t^2*E)/dt  12t^2*(3-plaq)  top.charge  t^2*E_ss  t^2*E_st
+  [WS]FLOW  t  plaq  E  t^2*E  t*d(t^2*E)/dt  12t^2*(3-plaq)  top.charge  t^2*E_ss  t^2*E_st
   E and the topological charge are calculated from the clover term
   The alternative based on the plaquette should approach t^2*E for t>~1
 
-  Wilson flow time t prepended to MCRG-blocked output
+  Flow time t prepended to MCRG-blocked output
 
-Sample input file:
-+++
-prompt 0
-nx 4
-ny 4
-nz 4
-nt 4
-
-start_eps 0.01
-max_eps 0.1
-tmax 0.3
-
-alpha_hyp0 0.6
-alpha_hyp1 0.2
-alpha_hyp2 0.2
-
-num_block 5
-tblock 0
-tblock 0.1
-tblock 0.15
-tblock 0.2
-tblock 0.3
-
-reload_serial tests/c44.d
-forget
+See ../testsuite/in.Wflow and ../testsuite/in.Sflow for sample input files

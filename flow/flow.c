@@ -1,9 +1,9 @@
 // -----------------------------------------------------------------
-// Run Wilson flow with adaptive step sizes
+// Run Wilson or Symanzik flow with adaptive step sizes
 // Just need to pass through fields used by integrator
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
-void wflow() {
+void flow() {
   register int i;
   register site *s;
   int j, istep, block_count = 0, blmax = 0;

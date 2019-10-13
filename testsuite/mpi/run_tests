@@ -1,16 +1,17 @@
 #!/bin/bash
 # This script needs to be run from the testsuite/mpi directory
 
-# Customization for the HET cluster at the University of Colorado
+# May need to be customized for different platforms
 makefile=Make_mpi
-run="/usr/local/mpich2-1.4.1p1/bin/mpirun -np 2"
+run="mpirun -np 2"
 
 # Require user to specify both directory and target
 if [ $# -lt 2 ]; then
   echo "Try these:"
   echo "./run_tests KS_nHYP_FA hmc"
   echo "./run_tests KS_nHYP_FA hmc_APBC"
-  echo "./run_tests wilson_flow Wflow"
+  echo "./run_tests flow flow Wflow"
+  echo "./run_tests flow flow Sflow"
   echo "./run_tests ks_vacpol vacpol && rm -f ../*TEST"
   echo "./run_tests mcrg_blocking mcrg"
   echo "./run_tests S4b_params S4b"
@@ -20,8 +21,14 @@ if [ $# -lt 2 ]; then
   exit 0
 fi
 
+# Most targets only have one infile, with the same name as the target itself
 dir=$1
 target=$2
+if [ $# -lt 3 ]; then
+  infile=$2
+else
+  infile=$3
+fi
 
 # Compile
 cd ../../$dir/
@@ -34,15 +41,15 @@ fi
 
 # Run
 cd ../testsuite/
-rm -f mpi/$target.out
+rm -f mpi/$infile.out
 echo "Running su3_$target..."
-$run ../$dir/su3_$target < in.$target > mpi/$target.out
+$run ../$dir/su3_$target < in.$infile > mpi/$infile.out
 
 # Check
 cd mpi/
-d="`diff -I'Time' -I'time' -I'seconds' -I'secs' -I'^start' -I'^exit:' $target.ref $target.out`"
+d="`diff -I'Time' -I'time' -I'seconds' -I'secs' -I'^start' -I'^exit:' $infile.ref $infile.out`"
 if [ -n "$d" ] ; then   # Non-zero string length
-  echo "$target.ref and $target.out differ:"
+  echo "$infile.ref and $infile.out differ:"
   echo "$d"
 else
   echo "PASS: su3_$target reproduces reference output"

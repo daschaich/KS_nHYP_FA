@@ -3,7 +3,7 @@
 // Use general_gathers; lattice must be divisible by 2^block in all dirs
 // Input "block" reports how many times lattice has been blocked
 // Use tempmat for temporary storage
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
 complex blocked_ploop(int block, int dir) {
   register int i, k;

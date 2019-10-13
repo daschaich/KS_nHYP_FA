@@ -94,10 +94,11 @@ EXTERN char **gen_pt[N_POINTERS];
 // Temporary fields
 EXTERN matrix *tempmat, *tempmat2;
 
-// Wilson flow stuff
+// Wilson and Symanzik flow stuff
 EXTERN Real tmax, start_eps, max_eps, epsilon;
 EXTERN matrix *S[NDIMS];
 EXTERN anti_hermitmat *A[NDIMS];
+EXTERN int flowflag;    // Specify Wilson vs. Symanzik flow
 
 // MCRG blocking stuff
 EXTERN Real alpha_smear[3];

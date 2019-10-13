@@ -6,7 +6,8 @@ if [ $# -lt 2 ]; then
   echo "Try these:"
   echo "./run_tests KS_nHYP_FA hmc"
   echo "./run_tests KS_nHYP_FA hmc_APBC"
-  echo "./run_tests wilson_flow Wflow"
+  echo "./run_tests flow flow Wflow"
+  echo "./run_tests flow flow Sflow"
   echo "./run_tests ks_vacpol vacpol && rm -f ../*TEST"
   echo "./run_tests mcrg_blocking mcrg"
   echo "./run_tests S4b_params S4b"
@@ -16,8 +17,14 @@ if [ $# -lt 2 ]; then
   exit 0
 fi
 
+# Most targets only have one infile, with the same name as the target itself
 dir=$1
 target=$2
+if [ $# -lt 3 ]; then
+  infile=$2
+else
+  infile=$3
+fi
 
 # Compile
 cd ../../$dir/
@@ -30,15 +37,15 @@ fi
 
 # Run
 cd ../testsuite/
-rm -f scalar/$target.out
+rm -f scalar/$infile.out
 echo "Running su3_$target..."
-../$dir/su3_$target < in.$target > scalar/$target.out
+../$dir/su3_$target < in.$infile > scalar/$infile.out
 
 # Check
 cd scalar/
-d="`diff -I'Time' -I'time' -I'seconds' -I'secs' -I'^start' -I'^exit:' $target.ref $target.out`"
+d="`diff -I'Time' -I'time' -I'seconds' -I'secs' -I'^start' -I'^exit:' $infile.ref $infile.out`"
 if [ -n "$d" ] ; then   # Non-zero string length
-  echo "$target.ref and $target.out differ:"
+  echo "$infile.ref and $infile.out differ:"
   echo "$d"
 else
   echo "PASS: su3_$target reproduces reference output"

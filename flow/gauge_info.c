@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Application-dependent routine for writing gauge info file
-// For Wilson flow
+// For Wilson or Symanzik flow
 
 // This file is an ASCII companion to the gauge configuration file
 // and contains information about the action used to generate it.
@@ -11,7 +11,7 @@
 // where n is an integer.
 //
 // Possible keywords are listed in io_lat.h
-#include "wflow_includes.h"
+#include "flow_includes.h"
 // -----------------------------------------------------------------
 
 

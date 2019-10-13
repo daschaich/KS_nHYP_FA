@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // Runge--Kutta integrator for infinitesimal smearing
-#include "wflow_includes.h"
+#include "flow_includes.h"
 // -----------------------------------------------------------------
 
 

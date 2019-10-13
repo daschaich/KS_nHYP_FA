@@ -2,7 +2,7 @@
 // Specialized nHYP smearing for MCRG-blocked measurements
 // Handles "neighboring" sites separated by 2^block links
 // Use tempmat2 for temporary storage
-#include "wflow_includes.h"
+#include "flow_includes.h"
 // -----------------------------------------------------------------
 
 

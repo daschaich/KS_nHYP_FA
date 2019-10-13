@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------
 // An arbitrary path walker using ordinary gathers
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
 // Put result in tempmat2
 // Use tempmat for temporary storage

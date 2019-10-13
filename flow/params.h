@@ -12,7 +12,8 @@ typedef struct {
   char startfile[MAXFILENAME], savefile[MAXFILENAME];
   char stringLFN[MAXFILENAME];  // ILDG LFN if applicable
 
-  // Wilson flow and MCRG blocking parameters
+  // Wilson/Symanzik flow and MCRG blocking parameters
+  int flowflag;           // Which flow to use (wilson or symanzik)
   int num_block;
   Real start_eps, max_eps;
   Real tmax, alpha_hyp0, alpha_hyp1, alpha_hyp2, tblock[100];

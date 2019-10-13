@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------
 // Measure MCRG-blocked observables after flowing for time t
 // Prepend flow time to output
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
 void mcrg_block(Real t, int blmax) {
   register int i, dir;

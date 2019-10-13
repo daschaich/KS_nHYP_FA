@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------
-// SU(3) Wilson flow setup
+// SU(3) Wilson and Symanzik flow setup
 #include <string.h>
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
 #define IF_OK if (status == 0)
 
@@ -18,7 +18,7 @@ int initial_set() {
   int prompt = 0, status = 0;
   if (mynode() == 0) {
     // Print banner
-    printf("Wilson flow with optional MCRG blocking\n");
+    printf("SU(3) flow with optional MCRG blocking\n");
     printf("Machine = %s, with %d nodes\n", machine_type(), numnodes());
     time_stamp("start");
 
@@ -66,7 +66,7 @@ int setup() {
   make_lattice();
   // Set up neighbor pointers and comlink structures
   make_nn_gathers();
-  // Allocate temporary fields and Wilson flow stuff
+  // Allocate temporary fields and Wilson/Symanzik flow stuff
   FIELD_ALLOC(tempmat, matrix);
   FIELD_ALLOC(tempmat2, matrix);
   FIELD_ALLOC_VEC(S, matrix, NDIMS);
@@ -79,7 +79,42 @@ int setup() {
 
 
 // -----------------------------------------------------------------
-// Read in parameters for SU(3) Wilson flow measurements
+// Find out what flow to use
+int ask_flow_type(FILE *fp, int prompt, int *flag) {
+  int status = 0;
+  char savebuf[256];
+
+  if (prompt != 0)
+    printf("enter 'wilson' or 'symanzik'\n");
+  status = fscanf(fp, "%s", savebuf);
+  if (status == EOF) {
+    printf("ask_flow_type: EOF on STDIN\n");
+    return 1;
+  }
+  if (status != 1) {
+    printf("\nask_flow_type: ERROR IN INPUT: ");
+    printf("can't read flow choice\n");
+    return 1;
+  }
+
+  printf("%s\n", savebuf);
+  if (strcmp("wilson", savebuf) == 0)
+    *flag = WILSON;
+  else if (strcmp("symanzik", savebuf) == 0)
+    *flag = SYMANZIK;
+  else {
+    printf("Error in input: invalid flow type\n");
+    printf("Only 'wilson' and 'symanzik' supported\n");
+    return 1;
+  }
+  return 0;
+}
+// -----------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------
+// Read in parameters for SU(3) Wilson or Symanzik flow measurements
 // prompt=1 indicates prompts are to be given for input
 int readin(int prompt) {
   int status, i;
@@ -89,7 +124,8 @@ int readin(int prompt) {
     printf("\n\n");
     status = 0;
 
-    // Wilson flow parameters
+    // Flow parameters
+    IF_OK status += ask_flow_type(stdin, prompt, &par_buf.flowflag);
     IF_OK status += get_f(stdin, prompt, "start_eps", &par_buf.start_eps);
     IF_OK status += get_f(stdin, prompt, "max_eps", &par_buf.max_eps);
     if (par_buf.start_eps == 0) {
@@ -160,6 +196,17 @@ int readin(int prompt) {
   alpha_smear[1] = par_buf.alpha_hyp1;
   alpha_smear[2] = par_buf.alpha_hyp2;
 
+  flowflag = par_buf.flowflag;
+  if (flowflag == WILSON) {
+    node0_printf("Running Wilson flow\n");
+  }         // Braces suppress compiler complaint
+  else if (flowflag == SYMANZIK) {
+    node0_printf("Running Symanzik flow\n");
+  }         // Braces suppress compiler complaint
+  else {    // This should have been caught above
+    node0_printf("Error: Unrecognized flow type %d, aborting\n", flowflag);
+    terminate(1);
+  }
   startflag = par_buf.startflag;
   saveflag = par_buf.saveflag;
   strcpy(startfile, par_buf.startfile);

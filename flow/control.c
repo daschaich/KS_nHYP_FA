@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------
-// Main procedure for Wilson flow
+// Main procedure for Wilson and Symanzik flow
 #define CONTROL
-#include "wflow_includes.h"
+#include "flow_includes.h"
 
 int main(int argc, char *argv[])  {
   int prompt;
@@ -25,9 +25,9 @@ int main(int argc, char *argv[])  {
   if (num_block > 0)
     make_loop_table();
 
-  // Run Wilson flow!
+  // Run Wilson or Symanzik flow!
   // Adaptive step size stuff all handled in this routine
-  wflow(S, A);
+  flow(S, A);
 
   node0_printf("RUNNING COMPLETED\n");
   dtime += dclock();

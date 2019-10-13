@@ -4,7 +4,7 @@ ny 4
 nz 4
 nt 4
 
-wilson
+symanzik
 start_eps 0.01
 max_eps 0.1
 tmax 0.5

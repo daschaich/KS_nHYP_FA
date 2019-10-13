@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Include files for SU(3) Wilson flow measurements
+// Include files for SU(3) Wilson and Symanzik flow measurements
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>             // For strlen
@@ -23,7 +23,7 @@
 // Prototypes for functions in high level code
 int setup();
 int readin(int prompt);
-void wflow();
+void flow();
 void stout_step_rk();
 void staple(matrix *stp[NDIMS]);
 

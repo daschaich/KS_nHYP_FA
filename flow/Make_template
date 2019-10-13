@@ -1,11 +1,11 @@
-# SU(3) Wilson flow measurements with optional MCRG blocking
+# SU(3) Wilson and Symanzik flow measurements with optional MCRG blocking
 # Generic make-include file
 # This template file defines rules and macros common to all architectures
 # It is intended to be an include file for other Makefiles
 # Don't use it by itself!
 
 # Targets:
-#   su3_Wflow
+#   su3_flow
 
 # Features:
 #   nHYP smearing (handles "neighboring" sites separated by 2^block links)
@@ -28,14 +28,14 @@ GLOBAL_HEADERS = ${INCLUDEDIR}/config.h       \
 MY_HEADERS = lattice.h \
              params.h  \
              defines.h \
-             wflow_includes.h
+             flow_includes.h
 
 HEADERS = ${GLOBAL_HEADERS} ${MY_HEADERS}
 
 # All required object files
 # Basic set from current directory
 MY_OBJECTS = control.o         \
-             wflow.o           \
+             flow.o            \
              setup.o           \
              gauge_info.o      \
              staple.o          \
@@ -132,7 +132,7 @@ endif
 DARCH = ${DHAVE_QMP} ${DHAVE_QIO} ${DHAVE_QDP} ${DHAVE_QOP}
 
 ##### Targets:
-su3_Wflow::
+su3_flow::
 	${MAKE} -f ${MAKEFILE} target "MYTARGET= $@"
 
 clean:
