@@ -88,12 +88,12 @@ EXTERN site *lattice;
 
 // Vectors for addressing
 // Generic pointers, for gather routines
-#define N_POINTERS 8   // Needed by ../generic/make_lattice.c
+#define N_POINTERS 9   // Needed by Symanzik flow
 EXTERN char **gen_pt[N_POINTERS];
 
 // Temporary fields
 // tempsym will only be malloc'd for Symanzik flow 2-hop staples
-#define N_TEMPSYM 5   // Needed by ../generic/make_lattice.c
+#define N_TEMPSYM 5
 EXTERN matrix *tempmat, *tempmat2, *tempsym[N_TEMPSYM];
 
 // Wilson and Symanzik flow stuff
