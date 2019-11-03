@@ -118,13 +118,33 @@ void flow() {
         interp_plaq = 3.0 - check / (12.0 * interp_t * interp_t);
 
         interp_topo = old_topo + Delta_t * slope_topo;
-        node0_printf("WFLOW %g %g %g %g %g %g %g %g %g (interp)\n",
+        if (flowflag == WILSON) {
+          node0_printf("WFLOW ");
+        }         // Braces suppress compiler complaint
+        else if (flowflag == SYMANZIK) {
+          node0_printf("SFLOW ");
+        }         // Braces suppress compiler complaint
+        else {    // This should have been caught by setup.c
+          node0_printf("Error: Unrecognized flow type %d, aborting\n", flowflag);
+          terminate(1);
+        }
+        node0_printf("%g %g %g %g %g %g %g %g %g (interp)\n",
                      interp_t, interp_plaq, interp_E, interp_tSqE,
                      interp_der, interp_check, interp_topo,
                      interp_Ess, interp_Est);
       }
     }
-    node0_printf("WFLOW %g %g %g %g %g %g %g %g %g\n",
+    if (flowflag == WILSON) {
+      node0_printf("WFLOW ");
+    }         // Braces suppress compiler complaint
+    else if (flowflag == SYMANZIK) {
+      node0_printf("SFLOW ");
+    }         // Braces suppress compiler complaint
+    else {    // This should have been caught by setup.c
+      node0_printf("Error: Unrecognized flow type %d, aborting\n", flowflag);
+      terminate(1);
+    }
+    node0_printf("%g %g %g %g %g %g %g %g %g\n",
                  t, plaq, E, tSqE, der_tSqE, check, topo, E_ss, E_st);
 
     // Do MCRG blocking at specified t
