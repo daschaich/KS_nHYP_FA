@@ -8,13 +8,14 @@ void wflow() {
   register site *s;
   int j, istep, block_count = 0, blmax = 0;
   int max_scale, eps_scale = 1, N_base = 0;     // All three always positive
-  double t = 0.0, E = 0.0, E_ss = 0.0, E_st = 0.0, tSqE = 0.0, der_tSqE;
+  double t = 0.0, E = 0.0, E_ss = 0.0, E_st = 0.0;
+  double tSqE_ss = 0.0, tSqE_st = 0.0, tSqE = 0.0, der_tSqE;
   double ssplaq, stplaq, plaq = 0, old_plaq, baseline = 0.0;
-  double check, old_check, topo, old_topo;
-  double old_Ess, old_Est, old_tSqE, slope_Ess, slope_Est;
-  double slope_tSqE, slope_check, slope_topo, prev_tSqE;
+  double check, old_check, slope_check, topo, old_topo, slope_topo;
+  double old_E, old_tSqEss, old_tSqEst, old_tSqE, prev_tSqE;
+  double slope_E, slope_tSqEss, slope_tSqEst, slope_tSqE;
   double Delta_t, interp_t, interp_plaq;
-  double interp_Ess, interp_Est, interp_E, interp_tSqE;
+  double interp_E, interp_tSqEss, interp_tSqEst, interp_tSqE;
   double interp_check, interp_topo, interp_der;
 
   // Determine maximum number of blockings from smallest dimension
@@ -47,8 +48,9 @@ void wflow() {
 
     // Save previous data for slope and interpolation
     // old_plaq is only used for adjusting step size below
-    old_Ess = E_ss;
-    old_Est = E_st;
+    old_E = E;
+    old_tSqEss = tSqE_ss;
+    old_tSqEst = tSqE_st;
     old_tSqE = tSqE;
     old_check = check;
     old_topo = topo;
@@ -72,9 +74,9 @@ void wflow() {
 
     // Normalization factor of 1/8 for each F_munu
     E = (E_ss + E_st) / (volume * 64.0);
-    E_ss *= t * t / (volume * 64.0);
-    E_st *= t * t / (volume * 64.0);
-    tSqE = E_ss + E_st;
+    tSqE_ss = E_ss * t * t / (volume * 64.0);
+    tSqE_st = E_st * t * t / (volume * 64.0);
+    tSqE = tSqE_ss + tSqE_st;
     der_tSqE = fabs(t) * (tSqE - old_tSqE) / fabs(epsilon);
     // Any negative signs in t and epsilon should cancel out anyway...
 
@@ -96,9 +98,11 @@ void wflow() {
 
     // If necessary, interpolate from previous t-eps to current t
     // before printing out results computed above
+    // Separate tSqE = tSqEss + tSqEst can provide consistency check
     if (eps_scale > 1) {
-      slope_Ess = (E_ss - old_Ess) / epsilon;
-      slope_Est = (E_st - old_Est) / epsilon;
+      slope_E = (E - old_E) / epsilon;
+      slope_tSqEss = (tSqE_ss - old_tSqEss) / epsilon;
+      slope_tSqEst = (tSqE_st - old_tSqEst) / epsilon;
       slope_tSqE = (tSqE - old_tSqE) / epsilon;
       slope_check = (check - old_check) / epsilon;
       slope_topo = (topo - old_topo) / epsilon;
@@ -107,9 +111,9 @@ void wflow() {
       for (j = 0; j < eps_scale - 1; j++) {
         interp_t += start_eps;
         Delta_t = (j + 1) * start_eps;
-        interp_Ess = old_Ess + Delta_t * slope_Ess;
-        interp_Est = old_Est + Delta_t * slope_Est;
-        interp_E = interp_Ess + interp_Est;
+        interp_E = old_E + Delta_t * slope_E;
+        interp_tSqEss = old_tSqEss + Delta_t * slope_tSqEss;
+        interp_tSqEst = old_tSqEst + Delta_t * slope_tSqEst;
         interp_tSqE = old_tSqE + Delta_t * slope_tSqE;
         interp_der = interp_t * (interp_tSqE - prev_tSqE) / start_eps;
         prev_tSqE = interp_tSqE;
@@ -121,11 +125,11 @@ void wflow() {
         node0_printf("WFLOW %g %g %g %g %g %g %g %g %g (interp)\n",
                      interp_t, interp_plaq, interp_E, interp_tSqE,
                      interp_der, interp_check, interp_topo,
-                     interp_Ess, interp_Est);
+                     interp_tSqEss, interp_tSqEst);
       }
     }
     node0_printf("WFLOW %g %g %g %g %g %g %g %g %g\n",
-                 t, plaq, E, tSqE, der_tSqE, check, topo, E_ss, E_st);
+                 t, plaq, E, tSqE, der_tSqE, check, topo, tSqE_ss, tSqE_st);
 
     // Do MCRG blocking at specified t
     // Use start_eps rather than epsilon to get more accurate targeting
