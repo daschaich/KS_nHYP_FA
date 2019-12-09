@@ -7,7 +7,7 @@ nt 4
 wilson
 start_eps 0.01
 max_eps 0.1
-tmax 0.5
+tmax 10.5
 
 alpha_hyp0 0.6
 alpha_hyp1 0.2
