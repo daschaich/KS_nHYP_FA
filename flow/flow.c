@@ -10,11 +10,11 @@ void flow() {
   int max_scale, eps_scale = 1, N_base = 0;     // All three always positive
   double t = 0.0, E = 0.0, E_ss = 0.0, E_st = 0.0;
   double tSqE_ss = 0.0, tSqE_st = 0.0, tSqE = 0.0, der_tSqE;
-  double ssplaq, stplaq, plaq = 0, old_plaq, baseline = 0.0;
+  double ssplaq, stplaq, plaq = 0.0, old_plaq, baseline = 0.0;
   double check, old_check, slope_check, topo, old_topo, slope_topo;
   double old_E, old_tSqEss, old_tSqEst, old_tSqE, prev_tSqE;
   double slope_E, slope_tSqEss, slope_tSqEst, slope_tSqE;
-  double Delta_t, interp_t, interp_plaq;
+  double Delta_t, interp_t, interp_plaq, slope_plaq;
   double interp_E, interp_tSqEss, interp_tSqEst, interp_tSqE;
   double interp_check, interp_topo, interp_der;
 
@@ -47,14 +47,13 @@ void flow() {
     make_field_strength(F_OFFSET(link), F_OFFSET(FS));
 
     // Save previous data for slope and interpolation
-    // old_plaq is only used for adjusting step size below
     old_E = E;
     old_tSqEss = tSqE_ss;
     old_tSqEst = tSqE_st;
     old_tSqE = tSqE;
+    old_plaq = plaq;
     old_check = check;
     old_topo = topo;
-    old_plaq = plaq;
 
     // Compute t^2 E and its slope
     // Accumulate space--space and space--time separately for anisotropy
@@ -104,6 +103,7 @@ void flow() {
       slope_tSqEss = (tSqE_ss - old_tSqEss) / epsilon;
       slope_tSqEst = (tSqE_st - old_tSqEst) / epsilon;
       slope_tSqE = (tSqE - old_tSqE) / epsilon;
+      slope_plaq = (plaq - old_plaq) / epsilon;
       slope_check = (check - old_check) / epsilon;
       slope_topo = (topo - old_topo) / epsilon;
       prev_tSqE = old_tSqE;   // For interpolating the derivative
@@ -119,7 +119,7 @@ void flow() {
         prev_tSqE = interp_tSqE;
 
         interp_check = old_check + Delta_t * slope_check;
-        interp_plaq = 3.0 - check / (12.0 * interp_t * interp_t);
+        interp_plaq = old_plaq + Delta_t * slope_plaq;
 
         interp_topo = old_topo + Delta_t * slope_topo;
         if (flowflag == WILSON) {
@@ -185,24 +185,19 @@ void flow() {
       eps_scale = (int)floor(baseline / ((plaq - old_plaq) * start_eps));
       if (fabs(eps_scale) > fabs(max_scale))
         eps_scale = max_scale;
-      epsilon = eps_scale * start_eps;
 
       // Make sure we don't overshoot tmax or next tblock
       // This can probably be made more elegant
-      // Need to make sure epsilon never becomes zero
-      if (fabs(t + epsilon) > fabs(tmax)) {
+      if (fabs(t + epsilon) > fabs(tmax))
         eps_scale = (int)floor((tmax - t) / start_eps);
-        if (eps_scale < 1)
-          eps_scale = 1;
-        epsilon = eps_scale * start_eps;
-      }
       else if (block_count < num_block
-               && fabs(t + epsilon) > fabs(tblock[block_count])) {
+               && fabs(t + epsilon) > fabs(tblock[block_count]))
         eps_scale = (int)floor((tblock[block_count] - t) / start_eps);
-        if (eps_scale < 1)
-          eps_scale = 1;
-        epsilon = eps_scale * start_eps;
-      }
+
+      // No matter what, don't want epsilon < start_eps...
+      if (eps_scale < 1)
+        eps_scale = 1;
+      epsilon = eps_scale * start_eps;
     }
   }
 }
