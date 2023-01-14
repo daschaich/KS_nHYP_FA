@@ -1,1 +1,1 @@
-../wilson_flow/loop_table.c
+../flow/loop_table.c
