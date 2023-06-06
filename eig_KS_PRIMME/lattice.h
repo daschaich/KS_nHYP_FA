@@ -40,6 +40,7 @@ typedef struct {
   vector chi;         // Source vector
   vector temp;        // For Matrix_Vec_mult
   vector tempvec[4];  // For dslash
+  vector ttt;         // For generic_ks/flavor_ops.c
 } site;
 // -----------------------------------------------------------------
 
@@ -109,7 +110,7 @@ EXTERN matrix *Staple1[4][4];
 EXTERN matrix *Staple2[4][4];
 EXTERN matrix *Staple3[4];
 
-EXTERN matrix *tempmat1;
+EXTERN matrix *tempmat;
 
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

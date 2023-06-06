@@ -5,7 +5,7 @@ nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Sat Aug  5 12:50:52 2017
+start: Tue Jun  6 16:40:42 2023
 
 type 0 for no prompts or 1 for prompts
 nflavors 12
@@ -34,11 +34,11 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.002294 seconds
-CHECK PLAQ: 1.9094453251406431e+00 1.8984215492349603e+00
+Time to reload gauge configuration = 0.000381 seconds
+CHECK PLAQ: 1.9094453251406434e+00 1.8984215492349603e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.00033 seconds
+Time to check unitarity = 0.00054 seconds
 GMES 1.3937999 0.038258851 0 1.9094453 1.8984215
 POLYA 1.3937999 0.038258851 1.5463969 0.010728566
 ACT 1.5784475
@@ -99,6 +99,8 @@ pbpy: mass 0.01, 43.714719 44.010516 -1.6985681 2.7051211 ( ave over 5 )
 pbpz: mass 0.01, 44.513151 41.665639 2.2409453 -1.9280205 ( ave over 5 )
 susc: -0.0040462681 1.3798883
 RUNNING COMPLETED
-Time = 0.02653 seconds
+Time = 0.02964 seconds
 total_iters = 118
+
+exit: Tue Jun  6 16:40:42 2023
 

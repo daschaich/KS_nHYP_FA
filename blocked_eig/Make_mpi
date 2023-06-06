@@ -3,7 +3,7 @@ MAKEFILE = Make_mpi
 
 MPP            = true
 PRECISION      = 2
-CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
+CC             = mpicc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
 CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
                  # Large files gcc only
@@ -14,14 +14,13 @@ WANTQDP        =
 WANTQIO        = # true
 WANTQMP        =
 
-SCIDAC         =
-QIOSNG         = # $(SCIDAC)/qio-single
+SCIDAC         = # /home/schaich/dev/install
+QIOSNG         = # $(SCIDAC)/qio
 QIOPAR         = # $(SCIDAC)/qio
-QMPSNG         = # ${SCIDAC}/qmp-single
+QMPSNG         = # ${SCIDAC}/qmp
 QMPPAR         = # ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
@@ -84,7 +83,7 @@ PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
          ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH}
 
-ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
+ILIB = ${LIBSCIDAC} ${LIBADD}
 
 check:
 	make -f Make_test check

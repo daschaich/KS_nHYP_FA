@@ -6,25 +6,7 @@
 
 
 // -----------------------------------------------------------------
-// Scalar multiply an SU3 vector in the lattice
-// Hard-code EVENANDODD parity
-void scalar_mult_latvec(field_offset src, Real scalar, field_offset dest) {
-  register int i;
-  register site *s;
-  register vector *spt, *dpt;
-
-  FORALLSITES(i, s) {
-    spt = (vector *)F_PT(s, src);
-    dpt = (vector *)F_PT(s, dest);
-    scalar_mult_vector(spt, scalar, dpt);
-  }
-}
-// -----------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------
-// Apply staggered D^dag.D = -D.D, with EVEN parity hard-coded
+// Apply staggered D^dag.D = -D.D, with parity hard-coded
 void Matrix_Vec_mult(vector *src, vector *res) {
   register site *s;
   register int i;
@@ -37,12 +19,12 @@ void Matrix_Vec_mult(vector *src, vector *res) {
   dslash(F_OFFSET(chi), F_OFFSET(temp), ODD);
   dslash(F_OFFSET(temp), F_OFFSET(psi), EVEN);
 
-  scalar_mult_latvec(F_OFFSET(psi), -1, F_OFFSET(psi));
+  scalar_mult_latvec(F_OFFSET(psi), -1.0, F_OFFSET(psi), EVENANDODD);
   FOREVENSITES(i, s)
     res[i] = s->psi;
 }
 
-// Apply just staggered D^dag, with EVEN parity hard-coded
+// Apply just staggered D^dag, with parity hard-coded
 void MatVec(vector *src, vector *res) {
   register site *s;
   register int i;
@@ -53,7 +35,7 @@ void MatVec(vector *src, vector *res) {
     clearvec(&(s->chi));
 
   dslash(F_OFFSET(chi), F_OFFSET(psi), EVEN);
-  scalar_mult_latvec(F_OFFSET(psi), -1, F_OFFSET(psi));
+  scalar_mult_latvec(F_OFFSET(psi), -1.0, F_OFFSET(psi), EVENANDODD);
   FOREVENSITES(i, s)
     res[i] = s->psi;
 }

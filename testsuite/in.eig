@@ -1,0 +1,19 @@
+prompt 0
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+
+start 0
+Nvecs 14
+block 14
+eig_tol 1e-7
+maxIter 2000
+
+reload_serial config.4444

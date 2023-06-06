@@ -1,0 +1,58 @@
+SU3 Kogut--Susskind eigenvalue calculation
+Machine = Scalar processor, with 1 nodes
+nHYP links, reading alpha_smear parameters from infile
+  IR_STAB = 1e-06
+  EPS_SQ = 1e-05
+NHYP_DEBUG turned on
+NOT checking unitarity when loading lattice
+start: Tue Jun  6 14:52:14 2023
+
+type 0 for no prompts or 1 for prompts
+nx 4
+ny 4
+nz 4
+nt 4
+iseed 41
+LAYOUT = Hypercubes, options = with fixed node_geometry
+ON EACH NODE 4 x 4 x 4 x 4
+Mallocing 0.3 MBytes per core for lattice
+Mallocing 3.6 MBytes per core for fields
+
+
+nsmear 1
+alpha_hyp0 0.5
+alpha_hyp1 0.5
+alpha_hyp2 0.4
+start 0
+Nvecs 14
+block 14
+eig_tol 1e-07
+maxIter 2000
+reload_serial config.4444
+Restored binary gauge configuration serially from file config.4444
+Time stamp Wed Dec 31 14:07:26 1997
+Checksums 38abcb08 70225d93 OK
+Time to reload gauge configuration = 0.0001869 seconds
+CHECK PLAQ: 1.9094453251406434e+00 1.8984215492349603e+00
+CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
+Plaquettes after smearing 1: 2.8036023 2.8025315
+
+EIGENVALUE 0 0.85285988
+EIGENVALUE 1 0.94121835
+EIGENVALUE 2 0.97104423
+EIGENVALUE 3 1.0291474
+EIGENVALUE 4 1.0756109
+EIGENVALUE 5 1.0977334
+EIGENVALUE 6 1.1566214
+EIGENVALUE 7 1.1897172
+EIGENVALUE 8 1.2348893
+EIGENVALUE 9 1.254875
+EIGENVALUE 10 1.2807796
+EIGENVALUE 11 1.3172939
+EIGENVALUE 12 1.3521061
+EIGENVALUE 13 1.383793
+RUNNING COMPLETED
+Time = 0.07679 seconds
+total_iters = 590
+exit: Tue Jun  6 14:52:14 2023
+

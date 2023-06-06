@@ -1,15 +1,16 @@
 #!/bin/bash
 # This script needs to be run from the testsuite/mpi directory
 
-# Customization for the HET cluster at the University of Colorado
+# May need to be customized for different platforms
 makefile=Make_mpi
-run="/usr/local/mpich2-1.4.1p1/bin/mpirun -np 2"
+run="mpirun -np 2"
 
 # Require user to specify both directory and target
 if [ $# -lt 2 ]; then
   echo "Try these:"
   echo "./run_tests KS_nHYP_FA hmc"
   echo "./run_tests KS_nHYP_FA hmc_APBC"
+  echo "./run_tests eig_KS_PRIMME eig"
   echo "./run_tests wilson_flow Wflow"
   echo "./run_tests ks_vacpol vacpol && rm -f ../*TEST"
   echo "./run_tests mcrg_blocking mcrg"

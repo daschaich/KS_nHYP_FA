@@ -6,7 +6,7 @@
 
 #include "generic_ks_includes.h"
 
-/* This is the definition of the epsilon symbol */
+// This is the definition of the epsilon symbol
 static struct {
   int d[4];
   Real sign;
@@ -38,9 +38,9 @@ static struct {
            {{3, 1, 0, 2}, 1.0},
            {{3, 2, 1, 0}, 1.0}};
 
-/* Apply the symmetric shift opperator in direction "dir" *
- * This is the explicit version                           *
- * Covariant shifts are used                              */
+// Apply the symmetric shift operator in direction "dir"
+// This is the explicit version
+// Covariant shifts are used
 void sym_shift(int dir, field_offset src, field_offset dest) {
   register int i;
   register site *s;
@@ -54,10 +54,8 @@ void sym_shift(int dir, field_offset src, field_offset dest) {
   tag[0] = start_gather_site(src, sizeof(vector), dir,
                              EVENANDODD, gen_pt[0]);
 
-  FORALLSITES(i, s) {
-    mult_adj_mat_vec(&(s->link[dir]), (vector *)F_PT(s, src),
-                         &(s->ttt));
-  }
+  FORALLSITES(i, s)
+    mult_adj_mat_vec(&(s->link[dir]), (vector *)F_PT(s, src), &(s->ttt));
 
   tag[1] = start_gather_site(F_OFFSET(ttt), sizeof(vector), OPP_DIR(dir),
                              EVENANDODD, gen_pt[1]);
@@ -65,7 +63,7 @@ void sym_shift(int dir, field_offset src, field_offset dest) {
   wait_gather(tag[0]);
   FORALLSITES(i, s) {
     mult_mat_vec(&(s->link[dir]), (vector *)gen_pt[0][i],
-                     (vector *)F_PT(s, dest));
+                 (vector *)F_PT(s, dest));
   }
   cleanup_gather(tag[0]);
 
@@ -74,11 +72,9 @@ void sym_shift(int dir, field_offset src, field_offset dest) {
     sum_vector((vector *)gen_pt[1][i], (vector *)F_PT(s, dest));
   cleanup_gather(tag[1]);
 
-  /* Now divide by 2 eq. (4.2b) of Golderman's Meson paper*/
-  FORALLSITES(i, s) {
-    scalar_mult_vector((vector *)F_PT(s, dest), 0.5,
-                           (vector *)F_PT(s, dest));
-  }
+  // Now divide by 2 (Eq. 4.2b of doi:10.1016/0550-3213(85)90138-5)
+  FORALLSITES(i, s)
+    scalar_mult_vector((vector *)F_PT(s, dest), 0.5, (vector *)F_PT(s, dest));
 }
 
 // Apply the symmetric shift with directions stored in the array d

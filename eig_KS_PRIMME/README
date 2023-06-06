@@ -24,27 +24,6 @@ Parameters:
     Example: If Nvecs=750 and block=200, the program will calculate
       0--199, 200--399, 400--599, 600--799
 
-Sample infile:
-+++
-prompt 0
-nx 4
-ny 4
-nz 4
-nt 4
-iseed 41
-
-nsmear 1
-alpha_hyp0 0.5
-alpha_hyp1 0.5
-alpha_hyp2 0.4
-
-start 0
-Nvecs 14
-block 14
-eig_tol 1e-7
-maxIter 2000
-
-reload_serial tests/c4444.d
 +++
 
 # Set path in ../PRIMME/Make_flags

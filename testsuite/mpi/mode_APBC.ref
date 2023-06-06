@@ -5,7 +5,7 @@ nHYP links, reading alpha_smear parameters from infile
   IR_STAB = 1e-06
   EPS_SQ = 1e-05
 NHYP_DEBUG turned on
-start: Sat Aug  5 13:30:24 2017
+start: Tue Jun  6 16:41:57 2023
 
 type 0 for no prompts or 1 for prompts
 nx 4
@@ -37,11 +37,11 @@ reload_serial config.4444
 Restored binary gauge configuration serially from file config.4444
 Time stamp Wed Dec 31 14:07:26 1997
 Checksums 38abcb08 70225d93 OK
-Time to reload gauge configuration = 0.002121 seconds
+Time to reload gauge configuration = 0.000612 seconds
 CHECK PLAQ: 1.9094453251406414e+00 1.8984215492349581e+00
 CHECK NERSC LINKTR: 8.8721354045749956e-01 CKSUM: 697f1d13
 Reunitarized for double precision.  Max deviation 1.4e-06 changed to 4.4e-16
-Time to check unitarity = 0.000113 seconds
+Time to check unitarity = 0.0001991 seconds
 Plaquettes after smearing 1: 2.8036023 2.8025315
 
 Step function Norder 32 epsilon 0.01 delta 0.000435 star 0.9633
@@ -76,5 +76,7 @@ NU(2.5): 111.3 ( 4 of 5 )
 NU(2.5): 109.4 ( 5 of 5 )
 nu(2.5): 101.121 5.02 ( ave over 5 )
 RUNNING COMPLETED
-Time = 0.7029 seconds
+Time = 0.6393 seconds
 total_iters = 33695
+exit: Tue Jun  6 16:41:58 2023
+

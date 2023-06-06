@@ -59,6 +59,8 @@ int main(int argc, char **argv) {
   node0_printf("Time = %.4g seconds\n", dtime);
   node0_printf("total_iters = %d\n\n", iters);
   fflush(stdout);
+  normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

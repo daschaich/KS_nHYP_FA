@@ -3,25 +3,24 @@ MAKEFILE = Make_mpi
 
 MPP            = true
 PRECISION      = 2
-CC             = /usr/local/mpich2-1.4.1p1/bin/mpicc
+CC             = mpicc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
 CLFS           = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE64
-               # Large files gcc only
-MACHINE_DEP_IO = io_ansi.o # (io_ansi.o io_nonansi.o)
+                 # Large files gcc only
+MACHINE_DEP_IO = io_ansi.o
 
 WANTQOP        =
 WANTQDP        =
-WANTQIO        = true
-WANTQMP        = true
+WANTQIO        = # true
+WANTQMP        =
 
-SCIDAC         = /nfs/beowulf03/schaich/lqcd/install
-QIOSNG         =
-QIOPAR         = $(SCIDAC)/qio
-QMPSNG         =
-QMPPAR         = ${SCIDAC}/qmp
+SCIDAC         = # /home/schaich/dev/install
+QIOSNG         = # $(SCIDAC)/qio
+QIOPAR         = # $(SCIDAC)/qio
+QMPSNG         = # ${SCIDAC}/qmp
+QMPPAR         = # ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qopqdp
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
@@ -76,9 +75,9 @@ PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}
 
 # Complete set of compiler flags - do not change
 CFLAGS = ${OPT} -D${COMMTYPE} ${CODETYPE} ${INLINEOPT} ${PREC} ${CLFS} \
-         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH} ${IMPI}
+         ${INCSCIDAC} -I${MYINCLUDEDIR} ${DEFINES} ${DARCH}
 
-ILIB = ${LIBSCIDAC} ${LMPI} ${LIBADD}
+ILIB = ${LIBSCIDAC} ${LIBADD}
 
 check:
 	make -f Make_test check

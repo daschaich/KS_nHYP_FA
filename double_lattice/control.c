@@ -83,6 +83,8 @@ int main(int argc, char *argv[])  {
     node0_printf("Time = %.4g seconds\n", dtime);
     fflush(stdout);
   } // readin(prompt) == 0
+  normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

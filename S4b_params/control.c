@@ -65,6 +65,8 @@ int main(int argc, char **argv) {
     node0_printf("total_iters = %d\n\n", avm_iters);
     fflush(stdout);
   } // readin(prompt) == 0
+  normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

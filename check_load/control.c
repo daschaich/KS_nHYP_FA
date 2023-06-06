@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
 
   // Load input and run (loop removed)
   readin(prompt);
+  normal_exit(0);
+  g_sync();         // Needed by at least some clusters
   return 0;
 }
 // -----------------------------------------------------------------

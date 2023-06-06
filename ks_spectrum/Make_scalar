@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------
 MAKEFILE = Make_scalar
 
-MPP            = true # Needed to activate SciDAC libraries
+MPP            = # true # Needed to activate SciDAC libraries
 PRECISION      = 2
 CC             = gcc
 OPT            = -O3 -DP4 -DPREFETCH -Wall -fno-strict-aliasing
@@ -11,17 +11,16 @@ MACHINE_DEP_IO = io_ansi.o
 
 WANTQOP        =
 WANTQDP        =
-WANTQIO        = true
+WANTQIO        = # true
 WANTQMP        =
 
-SCIDAC         = /home/schaich/current/lqcd/install
-QIOSNG         = # $(SCIDAC)/qio-single
-QIOPAR         = $(SCIDAC)/qio
-QMPSNG         = # ${SCIDAC}/qmp-single
-QMPPAR         = ${SCIDAC}/qmp
+SCIDAC         = # /home/schaich/dev/install
+QIOSNG         = # $(SCIDAC)/qio
+QIOPAR         = # $(SCIDAC)/qio
+QMPSNG         = # ${SCIDAC}/qmp
+QMPPAR         = # ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
@@ -29,7 +28,7 @@ include ../Make_template_scidac
 
 LD             = ${CC}
 LIBADD         =
-INLINEOPT      = # -DINLINE # -DSSE_GLOBAL_INLINE
+INLINEOPT      = -DSSE_GLOBAL_INLINE
 CTIME          = # -DCGTIME -DFFTIME -DLLTIME -DGFTIME -DREMAP
 CPROF          =
 CDEBUG         =
@@ -40,7 +39,7 @@ KSFFMULTI      = # -DKS_MULTIFF=FNMAT
 KSRHMCINT      =
 
 CODETYPE       = ${CTIME} ${CPROF} ${CDEBUG} \
-                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI}\
+                 ${KSCGSTORE} ${CPREFETCH} ${KSCGMULTI} \
                  ${KSFFMULTI} ${KSRHMCINT}
 
 MAKELIBRARIES  = Make_vanilla
@@ -62,20 +61,20 @@ ifeq ($(strip ${MPP}),true)
   endif
 else
   ifeq ($(strip ${HAVEQMP}),true)
-     COMMTYPE = SINGLE
-     COMMPKG = com_qmp.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_qmp.o
   else
-     COMMTYPE = SINGLE
-     COMMPKG = com_vanilla.o
+    COMMTYPE = SINGLE
+    COMMPKG = com_vanilla.o
   endif
 endif
 
 ifeq ($(strip ${HAVEQDP}),true)
-  QDPPREC = -DQDP_Precision=${PRECISION}
+  QDPPREC = -DQDP_PrecisionInt=${PRECISION}
 endif
 
 ifeq ($(strip ${HAVEQOP}),true)
-  QOPPREC = -DQOP_Precision=${PRECISION}
+  QOPPREC = -DQOP_PrecisionInt=${PRECISION}
 endif
 
 PREC = -DPRECISION=${PRECISION} ${QDPPREC} ${QOPPREC}

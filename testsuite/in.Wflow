@@ -13,11 +13,11 @@ alpha_hyp1 0.2
 alpha_hyp2 0.2
 num_block 6
 tblock 0
-tblock 0.1
-tblock 0.2
-tblock 0.3
-tblock 0.4
-tblock 0.5
+tblock 2.1
+tblock 4.2
+tblock 6.3
+tblock 8.4
+tblock 10.5
 
 reload_serial config.4444
 forget

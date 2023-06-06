@@ -14,14 +14,13 @@ WANTQDP        =
 WANTQIO        = # true
 WANTQMP        =
 
-SCIDAC         = # /home/schaich/current/lqcd/install
+SCIDAC         = # /home/schaich/dev/install
 QIOSNG         = # $(SCIDAC)/qio
 QIOPAR         = # $(SCIDAC)/qio
 QMPSNG         = # ${SCIDAC}/qmp
 QMPPAR         = # ${SCIDAC}/qmp
 QDP            = # ${SCIDAC}/qdp
 QLA            = # ${SCIDAC}/qla
-QOP            = # ${SCIDAC}/qop
 QOPQDP         = # ${SCIDAC}/qopqdp
 
 include ../Make_template_qop
