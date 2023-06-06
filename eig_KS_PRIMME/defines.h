@@ -7,7 +7,7 @@
 #define SITERAND
 
 // Don't check unitarity for blocked lattices
-#define NO_UNIT_CHECK
+//#define NO_UNIT_CHECK
 // -----------------------------------------------------------------
 
 
