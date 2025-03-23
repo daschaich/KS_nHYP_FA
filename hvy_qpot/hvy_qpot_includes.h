@@ -22,6 +22,7 @@
 // Prototypes for functions in high level code
 int setup();
 int readin(int prompt);
+void ax_gauge();
 
 // Currently fixing tot_smear=1, but allows some cheap flexibility
 void w_loop1(int tot_smear);
