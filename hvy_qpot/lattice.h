@@ -81,6 +81,6 @@ EXTERN matrix *Staple1[4][4];
 EXTERN matrix *Staple2[4][4];
 EXTERN matrix *Staple3[4];
 
-EXTERN matrix *tempmat1;
+EXTERN matrix *tempmat;
 #endif // _LATTICE_H
 // -----------------------------------------------------------------

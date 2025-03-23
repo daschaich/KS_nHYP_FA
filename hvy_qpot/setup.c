@@ -144,7 +144,7 @@ void make_fields() {
   FIELD_ALLOC_MAT_OFFDIAG(Staple1, matrix, 4);
   FIELD_ALLOC_MAT_OFFDIAG(Staple2, matrix, 4);
 
-  FIELD_ALLOC(tempmat1, matrix);
+  FIELD_ALLOC(tempmat, matrix);
   FIELD_ALLOC_VEC(Staple3, matrix, 4);
 
   node0_printf("Mallocing %.1f MBytes per core for fields\n",
